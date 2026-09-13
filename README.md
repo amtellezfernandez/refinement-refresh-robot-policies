@@ -1,4 +1,4 @@
-# Proposal 2: Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies
+# Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies
 
 The [submitted workshop version](submissions/robopad_2026_20260913/README.md)
 is archived separately. `main.tex` and `output/` are the continuing development
