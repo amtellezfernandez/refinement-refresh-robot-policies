@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 for directory in (ROOT, ROOT / "experiments", ROOT / "experiments/real_smolvla",
-                  ROOT / "experiments/instrument_validation", ROOT / "experiments/execution"):
+                  ROOT / "experiments/instrument_validation", ROOT / "experiments/tooling"):
     sys.path.insert(0, str(directory))
 
 

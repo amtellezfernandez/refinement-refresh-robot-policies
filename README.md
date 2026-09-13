@@ -1,148 +1,104 @@
-# Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies
+# Refinement versus Refresh
 
-The [submitted workshop version](submissions/robopad_2026_20260913/README.md)
-is archived separately. `main.tex` and `output/` are the continuing development
-version. See the [NeurIPS development plan](NEURIPS_DEVELOPMENT.md) for the next
-experiments, evidence checks, and manuscript updates.
+Compute allocation for closed-loop robot policies: when should inference compute
+refine an action prediction, and when should it obtain a fresh prediction?
 
-The paper asks how a frozen robot policy should divide inference computation
-between prediction refinement and observation-conditioned refresh. It presents
-the 12-configuration SmolVLA/LIBERO study, full-generation dense-arithmetic
-calibration, paired quality/resource measurements, and allocation predictions.
-Pilot and trace-validation evidence support the methods in the appendix.
-The current manuscript has seven main-text pages, one reference page, and three
-appendix pages. Historical resource-framework materials remain in the repository
-but are not presented as empirical adaptation results.
+[Working paper](paper/working.pdf) · [Submitted version](release/submitted.pdf) ·
+[ICLR roadmap](ROADMAP.md) · [Manuscript source](paper/main.tex)
 
-The [transfer amendment](audit/TRANSFER_AMENDMENT_20260913.md) records additional
-secondary contrasts and selector baselines after collection began. Discovery-only
-diagnostics reproduce the original scores and summarize fixed-input timing; they
-do not change the active experiment or establish transfer outcomes.
+Next target: **ICLR 2027 main conference**. Priorities are targeted second-policy
+evidence and the existing observation-age diagnostic. These are planned
+extensions, not completed results. The working PDF still uses the workshop
+template; [submission notes](SUBMISSION.md) track the conversion and author tasks.
 
-Start with the [revision plan](audit/NARRATIVE_PLAN.md),
-[manuscript source](main.tex), [most recently built PDF](output/resource_optimal_post_training.pdf),
-[revision audit](audit/REVISION_AUDIT.md),
-[allocation literature notes](audit/ALLOCATION_LITERATURE.md), and
-[bounded experiment design](experiments/EXPERIMENT_DESIGN.md).
+## Current evidence
 
-The [relevance revision](audit/RELEVANCE_REVISION_20260913.md) records the current
-structure and removal of obsolete planning and unrelated conceptual material.
+One frozen SmolVLA checkpoint, evaluated on LIBERO:
 
-## Evidence and next test
+- **Discovery:** 480 attempts across 12 configurations and four Spatial tasks.
+- **Confirmation:** 1,120 unique attempts across seven configurations and eight
+  Goal/Object tasks excluded from selection. All originally planned identities
+  are complete; two repeated records are excluded.
+- **Primary result:** at a two-action prefix, two denoising steps achieve
+  139/160 successes versus 122/160 for five steps. The paired difference is
+  +10.6 percentage points, with a descriptive, task-conditional 95% interval
+  of [+4.4, +16.9].
+- **Allocation question:** the five-action, two-denoising-step setting achieves
+  138/160 successes at 16.1 TFLOPs per attempt, versus 41.1 for the two-action
+  setting. Their quality difference remains unresolved; this is not an
+  equivalence or non-inferiority result.
+- **Selector limitation:** the fitted model and a simple cost-aware rule select
+  the same settings at all three tested ceilings.
 
-The September 13 manuscript snapshot adds the completed **480-attempt discovery
-study**: four Spatial tasks, five states, two seeds, and twelve `(h,d)` settings.
-All 87,364 dispatched actions reconcile with the episode records. Dense neural
-arithmetic calibration measures 641.675 GFLOPs per native generation, with 82.1%
-independent of denoising. The paper states excluded operations and sampled GPU
-monitoring limits explicitly. Complete discovery records and generated tables,
-figure, and audit are under
-`experiments/executed/refinement_refresh_final_001/`.
+These are 1,600 attempts across the two main studies; the earlier 80-attempt
+pilot is separate. Arithmetic is reference-calibrated, not a complete scalar
+operation count or a latency measurement. The separate stale-input diagnostic
+has 20/40 successes with five-tick input refresh versus 28/40 matched fresh
+inputs, a descriptive paired difference of -20.0 points with interval
+[-32.5, -7.5]. Its journals lack per-tick supplied-input hashes and observation
+ages, so it does not isolate every implementation detail.
 
-The frozen recommendations are `(5,2)`, `(2,2)`, and `(1,2)` at quarter, half,
-and full native compute-rate ceilings. The primary half-budget comparison is
-complete on eight transfer tasks: `(2,2)` records 139/160 successes versus
-122/160 for `(2,5)`, with descriptive paired interval [+4.4,+16.9] percentage
-points. Secondary confirmation settings and the stale-input diagnostic remain
-unfinished and are not claimed in the paper.
+The working paper retains the allocation framework and reports all three frozen
+comparisons, the amended descriptive comparisons, task-level counts, resource
+costs, and collection provenance. Its flow is allocation and fixed cost,
+controlled study, refinement results, then descriptive refresh results;
+extended fitting and measurement diagnostics are in the appendices. See the
+[revision audit](review/REVISION_AUDIT.md) for verification and limitations.
 
-- The archive illustrates a cost-proxy ambiguity: three runs each record 19
-  generations but different host inference time totals. This is a retrospective
-  observation, not a replicated solver comparison.
-- Offline reconciliation covers 28 completed archived artifacts (22 v1, four v2,
-  two v3), including exact replay of 86 recorded actions in one repeated v2 run.
-- The frozen mutation suite comprises 68 constructed trials / 272 checks.
-  Structural checks reject 12/52 observable defects, aggregate checks 28/52,
-  and full execution trace verification 52/52; all accept four controls. Twelve probes
-  remain technically accepted but their requested claims need external evidence.
-  This tests specified mechanisms, not natural error rates.
-- The original hypothetical adaptation example keeps correction labor, training
-  GPU-hours, and deployment seconds separate. A has lower values on both time
-  measures; B uses less labor. It supports no crossover or aggregate GPU-time
-  claim. Deployment totals of 120/135 seconds refer to 100 attempts.
+## Repository map
 
-The executed 80-attempt pilot compares prediction refinement and execution-prefix
-length. It uses
-two fixed Spatial tasks, five initial states, two policy seeds, and four `(h,d)`
-conditions. A one-action prefix achieves higher success at both denoising levels
-on this set. The principal `(5,5)` work reduction lowers success by 25 percentage
-points relative to native `(1,10)`; halving denoising at `h=1` leaves the quality
-difference unresolved. Concurrent GPU use excludes elapsed timings from clean
-efficiency claims. The 320-attempt broader plan and a matched-cost comparison
-remain unexecuted confirmation designs.
-Those earlier designs are distinct from the new completed discovery and ongoing
-confirmation campaign described above.
+| Location | Purpose |
+| --- | --- |
+| `paper/` | Active manuscript, bibliography, and generated publication assets |
+| `paper/` | Canonical manuscript source, bibliography, generated assets, and working PDF |
+| `release/` | Frozen submitted PDF, supplement, checksums, and dated archive |
+| `experiments/tooling/` | Evaluation runners, analysis tools, offline tests |
+| `experiments/runs/` | Recorded experiments and reproducible derived evidence |
+| `experiments/remote/` | Historical remote-status snapshots, not a live dashboard |
+| `review/` | Evidence checks and protocol amendments |
+| `review/archive/` | Superseded editorial notes |
+| `output/` | Supplementary deliverables |
 
-Trace v0.2 supports structure and declared-resource completeness checks. It cannot
-infer omitted events or independently verify measurements. Generic traces and
-deployment execution traces are separate formats; an integrated lifecycle recorder remains
-future work. Historical resource-disclosure labels remain unverified.
+Historical trace and instrument-validation materials remain under
+`experiments/real_smolvla/`, `experiments/instrument_validation/`, and
+`experiments/historical_temporal_reuse/`. They are not new deployment results.
 
-## Artifacts
+## Reproduce and build
 
-- `main.tex`, `references.bib`, `output/resource_optimal_post_training.pdf`: paper.
-- `RESOURCE_SCALING_PROFILE.md`: comparison-specific reporting template and
-  completed archive illustration.
-- `post_training_trace.schema.json`, `validate_trace.py`, `test_trace.py`:
-  generic trace v0.2 contract, validator and fault tests.
-- `examples/`: explicitly synthetic hybrid and frozen-deployment examples;
-  invalid update fixture. These values are not experimental results.
-- `experiments/real_smolvla/ARCHIVE_AUDIT.md` and `archive_audit.json`:
-  generated reconciliation with input digests, counters and limits.
-- `experiments/instrument_validation/`: frozen protocol, executed trial-level
-  results, generated table, and vector PDF/SVG heatmap; inputs remain unchanged.
-- `experiments/execution/`: GPU benchmark/evaluation runners, completed-run
-  analysis, and offline integrity tests.
-- `experiments/executed/`: passed development gates, complete 80-attempt paired
-  journals, runtime provenance, and reproduced paired analysis.
-- `experiments/execution/port_discovery.py`: independently reconciles completed
-  discovery journals and generates the new manuscript tables, figure, and audit;
-  run `python experiments/execution/port_discovery.py` from this paper directory.
-- `experiments/make_evaluation_plan.py`, `planned_evaluation.json`:
-  reproducible proposed schedule; availability/holdout not certified.
-- `experiments/make_pilot_plan.py`, `pilot_evaluation.json`:
-  frozen schedule used for the executed focused pilot.
-- `audit/BIBLIOGRAPHY_AUDIT.md`: 37-entry bibliography with primary-source metadata notes.
-- `audit/comparison_extraction_template.csv`: blank comparison-level extraction
-  template; `audit/pilot_audit.csv` preserves provisional legacy codes.
-- `EXPERIMENT_AUDIT.md`, `experiments/temporal_reuse/`: historical withdrawn
-  toy study and diagnostic, retained for traceability.
-
-## Validation and build
-
-Use Python 3.12+ with NumPy, jsonschema, and matplotlib. The mutation experiment
-records NumPy 2.5.3 and jsonschema 4.26.0; exact replay checks preserve those
-dependency versions in trial provenance. The optional original RNG-isolation test
-additionally needs Torch. Offline runner tests use explicit test doubles where
-appropriate; they do not invoke a learned model or GPU.
+Use Python 3.12+ with NumPy and matplotlib; the broader legacy tests also require
+jsonschema. LaTeX builds use latexmk, pdfLaTeX, and BibTeX. These commands do not
+launch model inference or remote experiments.
 
 ```bash
-python -m pip install numpy==2.5.3 jsonschema==4.26.0 matplotlib
-python verify_artifacts.py
-# Or run individual components:
-python -m unittest -v test_trace
-python validate_trace.py examples/hybrid_system_trace.json
-python validate_trace.py examples/deployment_trace.json
-python -m unittest discover -s experiments -p test_evaluation_plan.py
-python -m unittest discover -s experiments/real_smolvla -p 'test_*.py'
-python experiments/real_smolvla/audit_archive.py --check
-python experiments/instrument_validation/run_experiment.py --check
-python -m unittest discover -s experiments/execution -p 'test_*.py'
-latexmk -pdf -outdir=build main.tex
+# Replay all completed-confirmation journal checks and compare generated evidence.
+python3 experiments/tooling/analyze_confirmation.py --check
+
+# Offline runner and analysis tests.
+python3 -m unittest discover -s experiments/tooling -p 'test_*.py'
+
+# Render publication tables and vector figures from the retained reports.
+python3 experiments/tooling/render_paper_visuals.py
+python3 experiments/tooling/render_paper_visuals.py --check
+
+# Build the working manuscript; review before updating the root PDF.
+latexmk -pdf -outdir=build paper/main.tex
 ```
 
-The integrated offline verification passes: 79 tests, two Torch-dependent skips,
-28 archived results reconciled, and 68 mutation trials / 272 layer checks
-reproduced. This command does not run model inference or launch GPU experiments.
+For `analyze_confirmation.py`, omit `--check` only to regenerate the confirmation
+report and four evidence tables.
+The separate presentation renderer owns `paper/generated/`: eight tables, two
+vector figures, and a source/output hash manifest. It never refits, resamples,
+or overwrites evidence in `experiments/runs/`. Its `--check` mode regenerates
+assets in a temporary directory and compares every file, including the PDFs.
+Figures use 10-point text at final print width. The presentation tests check
+every plotted estimate and interval against the retained reports, table totals,
+and rejection of clipped or undersized figure text.
+The [run index](experiments/runs/README.md) identifies the compressed evidence
+snapshot and supporting studies. No checkpoint download or GPU is needed.
 
-The invalid fixture must return exit 1. `--require-complete` returns exit 2 for
-structurally valid traces with missing/unknown declared resource rows; ordinary
-structural validation returns 0. Completeness is relative to declared requirements,
-not proof that authors disclosed every relevant cost.
+The broader `python3 verify_artifacts.py` currently fails the legacy
+instrument-validation frozen runner-hash check. Its frozen hashes have not been
+rewritten; this limitation is separate from the passing confirmation audit.
 
-Tectonic is an alternative build: `tectonic --keep-logs --outdir build main.tex`.
-After visual review, copy `build/main.pdf` to the stable output path. The current
-13-page PDF (six main-content pages, two reference pages, five appendix pages)
-has been rebuilt and visually checked;
-see [submission notes](SUBMISSION.md)
-for workshop format and validation status.
+The submitted PDF is immutable. See [version/build notes](SUBMISSION.md) for
+its digest and [the roadmap](ROADMAP.md) for the next research steps.

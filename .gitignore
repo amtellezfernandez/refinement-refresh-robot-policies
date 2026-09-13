@@ -6,4 +6,9 @@ main.fls
 main.log
 main.out
 main.pdf
+build/
+paper/build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 tmp/

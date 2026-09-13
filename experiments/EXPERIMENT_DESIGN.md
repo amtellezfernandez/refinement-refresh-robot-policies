@@ -1,4 +1,4 @@
-# Proposal 2: refinement, refresh, and supported deployment choices
+# Experiment design
 
 Revision: 2026-09-12. **Prospective GPU design, not results or preregistration.** The
 historical toy, v1 pilot, and v2 smoke test were already observed. This design
@@ -87,7 +87,7 @@ configuration, and normalization files are available, but the model file failed
 its publisher SHA-256 check and was quarantined. A fresh HTTP transfer also timed
 out; no verified checkpoint or revision marker is present. This is setup progress,
 not a model-loading or policy-validity result.
-See [the current revision audit](../audit/REVISION_AUDIT.md) for the precise scope.
+See [the current revision audit](../review/REVISION_AUDIT.md) for the precise scope.
 
 References: [checkpoint](https://huggingface.co/HuggingFaceVLA/smolvla_libero),
 [official evaluation guide](https://huggingface.co/docs/lerobot/libero), and
@@ -240,13 +240,13 @@ Do not invent safety scores from the existing success ledgers.
 ## Literature experiment: repair the unit of analysis
 
 Preserve the 16-paper CSV as legacy coding, with no completeness headline. Use
-`audit/comparison_extraction_template.csv` to store a named contrast, exact version,
+`review/comparison_extraction_template.csv` to store a named contrast, exact version,
 source passage/locator, value/unit/denominator/phase, measurement versus derivation,
 and inherited versus incremental boundary. Define applicability before scoring.
 Have two independent annotators extract a bounded six-comparison pilot; report
 disagreements and adjudication. Do not replace missing sources with inferred zeros.
 Score full-lifecycle and contrast-specific disclosure separately. Metadata fixes
-in `references.bib` are not evidence that resource codes were verified.
+in `paper/references.bib` are not evidence that resource codes were verified.
 
 ## Later adaptation extension, not required for this workshop position paper
 

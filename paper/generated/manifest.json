@@ -1,0 +1,30 @@
+{
+  "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
+  "script_sha256": "83be0d18afdd6b8b264585d4f98f66e65b63c8b3f91c27d1a84b91e3d4cb4ab8",
+  "input_sha256": {
+    "experiments/runs/refinement_refresh_final_001/paper_analysis/discovery_audit.json": "0a4a26754151fe203f06637fcfaec85931f1f40218722f979dbdffd7fbcb4cec",
+    "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "93ae4aab553893ffc44b68dd58b160d13eb8c8e0ff9e237dd0c4053e946958bb",
+    "experiments/runs/refinement_refresh_final_001/paper_analysis/primary_report.json": "16dbe73a4d8413c0bbcab5520ac3864f2b260d28f7ebd4e7b8c956f2634f389d",
+    "experiments/runs/refinement_refresh_final_001/calibration.json": "b5cf102627fac4c56efc19a1975a49584fa0be36e7de4a3106f0a71a495c1b6d",
+    "experiments/runs/refinement_refresh_final_001/paper_analysis/selector_diagnostics.json": "12bbea3d730fe952252d12bbfe73c1560f1ebe0bdc0abefc783521fd42ae94ce",
+    "experiments/runs/refinement_refresh_final_001/frozen_prediction.json": "48017553c351960fc840c10b14922046b3b17e0aa09476feb98b9e5a060b056f"
+  },
+  "libraries": {
+    "matplotlib": "3.10.8",
+    "numpy": "2.4.2"
+  },
+  "figure_width_inches": 5.5,
+  "minimum_figure_font_pt": 10,
+  "output_sha256": {
+    "confirmation_resources.tex": "c44ca8583a865bbc85bcd77580a5e0adba7e19dc39b1612ec6d4b9ae3d228787",
+    "confirmation_predictions.tex": "b1e4d7ab078792a95913b2af49aba0b67e4a0f1c2df14a366d74fe5baa6b53a0",
+    "confirmation_secondary.tex": "9e290d73c8710750c2a1efb9ac1b822c3f3d79d94ec52294871963d3f08a1aa8",
+    "confirmation_tasks.tex": "838a63c60abe3719649e2b2f4d8fc10bd4c2938cebbe835a21c9a4a36be083d9",
+    "discovery_tasks.tex": "f59adbbe219084123f013c527a569eb5ce3609b20d6cdd8abba32cef7c6078b2",
+    "discovery_resources.tex": "c084af335f8b123ab76ec1f5323faf8496e552562b9e0967fe4fddc3d59d5fa9",
+    "primary_resources.tex": "8521e48f8ea5defa3d522fe80eee66baf62e49fa07031a199f0c89b0d0874931",
+    "selector_choices.tex": "7c0332da5d2b31555ef24753964ea8c370d538ae05e8f1723352785223936ed8",
+    "discovery_allocation.pdf": "2cf4b97956ec5f5f7a184c9dd0f345212ad2faf43ac477d390fb3482ee0bbe2c",
+    "confirmation_effects.pdf": "1dfa8bf3f878ed9e34de3a83eea3a4d4313e561c08d15b4feef5707c6219def4"
+  }
+}

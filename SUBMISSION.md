@@ -1,88 +1,99 @@
-# RoboPAD 2026 submission notes
+# Submission and working-version notes
 
 Title: **Refinement versus Refresh: Compute Allocation for Closed-Loop Robot
 Policies**.
 
-Positioning: a fixed-checkpoint empirical deployment study. The manuscript leads
-with the completed primary transfer result: at a fixed two-action prefix, two
-denoising steps record 139/160 successes versus 122/160 for five steps on eight
-tasks excluded from configuration selection. It then reports the 12-configuration
-discovery study, calibrated generation costs, and the selector limitation. Pilot
-and record-verification tests are supplementary methods evidence. The obsolete
-320-attempt plan, synthetic adaptation example, and generic lifecycle framework
-are excluded from the paper. No universal allocation law or adaptation result is
-claimed.
+## Version policy
 
-The [official call](https://robotpad2026.github.io/call-for-papers.html), checked
-2026-09-10, welcomes position/discussion papers, early and negative results, and
-reporting practices. It permits up to nine main-content pages (4--7 welcome),
-with unlimited references/appendix, using anonymous NeurIPS 2026 workshop style.
-The stated deadline is September 10, 2026 AoE. Submission is not performed by
-this revision.
+- [release/submitted.pdf](release/submitted.pdf) is the frozen submitted manuscript.
+- The dated [submission archive](release/archive/2026-09-13/) retains
+  another copy and the submission materials.
+- [paper/main.tex](paper/main.tex) and [paper/working.pdf](paper/working.pdf) are the continuing
+  working version. Post-submission results belong here.
 
-`main.tex` uses `[dblblindworkshop]`, anonymous authors, no identifying repository
-link or acknowledgements, and a brief disclosure of LLM-assisted revision/source
-checking/code review. Human authors remain responsible for research correctness.
+Both submitted PDF copies must retain SHA-256:
 
-## Build
-
-```bash
-latexmk -pdf -outdir=build main.tex
-# Alternative: tectonic --keep-logs --outdir build main.tex
-cp build/main.pdf output/resource_optimal_post_training.pdf
+```text
+9a23d4e8b603f20b2b0aed45ab68f55300a975d979d9814259ff5679499c19f5
 ```
 
-The stable output is `output/resource_optimal_post_training.pdf`. Build artifacts
-are ignored. Render and inspect the final PDF, check reference resolution and
-page count, and retain the validation record in `audit/REVISION_AUDIT.md`.
+The working manuscript uses the existing anonymous NeurIPS 2026 workshop style
+with the RoboPAD workshop title. It now includes the full 1,120-attempt
+confirmation study, in addition to 480 discovery attempts. This revision is not
+a new submission and does not change the submitted PDF.
 
-The manuscript evaluates prediction refinement and execution-prefix length across
-twelve configurations on four development tasks, then reports the completed
-primary frozen comparison on eight transfer tasks. The two-task pilot and
-measurement verification appear in the appendix; no universal configuration
-selector or cross-policy law is claimed.
+## Next target: ICLR 2027
 
-The current PDF has ten pages: six main-content pages, one reference page,
-and three appendix pages. The main text remains within the nine-page limit. It was rebuilt from the current source and
-visually checked.
-The integrated offline verifier now passes; see the revision audit for provenance
-and limitations.
+The main-conference development plan is in [ROADMAP.md](ROADMAP.md).
+Official requirements checked on 13 September 2026:
 
-## Scientific status
+- Abstract: 18 September 2026, 23:59 AoE (19 September, 13:59 CEST in Paris).
+  Paper: 25 September, 23:59 AoE (26 September, 13:59 CEST).
+  Internal cutoffs: 18 and 25 September at 18:00 CEST.
+  [Call for papers](https://iclr.cc/Conferences/2027/CallForPapers).
+- Convert the active manuscript to the official ICLR 2027 template; at most
+  nine main-text pages, excluding references and appendices. Preserve the
+  submitted workshop version. The current PDF is not yet ICLR-formatted.
+  [Author guidelines and template](https://iclr.cc/Conferences/2027/AuthorGuidelines).
+- Authors must settle the author list, verify OpenReview profiles, register a
+  genuine abstract, and check reciprocal-reviewer eligibility or exemption.
+  Do not assume these steps are complete. Additions to the author list are not
+  permitted after the abstract deadline.
+  [Author guidelines](https://iclr.cc/Conferences/2027/AuthorGuidelines).
+- Include an accurate AI-use section and matching submission-form disclosure,
+  covering conceptual work, hypotheses, design, interpretation, implementation,
+  and writing/figures where applicable. Authors must review the account and
+  describe only verification actually performed; automated checks are not
+  evidence of independent human review. The section is outside the page limit.
+  [AI policy](https://iclr.cc/Conferences/2027/AIPolicyForAuthors).
+- Audit anonymity in the manuscript and any released code or supplementary
+  archive. Keep the frozen primary-only supplement unchanged; prepare any new
+  full-evidence artifact separately. Include a reproducibility statement.
+- Do not submit substantially the same work concurrently to ICLR and ICRA.
+  ICLR permits relevant prior non-proceedings workshop presentations; RoboPAD
+  describes itself as non-archival. This does not certify submission status.
+  [ICLR policy](https://iclr.cc/Conferences/2027/AuthorGuidelines),
+  [RoboPAD policy](https://robotpad2026.github.io/call-for-papers.html).
 
-- The discovery study adds 480 attempts across 12 configurations and four
-  tasks, a dense-neural-arithmetic cost calibration, a quality-versus-compute
-  figure, and model-based allocation predictions. All 87,364 dispatched actions
-  reconcile with the episode and runtime records. See
-  [the port audit](audit/DISCOVERY_PORT_20260913.md).
-- Transfer validation is not inferred from discovery. The originally planned
-  primary pair is complete: all 320 identities are present, and the paired
-  result is reported in the manuscript. Remaining secondary confirmation
-  settings are not used for claims. All recommendations are existing grid
-  points, so this is a task-transfer test rather than prediction of an untested
-  configuration.
-- Generic trace v0.2 tests check structure and declared completeness, not whole
-  event coverage, empirical accuracy, unit conversion, or causality.
-- The archive audit reconciles 28 results: 22 v1, four v2, and two v3, with one
-  v2 task/state and an 86-action same-condition replay. Historical v1 pairing is
-  unverified.
-- The executed offline experiment comprises 68 constructed trials / 272 checks:
-  cumulative syntax, structure, aggregate, and full execution trace checks reject 4, 12,
-  28, and 52 of 52 observable corruptions. All accept four controls and 12 probes
-  whose requested claims remain unknown without external evidence. Unknowns are
-  excluded from rejection denominators; constructed cases do not estimate
-  natural error rates or robot performance.
-- The mutation operators are validator-aware unit-test cases, so their rejection
-  counts describe specified mechanism coverage rather than defect prevalence.
-- The three-run timing proxy is illustrative and retrospective; it does not
-  identify a solver effect or provide replicated deployment-cost evidence.
-- The controlled four-cell, 80-attempt pilot completed with independent terminal
-  outcomes, full runtime/checkpoint provenance, profiler reconciliation, and
-  upstream parity. It is conditional on two tasks and five states per task.
-- Its wall and CUDA timings overlap another GPU process and cannot support clean
-  elapsed-efficiency claims; the paper reports measured work counts and outcomes.
-- The 320-attempt broader protocol and matched-cost confirmation remain
-  prospective. No matched-quality efficiency result is claimed.
-- The bibliography is corrected; the 16-paper resource coding is not validated.
-- The proposed learned-policy evaluation is descriptive on a fixed task set and cannot promise
-  noninferiority, safety, population-wide performance, or a scaling law.
+ICRA 2027 remains an alternative requiring an explicit venue switch: its
+15 September 2026, 23:59 deadline is labeled PST, and its two-column eight-page
+limit includes references. It is not a later fallback after ICLR.
+[ICRA call](https://2027.ieee-icra.org/contribute/call-for-icra-2027-papers-now-accepting-submissions/).
+
+## Build and review
+
+```bash
+python3 experiments/tooling/analyze_confirmation.py --check
+python3 experiments/tooling/render_paper_visuals.py
+python3 experiments/tooling/render_paper_visuals.py --check
+latexmk -pdf -outdir=build paper/main.tex
+# Render and review build/main.pdf before copying:
+cp build/main.pdf paper/working.pdf
+sha256sum release/submitted.pdf release/archive/2026-09-13/submitted.pdf
+```
+
+The reviewed working build has seven main-content pages, one reference page,
+and six appendix pages. The final PDF and evidence checks are recorded in
+[review/REVISION_AUDIT.md](review/REVISION_AUDIT.md).
+The frozen primary-only supplement remains in
+[output/primary_transfer_supplement.zip](output/primary_transfer_supplement.zip);
+the new full-confirmation evidence is indexed in
+[experiments/runs/README.md](experiments/runs/README.md).
+
+## Claim boundaries
+
+The paper studies one frozen checkpoint in simulation. The primary comparison
+supports lower denoising at a fixed two-action prefix; it does not establish a
+universal refinement rule, a learned-selector advantage, or equivalent quality
+for the cheaper longer prefix. Secondary intervals are descriptive,
+task-conditional, and unadjusted. The stale-input diagnostic reports 20/40
+successes with five-tick held-input refresh versus 28/40 matched fresh inputs,
+with descriptive paired difference -20.0 points and interval [-32.5, -7.5].
+Its journals lack per-tick supplied-input hashes and observation ages, so it does
+not establish a complete causal decomposition. Aggregate transfer timings are
+not controlled latency evidence.
+
+The new confirmation audit passes. The legacy integrated verifier still reports
+a frozen runner-hash mismatch in instrument validation; no frozen protocol
+hashes were changed. Future work is tracked in
+[ROADMAP.md](ROADMAP.md).

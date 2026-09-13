@@ -1,0 +1,12 @@
+Proposal 2 remote coordination — development gates
+
+Base commit: a0e896c42fe89771abe8a19403444994dc0de095
+Branch: experiments/proposal2-remote
+
+Passed:
+- python -m unittest discover -s paper/proposal_paper2/experiments -p 'test_*.py' (11 tests)
+- validate_ledger.py infrastructure_v3/h10_two_episodes.json
+- validate_ledger.py infrastructure_v3/h10_reference.json
+
+Reserved evaluation outcomes were not opened by this gate run.
+Remote runtime and job inventory are recorded in proposal2_remote.json.

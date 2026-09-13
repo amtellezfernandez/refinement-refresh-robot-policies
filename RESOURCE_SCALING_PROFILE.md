@@ -63,7 +63,7 @@ Record the following when they affect the named comparison:
 These are reporting requirements for the selected claim. The current SmolVLA
 execution trace does not implement a world-model or action-verifier pipeline. Its checks
 do not certify that an unknown cost fits a budget or estimate a scaling law.
-The [allocation literature notes](audit/ALLOCATION_LITERATURE.md) document the
+The [allocation literature notes](review/ALLOCATION_LITERATURE.md) document the
 source examples motivating these fields.
 
 ## Outcomes and validity

@@ -1,4 +1,4 @@
-# Deployment allocation: experiment and decision protocol
+# Configuration decision protocol
 
 2026-09-12; follows `c89a898`. **Design only.** No new learned-policy outcomes,
 matched-cost pairs, quality certificates, or validated selector are reported.

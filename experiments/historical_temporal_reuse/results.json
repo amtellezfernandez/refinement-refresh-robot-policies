@@ -1,0 +1,87 @@
+{
+  "experiment": "controlled_historical_temporal_reuse",
+  "claim_tested": "fixed control frequency does not determine foundation-model invocation cost",
+  "disclaimer": "Synthetic 2D moving-obstacle simulator with a frozen deterministic surrogate model; not a VLA benchmark.",
+  "common": {
+    "horizon": 160,
+    "control_dt": 0.05,
+    "episodes": 1000
+  },
+  "results": [
+    {
+      "reuse_interval_control_steps": 1,
+      "control_hz": 20.0,
+      "episodes": 1000,
+      "success_rate": 0.916,
+      "collision_rate": 0.0,
+      "mean_control_steps": 32.423,
+      "mean_model_calls": 32.423,
+      "model_calls_total": 32423,
+      "wall_seconds": 12.933100005990127,
+      "wall_ms_per_episode": 12.933100005990127,
+      "device": "cuda",
+      "model_padding_matmuls": 10,
+      "seed": 20260910
+    },
+    {
+      "reuse_interval_control_steps": 2,
+      "control_hz": 20.0,
+      "episodes": 1000,
+      "success_rate": 0.944,
+      "collision_rate": 0.008,
+      "mean_control_steps": 25.416,
+      "mean_model_calls": 12.964,
+      "model_calls_total": 12964,
+      "wall_seconds": 5.337922378996154,
+      "wall_ms_per_episode": 5.337922378996154,
+      "device": "cuda",
+      "model_padding_matmuls": 10,
+      "seed": 20260910
+    },
+    {
+      "reuse_interval_control_steps": 4,
+      "control_hz": 20.0,
+      "episodes": 1000,
+      "success_rate": 0.951,
+      "collision_rate": 0.035,
+      "mean_control_steps": 23.466,
+      "mean_model_calls": 6.244,
+      "model_calls_total": 6244,
+      "wall_seconds": 2.7006316799961496,
+      "wall_ms_per_episode": 2.7006316799961496,
+      "device": "cuda",
+      "model_padding_matmuls": 10,
+      "seed": 20260910
+    },
+    {
+      "reuse_interval_control_steps": 8,
+      "control_hz": 20.0,
+      "episodes": 1000,
+      "success_rate": 0.927,
+      "collision_rate": 0.072,
+      "mean_control_steps": 19.866,
+      "mean_model_calls": 2.903,
+      "model_calls_total": 2903,
+      "wall_seconds": 1.3776361110212747,
+      "wall_ms_per_episode": 1.3776361110212747,
+      "device": "cuda",
+      "model_padding_matmuls": 10,
+      "seed": 20260910
+    },
+    {
+      "reuse_interval_control_steps": 16,
+      "control_hz": 20.0,
+      "episodes": 1000,
+      "success_rate": 0.893,
+      "collision_rate": 0.107,
+      "mean_control_steps": 19.149,
+      "mean_model_calls": 1.686,
+      "model_calls_total": 1686,
+      "wall_seconds": 0.8873083240177948,
+      "wall_ms_per_episode": 0.8873083240177948,
+      "device": "cuda",
+      "model_padding_matmuls": 10,
+      "seed": 20260910
+    }
+  ]
+}
