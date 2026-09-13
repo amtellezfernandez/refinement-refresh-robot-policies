@@ -1,0 +1,252 @@
+{
+  "attempts": 320,
+  "task_state_blocks": 80,
+  "task_state_seed_blocks": 160,
+  "dispatched_actions": 50451,
+  "metrics": {
+    "success": {
+      "selected_mean": 0.86875,
+      "comparator_mean": 0.7625,
+      "paired_difference": 0.10625000000000007,
+      "descriptive_95_interval": [
+        0.043749999999999845,
+        0.16875000000000007
+      ]
+    },
+    "reference_tflops": {
+      "selected_mean": 41.10724110935039,
+      "comparator_mean": 48.70537632844802,
+      "paired_difference": -7.598135219097628,
+      "descriptive_95_interval": [
+        -10.619617735734405,
+        -4.534984901051516
+      ]
+    },
+    "rollout_seconds": {
+      "selected_mean": 19.041852458906213,
+      "comparator_mean": 34.26072002463734,
+      "paired_difference": -15.218867565731124,
+      "descriptive_95_interval": [
+        -17.212065270651266,
+        -13.252171330380769
+      ]
+    },
+    "control_steps": {
+      "selected_mean": 149.025,
+      "comparator_mean": 166.29375,
+      "paired_difference": -17.268749999999983,
+      "descriptive_95_interval": [
+        -27.862812499999983,
+        -6.493750000000005
+      ]
+    }
+  },
+  "per_task": [
+    {
+      "suite": "libero_goal",
+      "task_id": 5,
+      "attempts_per_condition": 20,
+      "selected_successes": 16,
+      "comparator_successes": 14,
+      "both_success": 12,
+      "both_failure": 2,
+      "selected_only": 4,
+      "comparator_only": 2,
+      "difference": 0.1
+    },
+    {
+      "suite": "libero_goal",
+      "task_id": 6,
+      "attempts_per_condition": 20,
+      "selected_successes": 18,
+      "comparator_successes": 15,
+      "both_success": 15,
+      "both_failure": 2,
+      "selected_only": 3,
+      "comparator_only": 0,
+      "difference": 0.15
+    },
+    {
+      "suite": "libero_goal",
+      "task_id": 7,
+      "attempts_per_condition": 20,
+      "selected_successes": 19,
+      "comparator_successes": 18,
+      "both_success": 18,
+      "both_failure": 1,
+      "selected_only": 1,
+      "comparator_only": 0,
+      "difference": 0.05
+    },
+    {
+      "suite": "libero_goal",
+      "task_id": 8,
+      "attempts_per_condition": 20,
+      "selected_successes": 18,
+      "comparator_successes": 14,
+      "both_success": 13,
+      "both_failure": 1,
+      "selected_only": 5,
+      "comparator_only": 1,
+      "difference": 0.2
+    },
+    {
+      "suite": "libero_object",
+      "task_id": 5,
+      "attempts_per_condition": 20,
+      "selected_successes": 20,
+      "comparator_successes": 20,
+      "both_success": 20,
+      "both_failure": 0,
+      "selected_only": 0,
+      "comparator_only": 0,
+      "difference": 0.0
+    },
+    {
+      "suite": "libero_object",
+      "task_id": 6,
+      "attempts_per_condition": 20,
+      "selected_successes": 20,
+      "comparator_successes": 17,
+      "both_success": 17,
+      "both_failure": 0,
+      "selected_only": 3,
+      "comparator_only": 0,
+      "difference": 0.15
+    },
+    {
+      "suite": "libero_object",
+      "task_id": 7,
+      "attempts_per_condition": 20,
+      "selected_successes": 10,
+      "comparator_successes": 7,
+      "both_success": 4,
+      "both_failure": 7,
+      "selected_only": 6,
+      "comparator_only": 3,
+      "difference": 0.15
+    },
+    {
+      "suite": "libero_object",
+      "task_id": 8,
+      "attempts_per_condition": 20,
+      "selected_successes": 18,
+      "comparator_successes": 17,
+      "both_success": 16,
+      "both_failure": 1,
+      "selected_only": 2,
+      "comparator_only": 1,
+      "difference": 0.05
+    }
+  ],
+  "leave_one_task_out": [
+    {
+      "omitted_suite": "libero_goal",
+      "omitted_task_id": 5,
+      "difference": 0.10714285714285716
+    },
+    {
+      "omitted_suite": "libero_goal",
+      "omitted_task_id": 6,
+      "difference": 0.10000000000000002
+    },
+    {
+      "omitted_suite": "libero_goal",
+      "omitted_task_id": 7,
+      "difference": 0.11428571428571432
+    },
+    {
+      "omitted_suite": "libero_goal",
+      "omitted_task_id": 8,
+      "difference": 0.09285714285714287
+    },
+    {
+      "omitted_suite": "libero_object",
+      "omitted_task_id": 5,
+      "difference": 0.12142857142857146
+    },
+    {
+      "omitted_suite": "libero_object",
+      "omitted_task_id": 6,
+      "difference": 0.10000000000000002
+    },
+    {
+      "omitted_suite": "libero_object",
+      "omitted_task_id": 7,
+      "difference": 0.10000000000000002
+    },
+    {
+      "omitted_suite": "libero_object",
+      "omitted_task_id": 8,
+      "difference": 0.11428571428571431
+    }
+  ],
+  "termination_reasons": {
+    "2": {
+      "task_horizon": 21,
+      "success": 139
+    },
+    "5": {
+      "task_horizon": 38,
+      "success": 122
+    }
+  },
+  "calibration_timing_audit": [
+    {
+      "d": 2,
+      "calls": 60,
+      "host_mean_ms": 217.8911684338042,
+      "cuda_mean_ms": 217.8615275065104,
+      "mean_host_minus_cuda_ms": 0.02964092729380354
+    },
+    {
+      "d": 3,
+      "calls": 60,
+      "host_mean_ms": 269.9900384162902,
+      "cuda_mean_ms": 269.9695541381836,
+      "mean_host_minus_cuda_ms": 0.02048427810659632
+    },
+    {
+      "d": 5,
+      "calls": 60,
+      "host_mean_ms": 374.32106418176164,
+      "cuda_mean_ms": 374.3000737508138,
+      "mean_host_minus_cuda_ms": 0.02099043094785884
+    },
+    {
+      "d": 8,
+      "calls": 60,
+      "host_mean_ms": 529.7457072828062,
+      "cuda_mean_ms": 529.7256144205729,
+      "mean_host_minus_cuda_ms": 0.020092862233286723
+    },
+    {
+      "d": 10,
+      "calls": 60,
+      "host_mean_ms": 629.6243587169253,
+      "cuda_mean_ms": 629.6044871012369,
+      "mean_host_minus_cuda_ms": 0.019871615688316524
+    },
+    {
+      "d": 20,
+      "calls": 60,
+      "host_mean_ms": 1158.6348585655894,
+      "cuda_mean_ms": 1158.608251953125,
+      "mean_host_minus_cuda_ms": 0.026606612464335436
+    }
+  ],
+  "bootstrap": {
+    "draws": 20000,
+    "seed": 20260912,
+    "resampling": "states within each fixed task; both seeds and paired conditions retained; equal task weights"
+  },
+  "reporting_status": "Primary success comparison unchanged. Task disaggregation, leave-one-task-out sensitivity, and expenditure intervals added descriptively after outcomes.",
+  "timing_status": "Observed synchronous rollout times are descriptive: GPU process monitoring was not retained for priority completion.",
+  "checks": [
+    "exact original primary plan coverage",
+    "paired initial states and observations",
+    "neural stage counts",
+    "all dispatched actions and terminal outcomes",
+    "separate host and CUDA generation timing arrays"
+  ]
+}

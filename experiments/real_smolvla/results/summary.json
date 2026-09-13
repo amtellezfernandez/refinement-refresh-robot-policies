@@ -1,0 +1,5 @@
+[
+  {"n_action_steps": 1, "control_steps": 355, "neural_chunk_calls": 355, "control_to_neural": 1.0, "successes": [true, false], "success_rate_percent": 50.0, "eval_seconds": 162.1330807209015, "neural_p50_seconds": 0.4164288729953114, "neural_p95_seconds": 0.4242515953170368},
+  {"n_action_steps": 5, "control_steps": 357, "neural_chunk_calls": 72, "control_to_neural": 4.958333333333333, "successes": [true, false], "success_rate_percent": 50.0, "eval_seconds": 43.24162435531616, "neural_p50_seconds": 0.4033303140022326, "neural_p95_seconds": 0.41310230399394643},
+  {"n_action_steps": 10, "control_steps": 356, "neural_chunk_calls": 36, "control_to_neural": 9.88888888888889, "successes": [true, false], "success_rate_percent": 50.0, "eval_seconds": 28.749929189682007, "neural_p50_seconds": 0.40523286248208024, "neural_p95_seconds": 0.42225947375118267}
+]

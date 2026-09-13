@@ -1,0 +1,55 @@
+{
+  "spec_version": "0.2",
+  "system": "Negative fixture: UPDATE without records",
+  "pretrained_roots": [
+    "theta_0"
+  ],
+  "states": [
+    {
+      "id": "theta_0",
+      "carrier": "MODEL",
+      "roles": [
+        "POLICY"
+      ],
+      "lifetime": "CHECKPOINT"
+    },
+    {
+      "id": "theta_1",
+      "carrier": "MODEL",
+      "roles": [
+        "POLICY"
+      ],
+      "lifetime": "CHECKPOINT"
+    }
+  ],
+  "events": [
+    {
+      "id": "bad_update",
+      "operator": "UPDATE",
+      "inputs": [
+        "theta_0"
+      ],
+      "outputs": [
+        "theta_1"
+      ],
+      "specifications": [],
+      "signal": "SELF",
+      "phase": "OFFLINE",
+      "resources": [],
+      "required_resources": [
+        "training_accelerator_time"
+      ]
+    }
+  ],
+  "boundary": {
+    "scope": "adaptation_and_deployment",
+    "description": "Synthetic schema fixture; all numeric constants are illustrative, not observed.",
+    "included": [
+      "listed operations only"
+    ],
+    "excluded": [
+      "pretraining",
+      "unlisted overhead"
+    ]
+  }
+}

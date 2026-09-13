@@ -1,0 +1,377 @@
+{
+  "spec_version": "0.2",
+  "system": "Illustrative memory-world-model-online-adaptation VLA",
+  "pretrained_roots": [
+    "theta_0",
+    "wm_0"
+  ],
+  "states": [
+    {
+      "id": "theta_0",
+      "carrier": "MODEL",
+      "roles": [
+        "POLICY"
+      ],
+      "lifetime": "CHECKPOINT"
+    },
+    {
+      "id": "wm_0",
+      "carrier": "MODEL",
+      "roles": [
+        "DYNAMICS"
+      ],
+      "lifetime": "CHECKPOINT"
+    },
+    {
+      "id": "goal_safe",
+      "carrier": "SPECIFICATION",
+      "roles": [
+        "GOAL",
+        "CONSTRAINT"
+      ],
+      "lifetime": "EPISODE"
+    },
+    {
+      "id": "world_t0",
+      "carrier": "PHYSICAL",
+      "roles": [
+        "ENVIRONMENT"
+      ],
+      "lifetime": "EXTERNAL"
+    },
+    {
+      "id": "memory_t",
+      "carrier": "RECORDS",
+      "roles": [
+        "MEMORY",
+        "EXPERIENCE"
+      ],
+      "lifetime": "CROSS_EPISODE"
+    },
+    {
+      "id": "query_t",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "QUERY",
+        "OBSERVATION"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "retrieved_t",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "MEMORY"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "candidates_t",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "CANDIDATE",
+        "TRAJECTORY"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "imagined_t",
+      "carrier": "RECORDS",
+      "roles": [
+        "TRAJECTORY"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "scores_t",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "SCORE"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "selected_t",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "ACTION",
+        "TRAJECTORY"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "world_t1",
+      "carrier": "PHYSICAL",
+      "roles": [
+        "ENVIRONMENT"
+      ],
+      "lifetime": "EXTERNAL"
+    },
+    {
+      "id": "experience_t",
+      "carrier": "RECORDS",
+      "roles": [
+        "EXPERIENCE",
+        "OBSERVATION"
+      ],
+      "lifetime": "CROSS_EPISODE"
+    },
+    {
+      "id": "theta_1",
+      "carrier": "MODEL",
+      "roles": [
+        "POLICY"
+      ],
+      "lifetime": "CHECKPOINT"
+    }
+  ],
+  "events": [
+    {
+      "id": "retrieve_1",
+      "operator": "RETRIEVE",
+      "inputs": [
+        "query_t",
+        "memory_t"
+      ],
+      "outputs": [
+        "retrieved_t"
+      ],
+      "specifications": [],
+      "signal": "NONE",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "LATENCY",
+          "amount": 0.004,
+          "unit": "s",
+          "name": "latency_0",
+          "status": "derived",
+          "boundary": "retrieve_1 only",
+          "aggregation": "interval",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "required_resources": [
+        "latency_0"
+      ]
+    },
+    {
+      "id": "propose_1",
+      "operator": "PROPOSE",
+      "inputs": [
+        "theta_0",
+        "query_t",
+        "retrieved_t"
+      ],
+      "outputs": [
+        "candidates_t"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "NONE",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "LATENCY",
+          "amount": 0.02,
+          "unit": "s",
+          "name": "latency_0",
+          "status": "derived",
+          "boundary": "propose_1 only",
+          "aggregation": "interval",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "required_resources": [
+        "latency_0"
+      ]
+    },
+    {
+      "id": "imagine_1",
+      "operator": "IMAGINE",
+      "inputs": [
+        "wm_0",
+        "candidates_t"
+      ],
+      "outputs": [
+        "imagined_t"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "WORLD_MODEL",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "IMAGINATION",
+          "amount": 32,
+          "unit": "transitions",
+          "name": "imagination_0",
+          "status": "derived",
+          "boundary": "imagine_1 only",
+          "aggregation": "sum",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        },
+        {
+          "kind": "LATENCY",
+          "amount": 0.08,
+          "unit": "s",
+          "name": "latency_1",
+          "status": "derived",
+          "boundary": "imagine_1 only",
+          "aggregation": "interval",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "required_resources": [
+        "imagination_0",
+        "latency_1"
+      ]
+    },
+    {
+      "id": "evaluate_1",
+      "operator": "EVALUATE",
+      "inputs": [
+        "imagined_t"
+      ],
+      "outputs": [
+        "scores_t"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "SELF",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "LATENCY",
+          "amount": 0.004,
+          "unit": "s",
+          "name": "latency_0",
+          "status": "derived",
+          "boundary": "evaluate_1 only",
+          "aggregation": "interval",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "required_resources": [
+        "latency_0"
+      ]
+    },
+    {
+      "id": "select_1",
+      "operator": "SELECT",
+      "inputs": [
+        "candidates_t",
+        "scores_t"
+      ],
+      "outputs": [
+        "selected_t"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "SELF",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "LATENCY",
+          "amount": 0.002,
+          "unit": "s",
+          "name": "latency_0",
+          "status": "derived",
+          "boundary": "select_1 only",
+          "aggregation": "interval",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "required_resources": [
+        "latency_0"
+      ]
+    },
+    {
+      "id": "execute_1",
+      "operator": "EXECUTE",
+      "inputs": [
+        "selected_t",
+        "world_t0"
+      ],
+      "outputs": [
+        "world_t1",
+        "experience_t"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "ENVIRONMENT",
+      "phase": "CONTROL_CYCLE",
+      "resources": [
+        {
+          "kind": "REAL_ROBOT",
+          "amount": 0.2,
+          "unit": "s",
+          "name": "real_robot_0",
+          "status": "derived",
+          "boundary": "execute_1 only",
+          "aggregation": "sum",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "changes_physical_world": true,
+      "required_resources": [
+        "real_robot_0"
+      ],
+      "execution_environment": "real"
+    },
+    {
+      "id": "update_1",
+      "operator": "UPDATE",
+      "inputs": [
+        "theta_0",
+        "experience_t"
+      ],
+      "outputs": [
+        "theta_1"
+      ],
+      "specifications": [
+        "goal_safe"
+      ],
+      "signal": "ENVIRONMENT",
+      "phase": "BETWEEN_EPISODES",
+      "resources": [
+        {
+          "kind": "ACCELERATOR",
+          "amount": 0.03,
+          "unit": "GPU-hour",
+          "name": "accelerator_0",
+          "status": "derived",
+          "boundary": "update_1 only",
+          "aggregation": "sum",
+          "derivation": "Synthetic fixture constant; not an empirical measurement."
+        }
+      ],
+      "metadata": {
+        "parameterization": "LoRA"
+      },
+      "required_resources": [
+        "accelerator_0"
+      ]
+    }
+  ],
+  "outcomes": {},
+  "metadata": {
+    "status": "illustrative, not an empirical result"
+  },
+  "boundary": {
+    "scope": "adaptation_and_deployment",
+    "description": "Synthetic schema fixture; all numeric constants are illustrative, not observed.",
+    "included": [
+      "listed operations only"
+    ],
+    "excluded": [
+      "pretraining",
+      "unlisted overhead"
+    ]
+  }
+}

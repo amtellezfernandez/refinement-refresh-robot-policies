@@ -1,0 +1,245 @@
+{
+  "created_utc": "2026-09-13T09:14:55.983047+00:00",
+  "scope": "LIBERO metadata and policy tokenizer only; no rollout outcomes read",
+  "checkpoint": "/mnt/NVME1/projectx-robopad-proposal2/runtime/checkpoint",
+  "policy_preprocessor_sha256": "29267ff4423fcce93bbd76ad0f386905f9de5d267ca13379a5795a514a81b7a9",
+  "tokenizer_settings": {
+    "max_length": 48,
+    "task_key": "task",
+    "padding_side": "right",
+    "padding": "longest",
+    "truncation": true,
+    "tokenizer_name": "HuggingFaceTB/SmolVLM2-500M-Instruct"
+  },
+  "calibration_token_lengths": [
+    20
+  ],
+  "evaluation_token_length_range": [
+    5,
+    17
+  ],
+  "all_evaluation_lengths_at_most_calibration": true,
+  "rows": [
+    {
+      "phase": "calibration",
+      "suite": "libero_spatial",
+      "task_id": 0,
+      "task_name": "pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate",
+      "task_language": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+      "policy_text_sha256": "605133f4650fe9a0d0bae97b1c46610fe04b9a340099782b27c84f6c70e97f5a",
+      "input_ids_shape": [
+        1,
+        20
+      ],
+      "attention_mask_shape": [
+        1,
+        20
+      ],
+      "nonpadding_tokens": 20
+    },
+    {
+      "phase": "discovery",
+      "suite": "libero_spatial",
+      "task_id": 5,
+      "task_name": "pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate",
+      "task_language": "pick up the black bowl on the ramekin and place it on the plate",
+      "policy_text_sha256": "5edc948a63e59b396ac1f2bf5d2d64c3b5bca02e31c7f28e150411ad3306d4c3",
+      "input_ids_shape": [
+        1,
+        17
+      ],
+      "attention_mask_shape": [
+        1,
+        17
+      ],
+      "nonpadding_tokens": 17
+    },
+    {
+      "phase": "discovery",
+      "suite": "libero_spatial",
+      "task_id": 6,
+      "task_name": "pick_up_the_black_bowl_next_to_the_cookie_box_and_place_it_on_the_plate",
+      "task_language": "pick up the black bowl next to the cookie box and place it on the plate",
+      "policy_text_sha256": "29172ba07a2f32100c81febbba3246cf22b070a2c3ffc99f09008d8ed7420276",
+      "input_ids_shape": [
+        1,
+        17
+      ],
+      "attention_mask_shape": [
+        1,
+        17
+      ],
+      "nonpadding_tokens": 17
+    },
+    {
+      "phase": "discovery",
+      "suite": "libero_spatial",
+      "task_id": 7,
+      "task_name": "pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate",
+      "task_language": "pick up the black bowl on the stove and place it on the plate",
+      "policy_text_sha256": "e02808d657a5e9be4cceb56d8ca1018d33754355d648524c70fe5ec8912dfcb5",
+      "input_ids_shape": [
+        1,
+        15
+      ],
+      "attention_mask_shape": [
+        1,
+        15
+      ],
+      "nonpadding_tokens": 15
+    },
+    {
+      "phase": "discovery",
+      "suite": "libero_spatial",
+      "task_id": 8,
+      "task_name": "pick_up_the_black_bowl_next_to_the_plate_and_place_it_on_the_plate",
+      "task_language": "pick up the black bowl next to the plate and place it on the plate",
+      "policy_text_sha256": "ce56f37b198b4930a602d4d74ddc63d649f3a9c078c719b443ae03c661a15561",
+      "input_ids_shape": [
+        1,
+        16
+      ],
+      "attention_mask_shape": [
+        1,
+        16
+      ],
+      "nonpadding_tokens": 16
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_object",
+      "task_id": 5,
+      "task_name": "pick_up_the_tomato_sauce_and_place_it_in_the_basket",
+      "task_language": "pick up the tomato sauce and place it in the basket",
+      "policy_text_sha256": "b9fc369df8dc1af35bc75c39526576db3e35b04fce2add21a557c8c081d4c799",
+      "input_ids_shape": [
+        1,
+        12
+      ],
+      "attention_mask_shape": [
+        1,
+        12
+      ],
+      "nonpadding_tokens": 12
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_object",
+      "task_id": 6,
+      "task_name": "pick_up_the_butter_and_place_it_in_the_basket",
+      "task_language": "pick up the butter and place it in the basket",
+      "policy_text_sha256": "e7075b9372c686ee22bbc36959208227034ff7464589b0339df28ec553d253d0",
+      "input_ids_shape": [
+        1,
+        11
+      ],
+      "attention_mask_shape": [
+        1,
+        11
+      ],
+      "nonpadding_tokens": 11
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_object",
+      "task_id": 7,
+      "task_name": "pick_up_the_milk_and_place_it_in_the_basket",
+      "task_language": "pick up the milk and place it in the basket",
+      "policy_text_sha256": "dfb4983d78e963e007c7a3043718f82f87cd651520cac57dc54ffc38eca1897f",
+      "input_ids_shape": [
+        1,
+        11
+      ],
+      "attention_mask_shape": [
+        1,
+        11
+      ],
+      "nonpadding_tokens": 11
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_object",
+      "task_id": 8,
+      "task_name": "pick_up_the_chocolate_pudding_and_place_it_in_the_basket",
+      "task_language": "pick up the chocolate pudding and place it in the basket",
+      "policy_text_sha256": "cb2b3e8850f0e952bf55f47a12b7b15f743390efb4228784a170ca925a7da68f",
+      "input_ids_shape": [
+        1,
+        12
+      ],
+      "attention_mask_shape": [
+        1,
+        12
+      ],
+      "nonpadding_tokens": 12
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_goal",
+      "task_id": 5,
+      "task_name": "push_the_plate_to_the_front_of_the_stove",
+      "task_language": "push the plate to the front of the stove",
+      "policy_text_sha256": "cf09f93a8e86cc978e7dbbb810197eb49551680ec4baeaf5090e9f2559db1eee",
+      "input_ids_shape": [
+        1,
+        10
+      ],
+      "attention_mask_shape": [
+        1,
+        10
+      ],
+      "nonpadding_tokens": 10
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_goal",
+      "task_id": 6,
+      "task_name": "put_the_cream_cheese_in_the_bowl",
+      "task_language": "put the cream cheese in the bowl",
+      "policy_text_sha256": "40cfb34c5f2b24470d41ea1d35ad057542ffc57b2d1e8d6e585145aa5d133b42",
+      "input_ids_shape": [
+        1,
+        8
+      ],
+      "attention_mask_shape": [
+        1,
+        8
+      ],
+      "nonpadding_tokens": 8
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_goal",
+      "task_id": 7,
+      "task_name": "turn_on_the_stove",
+      "task_language": "turn on the stove",
+      "policy_text_sha256": "1349dd333ea44cf1540de665ddc1f205cf6ed11a4538528495039fd0ac90e6c8",
+      "input_ids_shape": [
+        1,
+        5
+      ],
+      "attention_mask_shape": [
+        1,
+        5
+      ],
+      "nonpadding_tokens": 5
+    },
+    {
+      "phase": "transfer",
+      "suite": "libero_goal",
+      "task_id": 8,
+      "task_name": "put_the_bowl_on_the_plate",
+      "task_language": "put the bowl on the plate",
+      "policy_text_sha256": "47231f10dd140dadee2f07b0028450c6d98cfab376c2dcd4af3735300521b182",
+      "input_ids_shape": [
+        1,
+        7
+      ],
+      "attention_mask_shape": [
+        1,
+        7
+      ],
+      "nonpadding_tokens": 7
+    }
+  ]
+}

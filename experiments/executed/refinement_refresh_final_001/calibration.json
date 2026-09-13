@@ -1,0 +1,2789 @@
+{
+  "status": "completed",
+  "generation_flops": {
+    "2": 550021623808,
+    "3": 561478238208,
+    "5": 584391467008,
+    "8": 618761310208,
+    "10": 641674539008,
+    "20": 756240683008
+  },
+  "affine": {
+    "base": 527108395008.00024,
+    "step": 11456614399.999998,
+    "max_relative_residual": 4.438745940745485e-16
+  },
+  "use": "Measured per-d values; no imposed affine fit",
+  "solver": {
+    "2": {
+      "actual_timesteps": [
+        1.0,
+        0.5
+      ],
+      "constant_field_end": [
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    "3": {
+      "actual_timesteps": [
+        1.0,
+        0.6666666865348816,
+        0.3333333432674408
+      ],
+      "constant_field_end": [
+        [
+          -5.960464477539063e-08,
+          -5.960464477539063e-08
+        ]
+      ]
+    },
+    "5": {
+      "actual_timesteps": [
+        1.0,
+        0.800000011920929,
+        0.6000000238418579,
+        0.4000000059604645,
+        0.20000000298023224
+      ],
+      "constant_field_end": [
+        [
+          2.9802322387695312e-08,
+          2.9802322387695312e-08
+        ]
+      ]
+    },
+    "8": {
+      "actual_timesteps": [
+        1.0,
+        0.875,
+        0.75,
+        0.625,
+        0.5,
+        0.375,
+        0.25,
+        0.125
+      ],
+      "constant_field_end": [
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    "10": {
+      "actual_timesteps": [
+        1.0,
+        0.8999999761581421,
+        0.800000011920929,
+        0.699999988079071,
+        0.6000000238418579,
+        0.5,
+        0.4000000059604645,
+        0.30000001192092896,
+        0.20000000298023224,
+        0.10000000149011612
+      ],
+      "constant_field_end": [
+        [
+          -7.450580596923828e-08,
+          -7.450580596923828e-08
+        ]
+      ]
+    },
+    "20": {
+      "actual_timesteps": [
+        1.0,
+        0.949999988079071,
+        0.8999999761581421,
+        0.8500000238418579,
+        0.800000011920929,
+        0.75,
+        0.699999988079071,
+        0.6499999761581421,
+        0.6000000238418579,
+        0.550000011920929,
+        0.5,
+        0.44999998807907104,
+        0.4000000059604645,
+        0.3499999940395355,
+        0.30000001192092896,
+        0.25,
+        0.20000000298023224,
+        0.15000000596046448,
+        0.10000000149011612,
+        0.05000000074505806
+      ],
+      "constant_field_end": [
+        [
+          -1.564621925354004e-07,
+          -1.564621925354004e-07
+        ]
+      ]
+    }
+  },
+  "operators": {
+    "2": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 325,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 453,
+        "aten.arange.default": 168,
+        "aten._to_copy.default": 1201,
+        "aten.add.Tensor": 425,
+        "aten.mul.Tensor": 1326,
+        "aten.sub.Tensor": 211,
+        "aten.clamp.default": 16,
+        "aten.view.default": 1956,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 7,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 706,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 2088,
+        "aten.select.int": 6,
+        "aten.sum.dim_IntList": 6,
+        "aten.reciprocal.default": 6,
+        "aten.unsqueeze.default": 966,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 4,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 827,
+        "aten.addmm.default": 153,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 196,
+        "aten._unsafe_view.default": 1030,
+        "aten.mm.default": 674,
+        "aten.lift_fresh.default": 71,
+        "aten.detach_.default": 71,
+        "aten.expand.default": 587,
+        "aten.cat.default": 332,
+        "aten.cumsum.default": 6,
+        "aten.le.Tensor": 3,
+        "aten.bitwise_and.Tensor": 3,
+        "aten.pow.Tensor_Scalar": 195,
+        "aten.mean.dim": 195,
+        "aten.rsqrt.default": 195,
+        "aten.pow.Scalar": 162,
+        "aten.div.Tensor": 160,
+        "aten.sin.default": 162,
+        "aten.cos.default": 162,
+        "aten.split.Tensor": 160,
+        "aten.empty_like.default": 160,
+        "aten.bmm.default": 192,
+        "aten.mul_.Tensor": 96,
+        "aten.scalar_tensor.default": 96,
+        "aten.where.self": 96,
+        "aten._softmax.default": 96,
+        "aten.add_.Tensor": 192,
+        "aten.silu.default": 98,
+        "aten.linspace.default": 2,
+        "aten.min.dim": 32
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 348036796416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 117393326080,
+        "aten.bmm": 4866170880
+      }
+    },
+    "3": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 421,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 613,
+        "aten.arange.default": 216,
+        "aten._to_copy.default": 1588,
+        "aten.add.Tensor": 540,
+        "aten.mul.Tensor": 1735,
+        "aten.sub.Tensor": 276,
+        "aten.clamp.default": 16,
+        "aten.view.default": 2476,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 8,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 898,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 2792,
+        "aten.select.int": 7,
+        "aten.sum.dim_IntList": 7,
+        "aten.reciprocal.default": 7,
+        "aten.unsqueeze.default": 1263,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 5,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 1055,
+        "aten.addmm.default": 157,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 260,
+        "aten._unsafe_view.default": 1382,
+        "aten.mm.default": 898,
+        "aten.lift_fresh.default": 73,
+        "aten.detach_.default": 73,
+        "aten.expand.default": 783,
+        "aten.cat.default": 417,
+        "aten.cumsum.default": 8,
+        "aten.le.Tensor": 4,
+        "aten.bitwise_and.Tensor": 4,
+        "aten.pow.Tensor_Scalar": 260,
+        "aten.mean.dim": 260,
+        "aten.rsqrt.default": 260,
+        "aten.pow.Scalar": 211,
+        "aten.div.Tensor": 208,
+        "aten.sin.default": 211,
+        "aten.cos.default": 211,
+        "aten.split.Tensor": 208,
+        "aten.empty_like.default": 208,
+        "aten.bmm.default": 256,
+        "aten.mul_.Tensor": 128,
+        "aten.scalar_tensor.default": 128,
+        "aten.where.self": 128,
+        "aten._softmax.default": 128,
+        "aten.add_.Tensor": 256,
+        "aten.silu.default": 131,
+        "aten.linspace.default": 3,
+        "aten.min.dim": 48
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 348108988416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 127708692480,
+        "aten.bmm": 5935226880
+      }
+    },
+    "5": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 613,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 933,
+        "aten.arange.default": 312,
+        "aten._to_copy.default": 2362,
+        "aten.add.Tensor": 770,
+        "aten.mul.Tensor": 2553,
+        "aten.sub.Tensor": 406,
+        "aten.clamp.default": 16,
+        "aten.view.default": 3516,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 10,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 1282,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 4200,
+        "aten.select.int": 9,
+        "aten.sum.dim_IntList": 9,
+        "aten.reciprocal.default": 9,
+        "aten.unsqueeze.default": 1857,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 7,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 1511,
+        "aten.addmm.default": 165,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 388,
+        "aten._unsafe_view.default": 2086,
+        "aten.mm.default": 1346,
+        "aten.lift_fresh.default": 77,
+        "aten.detach_.default": 77,
+        "aten.expand.default": 1175,
+        "aten.cat.default": 587,
+        "aten.cumsum.default": 12,
+        "aten.le.Tensor": 6,
+        "aten.bitwise_and.Tensor": 6,
+        "aten.pow.Tensor_Scalar": 390,
+        "aten.mean.dim": 390,
+        "aten.rsqrt.default": 390,
+        "aten.pow.Scalar": 309,
+        "aten.div.Tensor": 304,
+        "aten.sin.default": 309,
+        "aten.cos.default": 309,
+        "aten.split.Tensor": 304,
+        "aten.empty_like.default": 304,
+        "aten.bmm.default": 384,
+        "aten.mul_.Tensor": 192,
+        "aten.scalar_tensor.default": 192,
+        "aten.where.self": 192,
+        "aten._softmax.default": 192,
+        "aten.add_.Tensor": 384,
+        "aten.silu.default": 197,
+        "aten.linspace.default": 5,
+        "aten.min.dim": 80
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 348253372416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 148339425280,
+        "aten.bmm": 8073338880
+      }
+    },
+    "8": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 901,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 1413,
+        "aten.arange.default": 456,
+        "aten._to_copy.default": 3523,
+        "aten.add.Tensor": 1115,
+        "aten.mul.Tensor": 3780,
+        "aten.sub.Tensor": 601,
+        "aten.clamp.default": 16,
+        "aten.view.default": 5076,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 13,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 1858,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 6312,
+        "aten.select.int": 12,
+        "aten.sum.dim_IntList": 12,
+        "aten.reciprocal.default": 12,
+        "aten.unsqueeze.default": 2748,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 10,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 2195,
+        "aten.addmm.default": 177,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 580,
+        "aten._unsafe_view.default": 3142,
+        "aten.mm.default": 2018,
+        "aten.lift_fresh.default": 83,
+        "aten.detach_.default": 83,
+        "aten.expand.default": 1763,
+        "aten.cat.default": 842,
+        "aten.cumsum.default": 18,
+        "aten.le.Tensor": 9,
+        "aten.bitwise_and.Tensor": 9,
+        "aten.pow.Tensor_Scalar": 585,
+        "aten.mean.dim": 585,
+        "aten.rsqrt.default": 585,
+        "aten.pow.Scalar": 456,
+        "aten.div.Tensor": 448,
+        "aten.sin.default": 456,
+        "aten.cos.default": 456,
+        "aten.split.Tensor": 448,
+        "aten.empty_like.default": 448,
+        "aten.bmm.default": 576,
+        "aten.mul_.Tensor": 288,
+        "aten.scalar_tensor.default": 288,
+        "aten.where.self": 288,
+        "aten._softmax.default": 288,
+        "aten.add_.Tensor": 576,
+        "aten.silu.default": 296,
+        "aten.linspace.default": 8,
+        "aten.min.dim": 128
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 348469948416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 179285524480,
+        "aten.bmm": 11280506880
+      }
+    },
+    "10": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 1093,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 1733,
+        "aten.arange.default": 552,
+        "aten._to_copy.default": 4297,
+        "aten.add.Tensor": 1345,
+        "aten.mul.Tensor": 4598,
+        "aten.sub.Tensor": 731,
+        "aten.clamp.default": 16,
+        "aten.view.default": 6116,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 15,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 2242,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 7720,
+        "aten.select.int": 14,
+        "aten.sum.dim_IntList": 14,
+        "aten.reciprocal.default": 14,
+        "aten.unsqueeze.default": 3342,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 12,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 2651,
+        "aten.addmm.default": 185,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 708,
+        "aten._unsafe_view.default": 3846,
+        "aten.mm.default": 2466,
+        "aten.lift_fresh.default": 87,
+        "aten.detach_.default": 87,
+        "aten.expand.default": 2155,
+        "aten.cat.default": 1012,
+        "aten.cumsum.default": 22,
+        "aten.le.Tensor": 11,
+        "aten.bitwise_and.Tensor": 11,
+        "aten.pow.Tensor_Scalar": 715,
+        "aten.mean.dim": 715,
+        "aten.rsqrt.default": 715,
+        "aten.pow.Scalar": 554,
+        "aten.div.Tensor": 544,
+        "aten.sin.default": 554,
+        "aten.cos.default": 554,
+        "aten.split.Tensor": 544,
+        "aten.empty_like.default": 544,
+        "aten.bmm.default": 704,
+        "aten.mul_.Tensor": 352,
+        "aten.scalar_tensor.default": 352,
+        "aten.where.self": 352,
+        "aten._softmax.default": 352,
+        "aten.add_.Tensor": 704,
+        "aten.silu.default": 362,
+        "aten.linspace.default": 10,
+        "aten.min.dim": 160
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 348614332416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 199916257280,
+        "aten.bmm": 13418618880
+      }
+    },
+    "20": {
+      "inventory": {
+        "aten.empty.memory_format": 10,
+        "aten.set_.source_Storage": 10,
+        "aten.copy_.default": 2053,
+        "aten.new_empty.default": 5,
+        "aten.set_.source_Storage_storage_offset": 5,
+        "aten.clone.default": 3333,
+        "aten.arange.default": 1032,
+        "aten._to_copy.default": 8167,
+        "aten.add.Tensor": 2495,
+        "aten.mul.Tensor": 8688,
+        "aten.sub.Tensor": 1381,
+        "aten.clamp.default": 16,
+        "aten.view.default": 11316,
+        "aten._unsafe_index.Tensor": 8,
+        "aten.constant_pad_nd.default": 3,
+        "aten.ones.default": 25,
+        "aten.convolution.default": 2,
+        "aten.transpose.int": 4162,
+        "aten.arange.start_step": 2,
+        "aten.full.default": 2,
+        "aten.slice.Tensor": 14760,
+        "aten.select.int": 24,
+        "aten.sum.dim_IntList": 24,
+        "aten.reciprocal.default": 24,
+        "aten.unsqueeze.default": 6312,
+        "aten.bucketize.Tensor": 4,
+        "aten.index.Tensor": 2,
+        "aten.index_put_.default": 2,
+        "aten.embedding.default": 3,
+        "aten.all.default": 2,
+        "aten._local_scalar_dense.default": 22,
+        "aten.native_layer_norm.default": 50,
+        "aten.t.default": 4931,
+        "aten.addmm.default": 225,
+        "aten._scaled_dot_product_efficient_attention.default": 24,
+        "aten.gelu.default": 24,
+        "aten.permute.default": 1348,
+        "aten._unsafe_view.default": 7366,
+        "aten.mm.default": 4706,
+        "aten.lift_fresh.default": 107,
+        "aten.detach_.default": 107,
+        "aten.expand.default": 4115,
+        "aten.cat.default": 1862,
+        "aten.cumsum.default": 42,
+        "aten.le.Tensor": 21,
+        "aten.bitwise_and.Tensor": 21,
+        "aten.pow.Tensor_Scalar": 1365,
+        "aten.mean.dim": 1365,
+        "aten.rsqrt.default": 1365,
+        "aten.pow.Scalar": 1044,
+        "aten.div.Tensor": 1024,
+        "aten.sin.default": 1044,
+        "aten.cos.default": 1044,
+        "aten.split.Tensor": 1024,
+        "aten.empty_like.default": 1024,
+        "aten.bmm.default": 1344,
+        "aten.mul_.Tensor": 672,
+        "aten.scalar_tensor.default": 672,
+        "aten.where.self": 672,
+        "aten._softmax.default": 672,
+        "aten.add_.Tensor": 1344,
+        "aten.silu.default": 692,
+        "aten.linspace.default": 20,
+        "aten.min.dim": 320
+      },
+      "flop_counts": {
+        "aten.convolution": 2415919104,
+        "aten.addmm": 349336252416,
+        "aten._scaled_dot_product_efficient_attention": 77309411328,
+        "aten.mm": 303069921280,
+        "aten.bmm": 24109178880
+      }
+    }
+  },
+  "timings": {
+    "2": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 0.21894484000222292,
+        "cuda_ms": 218.90451049804688
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 0.21863686200231314,
+        "cuda_ms": 218.6146240234375
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 0.2184811519982759,
+        "cuda_ms": 218.4598388671875
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 0.2187453229998937,
+        "cuda_ms": 218.7263946533203
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 0.21919459500350058,
+        "cuda_ms": 219.17286682128906
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 0.21890325099229813,
+        "cuda_ms": 218.88307189941406
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 0.21882449800614268,
+        "cuda_ms": 218.80320739746094
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 0.21888009700342081,
+        "cuda_ms": 218.8605194091797
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 0.2190133020048961,
+        "cuda_ms": 218.99058532714844
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 0.21889850300794933,
+        "cuda_ms": 218.8800048828125
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 0.2201444439997431,
+        "cuda_ms": 220.1243133544922
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 0.21946015099820215,
+        "cuda_ms": 219.4361572265625
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 0.21870698999555316,
+        "cuda_ms": 218.68544006347656
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 0.22010538399626967,
+        "cuda_ms": 220.08554077148438
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 0.2187506519985618,
+        "cuda_ms": 218.7315216064453
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 0.21878813298826572,
+        "cuda_ms": 218.2277069091797
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 0.21900975100288633,
+        "cuda_ms": 218.9891815185547
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 0.21914238200406544,
+        "cuda_ms": 219.12057495117188
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 0.21966923400759697,
+        "cuda_ms": 219.6479949951172
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 0.2193790429882938,
+        "cuda_ms": 219.359130859375
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 0.2158988770097494,
+        "cuda_ms": 215.8756103515625
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 0.21590350799669977,
+        "cuda_ms": 215.88377380371094
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 0.2140909930021735,
+        "cuda_ms": 214.0713348388672
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 0.2148138439952163,
+        "cuda_ms": 214.7942352294922
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 0.21405085700098425,
+        "cuda_ms": 214.03114318847656
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 0.21430368701112457,
+        "cuda_ms": 214.28326416015625
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 0.21514083800138906,
+        "cuda_ms": 215.12179565429688
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 0.21469547000015154,
+        "cuda_ms": 214.6754608154297
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 0.21522009700129274,
+        "cuda_ms": 215.198974609375
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 0.21380794400465675,
+        "cuda_ms": 213.78802490234375
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 0.21445343999948818,
+        "cuda_ms": 214.43411254882812
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 0.21381922300497536,
+        "cuda_ms": 213.79898071289062
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 0.21427792900067288,
+        "cuda_ms": 214.25868225097656
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 0.213417381994077,
+        "cuda_ms": 213.39744567871094
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 0.21328458399511874,
+        "cuda_ms": 213.26620483398438
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 0.21496451800339855,
+        "cuda_ms": 214.94566345214844
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 0.2142900839971844,
+        "cuda_ms": 214.2696075439453
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 0.21400830800121184,
+        "cuda_ms": 213.98934936523438
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 0.214645604006364,
+        "cuda_ms": 214.62646484375
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 0.21434106800006703,
+        "cuda_ms": 214.32115173339844
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 0.21936966700013727,
+        "cuda_ms": 219.35020446777344
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 0.2193171330000041,
+        "cuda_ms": 219.29689025878906
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 0.22017352998955175,
+        "cuda_ms": 220.1538543701172
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 0.22046165900246706,
+        "cuda_ms": 220.4416046142578
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 0.21976401000574697,
+        "cuda_ms": 219.7431640625
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 0.22025314200436696,
+        "cuda_ms": 220.23379516601562
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 0.22119127100449987,
+        "cuda_ms": 221.16851806640625
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 0.21994202499627136,
+        "cuda_ms": 219.922119140625
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 0.219575196999358,
+        "cuda_ms": 219.55465698242188
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 0.22028159200272057,
+        "cuda_ms": 220.2612762451172
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 0.22002811900165398,
+        "cuda_ms": 220.0076446533203
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 0.220329653006047,
+        "cuda_ms": 220.30963134765625
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 0.22020543899270706,
+        "cuda_ms": 220.1847686767578
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 0.22005454399914015,
+        "cuda_ms": 220.03404235839844
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 0.21917762300290633,
+        "cuda_ms": 219.1573486328125
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 0.21966854798665736,
+        "cuda_ms": 219.64764404296875
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 0.2202697370084934,
+        "cuda_ms": 220.2499237060547
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 0.22043804300483316,
+        "cuda_ms": 220.4180450439453
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 0.2221920589945512,
+        "cuda_ms": 222.1721954345703
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 0.21967027299979236,
+        "cuda_ms": 219.6498565673828
+      }
+    ],
+    "5": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 0.3779069669981254,
+        "cuda_ms": 377.8856506347656
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 0.3782551959884586,
+        "cuda_ms": 378.2347106933594
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 0.37712261998967733,
+        "cuda_ms": 377.1034851074219
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 0.37717315601184964,
+        "cuda_ms": 377.1535339355469
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 0.3778397190035321,
+        "cuda_ms": 377.7748718261719
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 0.3780743540119147,
+        "cuda_ms": 378.0546569824219
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 0.3778436089924071,
+        "cuda_ms": 377.8232421875
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 0.37842724099755287,
+        "cuda_ms": 378.40789794921875
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 0.37897869099106174,
+        "cuda_ms": 378.95782470703125
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 0.379289680000511,
+        "cuda_ms": 379.26953125
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 0.37768409299314953,
+        "cuda_ms": 377.6632995605469
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 0.37719230899529066,
+        "cuda_ms": 377.169921875
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 0.3782008549897,
+        "cuda_ms": 378.1803894042969
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 0.3777231040003244,
+        "cuda_ms": 377.70245361328125
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 0.3792954579985235,
+        "cuda_ms": 379.2733459472656
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 0.37818745599361137,
+        "cuda_ms": 378.1663818359375
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 0.3786495759995887,
+        "cuda_ms": 378.62774658203125
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 0.3789325440011453,
+        "cuda_ms": 378.91278076171875
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 0.37733552099962253,
+        "cuda_ms": 377.3149108886719
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 0.3779979969986016,
+        "cuda_ms": 377.976806640625
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 0.36650127499888185,
+        "cuda_ms": 366.48211669921875
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 0.3680176679918077,
+        "cuda_ms": 367.9969177246094
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 0.3673295209882781,
+        "cuda_ms": 367.3108215332031
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 0.3662215069925878,
+        "cuda_ms": 366.20184326171875
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 0.3668140410009073,
+        "cuda_ms": 366.7937316894531
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 0.3658995600126218,
+        "cuda_ms": 365.8805847167969
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 0.3671831850078888,
+        "cuda_ms": 367.16412353515625
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 0.3670306299900403,
+        "cuda_ms": 367.0109558105469
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 0.3659872199932579,
+        "cuda_ms": 365.96917724609375
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 0.36553895300312433,
+        "cuda_ms": 365.5198669433594
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 0.3670653110020794,
+        "cuda_ms": 367.0440979003906
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 0.3662831769906916,
+        "cuda_ms": 366.2643127441406
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 0.3660279399919091,
+        "cuda_ms": 366.00811767578125
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 0.36749717699422035,
+        "cuda_ms": 367.4776916503906
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 0.36607722599001136,
+        "cuda_ms": 366.0585021972656
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 0.3674795510014519,
+        "cuda_ms": 367.4612731933594
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 0.3672558679973008,
+        "cuda_ms": 367.2367248535156
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 0.36761978300637566,
+        "cuda_ms": 367.59967041015625
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 0.36649083498923574,
+        "cuda_ms": 366.4721984863281
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 0.36712768500729,
+        "cuda_ms": 367.1039733886719
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 0.37821322499075904,
+        "cuda_ms": 378.1929016113281
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 0.3767725650104694,
+        "cuda_ms": 376.7508239746094
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 0.37906167199253105,
+        "cuda_ms": 379.04266357421875
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 0.3776079499948537,
+        "cuda_ms": 377.5867004394531
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 0.3774866210005712,
+        "cuda_ms": 377.4678955078125
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 0.3787245870043989,
+        "cuda_ms": 378.70404052734375
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 0.3768031380022876,
+        "cuda_ms": 376.7828369140625
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 0.37745263800024986,
+        "cuda_ms": 377.4271545410156
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 0.3783147670037579,
+        "cuda_ms": 378.2948913574219
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 0.3781862589967204,
+        "cuda_ms": 378.166259765625
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 0.37875268700008746,
+        "cuda_ms": 378.7322998046875
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 0.37780880100035574,
+        "cuda_ms": 377.7894287109375
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 0.37786451599095017,
+        "cuda_ms": 377.845458984375
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 0.37850752400117926,
+        "cuda_ms": 378.4873962402344
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 0.37882994100800715,
+        "cuda_ms": 378.80792236328125
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 0.37871965499653015,
+        "cuda_ms": 378.6979064941406
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 0.3789359020011034,
+        "cuda_ms": 378.9147644042969
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 0.3780487460026052,
+        "cuda_ms": 378.029052734375
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 0.3776836210017791,
+        "cuda_ms": 377.66259765625
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 0.37793077700189315,
+        "cuda_ms": 377.9112854003906
+      }
+    ],
+    "3": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 0.2726664619985968,
+        "cuda_ms": 272.64306640625
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 0.2728881509974599,
+        "cuda_ms": 272.8670959472656
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 0.27337481699942145,
+        "cuda_ms": 273.3529357910156
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 0.2727584270032821,
+        "cuda_ms": 272.7383117675781
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 0.27202831700560637,
+        "cuda_ms": 272.0081787109375
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 0.2726948219933547,
+        "cuda_ms": 272.6750183105469
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 0.2728127279988257,
+        "cuda_ms": 272.791748046875
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 0.27288102399325,
+        "cuda_ms": 272.86016845703125
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 0.27248424899880774,
+        "cuda_ms": 272.464599609375
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 0.2733894779958064,
+        "cuda_ms": 273.369140625
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 0.27267880999716,
+        "cuda_ms": 272.6553649902344
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 0.2729706240061205,
+        "cuda_ms": 272.9410705566406
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 0.2715352570085088,
+        "cuda_ms": 271.51556396484375
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 0.271674642994185,
+        "cuda_ms": 271.6549377441406
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 0.2734942980023334,
+        "cuda_ms": 273.47314453125
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 0.27241593999497127,
+        "cuda_ms": 272.39422607421875
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 0.2716431240114616,
+        "cuda_ms": 271.6231689453125
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 0.27162672000122257,
+        "cuda_ms": 271.60577392578125
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 0.2723494569945615,
+        "cuda_ms": 272.3290710449219
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 0.27326421899488196,
+        "cuda_ms": 273.24212646484375
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 0.26559500899747945,
+        "cuda_ms": 265.5733642578125
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 0.2657667869934812,
+        "cuda_ms": 265.7464294433594
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 0.2646141599980183,
+        "cuda_ms": 264.5950012207031
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 0.26561288500670344,
+        "cuda_ms": 265.59283447265625
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 0.2656324819981819,
+        "cuda_ms": 265.6133117675781
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 0.2651846509979805,
+        "cuda_ms": 265.1661682128906
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 0.2665985740022734,
+        "cuda_ms": 266.5759582519531
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 0.26547659799689427,
+        "cuda_ms": 265.4566345214844
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 0.2646757190086646,
+        "cuda_ms": 264.65667724609375
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 0.26608062599552795,
+        "cuda_ms": 266.0597229003906
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 0.26539789799426217,
+        "cuda_ms": 265.3787841796875
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 0.26535102500929497,
+        "cuda_ms": 265.32965087890625
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 0.26468737800314557,
+        "cuda_ms": 264.6680908203125
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 0.26468643300177064,
+        "cuda_ms": 264.6671447753906
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 0.264502657999401,
+        "cuda_ms": 264.4831237792969
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 0.26566105999518186,
+        "cuda_ms": 265.6409606933594
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 0.26508975100296084,
+        "cuda_ms": 265.07000732421875
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 0.26482662199123297,
+        "cuda_ms": 264.80743408203125
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 0.264712749994942,
+        "cuda_ms": 264.6912841796875
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 0.26526536799792666,
+        "cuda_ms": 265.2460021972656
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 0.27174774299783166,
+        "cuda_ms": 271.7276306152344
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 0.2710404329991434,
+        "cuda_ms": 271.0201110839844
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 0.27135918199201114,
+        "cuda_ms": 271.3396911621094
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 0.2714622990024509,
+        "cuda_ms": 271.4418029785156
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 0.2713818780030124,
+        "cuda_ms": 271.3619384765625
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 0.2717078080022475,
+        "cuda_ms": 271.6876220703125
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 0.27181544998893514,
+        "cuda_ms": 271.796142578125
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 0.2722687820059946,
+        "cuda_ms": 272.2476501464844
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 0.27163296499929857,
+        "cuda_ms": 271.6139221191406
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 0.2731636009993963,
+        "cuda_ms": 273.1425476074219
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 0.2729725109966239,
+        "cuda_ms": 272.95159912109375
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 0.27191781099827494,
+        "cuda_ms": 271.89862060546875
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 0.271770438994281,
+        "cuda_ms": 271.7491149902344
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 0.27217702400230337,
+        "cuda_ms": 272.1556396484375
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 0.27203563100192696,
+        "cuda_ms": 272.0160827636719
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 0.27201279300788883,
+        "cuda_ms": 271.9936218261719
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 0.2740497870108811,
+        "cuda_ms": 274.0316162109375
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 0.27269320499908645,
+        "cuda_ms": 272.6728210449219
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 0.2723545059998287,
+        "cuda_ms": 272.332763671875
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 0.27278845600085333,
+        "cuda_ms": 272.7690124511719
+      }
+    ],
+    "8": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 0.5366735550051089,
+        "cuda_ms": 536.6527709960938
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 0.5352400480041979,
+        "cuda_ms": 535.21728515625
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 0.536560256005032,
+        "cuda_ms": 536.5391845703125
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 0.5356261480046669,
+        "cuda_ms": 535.6050415039062
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 0.5373492789949523,
+        "cuda_ms": 537.3296508789062
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 0.5377699980017496,
+        "cuda_ms": 537.7513427734375
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 0.536070464993827,
+        "cuda_ms": 536.0512084960938
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 0.543872983995243,
+        "cuda_ms": 543.8509521484375
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 0.551913302988396,
+        "cuda_ms": 551.8911743164062
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 0.5387486269901274,
+        "cuda_ms": 538.7283935546875
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 0.5475845159962773,
+        "cuda_ms": 547.5635375976562
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 0.5366389200062258,
+        "cuda_ms": 536.6016235351562
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 0.5289160449901829,
+        "cuda_ms": 528.8959350585938
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 0.5207394400058547,
+        "cuda_ms": 520.7183227539062
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 0.521978135991958,
+        "cuda_ms": 521.9594116210938
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 0.5211485559993889,
+        "cuda_ms": 521.126220703125
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 0.5221037159935804,
+        "cuda_ms": 522.0816650390625
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 0.5250651850074064,
+        "cuda_ms": 525.0463256835938
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 0.5301687449973542,
+        "cuda_ms": 530.1483764648438
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 0.5219141400011722,
+        "cuda_ms": 521.8938598632812
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 0.5205931880045682,
+        "cuda_ms": 520.573974609375
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 0.5188606849987991,
+        "cuda_ms": 518.84228515625
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 0.5201638380094664,
+        "cuda_ms": 520.1438598632812
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 0.5210209109936841,
+        "cuda_ms": 521.0020141601562
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 0.5193754170031752,
+        "cuda_ms": 519.3563232421875
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 0.5196598909969907,
+        "cuda_ms": 519.64208984375
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 0.520280187993194,
+        "cuda_ms": 520.2616577148438
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 0.5188153429917293,
+        "cuda_ms": 518.7974243164062
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 0.5187445860065054,
+        "cuda_ms": 518.7236328125
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 0.5216664129984565,
+        "cuda_ms": 521.6463623046875
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 0.5211488920031115,
+        "cuda_ms": 521.1302490234375
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 0.5185980460082646,
+        "cuda_ms": 518.578857421875
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 0.5192712239950197,
+        "cuda_ms": 519.251953125
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 0.5195437999936985,
+        "cuda_ms": 519.5247802734375
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 0.5198578109993832,
+        "cuda_ms": 519.8387451171875
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 0.5185778970044339,
+        "cuda_ms": 518.5576782226562
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 0.5199872399971355,
+        "cuda_ms": 519.96875
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 0.5189799970103195,
+        "cuda_ms": 518.9591064453125
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 0.5192013059859164,
+        "cuda_ms": 519.1817016601562
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 0.5229226359952008,
+        "cuda_ms": 522.902587890625
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 0.534927095999592,
+        "cuda_ms": 534.9088134765625
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 0.5361692570004379,
+        "cuda_ms": 536.1502685546875
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 0.5349304370029131,
+        "cuda_ms": 534.9110717773438
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 0.5354029430018272,
+        "cuda_ms": 535.3831176757812
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 0.5370272260042839,
+        "cuda_ms": 537.006103515625
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 0.5345908199960832,
+        "cuda_ms": 534.5711059570312
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 0.5376552620000439,
+        "cuda_ms": 537.6365966796875
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 0.5361408839962678,
+        "cuda_ms": 536.1212768554688
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 0.5370431240007747,
+        "cuda_ms": 537.0245361328125
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 0.5363978410023265,
+        "cuda_ms": 536.3783569335938
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 0.5360585390008055,
+        "cuda_ms": 536.0400390625
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 0.5362738059920957,
+        "cuda_ms": 536.25537109375
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 0.5363570400077151,
+        "cuda_ms": 536.3367309570312
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 0.5363202400039881,
+        "cuda_ms": 536.300537109375
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 0.536373252994963,
+        "cuda_ms": 536.35302734375
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 0.5367599879973568,
+        "cuda_ms": 536.7408447265625
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 0.5362241889961297,
+        "cuda_ms": 536.2033081054688
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 0.5351263850025134,
+        "cuda_ms": 535.1065673828125
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 0.5353541149961529,
+        "cuda_ms": 535.3336181640625
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 0.5362586210103473,
+        "cuda_ms": 536.2392578125
+      }
+    ],
+    "10": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 0.6230617120017996,
+        "cuda_ms": 623.04052734375
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 0.623652376991231,
+        "cuda_ms": 623.6329956054688
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 0.6233467010024469,
+        "cuda_ms": 623.3253173828125
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 0.6231299939972814,
+        "cuda_ms": 623.109130859375
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 0.625380571000278,
+        "cuda_ms": 625.36083984375
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 0.6234918409900274,
+        "cuda_ms": 623.4734497070312
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 0.6243269669939764,
+        "cuda_ms": 624.3082275390625
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 0.6245631390047492,
+        "cuda_ms": 624.5435180664062
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 0.6227824189991225,
+        "cuda_ms": 622.7639770507812
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 0.6240583559992956,
+        "cuda_ms": 624.0381469726562
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 0.6221504150016699,
+        "cuda_ms": 622.1300048828125
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 0.6219746050046524,
+        "cuda_ms": 621.9539184570312
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 0.6234780640079407,
+        "cuda_ms": 623.4583129882812
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 0.6214653359929798,
+        "cuda_ms": 621.4461669921875
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 0.6229762990114978,
+        "cuda_ms": 622.953369140625
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 0.6247838910057908,
+        "cuda_ms": 624.7630004882812
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 0.6218973789946176,
+        "cuda_ms": 621.8792114257812
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 0.6220190250023734,
+        "cuda_ms": 622.0001220703125
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 0.6221560240082908,
+        "cuda_ms": 622.1332397460938
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 0.6231466900062514,
+        "cuda_ms": 623.1292724609375
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 0.6221843660023296,
+        "cuda_ms": 622.1638793945312
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 0.6228603060008027,
+        "cuda_ms": 622.841064453125
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 0.6239920200023334,
+        "cuda_ms": 623.97412109375
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 0.6229554610035848,
+        "cuda_ms": 622.9359741210938
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 0.6232154710014584,
+        "cuda_ms": 623.1972045898438
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 0.6225898810080253,
+        "cuda_ms": 622.5704956054688
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 0.6243326270050602,
+        "cuda_ms": 624.3123168945312
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 0.6226696660014568,
+        "cuda_ms": 622.6509399414062
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 0.6227773720020195,
+        "cuda_ms": 622.7581176757812
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 0.6216668799897889,
+        "cuda_ms": 621.6478881835938
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 0.6219210729905171,
+        "cuda_ms": 621.9017944335938
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 0.621637472009752,
+        "cuda_ms": 621.6181030273438
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 0.6220345170004293,
+        "cuda_ms": 622.0147094726562
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 0.6268242840014864,
+        "cuda_ms": 626.8018188476562
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 0.6244841959996847,
+        "cuda_ms": 624.4638671875
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 0.6318818479921902,
+        "cuda_ms": 631.863037109375
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 0.6210571690025972,
+        "cuda_ms": 621.03759765625
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 0.6219341410032939,
+        "cuda_ms": 621.9161376953125
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 0.6229576679907041,
+        "cuda_ms": 622.9391479492188
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 0.6248677149997093,
+        "cuda_ms": 624.847900390625
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 0.6423887399869272,
+        "cuda_ms": 642.3695068359375
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 0.6460753209976247,
+        "cuda_ms": 646.0528564453125
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 0.6420769229880534,
+        "cuda_ms": 642.0562133789062
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 0.6414454909972847,
+        "cuda_ms": 641.4255981445312
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 0.6410902159987018,
+        "cuda_ms": 641.071044921875
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 0.6413577519997489,
+        "cuda_ms": 641.3373413085938
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 0.6431249260058394,
+        "cuda_ms": 643.1016845703125
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 0.6464806020085234,
+        "cuda_ms": 646.4581909179688
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 0.6418731940066209,
+        "cuda_ms": 641.8532104492188
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 0.6423962359986035,
+        "cuda_ms": 642.3736572265625
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 0.6415646029927302,
+        "cuda_ms": 641.5452270507812
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 0.6417188769992208,
+        "cuda_ms": 641.69970703125
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 0.6420059109950671,
+        "cuda_ms": 641.986572265625
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 0.6416460180043941,
+        "cuda_ms": 641.6271362304688
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 0.6414816320029786,
+        "cuda_ms": 641.4613037109375
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 0.6407106300030136,
+        "cuda_ms": 640.6921997070312
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 0.6422062939964235,
+        "cuda_ms": 642.1868896484375
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 0.643070580001222,
+        "cuda_ms": 643.0502319335938
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 0.6411465200071689,
+        "cuda_ms": 641.1264038085938
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 0.6409151190018747,
+        "cuda_ms": 640.8953857421875
+      }
+    ],
+    "20": [
+      {
+        "block": 0,
+        "call": 0,
+        "host_s": 1.1346420740010217,
+        "cuda_ms": 1134.62353515625
+      },
+      {
+        "block": 0,
+        "call": 1,
+        "host_s": 1.1424350599991158,
+        "cuda_ms": 1142.417236328125
+      },
+      {
+        "block": 0,
+        "call": 2,
+        "host_s": 1.1317217930045445,
+        "cuda_ms": 1131.705078125
+      },
+      {
+        "block": 0,
+        "call": 3,
+        "host_s": 1.1366435249947244,
+        "cuda_ms": 1136.626708984375
+      },
+      {
+        "block": 0,
+        "call": 4,
+        "host_s": 1.1330926730006468,
+        "cuda_ms": 1133.0751953125
+      },
+      {
+        "block": 0,
+        "call": 5,
+        "host_s": 1.1305026350019034,
+        "cuda_ms": 1130.4847412109375
+      },
+      {
+        "block": 0,
+        "call": 6,
+        "host_s": 1.1352545819972875,
+        "cuda_ms": 1135.2349853515625
+      },
+      {
+        "block": 0,
+        "call": 7,
+        "host_s": 1.131270958998357,
+        "cuda_ms": 1131.25341796875
+      },
+      {
+        "block": 0,
+        "call": 8,
+        "host_s": 1.1363350869942224,
+        "cuda_ms": 1136.3179931640625
+      },
+      {
+        "block": 0,
+        "call": 9,
+        "host_s": 1.1305663879902568,
+        "cuda_ms": 1130.5491943359375
+      },
+      {
+        "block": 0,
+        "call": 10,
+        "host_s": 1.1375388669985114,
+        "cuda_ms": 1137.5196533203125
+      },
+      {
+        "block": 0,
+        "call": 11,
+        "host_s": 1.1316880919912364,
+        "cuda_ms": 1131.6700439453125
+      },
+      {
+        "block": 0,
+        "call": 12,
+        "host_s": 1.131830126993009,
+        "cuda_ms": 1131.8121337890625
+      },
+      {
+        "block": 0,
+        "call": 13,
+        "host_s": 1.1299446949997218,
+        "cuda_ms": 1129.9287109375
+      },
+      {
+        "block": 0,
+        "call": 14,
+        "host_s": 1.131780436000554,
+        "cuda_ms": 1131.762451171875
+      },
+      {
+        "block": 0,
+        "call": 15,
+        "host_s": 1.1342952819977654,
+        "cuda_ms": 1134.276611328125
+      },
+      {
+        "block": 0,
+        "call": 16,
+        "host_s": 1.1312321840086952,
+        "cuda_ms": 1131.21337890625
+      },
+      {
+        "block": 0,
+        "call": 17,
+        "host_s": 1.1309311960067134,
+        "cuda_ms": 1130.9134521484375
+      },
+      {
+        "block": 0,
+        "call": 18,
+        "host_s": 1.1325604209996527,
+        "cuda_ms": 1132.541748046875
+      },
+      {
+        "block": 0,
+        "call": 19,
+        "host_s": 1.135809576997417,
+        "cuda_ms": 1135.793212890625
+      },
+      {
+        "block": 1,
+        "call": 0,
+        "host_s": 1.1310478350060293,
+        "cuda_ms": 1131.025634765625
+      },
+      {
+        "block": 1,
+        "call": 1,
+        "host_s": 1.1603893769934075,
+        "cuda_ms": 1160.3721923828125
+      },
+      {
+        "block": 1,
+        "call": 2,
+        "host_s": 1.1699910719908075,
+        "cuda_ms": 1169.9735107421875
+      },
+      {
+        "block": 1,
+        "call": 3,
+        "host_s": 1.1723274779942585,
+        "cuda_ms": 1172.3067626953125
+      },
+      {
+        "block": 1,
+        "call": 4,
+        "host_s": 1.1765569290000712,
+        "cuda_ms": 1176.538818359375
+      },
+      {
+        "block": 1,
+        "call": 5,
+        "host_s": 1.186288308002986,
+        "cuda_ms": 1186.2694091796875
+      },
+      {
+        "block": 1,
+        "call": 6,
+        "host_s": 1.1693812229932519,
+        "cuda_ms": 1169.3626708984375
+      },
+      {
+        "block": 1,
+        "call": 7,
+        "host_s": 1.1676014409895288,
+        "cuda_ms": 1167.583740234375
+      },
+      {
+        "block": 1,
+        "call": 8,
+        "host_s": 1.1694451119983569,
+        "cuda_ms": 1169.42626953125
+      },
+      {
+        "block": 1,
+        "call": 9,
+        "host_s": 1.168106255994644,
+        "cuda_ms": 1168.0880126953125
+      },
+      {
+        "block": 1,
+        "call": 10,
+        "host_s": 1.200709607990575,
+        "cuda_ms": 1200.6922607421875
+      },
+      {
+        "block": 1,
+        "call": 11,
+        "host_s": 1.1878642900119303,
+        "cuda_ms": 1187.3321533203125
+      },
+      {
+        "block": 1,
+        "call": 12,
+        "host_s": 1.1745414009928936,
+        "cuda_ms": 1174.52197265625
+      },
+      {
+        "block": 1,
+        "call": 13,
+        "host_s": 1.1700678560009692,
+        "cuda_ms": 1170.050048828125
+      },
+      {
+        "block": 1,
+        "call": 14,
+        "host_s": 1.1706257019977784,
+        "cuda_ms": 1170.6068115234375
+      },
+      {
+        "block": 1,
+        "call": 15,
+        "host_s": 1.1698457559978124,
+        "cuda_ms": 1169.82861328125
+      },
+      {
+        "block": 1,
+        "call": 16,
+        "host_s": 1.1844758960069157,
+        "cuda_ms": 1184.4583740234375
+      },
+      {
+        "block": 1,
+        "call": 17,
+        "host_s": 1.1771248100121738,
+        "cuda_ms": 1177.1072998046875
+      },
+      {
+        "block": 1,
+        "call": 18,
+        "host_s": 1.1742842639941955,
+        "cuda_ms": 1174.26708984375
+      },
+      {
+        "block": 1,
+        "call": 19,
+        "host_s": 1.1720263399911346,
+        "cuda_ms": 1172.0089111328125
+      },
+      {
+        "block": 2,
+        "call": 0,
+        "host_s": 1.1696136709942948,
+        "cuda_ms": 1169.595703125
+      },
+      {
+        "block": 2,
+        "call": 1,
+        "host_s": 1.1698406799987424,
+        "cuda_ms": 1169.82373046875
+      },
+      {
+        "block": 2,
+        "call": 2,
+        "host_s": 1.167140304998611,
+        "cuda_ms": 1167.1214599609375
+      },
+      {
+        "block": 2,
+        "call": 3,
+        "host_s": 1.1682397940021474,
+        "cuda_ms": 1168.22119140625
+      },
+      {
+        "block": 2,
+        "call": 4,
+        "host_s": 1.1666514509997796,
+        "cuda_ms": 1166.6339111328125
+      },
+      {
+        "block": 2,
+        "call": 5,
+        "host_s": 1.1660933759994805,
+        "cuda_ms": 1166.075439453125
+      },
+      {
+        "block": 2,
+        "call": 6,
+        "host_s": 1.1686288570053875,
+        "cuda_ms": 1168.610107421875
+      },
+      {
+        "block": 2,
+        "call": 7,
+        "host_s": 1.167252726998413,
+        "cuda_ms": 1167.236083984375
+      },
+      {
+        "block": 2,
+        "call": 8,
+        "host_s": 1.1677873699954944,
+        "cuda_ms": 1167.7685546875
+      },
+      {
+        "block": 2,
+        "call": 9,
+        "host_s": 1.1676409890060313,
+        "cuda_ms": 1167.623291015625
+      },
+      {
+        "block": 2,
+        "call": 10,
+        "host_s": 1.168670083003235,
+        "cuda_ms": 1168.6533203125
+      },
+      {
+        "block": 2,
+        "call": 11,
+        "host_s": 1.1685734380007489,
+        "cuda_ms": 1168.554931640625
+      },
+      {
+        "block": 2,
+        "call": 12,
+        "host_s": 1.1730632879916811,
+        "cuda_ms": 1173.0419921875
+      },
+      {
+        "block": 2,
+        "call": 13,
+        "host_s": 1.1784881370112998,
+        "cuda_ms": 1178.470458984375
+      },
+      {
+        "block": 2,
+        "call": 14,
+        "host_s": 1.1723888120031916,
+        "cuda_ms": 1172.37060546875
+      },
+      {
+        "block": 2,
+        "call": 15,
+        "host_s": 1.1762186669948278,
+        "cuda_ms": 1176.2001953125
+      },
+      {
+        "block": 2,
+        "call": 16,
+        "host_s": 1.1717702519963495,
+        "cuda_ms": 1171.751953125
+      },
+      {
+        "block": 2,
+        "call": 17,
+        "host_s": 1.1686024230002658,
+        "cuda_ms": 1168.58544921875
+      },
+      {
+        "block": 2,
+        "call": 18,
+        "host_s": 1.169989304995397,
+        "cuda_ms": 1169.9720458984375
+      },
+      {
+        "block": 2,
+        "call": 19,
+        "host_s": 1.168661282004905,
+        "cuda_ms": 1168.6446533203125
+      }
+    ]
+  },
+  "native": {
+    "h": 1,
+    "d": 10,
+    "chunk_size": 50
+  },
+  "inputs_sha256": "8e49ed0c3d87ccd8c75ea02c00e128b9ef7807ad6d7a0805eb208a490ec6743b",
+  "input_shapes": {
+    "observation.images.image": [
+      1,
+      3,
+      360,
+      360
+    ],
+    "observation.images.image2": [
+      1,
+      3,
+      360,
+      360
+    ],
+    "observation.state": [
+      1,
+      8
+    ],
+    "observation.language.tokens": [
+      1,
+      20
+    ],
+    "observation.language.attention_mask": [
+      1,
+      20
+    ]
+  },
+  "torch_version": "2.7.1+cu126",
+  "gpu": "NVIDIA GeForce RTX 4060 Ti",
+  "boundary": "Complete predict_action_chunk neural dense arithmetic: all supported matrix products, convolutions and attention across vision, language prefill and action expert; multiply-add=2 FLOPs. Embedding lookups, normalization, activations, elementwise arithmetic, indexing and external preprocessing excluded by the declared conventional dense-arithmetic boundary. Full operator inventory retained for audit; this is not an exact count of every scalar instruction.",
+  "timing_boundary": "Host prediction plus end-event synchronization; CUDA current-stream prediction interval. Profiling and warmup excluded. Display processes remain on shared display GPU; no unrelated CUDA compute process permitted."
+}

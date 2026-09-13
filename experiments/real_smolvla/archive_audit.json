@@ -1,0 +1,1084 @@
+{
+  "audit_schema_version": 1,
+  "command": "python audit_archive.py --write",
+  "scope": "completed archived evaluator artifacts; no new policy evaluation",
+  "input_hash_scope": "SHA-256 of UTF-8 file bytes after CRLF-to-LF normalization for cross-platform Git checkouts",
+  "artifact_count": 28,
+  "legacy_v1_count": 22,
+  "v2_count": 4,
+  "v3_count": 2,
+  "pooled_success_rate": null,
+  "pooling_exclusion_reason": "Selected tasks and repeated/overlapping episodes across conditions; artifacts are not independent observations.",
+  "comparisons": [
+    {
+      "left": "results/infrastructure_v2/h1.json",
+      "right": "results/infrastructure_v2/h5.json",
+      "initial_state_pairing": "verified",
+      "action_replay": "not required across conditions",
+      "paired_episode_count": 1,
+      "replayed_actions": null
+    },
+    {
+      "left": "results/infrastructure_v2/h1.json",
+      "right": "results/infrastructure_v2/h10.json",
+      "initial_state_pairing": "verified",
+      "action_replay": "not required across conditions",
+      "paired_episode_count": 1,
+      "replayed_actions": null
+    },
+    {
+      "left": "results/infrastructure_v2/h10.json",
+      "right": "results/infrastructure_v2/h10_repeat.json",
+      "initial_state_pairing": "verified",
+      "action_replay": "verified",
+      "paired_episode_count": 1,
+      "replayed_actions": 86
+    }
+  ],
+  "missing_evidence": [
+    "Legacy v1 lacks initial-state and step-action hashes: pairing/replay cannot be certified retrospectively.",
+    "No broad-suite h=1 completed reference artifacts are archived.",
+    "V2 covers one task and one initial state plus a repeated h=10 run; no powered quality/noninferiority comparison.",
+    "V2 total eval_s includes warm-up, environment, rendering and bookkeeping; do not equate it to measured CUDA-event time.",
+    "No adaptive refresh, independently measured training/adaptation cost, energy, or matched-quality lifecycle break-even experiment.",
+    "No independent per-episode terminal-state/outcome record in the v2 ledger; final evaluator success totals are reconciled by task only.",
+    "Archived v2 ledgers do not embed checkpoint hash, hardware, package versions, task limits, or run order."
+  ],
+  "results": [
+    {
+      "path": "results/broad_sweep/10_h10.json",
+      "sha256_lf_normalized": "ded1c17e1f9c80f81bcd59b2600ea2001cbccda3fd026445fc82117de73aa5e6",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 5,
+      "success_rate_percent": 20.0,
+      "control_steps": 2341,
+      "neural_chunks": 235,
+      "control_to_neural": 9.961702127659574,
+      "rollout_seconds": 165.87639808654785,
+      "legacy_inference_host_seconds": 97.05343233814347,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_10",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 2,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 3,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 4,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/10_h5.json",
+      "sha256_lf_normalized": "8cfc626f01ba91f1cb009733c9b46413916723889e8da4551bdb7b098503a1ec",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 5,
+      "success_rate_percent": 40.0,
+      "control_steps": 2077,
+      "neural_chunks": 416,
+      "control_to_neural": 4.992788461538462,
+      "rollout_seconds": 239.74116325378418,
+      "legacy_inference_host_seconds": 174.11205518926727,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_10",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 3,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_10",
+          "task_id": 4,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/goal_h10.json",
+      "sha256_lf_normalized": "8fce137404b17ce6f2f52b2ea7a8309f9e97c91faa4d0823a1f48599dc20d128",
+      "ledger_version": 1,
+      "successes": 4,
+      "episodes": 5,
+      "success_rate_percent": 80.0,
+      "control_steps": 712,
+      "neural_chunks": 72,
+      "control_to_neural": 9.88888888888889,
+      "rollout_seconds": 57.359363317489624,
+      "legacy_inference_host_seconds": 30.071730294119334,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_goal",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 3,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 4,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/goal_h5.json",
+      "sha256_lf_normalized": "d66c177052e04ea71dd70f52ad85f3fe5e8490a5479e0944a24a11029415ed4f",
+      "ledger_version": 1,
+      "successes": 4,
+      "episodes": 5,
+      "success_rate_percent": 80.0,
+      "control_steps": 828,
+      "neural_chunks": 166,
+      "control_to_neural": 4.9879518072289155,
+      "rollout_seconds": 98.38320207595825,
+      "legacy_inference_host_seconds": 68.66551565023838,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_goal",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 3,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_goal",
+          "task_id": 4,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/object_h10.json",
+      "sha256_lf_normalized": "c1f3dfeaece4991c673254f3f921e1ef68d3e36a3c1431c30cd6c7f9947a2a89",
+      "ledger_version": 1,
+      "successes": 3,
+      "episodes": 5,
+      "success_rate_percent": 60.0,
+      "control_steps": 926,
+      "neural_chunks": 94,
+      "control_to_neural": 9.851063829787234,
+      "rollout_seconds": 72.37901425361633,
+      "legacy_inference_host_seconds": 40.42169334486243,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_object",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 3,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 4,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/object_h5.json",
+      "sha256_lf_normalized": "0bb1d68641d760f6c7b6c393627ccc9ee41fdcbeba4b2cacb8e28b12c677f216",
+      "ledger_version": 1,
+      "successes": 3,
+      "episodes": 5,
+      "success_rate_percent": 60.0,
+      "control_steps": 977,
+      "neural_chunks": 196,
+      "control_to_neural": 4.98469387755102,
+      "rollout_seconds": 115.27423214912415,
+      "legacy_inference_host_seconds": 81.29748202185147,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_object",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 3,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_object",
+          "task_id": 4,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/spatial_h10.json",
+      "sha256_lf_normalized": "14c2cc2b1e30f4fac0f77561b2059c88162fb1f046bdf58dd8c28bb2faa6abc7",
+      "ledger_version": 1,
+      "successes": 4,
+      "episodes": 5,
+      "success_rate_percent": 80.0,
+      "control_steps": 690,
+      "neural_chunks": 70,
+      "control_to_neural": 9.857142857142858,
+      "rollout_seconds": 62.31058120727539,
+      "legacy_inference_host_seconds": 29.257480653002858,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 3,
+          "successes": [
+            false
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 4,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/broad_sweep/spatial_h5.json",
+      "sha256_lf_normalized": "b069c5b0e507e730e7732525c9a0e93897bc34e6d54e643b3a0104a3f86fd97c",
+      "ledger_version": 1,
+      "successes": 5,
+      "episodes": 5,
+      "success_rate_percent": 100.0,
+      "control_steps": 479,
+      "neural_chunks": 99,
+      "control_to_neural": 4.838383838383838,
+      "rollout_seconds": 68.6398253440857,
+      "legacy_inference_host_seconds": 41.51720333905541,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 2,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 3,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 4,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_h1.json",
+      "sha256_lf_normalized": "768b794188c231505c37dbd805b3e9562a285e4a4d46c4b3d1d7031631133e98",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 355,
+      "neural_chunks": 355,
+      "control_to_neural": 1.0,
+      "rollout_seconds": 162.1330807209015,
+      "legacy_inference_host_seconds": 148.6995327930199,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_h10.json",
+      "sha256_lf_normalized": "53be4747b1513460acefb12e3f64d0e9215a1f6679f76b142186437224cc4e25",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 356,
+      "neural_chunks": 36,
+      "control_to_neural": 9.88888888888889,
+      "rollout_seconds": 28.749929189682007,
+      "legacy_inference_host_seconds": 15.052824855898507,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_h10_repeat.json",
+      "sha256_lf_normalized": "1543fd5ca6f71d61b92f8a85038a4c67efcbff2744ff935f5128566daf824ab5",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 356,
+      "neural_chunks": 36,
+      "control_to_neural": 9.88888888888889,
+      "rollout_seconds": 29.201308488845825,
+      "legacy_inference_host_seconds": 15.296107461093925,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_h5.json",
+      "sha256_lf_normalized": "472bee679d8f7ae1d64a3c6aaeb14c2a11d3466ba2764b5e636aa62240081026",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 357,
+      "neural_chunks": 72,
+      "control_to_neural": 4.958333333333333,
+      "rollout_seconds": 43.24162435531616,
+      "legacy_inference_host_seconds": 29.454286714986665,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h10.json",
+      "sha256_lf_normalized": "63b3a4326e700567c025910b7c47c591871b2e1d9569f1ae516099f5b59c681d",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 2,
+      "success_rate_percent": 100.0,
+      "control_steps": 183,
+      "neural_chunks": 19,
+      "control_to_neural": 9.631578947368421,
+      "rollout_seconds": 18.907402753829956,
+      "legacy_inference_host_seconds": 8.143339685047977,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h10_d20.json",
+      "sha256_lf_normalized": "556fac2c005a2255896ea9785968c5860080ed7037a486312cee64ca10a243dc",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 2,
+      "success_rate_percent": 100.0,
+      "control_steps": 185,
+      "neural_chunks": 19,
+      "control_to_neural": 9.736842105263158,
+      "rollout_seconds": 26.111766815185547,
+      "legacy_inference_host_seconds": 15.309018360916525,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h10_d5.json",
+      "sha256_lf_normalized": "1f5bfb91e174254ecf249f6ae71e4f6dc240a12bc300348d8dd8587eaeba567b",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 2,
+      "success_rate_percent": 100.0,
+      "control_steps": 176,
+      "neural_chunks": 19,
+      "control_to_neural": 9.263157894736842,
+      "rollout_seconds": 15.498991966247559,
+      "legacy_inference_host_seconds": 4.877758584916592,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h5.json",
+      "sha256_lf_normalized": "5dae76c15cb73040e68f141516aaff6e4d7e2315c7fd9e67962f7a2cf0543a76",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 2,
+      "success_rate_percent": 100.0,
+      "control_steps": 176,
+      "neural_chunks": 36,
+      "control_to_neural": 4.888888888888889,
+      "rollout_seconds": 25.773671865463257,
+      "legacy_inference_host_seconds": 15.162659768015146,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h5_d20.json",
+      "sha256_lf_normalized": "55d316b71a8f1ba4318be72b914a1a2b0dbc25b41fe24d826558b0b8aa4c6e02",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 355,
+      "neural_chunks": 71,
+      "control_to_neural": 5.0,
+      "rollout_seconds": 71.65696907043457,
+      "legacy_inference_host_seconds": 56.019762236013776,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/eval_spatial01_h5_d5.json",
+      "sha256_lf_normalized": "90217c6690574eb064b7b6c25e1790cc3f7289c16b7c81069adea71a6bcdaf61",
+      "ledger_version": 1,
+      "successes": 2,
+      "episodes": 2,
+      "success_rate_percent": 100.0,
+      "control_steps": 177,
+      "neural_chunks": 36,
+      "control_to_neural": 4.916666666666667,
+      "rollout_seconds": 19.302152156829834,
+      "legacy_inference_host_seconds": 8.783781201898819,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        },
+        {
+          "suite": "libero_spatial",
+          "task_id": 1,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/infrastructure_v2/h1.json",
+      "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63",
+      "ledger_version": 2,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 92,
+      "neural_chunks": 92,
+      "control_to_neural": 1.0,
+      "rollout_seconds": 72.20224690437317,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "available for explicit comparison",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ],
+      "h": 1,
+      "denoising_steps": 10,
+      "warmup_chunks": 20,
+      "episode_identities": [
+        [
+          "libero_spatial",
+          0,
+          0,
+          1000
+        ]
+      ],
+      "measured_cuda_event_ms": {
+        "sum": 54257.07336425781,
+        "p50": 589.614990234375,
+        "p95": 591.5607757568359,
+        "n": 92
+      },
+      "warmup_cuda_event_ms": {
+        "sum": 12118.412841796875,
+        "p50": 589.0934143066406,
+        "p95": 607.4566009521486,
+        "n": 20
+      }
+    },
+    {
+      "path": "results/infrastructure_v2/h10.json",
+      "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828",
+      "ledger_version": 2,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 86,
+      "neural_chunks": 9,
+      "control_to_neural": 9.555555555555555,
+      "rollout_seconds": 22.509581327438354,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "available for explicit comparison",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ],
+      "h": 10,
+      "denoising_steps": 10,
+      "warmup_chunks": 20,
+      "episode_identities": [
+        [
+          "libero_spatial",
+          0,
+          0,
+          1000
+        ]
+      ],
+      "measured_cuda_event_ms": {
+        "sum": 5160.85986328125,
+        "p50": 573.3549194335938,
+        "p95": 575.3504028320312,
+        "n": 9
+      },
+      "warmup_cuda_event_ms": {
+        "sum": 11772.84228515625,
+        "p50": 572.6602172851562,
+        "p95": 591.9146453857425,
+        "n": 20
+      }
+    },
+    {
+      "path": "results/infrastructure_v2/h10_repeat.json",
+      "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc",
+      "ledger_version": 2,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 86,
+      "neural_chunks": 9,
+      "control_to_neural": 9.555555555555555,
+      "rollout_seconds": 23.45198154449463,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "available for explicit comparison",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ],
+      "h": 10,
+      "denoising_steps": 10,
+      "warmup_chunks": 20,
+      "episode_identities": [
+        [
+          "libero_spatial",
+          0,
+          0,
+          1000
+        ]
+      ],
+      "measured_cuda_event_ms": {
+        "sum": 5423.951843261719,
+        "p50": 602.8157348632812,
+        "p95": 603.4830078125,
+        "n": 9
+      },
+      "warmup_cuda_event_ms": {
+        "sum": 12398.801025390625,
+        "p50": 601.586181640625,
+        "p95": 648.3955963134767,
+        "n": 20
+      }
+    },
+    {
+      "path": "results/infrastructure_v2/h5.json",
+      "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e",
+      "ledger_version": 2,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 66,
+      "neural_chunks": 14,
+      "control_to_neural": 4.714285714285714,
+      "rollout_seconds": 25.547541618347168,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "available for explicit comparison",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ],
+      "h": 5,
+      "denoising_steps": 10,
+      "warmup_chunks": 20,
+      "episode_identities": [
+        [
+          "libero_spatial",
+          0,
+          0,
+          1000
+        ]
+      ],
+      "measured_cuda_event_ms": {
+        "sum": 8357.559692382812,
+        "p50": 595.3590698242188,
+        "p95": 607.0224914550781,
+        "n": 14
+      },
+      "warmup_cuda_event_ms": {
+        "sum": 12204.824951171875,
+        "p50": 593.1819763183594,
+        "p95": 613.4136199951174,
+        "n": 20
+      }
+    },
+    {
+      "path": "results/infrastructure_v3/h10_reference.json",
+      "sha256_lf_normalized": "9ca62cae47c3bccce46fb0130d15043545c06c2007dd832c15a8b2edf8441241",
+      "ledger_version": 3,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 86,
+      "neural_chunks": 9,
+      "control_to_neural": 9.555555555555555,
+      "rollout_seconds": 28.19705319404602,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/infrastructure_v3/h10_two_episodes.json",
+      "sha256_lf_normalized": "6583e4a7dcac82c55f7bf6df869f1b96dc92b5eb6223368b564740dff7ed4a3d",
+      "ledger_version": 3,
+      "successes": 1,
+      "episodes": 2,
+      "success_rate_percent": 50.0,
+      "control_steps": 366,
+      "neural_chunks": 37,
+      "control_to_neural": 9.891891891891891,
+      "rollout_seconds": 71.26333284378052,
+      "legacy_inference_host_seconds": null,
+      "timing_scope": "CUDA-event stream elapsed; warmup excluded from inference events",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/suite_gate/10.json",
+      "sha256_lf_normalized": "32447bb729e3def6133705742e6076aec757811822bf18d08e982b71450043fa",
+      "ledger_version": 1,
+      "successes": 0,
+      "episodes": 1,
+      "success_rate_percent": 0.0,
+      "control_steps": 520,
+      "neural_chunks": 52,
+      "control_to_neural": 10.0,
+      "rollout_seconds": 38.93388843536377,
+      "legacy_inference_host_seconds": 22.104912201786647,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_10",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/suite_gate/goal.json",
+      "sha256_lf_normalized": "54de857bb182bb91197e8abfbb404a5f3b309a98211dfb3d301419b7018ac136",
+      "ledger_version": 1,
+      "successes": 0,
+      "episodes": 1,
+      "success_rate_percent": 0.0,
+      "control_steps": 300,
+      "neural_chunks": 30,
+      "control_to_neural": 10.0,
+      "rollout_seconds": 22.671258211135864,
+      "legacy_inference_host_seconds": 12.921445689047687,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_goal",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/suite_gate/object.json",
+      "sha256_lf_normalized": "7a41b3b518a0b83f79735fad5d18e487136c686455622301dba91b1f50304949",
+      "ledger_version": 1,
+      "successes": 0,
+      "episodes": 1,
+      "success_rate_percent": 0.0,
+      "control_steps": 280,
+      "neural_chunks": 28,
+      "control_to_neural": 10.0,
+      "rollout_seconds": 20.800792694091797,
+      "legacy_inference_host_seconds": 11.921950772986747,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_object",
+          "task_id": 0,
+          "successes": [
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "path": "results/suite_gate/spatial.json",
+      "sha256_lf_normalized": "e1333a10cfc6a4148603962c3d7f28d45c6fd6d54a23cca048e9c1f99af341a2",
+      "ledger_version": 1,
+      "successes": 1,
+      "episodes": 1,
+      "success_rate_percent": 100.0,
+      "control_steps": 76,
+      "neural_chunks": 8,
+      "control_to_neural": 9.5,
+      "rollout_seconds": 8.774989366531372,
+      "legacy_inference_host_seconds": 3.660028682963457,
+      "timing_scope": "host elapsed with post-call CUDA synchronization; includes cold calls",
+      "pairing_evidence": "unverifiable",
+      "task_outcomes": [
+        {
+          "suite": "libero_spatial",
+          "task_id": 0,
+          "successes": [
+            true
+          ]
+        }
+      ]
+    }
+  ]
+}

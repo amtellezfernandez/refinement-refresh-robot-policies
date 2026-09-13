@@ -1,0 +1,19 @@
+{
+  "checkpoint": "HuggingFaceVLA/smolvla_libero",
+  "checkpoint_revision": "6721902bc4d61e50a3bfdb11dfb4cb626f05d102",
+  "lerobot_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+  "environment": "LIBERO libero_spatial",
+  "task_ids_primary": [0],
+  "task_ids_cross_task": [0, 1],
+  "suite_gate": {"libero_spatial": 1.0, "libero_object": 0.0, "libero_goal": 0.0, "libero_10": 0.0},
+  "seed": 1000,
+  "primary_episodes": 2,
+  "cross_task_episodes_per_task": 1,
+  "denoising_steps_primary": 10,
+  "device": "cuda",
+  "ledger_version": 1,
+  "instrumentation": ["select_action_calls", "_get_action_chunk_calls", "host_elapsed_seconds_with_post_call_cuda_synchronize"],
+  "timing_limitations": "Includes cold calls; not CUDA-event or kernel-only timing. Do not combine with separately instrumented v2 results.",
+  "pairing_status": "Requested task and seed settings match; initial-state pairing and action replay cannot be verified from v1 aggregate ledgers.",
+  "scope": "deployment accounting pilot; not a scaling law or general policy evaluation"
+}

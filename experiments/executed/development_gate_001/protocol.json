@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "kind": "development_pipeline_gates",
+  "identity": {
+    "suite": "libero_spatial",
+    "task_id": 0,
+    "initial_state_id": 0,
+    "policy_seed": 1000
+  },
+  "planned_chunk_calls": 8,
+  "max_seconds": 2400.0,
+  "image_size": 360,
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "checkpoint_revision": "6721902bc4d61e50a3bfdb11dfb4cb626f05d102",
+  "lerobot_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+  "call_order": [
+    "native",
+    "native_repeat",
+    "camera_swap",
+    "zero_images",
+    "profile_d5",
+    "counter_d5",
+    "profile_d10",
+    "counter_d10"
+  ],
+  "decision_rule": "Native repeat and profiler/counter outputs must be allclose; at least one image perturbation must change the full output beyond tolerance. Both independent source profiles must count one sample_actions and d denoise_step calls. Zero-action control must not succeed and must reach the task horizon or an actual terminal condition.",
+  "timing_scope": "Budget includes local model load and environment setup, checked between operations; an in-progress CUDA or simulator operation is not forcibly killed.",
+  "limitations": "One development input. Perturbation sensitivity does not establish useful visual grounding or policy quality. No accuracy, power, FLOP or safety claim."
+}

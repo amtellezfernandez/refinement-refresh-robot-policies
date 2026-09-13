@@ -1,0 +1,2739 @@
+{
+  "experiment": "Deterministic offline ledger mutation robustness",
+  "protocol_sha256": "93dba024bb4d62b37dd1c2fc1e14ab95030682a22d41bc5b0365ed2fef19ddbf",
+  "run_type": "executed local validation of constructed artifacts; no new robot evaluation",
+  "source_count": 4,
+  "case_count": 17,
+  "trial_count": 68,
+  "layer_checks": 272,
+  "dependencies": {
+    "numpy": "2.4.2",
+    "jsonschema": "4.26.0"
+  },
+  "trials": [
+    {
+      "trial_id": "h1/untouched",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "untouched",
+      "label": "Untouched archived artifact",
+      "ground_truth": "control",
+      "intervention": "No mutation; accepted in-band data does not establish completeness outside its scope.",
+      "payload_sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/invalid_json",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "invalid_json",
+      "label": "Invalid JSON",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final closing brace; violates JSON grammar.",
+      "payload_sha256_lf_normalized": "329a27a38488667c481849e8e547be5d041275a950d15aa20e44a6d5b68d4832",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 5466 column 1 (char 145669)",
+          "outcome": "detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 5466 column 1 (char 145669)",
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 5466 column 1 (char 145669)",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 5466 column 1 (char 145669)",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/missing_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "missing_environment_event",
+      "label": "Missing environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final consumer event but retain producer stream and selection counter.",
+      "payload_sha256_lf_normalized": "077be794f13aff776a6b53ce2b5a833787fb975e11c9d4a9d4c2fcc06f15e2b3",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/duplicate_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "duplicate_environment_event",
+      "label": "Duplicate environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Append final consumer event without changing independent streams/counters.",
+      "payload_sha256_lf_normalized": "c9191d51abf0f8fa2520180581f31cb5fb56d3de0d5f2c1950d744752b064a55",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/sampler_count_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "sampler_count_drift",
+      "label": "Independent counter mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment measured sampler counter only.",
+      "payload_sha256_lf_normalized": "769cc7e8469eb1ce0b4d66a6b53da51fb66ec09decdaae1c32fd361e58fd152e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/stale_action_hash",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "stale_action_hash",
+      "label": "Action with stale hash",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action value while retaining original hash.",
+      "payload_sha256_lf_normalized": "d1f8a79219e68cd841127ebe22f14270a8b967363e2be13627bb341718c1408d",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "array hash mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/consumer_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "consumer_action_rewrite",
+      "label": "Producer/consumer action mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action and recompute its valid hash; producer stream stays original.",
+      "payload_sha256_lf_normalized": "4bf414298fc99a4d3925242e1087e9ceddd17fb78228b38d2a3129c30aad909f",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "producer/environment action mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/identity_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "identity_drift",
+      "label": "Episode identity mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment episode task ID only; inference identities and task outcomes stay original.",
+      "payload_sha256_lf_normalized": "ba04b1fee2c9ad148c180edd1db7d6b7c6a7cff799d7339d75db65dc21fcdc0c",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/outcome_rate_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "outcome_rate_drift",
+      "label": "Outcome aggregate mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Replace overall success percentage with the opposite binary outcome; task/group outcomes stay original.",
+      "payload_sha256_lf_normalized": "4117b907808fd0e1046bd9844c7b5d7909dc1d1c138577778efb25a340a0278e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/incomplete_result",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "incomplete_result",
+      "label": "Missing completed-result wrapper",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove overall result; remaining ledger alone cannot establish completed evaluator output.",
+      "payload_sha256_lf_normalized": "60ffa4b65cd36e14890c9c5524d8021b8ffdfa9d54fbe0883fc002748975f862",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/reordered_environment_events",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "reordered_environment_events",
+      "label": "Reordered steps",
+      "ground_truth": "observable_defect",
+      "intervention": "Swap first two consumer events; counts and action hashes stay valid.",
+      "payload_sha256_lf_normalized": "78cf4fe322afbc7266eebc88a0b819e1a0bf36e8bc0113c25f555ae7569c5a06",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "missing/duplicated/reordered step",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/balanced_duplicate_inference",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "balanced_duplicate_inference",
+      "label": "Duplicate chunk; balanced counts",
+      "ground_truth": "observable_defect",
+      "intervention": "Append a measured inference and increment both counters; aggregate counts agree but schedule duplicates.",
+      "payload_sha256_lf_normalized": "6826ef5964e6ebfbe8ce4ce4f7493d10101c538f4e7e1b9471cebaf9295286d4",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/missing_timing_unit",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "missing_timing_unit",
+      "label": "Missing timing field/unit",
+      "ground_truth": "observable_defect",
+      "intervention": "Rename first inference cuda_ms to duration, losing the declared clock/unit field.",
+      "payload_sha256_lf_normalized": "33e538c028e9e49926afe61e904e352999b451b7d0358736240b2d07abbd9e70",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/interleaved_warmup",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "interleaved_warmup",
+      "label": "Warm-up after measured event",
+      "ground_truth": "observable_defect",
+      "intervention": "Move first warm-up event to end; all event and counter totals stay unchanged.",
+      "payload_sha256_lf_normalized": "3dd0de7687dd761c267b20988d6ec0efe233e95fc340718ccd1526f0bd4622b5",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "warmup/measured events interleaved",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/joint_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "joint_action_rewrite",
+      "label": "Joint action rewrite",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Change both first action streams and recompute hashes. Without an external expected-action reference, an internally consistent record cannot certify which action occurred.",
+      "payload_sha256_lf_normalized": "f17fcd5c416ba818c42a1d73789a250d873410f7fb6aa6f8108954fde42491a4",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/preprocessing_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "preprocessing_coverage_query",
+      "label": "Unlogged preprocessing coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether all preprocessing was accounted for. No independent expected-stage manifest or preprocessing cost is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h1/rendering_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h1.json",
+        "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+      },
+      "case": "rendering_coverage_query",
+      "label": "Unlogged rendering coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether rendering costs were fully included. No independent stage-level rendering record is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/untouched",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "untouched",
+      "label": "Untouched archived artifact",
+      "ground_truth": "control",
+      "intervention": "No mutation; accepted in-band data does not establish completeness outside its scope.",
+      "payload_sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/invalid_json",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "invalid_json",
+      "label": "Invalid JSON",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final closing brace; violates JSON grammar.",
+      "payload_sha256_lf_normalized": "b3f6374714bddce2b09003544b20b141926eb830a846193b5ecd85a9dceeb403",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 3464 column 1 (char 96495)",
+          "outcome": "detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 3464 column 1 (char 96495)",
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 3464 column 1 (char 96495)",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 3464 column 1 (char 96495)",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/missing_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "missing_environment_event",
+      "label": "Missing environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final consumer event but retain producer stream and selection counter.",
+      "payload_sha256_lf_normalized": "af5898efc388c449642a2a125527aabbf436c577c1e17a0559a63939ccce9d6a",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/duplicate_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "duplicate_environment_event",
+      "label": "Duplicate environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Append final consumer event without changing independent streams/counters.",
+      "payload_sha256_lf_normalized": "b84aafb0aed8e71a92ad9139578e871201895f13aac049a774456a781a596fa7",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/sampler_count_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "sampler_count_drift",
+      "label": "Independent counter mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment measured sampler counter only.",
+      "payload_sha256_lf_normalized": "852b9f9dbd40cccbd07fe10068ef347a42b432ef2f005d1ac3994b2de67e7405",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/stale_action_hash",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "stale_action_hash",
+      "label": "Action with stale hash",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action value while retaining original hash.",
+      "payload_sha256_lf_normalized": "5bb1b68f13d2e11ebbd4cbd0088e8669df63aeadb050a4afad5e59ebe8db6694",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "array hash mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/consumer_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "consumer_action_rewrite",
+      "label": "Producer/consumer action mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action and recompute its valid hash; producer stream stays original.",
+      "payload_sha256_lf_normalized": "271edd0a2c4e4b274093c4868917ceb2f90ec0560cdeea1921c2e096fce269d2",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "producer/environment action mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/identity_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "identity_drift",
+      "label": "Episode identity mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment episode task ID only; inference identities and task outcomes stay original.",
+      "payload_sha256_lf_normalized": "15fc8da0df9a68bbcc92e95268ba825aab03ef26c09d5491b397c90691ae8be8",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/outcome_rate_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "outcome_rate_drift",
+      "label": "Outcome aggregate mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Replace overall success percentage with the opposite binary outcome; task/group outcomes stay original.",
+      "payload_sha256_lf_normalized": "c6174003620b68fbbe06bc1c02f38d32fb16c7f4a5744c4a4e435530b456361e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/incomplete_result",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "incomplete_result",
+      "label": "Missing completed-result wrapper",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove overall result; remaining ledger alone cannot establish completed evaluator output.",
+      "payload_sha256_lf_normalized": "9640733547159a2bf390650b49b99faf0902e20c4700839578a6bfa330b76be5",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/reordered_environment_events",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "reordered_environment_events",
+      "label": "Reordered steps",
+      "ground_truth": "observable_defect",
+      "intervention": "Swap first two consumer events; counts and action hashes stay valid.",
+      "payload_sha256_lf_normalized": "6e5f2f2ccefd7622f8de6e6f89935489e11c634bfb86af8a3033118626713e93",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "missing/duplicated/reordered step",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/balanced_duplicate_inference",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "balanced_duplicate_inference",
+      "label": "Duplicate chunk; balanced counts",
+      "ground_truth": "observable_defect",
+      "intervention": "Append a measured inference and increment both counters; aggregate counts agree but schedule duplicates.",
+      "payload_sha256_lf_normalized": "6524117dc4de5a46934097f7712ab1318ccc04f0b8afb5dd5e69e08d19a75b8d",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/missing_timing_unit",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "missing_timing_unit",
+      "label": "Missing timing field/unit",
+      "ground_truth": "observable_defect",
+      "intervention": "Rename first inference cuda_ms to duration, losing the declared clock/unit field.",
+      "payload_sha256_lf_normalized": "f15b9c6f0fad1919ef500654c7b50eae148244f2c91c92e105e18cb226e448aa",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/interleaved_warmup",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "interleaved_warmup",
+      "label": "Warm-up after measured event",
+      "ground_truth": "observable_defect",
+      "intervention": "Move first warm-up event to end; all event and counter totals stay unchanged.",
+      "payload_sha256_lf_normalized": "dde5bd63e3336650cb5c976f4226fc7bfcb537338651a155aebf97710936fb7e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "warmup/measured events interleaved",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/joint_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "joint_action_rewrite",
+      "label": "Joint action rewrite",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Change both first action streams and recompute hashes. Without an external expected-action reference, an internally consistent record cannot certify which action occurred.",
+      "payload_sha256_lf_normalized": "a76d5041d2b5149e9b9581663dba0a1d20c1968773534b7fc2d7028c994cf38e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/preprocessing_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "preprocessing_coverage_query",
+      "label": "Unlogged preprocessing coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether all preprocessing was accounted for. No independent expected-stage manifest or preprocessing cost is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h5/rendering_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h5.json",
+        "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+      },
+      "case": "rendering_coverage_query",
+      "label": "Unlogged rendering coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether rendering costs were fully included. No independent stage-level rendering record is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/untouched",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "untouched",
+      "label": "Untouched archived artifact",
+      "ground_truth": "control",
+      "intervention": "No mutation; accepted in-band data does not establish completeness outside its scope.",
+      "payload_sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/invalid_json",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "invalid_json",
+      "label": "Invalid JSON",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final closing brace; violates JSON grammar.",
+      "payload_sha256_lf_normalized": "15d04f10f7eee9fdbe65c202fb3c26c20ff88978bf2e031e783f90c221f57b28",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 120998)",
+          "outcome": "detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 120998)",
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 120998)",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 120998)",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/missing_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "missing_environment_event",
+      "label": "Missing environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final consumer event but retain producer stream and selection counter.",
+      "payload_sha256_lf_normalized": "cb0a0dc15552937b8c6b142facdee9896fb883689e069c81366920c2464f77d1",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/duplicate_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "duplicate_environment_event",
+      "label": "Duplicate environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Append final consumer event without changing independent streams/counters.",
+      "payload_sha256_lf_normalized": "786fdac65bf9a73063a7b2a9775a49ddb8765e3cf7fb13b5c5ed2922da5048d9",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/sampler_count_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "sampler_count_drift",
+      "label": "Independent counter mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment measured sampler counter only.",
+      "payload_sha256_lf_normalized": "bcae2191d331bc1eb448eca2ef3d072e6e422c6720276946b1fc31fce94de909",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/stale_action_hash",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "stale_action_hash",
+      "label": "Action with stale hash",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action value while retaining original hash.",
+      "payload_sha256_lf_normalized": "204ac7f593c1cd685253c59af5a616c832ce095879fba3423294b7a0230656f6",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "array hash mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/consumer_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "consumer_action_rewrite",
+      "label": "Producer/consumer action mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action and recompute its valid hash; producer stream stays original.",
+      "payload_sha256_lf_normalized": "ca7183a6b90a4cbe8d275e065e33948eaf2182e5bf99853cf879fe81b1fb76d5",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "producer/environment action mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/identity_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "identity_drift",
+      "label": "Episode identity mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment episode task ID only; inference identities and task outcomes stay original.",
+      "payload_sha256_lf_normalized": "bb7f2b8c6876d10a0edb4fbef25eef4e455e2a787b1f6870b5961855fe241d7b",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/outcome_rate_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "outcome_rate_drift",
+      "label": "Outcome aggregate mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Replace overall success percentage with the opposite binary outcome; task/group outcomes stay original.",
+      "payload_sha256_lf_normalized": "c70203b9fd6b2ad180e1254c8948b1a14d21fb8e4d7d03e03bcf3bd1d2490c95",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/incomplete_result",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "incomplete_result",
+      "label": "Missing completed-result wrapper",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove overall result; remaining ledger alone cannot establish completed evaluator output.",
+      "payload_sha256_lf_normalized": "ed27e8bab3c7f6e3f95fac76a52090183b3edea09553b2b8c002767ddd849f75",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/reordered_environment_events",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "reordered_environment_events",
+      "label": "Reordered steps",
+      "ground_truth": "observable_defect",
+      "intervention": "Swap first two consumer events; counts and action hashes stay valid.",
+      "payload_sha256_lf_normalized": "bc2c00f18688859104b98f48240a474938360a0e3e60a3cacefcedb27b9268bd",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "missing/duplicated/reordered step",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/balanced_duplicate_inference",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "balanced_duplicate_inference",
+      "label": "Duplicate chunk; balanced counts",
+      "ground_truth": "observable_defect",
+      "intervention": "Append a measured inference and increment both counters; aggregate counts agree but schedule duplicates.",
+      "payload_sha256_lf_normalized": "76ffb80e8b68b25681358dcfe569209b09c548ecc3381530f94df06b894c6264",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/missing_timing_unit",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "missing_timing_unit",
+      "label": "Missing timing field/unit",
+      "ground_truth": "observable_defect",
+      "intervention": "Rename first inference cuda_ms to duration, losing the declared clock/unit field.",
+      "payload_sha256_lf_normalized": "f38ada0af45148ce394d6af7c976f588281a405df7d31bfae0f5fa7b2deee701",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/interleaved_warmup",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "interleaved_warmup",
+      "label": "Warm-up after measured event",
+      "ground_truth": "observable_defect",
+      "intervention": "Move first warm-up event to end; all event and counter totals stay unchanged.",
+      "payload_sha256_lf_normalized": "ce962cecab1849fc8d61afbf5e34b76841af526c8cf08f22abc02009dc813dfb",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "warmup/measured events interleaved",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/joint_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "joint_action_rewrite",
+      "label": "Joint action rewrite",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Change both first action streams and recompute hashes. Without an external expected-action reference, an internally consistent record cannot certify which action occurred.",
+      "payload_sha256_lf_normalized": "c67040b8201ee1bc31966e4200c9d60eba2a20da774c3e81d189735f47b7f965",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/preprocessing_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "preprocessing_coverage_query",
+      "label": "Unlogged preprocessing coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether all preprocessing was accounted for. No independent expected-stage manifest or preprocessing cost is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10/rendering_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10.json",
+        "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+      },
+      "case": "rendering_coverage_query",
+      "label": "Unlogged rendering coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether rendering costs were fully included. No independent stage-level rendering record is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/untouched",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "untouched",
+      "label": "Untouched archived artifact",
+      "ground_truth": "control",
+      "intervention": "No mutation; accepted in-band data does not establish completeness outside its scope.",
+      "payload_sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "accepted_control"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/invalid_json",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "invalid_json",
+      "label": "Invalid JSON",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final closing brace; violates JSON grammar.",
+      "payload_sha256_lf_normalized": "df25f6d1396369827b7f7c24c85ea5aff0eff54b6c3573db62c72edaebc7550c",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 121033)",
+          "outcome": "detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 121033)",
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 121033)",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "syntax",
+          "reason": "Expecting ',' delimiter: line 4289 column 1 (char 121033)",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/missing_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "missing_environment_event",
+      "label": "Missing environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove final consumer event but retain producer stream and selection counter.",
+      "payload_sha256_lf_normalized": "b56e48b957113099db7bc2cba3c2087b68acdeece5b128e5947f26d2a8d336c4",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/duplicate_environment_event",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "duplicate_environment_event",
+      "label": "Duplicate environment event",
+      "ground_truth": "observable_defect",
+      "intervention": "Append final consumer event without changing independent streams/counters.",
+      "payload_sha256_lf_normalized": "5609ab8486846b4d0299cef93055cf59c5e4aeb4d9407beeb9185789bc643473",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate producer/consumer/selection counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/sampler_count_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "sampler_count_drift",
+      "label": "Independent counter mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment measured sampler counter only.",
+      "payload_sha256_lf_normalized": "8372ff5b9c523b64050c858636ca8b0e07b3353ae4564cf6e6a038de0aef5bc9",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "aggregate phase/event/chunk/sampler counts disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/stale_action_hash",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "stale_action_hash",
+      "label": "Action with stale hash",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action value while retaining original hash.",
+      "payload_sha256_lf_normalized": "ffffef544dcbeba599889bfb8f5a6c52835fbded52957926688e694ea11e82d9",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "array hash mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/consumer_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "consumer_action_rewrite",
+      "label": "Producer/consumer action mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Change first consumer action and recompute its valid hash; producer stream stays original.",
+      "payload_sha256_lf_normalized": "6510f2cc65b257242fc58f5b199e9065ca90189f7f0ef60969094a6acfb1f5c5",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "producer/environment action mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/identity_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "identity_drift",
+      "label": "Episode identity mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Increment episode task ID only; inference identities and task outcomes stay original.",
+      "payload_sha256_lf_normalized": "db08c5b26624286f7b4720363d8c6e6ee4862f658b1a3c0f7943bd9280bf16ce",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/outcome_rate_drift",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "outcome_rate_drift",
+      "label": "Outcome aggregate mismatch",
+      "ground_truth": "observable_defect",
+      "intervention": "Replace overall success percentage with the opposite binary outcome; task/group outcomes stay original.",
+      "payload_sha256_lf_normalized": "6ec1447a6f603dee62bffe571be729c310c21f824dccee4a5bddcf5974ff113c",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "aggregates",
+          "reason": "outcome/overall success rates disagree",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/incomplete_result",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "incomplete_result",
+      "label": "Missing completed-result wrapper",
+      "ground_truth": "observable_defect",
+      "intervention": "Remove overall result; remaining ledger alone cannot establish completed evaluator output.",
+      "payload_sha256_lf_normalized": "453bb4e50965ebfe9836f8550d2e839fa34029d9b60010f578ebb29bcf9ec564",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'overall' is a required property",
+          "error_path": [],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/reordered_environment_events",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "reordered_environment_events",
+      "label": "Reordered steps",
+      "ground_truth": "observable_defect",
+      "intervention": "Swap first two consumer events; counts and action hashes stay valid.",
+      "payload_sha256_lf_normalized": "cff43f9311118acc5af1dcf4eae0a9211489bc8c5c037702d64a6c464029a498",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "missing/duplicated/reordered step",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/balanced_duplicate_inference",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "balanced_duplicate_inference",
+      "label": "Duplicate chunk; balanced counts",
+      "ground_truth": "observable_defect",
+      "intervention": "Append a measured inference and increment both counters; aggregate counts agree but schedule duplicates.",
+      "payload_sha256_lf_normalized": "0bbb3b4713af7ef34f59630f24ba4cb8a50ccdf901340ccdbc9c7c36ba753221",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "chunk schedule mismatch",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/missing_timing_unit",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "missing_timing_unit",
+      "label": "Missing timing field/unit",
+      "ground_truth": "observable_defect",
+      "intervention": "Rename first inference cuda_ms to duration, losing the declared clock/unit field.",
+      "payload_sha256_lf_normalized": "bea05d014b6ceef05830e2a5a4d96687d0416bd3b26a7a1d0cbd39351b8679c3",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "aggregates": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "structure",
+          "reason": "'cuda_ms' is a required property",
+          "error_path": [
+            "robopad_ledger",
+            "inferences",
+            0
+          ],
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/interleaved_warmup",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "interleaved_warmup",
+      "label": "Warm-up after measured event",
+      "ground_truth": "observable_defect",
+      "intervention": "Move first warm-up event to end; all event and counter totals stay unchanged.",
+      "payload_sha256_lf_normalized": "76c242d5c85529217d20f33bdf4806183c759b0e7ed2045775c5be6a70e7b8f9",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "not_detected"
+        },
+        "full_ledger": {
+          "technical_verdict": "rejected",
+          "rejected_at": "full_ledger",
+          "reason": "warmup/measured events interleaved",
+          "outcome": "detected"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/joint_action_rewrite",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "joint_action_rewrite",
+      "label": "Joint action rewrite",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Change both first action streams and recompute hashes. Without an external expected-action reference, an internally consistent record cannot certify which action occurred.",
+      "payload_sha256_lf_normalized": "07b816b960caca57e79f84ef3e2f09fc9db1d76715de236648f713fccb13262e",
+      "payload_differs_from_source": true,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/preprocessing_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "preprocessing_coverage_query",
+      "label": "Unlogged preprocessing coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether all preprocessing was accounted for. No independent expected-stage manifest or preprocessing cost is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    },
+    {
+      "trial_id": "h10_repeat/rendering_coverage_query",
+      "source": {
+        "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+        "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+      },
+      "case": "rendering_coverage_query",
+      "label": "Unlogged rendering coverage",
+      "ground_truth": "unobservable_scenario",
+      "intervention": "Unchanged bytes; ask whether rendering costs were fully included. No independent stage-level rendering record is available. This is an unknown coverage query, not an invented measured omission.",
+      "payload_sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc",
+      "payload_differs_from_source": false,
+      "validation_results": {
+        "syntax": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "structure": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "aggregates": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        },
+        "full_ledger": {
+          "technical_verdict": "accepted",
+          "rejected_at": null,
+          "reason": null,
+          "outcome": "unknown"
+        }
+      }
+    }
+  ]
+}

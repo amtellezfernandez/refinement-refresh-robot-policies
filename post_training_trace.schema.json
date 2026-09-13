@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://robotpad.example/schemas/post-training-trace-v0.2.json",
+  "title": "Post-Training Resource Trace v0.2",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "system",
+    "boundary",
+    "pretrained_roots",
+    "states",
+    "events"
+  ],
+  "properties": {
+    "spec_version": {
+      "const": "0.2"
+    },
+    "system": {
+      "type": "string",
+      "minLength": 1
+    },
+    "boundary": {
+      "type": "object",
+      "required": [
+        "scope",
+        "description",
+        "included",
+        "excluded"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "adaptation",
+            "deployment",
+            "adaptation_and_deployment"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "included": {
+          "$ref": "#/$defs/nonempty_names"
+        },
+        "excluded": {
+          "$ref": "#/$defs/names"
+        }
+      },
+      "additionalProperties": false
+    },
+    "pretrained_roots": {
+      "$ref": "#/$defs/nonempty_names"
+    },
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/state"
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "outcomes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "names": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "nonempty_names": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "id",
+        "carrier",
+        "roles",
+        "lifetime"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "carrier": {
+          "enum": [
+            "MODEL",
+            "RECORDS",
+            "WORKSPACE",
+            "PHYSICAL",
+            "SPECIFICATION"
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "POLICY",
+              "DYNAMICS",
+              "VALUE",
+              "REWARD",
+              "ADAPTER",
+              "DETECTOR",
+              "CONSTRAINT",
+              "GOAL",
+              "PREFERENCE",
+              "MEMORY",
+              "EXPERIENCE",
+              "WORLD_REPRESENTATION",
+              "OBSERVATION",
+              "QUERY",
+              "CANDIDATE",
+              "SCORE",
+              "ACTION",
+              "TRAJECTORY",
+              "ENVIRONMENT"
+            ]
+          }
+        },
+        "lifetime": {
+          "enum": [
+            "EVENT",
+            "CONTROL_CYCLE",
+            "EPISODE",
+            "CROSS_EPISODE",
+            "CHECKPOINT",
+            "EXTERNAL"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "resource": {
+      "type": "object",
+      "required": [
+        "name",
+        "kind",
+        "status",
+        "amount",
+        "unit",
+        "boundary",
+        "aggregation"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "REAL_ROBOT",
+            "HUMAN",
+            "SIMULATION",
+            "IMAGINATION",
+            "ACCELERATOR",
+            "STORAGE",
+            "LATENCY",
+            "ENERGY"
+          ]
+        },
+        "status": {
+          "enum": [
+            "measured",
+            "derived",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "amount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "boundary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggregation": {
+          "enum": [
+            "sum",
+            "max",
+            "snapshot",
+            "interval"
+          ]
+        },
+        "derivation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "status": {
+              "const": "measured"
+            },
+            "amount": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "required": [
+            "derivation"
+          ],
+          "properties": {
+            "status": {
+              "const": "derived"
+            },
+            "amount": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "properties": {
+            "status": {
+              "enum": [
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "amount": {
+              "type": "null"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "id",
+        "operator",
+        "inputs",
+        "outputs",
+        "specifications",
+        "signal",
+        "phase",
+        "required_resources",
+        "resources"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "enum": [
+            "COLLECT",
+            "PROPOSE",
+            "IMAGINE",
+            "EVALUATE",
+            "SELECT",
+            "UPDATE",
+            "WRITE",
+            "RETRIEVE",
+            "EXECUTE"
+          ]
+        },
+        "inputs": {
+          "$ref": "#/$defs/names"
+        },
+        "outputs": {
+          "$ref": "#/$defs/nonempty_names"
+        },
+        "specifications": {
+          "$ref": "#/$defs/names"
+        },
+        "signal": {
+          "enum": [
+            "NONE",
+            "HUMAN",
+            "ENVIRONMENT",
+            "SIMULATOR",
+            "WORLD_MODEL",
+            "SELF",
+            "CROSS_ROBOT"
+          ]
+        },
+        "phase": {
+          "enum": [
+            "OFFLINE",
+            "BETWEEN_EPISODES",
+            "WITHIN_EPISODE",
+            "CONTROL_CYCLE"
+          ]
+        },
+        "start_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "duration_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "required_resources": {
+          "$ref": "#/$defs/nonempty_names"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/resource"
+          }
+        },
+        "execution_environment": {
+          "enum": [
+            "real",
+            "simulated"
+          ]
+        },
+        "changes_physical_world": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "status": "invalid_as_evidence_for_foundation_model_efficiency",
+  "source_sha256": "68641263e8b0db561132bd0abec22d9c6cd631e27b53937e285e5588801aaea7",
+  "python": "3.12.3",
+  "torch": "2.6.0+cu124",
+  "numpy": "1.26.4",
+  "device": "cpu",
+  "model_output_probes": [
+    {
+      "padding": 0,
+      "max_abs_model_output": 0.9081248641014099,
+      "mean_output_l2": 0.6021891236305237,
+      "padding_matrix_spectral_norm": 0.15051127970218658
+    },
+    {
+      "padding": 10,
+      "max_abs_model_output": 2.8830399873003287e-11,
+      "mean_output_l2": 1.2140776231572836e-11,
+      "padding_matrix_spectral_norm": 0.15051127970218658
+    },
+    {
+      "padding": 80,
+      "max_abs_model_output": 0.0,
+      "mean_output_l2": 0.0,
+      "padding_matrix_spectral_norm": 0.15051127970218658
+    }
+  ],
+  "zero_model_ablation": [
+    {
+      "interval": 1,
+      "episodes": 100,
+      "identical_outcome_tuples_with_zero_model": 100,
+      "identical_episode_rng_states_with_zero_model": 100
+    },
+    {
+      "interval": 2,
+      "episodes": 100,
+      "identical_outcome_tuples_with_zero_model": 100,
+      "identical_episode_rng_states_with_zero_model": 100
+    },
+    {
+      "interval": 4,
+      "episodes": 100,
+      "identical_outcome_tuples_with_zero_model": 100,
+      "identical_episode_rng_states_with_zero_model": 100
+    },
+    {
+      "interval": 8,
+      "episodes": 100,
+      "identical_outcome_tuples_with_zero_model": 100,
+      "identical_episode_rng_states_with_zero_model": 100
+    },
+    {
+      "interval": 16,
+      "episodes": 100,
+      "identical_outcome_tuples_with_zero_model": 100,
+      "identical_episode_rng_states_with_zero_model": 100
+    }
+  ],
+  "episode_pairing": [
+    {
+      "interval": 1,
+      "rng_state_matches_vs_interval_1": 100,
+      "episodes": 100,
+      "first_four_rng_states": [
+        "3c4f151fe04c5073fd2c47b60fcb0de77edadbbf66ab8e8804d38bc6d22041c3",
+        "0ebb3617db278b5f71e79109f9d1660b227643f57e66c36fca34731fd6207afb",
+        "15fcff35f67c18fceef80f0dd4492a32c794fa5e2990ff601adc0b9e85b5e19b",
+        "74af943a6baf79957e3c3ddeeea95e3eb260f26c7d18c7e3a75cfb2a85cc0d86"
+      ]
+    },
+    {
+      "interval": 2,
+      "rng_state_matches_vs_interval_1": 2,
+      "episodes": 100,
+      "first_four_rng_states": [
+        "3c4f151fe04c5073fd2c47b60fcb0de77edadbbf66ab8e8804d38bc6d22041c3",
+        "0ebb3617db278b5f71e79109f9d1660b227643f57e66c36fca34731fd6207afb",
+        "634ef1232068bc9c8bb537b45202fed5d10a4bb498e02b883016ad9dd3d3797f",
+        "bccf9c664662dac4edd11452ff36dcc30a50a9e46b21564d1ab4ace797bae363"
+      ]
+    },
+    {
+      "interval": 4,
+      "rng_state_matches_vs_interval_1": 2,
+      "episodes": 100,
+      "first_four_rng_states": [
+        "3c4f151fe04c5073fd2c47b60fcb0de77edadbbf66ab8e8804d38bc6d22041c3",
+        "0ebb3617db278b5f71e79109f9d1660b227643f57e66c36fca34731fd6207afb",
+        "96be74b4522efcca0836eda07ff66fe26082fe9585e5d62ec02a13d7f6bf8815",
+        "5384435f67733b368539199771571e731646433070142777b2da530551fa0024"
+      ]
+    },
+    {
+      "interval": 8,
+      "rng_state_matches_vs_interval_1": 2,
+      "episodes": 100,
+      "first_four_rng_states": [
+        "3c4f151fe04c5073fd2c47b60fcb0de77edadbbf66ab8e8804d38bc6d22041c3",
+        "0ebb3617db278b5f71e79109f9d1660b227643f57e66c36fca34731fd6207afb",
+        "634ef1232068bc9c8bb537b45202fed5d10a4bb498e02b883016ad9dd3d3797f",
+        "bccf9c664662dac4edd11452ff36dcc30a50a9e46b21564d1ab4ace797bae363"
+      ]
+    },
+    {
+      "interval": 16,
+      "rng_state_matches_vs_interval_1": 2,
+      "episodes": 100,
+      "first_four_rng_states": [
+        "3c4f151fe04c5073fd2c47b60fcb0de77edadbbf66ab8e8804d38bc6d22041c3",
+        "0ebb3617db278b5f71e79109f9d1660b227643f57e66c36fca34731fd6207afb",
+        "c236bdf3510bac051d54334e47db289e4cfa4e51ff49873c388553f00a5768d8",
+        "671487e80af2a6d1bc0afd77ae1a048694d96ba3e40d030ad34132436fd60255"
+      ]
+    }
+  ],
+  "limits": "CPU diagnostic on 100 episodes per condition; outcome identity is not trajectory identity. Original GPU timing is not remeasured."
+}

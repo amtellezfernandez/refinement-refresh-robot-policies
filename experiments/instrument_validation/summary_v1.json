@@ -1,0 +1,395 @@
+{
+  "protocol_sha256": "636782b174ac10eb2663961941b335229c8626d798f612486392f92a688854a8",
+  "source_count": 4,
+  "trial_count": 68,
+  "layer_checks": 272,
+  "interpretation": "Finite-suite descriptive counts; unknown scenarios excluded from defect denominator; sources are related, not independent rollouts.",
+  "layers": [
+    {
+      "layer": "syntax",
+      "observable_defects": 52,
+      "detected": 4,
+      "not_detected": 48,
+      "controls": 4,
+      "accepted_controls": 4,
+      "false_rejections": 0,
+      "unknown_scenarios": 12,
+      "validator_errors": 0
+    },
+    {
+      "layer": "structure",
+      "observable_defects": 52,
+      "detected": 12,
+      "not_detected": 40,
+      "controls": 4,
+      "accepted_controls": 4,
+      "false_rejections": 0,
+      "unknown_scenarios": 12,
+      "validator_errors": 0
+    },
+    {
+      "layer": "aggregates",
+      "observable_defects": 52,
+      "detected": 28,
+      "not_detected": 24,
+      "controls": 4,
+      "accepted_controls": 4,
+      "false_rejections": 0,
+      "unknown_scenarios": 12,
+      "validator_errors": 0
+    },
+    {
+      "layer": "full_ledger",
+      "observable_defects": 52,
+      "detected": 52,
+      "not_detected": 0,
+      "controls": 4,
+      "accepted_controls": 4,
+      "false_rejections": 0,
+      "unknown_scenarios": 12,
+      "validator_errors": 0
+    }
+  ],
+  "by_case": [
+    {
+      "case": "untouched",
+      "ground_truth": "control",
+      "label": "Untouched archived artifact",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "accepted_control": 4
+        },
+        "structure": {
+          "accepted_control": 4
+        },
+        "aggregates": {
+          "accepted_control": 4
+        },
+        "full_ledger": {
+          "accepted_control": 4
+        }
+      }
+    },
+    {
+      "case": "invalid_json",
+      "ground_truth": "observable_defect",
+      "label": "Invalid JSON",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "detected": 4
+        },
+        "structure": {
+          "detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "missing_environment_event",
+      "ground_truth": "observable_defect",
+      "label": "Missing environment event",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "duplicate_environment_event",
+      "ground_truth": "observable_defect",
+      "label": "Duplicate environment event",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "sampler_count_drift",
+      "ground_truth": "observable_defect",
+      "label": "Independent counter mismatch",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "stale_action_hash",
+      "ground_truth": "observable_defect",
+      "label": "Action with stale hash",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "consumer_action_rewrite",
+      "ground_truth": "observable_defect",
+      "label": "Producer/consumer action mismatch",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "identity_drift",
+      "ground_truth": "observable_defect",
+      "label": "Episode identity mismatch",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "outcome_rate_drift",
+      "ground_truth": "observable_defect",
+      "label": "Outcome aggregate mismatch",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "incomplete_result",
+      "ground_truth": "observable_defect",
+      "label": "Missing completed-result wrapper",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "reordered_environment_events",
+      "ground_truth": "observable_defect",
+      "label": "Reordered steps",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "balanced_duplicate_inference",
+      "ground_truth": "observable_defect",
+      "label": "Duplicate chunk; balanced counts",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "missing_timing_unit",
+      "ground_truth": "observable_defect",
+      "label": "Missing timing field/unit",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "detected": 4
+        },
+        "aggregates": {
+          "detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "interleaved_warmup",
+      "ground_truth": "observable_defect",
+      "label": "Warm-up after measured event",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "not_detected": 4
+        },
+        "structure": {
+          "not_detected": 4
+        },
+        "aggregates": {
+          "not_detected": 4
+        },
+        "full_ledger": {
+          "detected": 4
+        }
+      }
+    },
+    {
+      "case": "joint_action_rewrite",
+      "ground_truth": "unobservable_scenario",
+      "label": "Joint action rewrite",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "unknown": 4
+        },
+        "structure": {
+          "unknown": 4
+        },
+        "aggregates": {
+          "unknown": 4
+        },
+        "full_ledger": {
+          "unknown": 4
+        }
+      }
+    },
+    {
+      "case": "preprocessing_coverage_query",
+      "ground_truth": "unobservable_scenario",
+      "label": "Unlogged preprocessing coverage",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "unknown": 4
+        },
+        "structure": {
+          "unknown": 4
+        },
+        "aggregates": {
+          "unknown": 4
+        },
+        "full_ledger": {
+          "unknown": 4
+        }
+      }
+    },
+    {
+      "case": "rendering_coverage_query",
+      "ground_truth": "unobservable_scenario",
+      "label": "Unlogged rendering coverage",
+      "n": 4,
+      "layers": {
+        "syntax": {
+          "unknown": 4
+        },
+        "structure": {
+          "unknown": 4
+        },
+        "aggregates": {
+          "unknown": 4
+        },
+        "full_ledger": {
+          "unknown": 4
+        }
+      }
+    }
+  ]
+}

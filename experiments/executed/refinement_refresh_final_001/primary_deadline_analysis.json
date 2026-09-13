@@ -1,0 +1,61 @@
+{
+  "status": "audited_complete_frozen_primary_transfer_comparison",
+  "comparison": {
+    "selected": [
+      2,
+      2
+    ],
+    "comparator": [
+      2,
+      5
+    ]
+  },
+  "frozen_predicted_difference": 0.04,
+  "observed_paired_difference": 0.10625,
+  "descriptive_95_percent_interval": [
+    0.04375,
+    0.16875
+  ],
+  "observed_minus_predicted": 0.06625,
+  "tasks": 8,
+  "task_state_blocks": 80,
+  "task_state_seed_blocks": 160,
+  "policy_seeds_per_state": 2,
+  "conditions": [
+    {
+      "h": 2,
+      "d": 2,
+      "attempts": 160,
+      "successes": 139,
+      "success_rate": 0.86875,
+      "nominal_gflops_per_control_step": 275.010811904,
+      "mean_tflops_per_attempt": 41.1072411093504,
+      "mean_rollout_seconds_per_attempt": 19.041852458906213
+    },
+    {
+      "h": 2,
+      "d": 5,
+      "attempts": 160,
+      "successes": 122,
+      "success_rate": 0.7625,
+      "nominal_gflops_per_control_step": 292.195733504,
+      "mean_tflops_per_attempt": 48.705376328448,
+      "mean_rollout_seconds_per_attempt": 34.26072002463734
+    }
+  ],
+  "scope": "Eight fixed transfer tasks; state bootstrap within task preserves both seeds and pairing. Descriptive interval; no non-inferiority or benchmark-wide claim.",
+  "checks": [
+    "original planned identity coverage",
+    "condition balance",
+    "paired initial states and observations",
+    "generation and neural-stage counts",
+    "complete action journals for included attempts",
+    "deadline-run manifest and summary"
+  ],
+  "sources": {
+    "original_confirmation_episodes_sha256": "03a6a6ed5080ac9fb757d1a049531fe757f6070ae6f9a4a2606e3c654d40e0a5",
+    "deadline_episodes_sha256": "6f9c1bee5e7757c95960d33059d7bde47f2d0b4bb759b8ce75a005be3edba4e8",
+    "deadline_steps_sha256": "b27b5bafc5592e83e0eff58d971b084983306a94c4db4f95129861ee7408f600",
+    "deadline_schedule_amendment_sha256": "f9778c6f34e044b990b4c44981e9b0f6c442a0e5ca57aa2ee463972d4ed18df0"
+  }
+}

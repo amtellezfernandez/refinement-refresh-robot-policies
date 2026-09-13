@@ -1,0 +1,270 @@
+{
+  "models": [
+    {
+      "kind": "compute",
+      "ridge": 1.0,
+      "grouped_log_loss": 0.7085154079532693,
+      "coefficients": [
+        0.6119360555352683,
+        0.25398403844757195,
+        -0.15245067568293727
+      ]
+    },
+    {
+      "kind": "compute",
+      "ridge": 10.0,
+      "grouped_log_loss": 0.7066760655041406,
+      "coefficients": [
+        0.5800498040932645,
+        0.1606201801893422,
+        -0.19205728791782908
+      ]
+    },
+    {
+      "kind": "allocation",
+      "ridge": 1.0,
+      "grouped_log_loss": 0.7074257415784989,
+      "coefficients": [
+        0.5845305564252461,
+        -0.16902309145287586,
+        -0.025378563972403477,
+        -0.27634549289270766,
+        0.024568596198037647,
+        -0.1447097772788572
+      ]
+    },
+    {
+      "kind": "allocation",
+      "ridge": 10.0,
+      "grouped_log_loss": 0.7048017018910679,
+      "coefficients": [
+        0.556443118788118,
+        -0.150865784114587,
+        -0.04308392159537432,
+        -0.26246738429573224,
+        0.028134474399066904,
+        -0.11100041017418434
+      ]
+    }
+  ],
+  "selected_model": {
+    "kind": "allocation",
+    "ridge": 10.0,
+    "grouped_log_loss": 0.7048017018910679,
+    "coefficients": [
+      0.556443118788118,
+      -0.150865784114587,
+      -0.04308392159537432,
+      -0.26246738429573224,
+      0.028134474399066904,
+      -0.11100041017418434
+    ]
+  },
+  "comparisons": [
+    {
+      "fraction": 0.25,
+      "primary": false,
+      "ceiling": 160418634752.0,
+      "recommendation": [
+        5,
+        2
+      ],
+      "alternative": [
+        5,
+        5
+      ],
+      "prediction_type": "task_transfer",
+      "predicted_success": 0.5158716442461054,
+      "alternative_predicted_success": 0.45040798597696285,
+      "predicted_difference": 0.06546365826914258,
+      "predicts_superiority": true,
+      "status": "frozen_before_confirmation"
+    },
+    {
+      "fraction": 0.5,
+      "primary": true,
+      "ceiling": 320837269504.0,
+      "recommendation": [
+        2,
+        2
+      ],
+      "alternative": [
+        2,
+        5
+      ],
+      "prediction_type": "task_transfer",
+      "predicted_success": 0.6437813860311742,
+      "alternative_predicted_success": 0.6040762892192784,
+      "predicted_difference": 0.039705096811895824,
+      "predicts_superiority": true,
+      "status": "frozen_before_confirmation"
+    },
+    {
+      "fraction": 1.0,
+      "primary": false,
+      "ceiling": 641674539008.0,
+      "recommendation": [
+        1,
+        2
+      ],
+      "alternative": [
+        1,
+        5
+      ],
+      "prediction_type": "task_transfer",
+      "predicted_success": 0.6678907152174882,
+      "alternative_predicted_success": 0.6456160187105395,
+      "predicted_difference": 0.022274696506948688,
+      "predicts_superiority": true,
+      "status": "frozen_before_confirmation"
+    }
+  ],
+  "discovery_sha256": "7ebdec030428652533a0d68e92a4c99d864f037ee0802e14bdc2735ce01697c1",
+  "candidates": [
+    {
+      "h": 1,
+      "d": 2,
+      "prediction": 0.6678907152174882,
+      "rate": 550021623808.0
+    },
+    {
+      "h": 1,
+      "d": 5,
+      "prediction": 0.6456160187105395,
+      "rate": 584391467008.0
+    },
+    {
+      "h": 1,
+      "d": 10,
+      "prediction": 0.6356291478401168,
+      "rate": 641674539008.0
+    },
+    {
+      "h": 1,
+      "d": 20,
+      "prediction": 0.6318349618881206,
+      "rate": 756240683008.0
+    },
+    {
+      "h": 2,
+      "d": 2,
+      "prediction": 0.6437813860311742,
+      "rate": 275010811904.0
+    },
+    {
+      "h": 2,
+      "d": 5,
+      "prediction": 0.6040762892192784,
+      "rate": 292195733504.0
+    },
+    {
+      "h": 2,
+      "d": 10,
+      "prediction": 0.5807292332763427,
+      "rate": 320837269504.0
+    },
+    {
+      "h": 2,
+      "d": 20,
+      "prediction": 0.5636751295908246,
+      "rate": 378120341504.0
+    },
+    {
+      "h": 5,
+      "d": 2,
+      "prediction": 0.5158716442461054,
+      "rate": 110004324761.6
+    },
+    {
+      "h": 5,
+      "d": 5,
+      "prediction": 0.45040798597696285,
+      "rate": 116878293401.6
+    },
+    {
+      "h": 5,
+      "d": 10,
+      "prediction": 0.4094516375266639,
+      "rate": 128334907801.6
+    },
+    {
+      "h": 5,
+      "d": 20,
+      "prediction": 0.37603583656530454,
+      "rate": 151248136601.6
+    },
+    {
+      "h": 1,
+      "d": 3,
+      "prediction": 0.6568070193461676,
+      "rate": 561478238208.0
+    },
+    {
+      "h": 1,
+      "d": 8,
+      "prediction": 0.6381763966006759,
+      "rate": 618761310208.0
+    },
+    {
+      "h": 2,
+      "d": 3,
+      "prediction": 0.6250537827576647,
+      "rate": 280739119104.0
+    },
+    {
+      "h": 2,
+      "d": 8,
+      "prediction": 0.5875753718353045,
+      "rate": 309380655104.0
+    },
+    {
+      "h": 3,
+      "d": 2,
+      "prediction": 0.6016627145905429,
+      "rate": 183340541269.33334
+    },
+    {
+      "h": 3,
+      "d": 3,
+      "prediction": 0.5777124458082322,
+      "rate": 187159412736.0
+    },
+    {
+      "h": 3,
+      "d": 5,
+      "prediction": 0.550285174704599,
+      "rate": 194797155669.33334
+    },
+    {
+      "h": 3,
+      "d": 8,
+      "prediction": 0.5280060898429457,
+      "rate": 206253770069.33334
+    },
+    {
+      "h": 3,
+      "d": 10,
+      "prediction": 0.5184704357805661,
+      "rate": 213891513002.66666
+    },
+    {
+      "h": 3,
+      "d": 20,
+      "prediction": 0.49326099771390125,
+      "rate": 252080227669.33334
+    },
+    {
+      "h": 5,
+      "d": 3,
+      "prediction": 0.4853814500685151,
+      "rate": 112295647641.6
+    },
+    {
+      "h": 5,
+      "d": 8,
+      "prediction": 0.42180849522847935,
+      "rate": 123752262041.6
+    }
+  ],
+  "uncertainty": "Descriptive paired state bootstrap, 20000 draws; primary budget .5; others secondary. Fixed coverage, no noninferiority claim. Selection uncertainty assessed by held-task CV."
+}

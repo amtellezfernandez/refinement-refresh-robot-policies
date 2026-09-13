@@ -1,0 +1,2984 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "protocol": {
+    "version": 1,
+    "design": "Deterministic direct-record query recovery under artificial information suppression",
+    "queries": [
+      {
+        "id": "success_attempts",
+        "label": "Successes / attempts",
+        "unit": "count / count",
+        "boundary": "All completed attempted episodes in the declared condition, including failures",
+        "required_fields": [
+          "success"
+        ]
+      },
+      {
+        "id": "generations",
+        "label": "Actual chunk generations",
+        "unit": "count",
+        "boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+        "required_fields": [
+          "generations"
+        ]
+      },
+      {
+        "id": "denoise_nfe",
+        "label": "Measured denoise evaluations",
+        "unit": "count",
+        "boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+        "required_fields": [
+          "denoise_nfe"
+        ]
+      },
+      {
+        "id": "rollout_wall_s",
+        "label": "Total outer rollout wall time",
+        "unit": "s",
+        "boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+        "required_fields": [
+          "rollout_wall_s"
+        ]
+      },
+      {
+        "id": "wall_per_attempt_s",
+        "label": "Mean wall time / attempt",
+        "unit": "s / attempt",
+        "boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+        "required_fields": [
+          "rollout_wall_s"
+        ]
+      },
+      {
+        "id": "wall_per_success_s",
+        "label": "All-attempt wall time / success",
+        "unit": "s / success",
+        "boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+        "required_fields": [
+          "rollout_wall_s",
+          "success"
+        ],
+        "zero_denominator_rule": "Known zero successes establishes undefined even when wall time is suppressed"
+      }
+    ],
+    "projections": [
+      {
+        "id": "outcomes_only",
+        "short": "O",
+        "fields": [
+          "attempt_id",
+          "success"
+        ]
+      },
+      {
+        "id": "outcomes_generations",
+        "short": "G",
+        "fields": [
+          "attempt_id",
+          "success",
+          "generations"
+        ]
+      },
+      {
+        "id": "full_ledger",
+        "short": "L",
+        "fields": [
+          "attempt_id",
+          "success",
+          "generations",
+          "denoise_nfe",
+          "rollout_wall_s"
+        ]
+      }
+    ],
+    "reference": "Completed records independently reconciled against retained step journals by this analyzer",
+    "information_contract": "Reduced projections omit solver configuration, source, action-step schedules and timing. Condition identifiers are opaque to the recovery function. Only direct retained fields and the declared arithmetic are queried; the check does not assert that NFE is impossible to derive when solver configuration/source are available.",
+    "status_contract": "recovered = defined value obtained; undefined = enough information establishes zero denominator; unknown = required information suppressed. Recovered and undefined count as answered when they match the reference.",
+    "limits": "Finite deterministic mechanism check, not a reader study, natural disclosure experiment, independent empirical benefit estimate, or evidence of improved decisions. Full-projection success is a consistency check of deliberately retained fields, not a publication-level utility claim."
+  },
+  "protocol_sha256": "0ae79c466b603b0b52fa343e7b12911bdccfdb71efd48c3caf7973f205af88fe",
+  "protocol_status": "Fixed code-defined queries/projections; not external preregistration",
+  "runtime_manifest_sha256": "d79cbf18404b2517b7ca7ca6b086f5389ff196616ba18ffb99708b9ff5bc6ad2",
+  "reference_episode_records_sha256": "c7215736786508f1b19f51926314721396eda9407a0b7f42e382d8b6cb32f260",
+  "analysis_script_sha256": "5dddcedec6bc6ef76dd207759cdb951afc0ec4d5bdce15be8811ad18f29634ea",
+  "outer_rollout_boundary": "Rollout wall includes preprocessing, noise, generation, actions, simulator/rendering and journal writes; excludes reset, warmup, model load and environment creation.",
+  "queries_per_cell": 6,
+  "cells": [
+    {
+      "cell_id": 0,
+      "h": 1,
+      "d": 5,
+      "attempts": 20,
+      "references": {
+        "success_attempts": {
+          "status": "recovered",
+          "value": {
+            "successes": 12,
+            "attempts": 20
+          }
+        },
+        "generations": {
+          "status": "recovered",
+          "value": 3462
+        },
+        "denoise_nfe": {
+          "status": "recovered",
+          "value": 17310
+        },
+        "rollout_wall_s": {
+          "status": "recovered",
+          "value": 1374.6024219300089
+        },
+        "wall_per_attempt_s": {
+          "status": "recovered",
+          "value": 68.73012109650044
+        },
+        "wall_per_success_s": {
+          "status": "recovered",
+          "value": 114.55020182750074
+        }
+      }
+    },
+    {
+      "cell_id": 1,
+      "h": 1,
+      "d": 10,
+      "attempts": 20,
+      "references": {
+        "success_attempts": {
+          "status": "recovered",
+          "value": {
+            "successes": 13,
+            "attempts": 20
+          }
+        },
+        "generations": {
+          "status": "recovered",
+          "value": 3299
+        },
+        "denoise_nfe": {
+          "status": "recovered",
+          "value": 32990
+        },
+        "rollout_wall_s": {
+          "status": "recovered",
+          "value": 2185.14163665301
+        },
+        "wall_per_attempt_s": {
+          "status": "recovered",
+          "value": 109.25708183265051
+        },
+        "wall_per_success_s": {
+          "status": "recovered",
+          "value": 168.0878182040777
+        }
+      }
+    },
+    {
+      "cell_id": 2,
+      "h": 5,
+      "d": 5,
+      "attempts": 20,
+      "references": {
+        "success_attempts": {
+          "status": "recovered",
+          "value": {
+            "successes": 8,
+            "attempts": 20
+          }
+        },
+        "generations": {
+          "status": "recovered",
+          "value": 843
+        },
+        "denoise_nfe": {
+          "status": "recovered",
+          "value": 4215
+        },
+        "rollout_wall_s": {
+          "status": "recovered",
+          "value": 425.1826933630073
+        },
+        "wall_per_attempt_s": {
+          "status": "recovered",
+          "value": 21.259134668150363
+        },
+        "wall_per_success_s": {
+          "status": "recovered",
+          "value": 53.14783667037591
+        }
+      }
+    },
+    {
+      "cell_id": 3,
+      "h": 5,
+      "d": 10,
+      "attempts": 20,
+      "references": {
+        "success_attempts": {
+          "status": "recovered",
+          "value": {
+            "successes": 6,
+            "attempts": 20
+          }
+        },
+        "generations": {
+          "status": "recovered",
+          "value": 909
+        },
+        "denoise_nfe": {
+          "status": "recovered",
+          "value": 9090
+        },
+        "rollout_wall_s": {
+          "status": "recovered",
+          "value": 695.9836246120176
+        },
+        "wall_per_attempt_s": {
+          "status": "recovered",
+          "value": 34.79918123060088
+        },
+        "wall_per_success_s": {
+          "status": "recovered",
+          "value": 115.9972707686696
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "cell_id": 0,
+      "query_id": "success_attempts",
+      "projection": "outcomes_only",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 12,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 12,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "generations",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "generations"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 3462
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 17310
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 1374.6024219300089
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 68.73012109650044
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 114.55020182750074
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "success_attempts",
+      "projection": "outcomes_generations",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 12,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 12,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "generations",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 3462,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 3462
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 17310
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 1374.6024219300089
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 68.73012109650044
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 114.55020182750074
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 0,
+      "query_id": "success_attempts",
+      "projection": "full_ledger",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 12,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 12,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "generations",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 3462,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 3462
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "denoise_nfe",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "recovered",
+      "value": 17310,
+      "used_fields": [
+        "denoise_nfe"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 17310
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "rollout_wall_s",
+      "projection": "full_ledger",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "recovered",
+      "value": 1374.6024219300089,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 1374.6024219300089
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_attempt_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "recovered",
+      "value": 68.73012109650044,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 68.73012109650044
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 0,
+      "query_id": "wall_per_success_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "recovered",
+      "value": 114.55020182750074,
+      "used_fields": [
+        "rollout_wall_s",
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 114.55020182750074
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "success_attempts",
+      "projection": "outcomes_only",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 13,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 13,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "generations",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "generations"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 3299
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 32990
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 2185.14163665301
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 109.25708183265051
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 168.0878182040777
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "success_attempts",
+      "projection": "outcomes_generations",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 13,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 13,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "generations",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 3299,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 3299
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 32990
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 2185.14163665301
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 109.25708183265051
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 168.0878182040777
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 1,
+      "query_id": "success_attempts",
+      "projection": "full_ledger",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 13,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 13,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "generations",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 3299,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 3299
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "denoise_nfe",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "recovered",
+      "value": 32990,
+      "used_fields": [
+        "denoise_nfe"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 32990
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "rollout_wall_s",
+      "projection": "full_ledger",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "recovered",
+      "value": 2185.14163665301,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 2185.14163665301
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_attempt_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "recovered",
+      "value": 109.25708183265051,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 109.25708183265051
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 1,
+      "query_id": "wall_per_success_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "recovered",
+      "value": 168.0878182040777,
+      "used_fields": [
+        "rollout_wall_s",
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 168.0878182040777
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "success_attempts",
+      "projection": "outcomes_only",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 8,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 8,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "generations",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "generations"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 843
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 4215
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 425.1826933630073
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 21.259134668150363
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 53.14783667037591
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "success_attempts",
+      "projection": "outcomes_generations",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 8,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 8,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "generations",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 843,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 843
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 4215
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 425.1826933630073
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 21.259134668150363
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 53.14783667037591
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 2,
+      "query_id": "success_attempts",
+      "projection": "full_ledger",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 8,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 8,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "generations",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 843,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 843
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "denoise_nfe",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "recovered",
+      "value": 4215,
+      "used_fields": [
+        "denoise_nfe"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 4215
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "rollout_wall_s",
+      "projection": "full_ledger",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "recovered",
+      "value": 425.1826933630073,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 425.1826933630073
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_attempt_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "recovered",
+      "value": 21.259134668150363,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 21.259134668150363
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 2,
+      "query_id": "wall_per_success_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "recovered",
+      "value": 53.14783667037591,
+      "used_fields": [
+        "rollout_wall_s",
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 53.14783667037591
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "success_attempts",
+      "projection": "outcomes_only",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 6,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 6,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "generations",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "generations"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 909
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_only",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 9090
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 695.9836246120176
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 34.79918123060088
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_only",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 115.9972707686696
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "success_attempts",
+      "projection": "outcomes_generations",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 6,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 6,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "generations",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 909,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 909
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "denoise_nfe",
+      "projection": "outcomes_generations",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "denoise_nfe"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 9090
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "rollout_wall_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 695.9836246120176
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_attempt_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 34.79918123060088
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_success_s",
+      "projection": "outcomes_generations",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "unknown",
+      "value": null,
+      "missing_fields": [
+        "rollout_wall_s"
+      ],
+      "reason": "Required direct records are absent from this artificial projection",
+      "reference": {
+        "status": "recovered",
+        "value": 115.9972707686696
+      },
+      "correct_answer": null
+    },
+    {
+      "cell_id": 3,
+      "query_id": "success_attempts",
+      "projection": "full_ledger",
+      "requested_unit": "count / count",
+      "requested_boundary": "All completed attempted episodes in the declared condition, including failures",
+      "status": "recovered",
+      "value": {
+        "successes": 6,
+        "attempts": 20
+      },
+      "used_fields": [
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": {
+          "successes": 6,
+          "attempts": 20
+        }
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "generations",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "status": "recovered",
+      "value": 909,
+      "used_fields": [
+        "generations"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 909
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "denoise_nfe",
+      "projection": "full_ledger",
+      "requested_unit": "count",
+      "requested_boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "status": "recovered",
+      "value": 9090,
+      "used_fields": [
+        "denoise_nfe"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 9090
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "rollout_wall_s",
+      "projection": "full_ledger",
+      "requested_unit": "s",
+      "requested_boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "status": "recovered",
+      "value": 695.9836246120176,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 695.9836246120176
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_attempt_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / attempt",
+      "requested_boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "status": "recovered",
+      "value": 34.79918123060088,
+      "used_fields": [
+        "rollout_wall_s"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 34.79918123060088
+      },
+      "correct_answer": true
+    },
+    {
+      "cell_id": 3,
+      "query_id": "wall_per_success_s",
+      "projection": "full_ledger",
+      "requested_unit": "s / success",
+      "requested_boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "status": "recovered",
+      "value": 115.9972707686696,
+      "used_fields": [
+        "rollout_wall_s",
+        "success"
+      ],
+      "reference": {
+        "status": "recovered",
+        "value": 115.9972707686696
+      },
+      "correct_answer": true
+    }
+  ],
+  "projections": [
+    {
+      "cell_id": 0,
+      "projection": "outcomes_only",
+      "records_sha256": "61eecaa7bae565640a91f0e7560750d4efffcc09690e1b9e1824310087d2724f",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        }
+      ]
+    },
+    {
+      "cell_id": 0,
+      "projection": "outcomes_generations",
+      "records_sha256": "765e5413d1fcd1d761183a526f8ab5aee876208e773b62a43c286a0d01c2a028",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 87
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 98
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 91
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 91
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 112
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 93
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 97
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 109
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 111
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 117
+        }
+      ]
+    },
+    {
+      "cell_id": 0,
+      "projection": "full_ledger",
+      "records_sha256": "b42e7c5f72f62563a56f5e256313d0d7dc7601155e09f9a3db9b412427fe4704",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 87,
+          "denoise_nfe": 435,
+          "rollout_wall_s": 36.13255259599828
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 113.09447226399789
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 110.85974072299723
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 98,
+          "denoise_nfe": 490,
+          "rollout_wall_s": 38.88919589899888
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 110.65679485899454
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 91,
+          "denoise_nfe": 455,
+          "rollout_wall_s": 36.63602948199696
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 91,
+          "denoise_nfe": 455,
+          "rollout_wall_s": 35.982365471994854
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108,
+          "denoise_nfe": 540,
+          "rollout_wall_s": 42.363283252001565
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 110.55189987900667
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 112,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.94691351400252
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 93,
+          "denoise_nfe": 465,
+          "rollout_wall_s": 36.87946338700567
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 97,
+          "denoise_nfe": 485,
+          "rollout_wall_s": 38.22880709599849
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 109.82303237100132
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 109.75822257700202
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 112.98278266399575
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 1400,
+          "rollout_wall_s": 110.38599613599945
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 109,
+          "denoise_nfe": 545,
+          "rollout_wall_s": 44.02891192099196
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108,
+          "denoise_nfe": 540,
+          "rollout_wall_s": 42.375330373004545
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 111,
+          "denoise_nfe": 555,
+          "rollout_wall_s": 44.96579916701012
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 117,
+          "denoise_nfe": 585,
+          "rollout_wall_s": 46.060828298010165
+        }
+      ]
+    },
+    {
+      "cell_id": 1,
+      "projection": "outcomes_only",
+      "records_sha256": "251e9f3fce6b4ed3a0ef3a30cb6b14ee1ca049ffb39df50fb31a2482bd20ef7a",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        }
+      ]
+    },
+    {
+      "cell_id": 1,
+      "projection": "outcomes_generations",
+      "records_sha256": "c3a9e41342b5ff208309bb45774437d063d14e55db53cd3ca04056603e85b648",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 88
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 99
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 96
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 136
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 90
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 92
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 109
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 110
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 89
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 98
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 116
+        }
+      ]
+    },
+    {
+      "cell_id": 1,
+      "projection": "full_ledger",
+      "records_sha256": "5979fe30819c2e98495cad08c102e58c08b6e7140db32e574c3851d1fb746b26",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 88,
+          "denoise_nfe": 880,
+          "rollout_wall_s": 60.41400313700433
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 99,
+          "denoise_nfe": 990,
+          "rollout_wall_s": 64.60625371499918
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 188.9518104009985
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 96,
+          "denoise_nfe": 960,
+          "rollout_wall_s": 64.76742045900028
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 136,
+          "denoise_nfe": 1360,
+          "rollout_wall_s": 89.06081504900067
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 90,
+          "denoise_nfe": 900,
+          "rollout_wall_s": 60.701756833994295
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 92,
+          "denoise_nfe": 920,
+          "rollout_wall_s": 59.88379491499654
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 109,
+          "denoise_nfe": 1090,
+          "rollout_wall_s": 70.81819963500311
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 182.6333879820013
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 110,
+          "denoise_nfe": 1100,
+          "rollout_wall_s": 73.28284140100004
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 89,
+          "denoise_nfe": 890,
+          "rollout_wall_s": 59.48383988900605
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 98,
+          "denoise_nfe": 980,
+          "rollout_wall_s": 64.20090371300466
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 187.37249678900116
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 182.37374822799757
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 187.77592067800288
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 182.74725566600682
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108,
+          "denoise_nfe": 1080,
+          "rollout_wall_s": 72.52273912700184
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 108,
+          "denoise_nfe": 1080,
+          "rollout_wall_s": 70.12834081699839
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 280,
+          "denoise_nfe": 2800,
+          "rollout_wall_s": 187.9041806489986
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h1_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 116,
+          "denoise_nfe": 1160,
+          "rollout_wall_s": 75.511927568994
+        }
+      ]
+    },
+    {
+      "cell_id": 2,
+      "projection": "outcomes_only",
+      "records_sha256": "d3dfc655935850fb44dfb422d8c24bd86368d4a8bc5f85c6e416338582ffd4c0",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        }
+      ]
+    },
+    {
+      "cell_id": 2,
+      "projection": "outcomes_generations",
+      "records_sha256": "ae991c8d09ed30fd4eccb26b6c4afaf7c1b0ef6bdb2e877066687fff2fc52bdf",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 19
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 22
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 23
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 25
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        }
+      ]
+    },
+    {
+      "cell_id": 2,
+      "projection": "full_ledger",
+      "records_sha256": "92291d048e46078a513cff91d253e577abd3dd587b22ee0a802fbb950f3c041e",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 30.13526707199344
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20,
+          "denoise_nfe": 100,
+          "rollout_wall_s": 10.465311923995614
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 29.536501499002043
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 28.963269609004783
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 27.808251344999007
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 19,
+          "denoise_nfe": 95,
+          "rollout_wall_s": 9.508031928999117
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 27.89193955600058
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 22,
+          "denoise_nfe": 110,
+          "rollout_wall_s": 10.914325596000708
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 28.03041655499692
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 23,
+          "denoise_nfe": 115,
+          "rollout_wall_s": 11.275861007001367
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21,
+          "denoise_nfe": 105,
+          "rollout_wall_s": 10.72056615800102
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 27.388348360000236
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 28.228650076009217
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 27.392547245995956
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 28.13217723199341
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20,
+          "denoise_nfe": 100,
+          "rollout_wall_s": 10.058278383003199
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21,
+          "denoise_nfe": 105,
+          "rollout_wall_s": 10.275486999002169
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 25,
+          "denoise_nfe": 125,
+          "rollout_wall_s": 12.255593242007308
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 28.295239817001857
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d5.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 280,
+          "rollout_wall_s": 27.906629757999326
+        }
+      ]
+    },
+    {
+      "cell_id": 3,
+      "projection": "outcomes_only",
+      "records_sha256": "782d3565b68c1b50c80368b78865427ad89536dd293d3386941e8721ba91c808",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false
+        }
+      ]
+    },
+    {
+      "cell_id": 3,
+      "projection": "outcomes_generations",
+      "records_sha256": "ba8c776f6af7c20f100e1bc30f7ec1c046613950eb99480336e81cd7edb7efcd",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 22
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 23
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 18
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56
+        }
+      ]
+    },
+    {
+      "cell_id": 3,
+      "projection": "full_ledger",
+      "records_sha256": "89da615effc408b4be78bfe1738532bd4467033e3b92927c7c9e2c9f0dcff687",
+      "records": [
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 45.265265004003595
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21,
+          "denoise_nfe": 210,
+          "rollout_wall_s": 15.74745991400414
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.909952025001985
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.521882729000936
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state013.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.484089197001595
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.561876813997515
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.75147932300024
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 22,
+          "denoise_nfe": 220,
+          "rollout_wall_s": 16.409055710995744
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.67522883199854
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 23,
+          "denoise_nfe": 230,
+          "rollout_wall_s": 17.13672883599793
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state012.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 18,
+          "denoise_nfe": 180,
+          "rollout_wall_s": 14.13565517400275
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state013.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.061422544997185
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.47696912000538
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 42.05433830000402
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state011.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.17501094999898
+        },
+        {
+          "attempt_id": "libero_spatial.task005.state010.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 20,
+          "denoise_nfe": 200,
+          "rollout_wall_s": 15.639297948990134
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state010.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": true,
+          "generations": 21,
+          "denoise_nfe": 210,
+          "rollout_wall_s": 15.702545364998514
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2001.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.25648955300858
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state014.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 43.14889204900828
+        },
+        {
+          "attempt_id": "libero_spatial.task006.state012.seed2000.h5_d10.attempt_4bdfd1dbbe1445bf99b17ad7971900a1",
+          "success": false,
+          "generations": 56,
+          "denoise_nfe": 560,
+          "rollout_wall_s": 41.86998522200156
+        }
+      ]
+    }
+  ],
+  "unique_queries": 24,
+  "projection_checks": 72,
+  "summary": [
+    {
+      "projection": "outcomes_only",
+      "queries": 24,
+      "recovered": 4,
+      "unknown": 20,
+      "undefined": 0,
+      "answered_correctly": 4,
+      "wrong_answers": 0
+    },
+    {
+      "projection": "outcomes_generations",
+      "queries": 24,
+      "recovered": 8,
+      "unknown": 16,
+      "undefined": 0,
+      "answered_correctly": 8,
+      "wrong_answers": 0
+    },
+    {
+      "projection": "full_ledger",
+      "queries": 24,
+      "recovered": 24,
+      "unknown": 0,
+      "undefined": 0,
+      "answered_correctly": 24,
+      "wrong_answers": 0
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "branch": "experiments/proposal2-remote",
+  "base_commit": "a0e896c42fe89771abe8a19403444994dc0de095",
+  "remote": {
+    "host": "zetroc.fr",
+    "port": 16641,
+    "user": "projectx",
+    "path": "/mnt/NVME1/projectx-robopad-proposal1",
+    "git_checkout": false,
+    "note": "The remote experiment workspace is a data directory; repository coordination is performed from the laptop branch."
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "driver": "595.84",
+    "memory_total_mib": 16380,
+    "memory_used_mib_at_capture": 2813,
+    "utilization_percent_at_capture": 22
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "torch": "2.7.1+cu126",
+    "cuda": "12.6",
+    "cuda_available": true,
+    "lerobot": "0.6.2",
+    "transformers": "5.3.0"
+  },
+  "checkpoints": {
+    "corrective_seed456_model_sha256": "f27ad2ee49665dfc3c9165533ac98c63c18feafc2f37bc472d487c57abfe2d0b",
+    "control_seed456_model_sha256": "a8ad13061da924311bf12b6a3e20a3e65184de20996a76b884ffb74b625557e9",
+    "heldout_manifest_sha256": "765f9e3370c880ecd72e63263ccd977b618fc6c8ff482b7e48903663396cd0c1"
+  },
+  "active_jobs": [
+    {
+      "kind": "tmux",
+      "session": "robopad-p1-test",
+      "pid": 41559,
+      "command": "experiments/gen_test_runner.py --manifest results/generalization_test_001/manifest.json",
+      "scope": "Proposal 1 held-out campaign; preserved and not altered by Proposal 2 gates"
+    }
+  ],
+  "existing_result_directories": [
+    "corrective_control_001",
+    "corrective_control_eval_001",
+    "corrective_control_review_001",
+    "corrective_corrective_001",
+    "development_sft_001",
+    "development_sft_eval_001",
+    "development_sft_review_001",
+    "generalization_test_001",
+    "generalization_validation_001",
+    "generalization_validation_002",
+    "generalization_train_dataset_001",
+    "generalization_train_traces_001",
+    "generalization_train_teachers_001",
+    "generalization_train_teachers_002",
+    "drift_corrections_001",
+    "oracle_supervision_001",
+    "oracle_supervision_002",
+    "recovery_learning_001",
+    "retention_nominal_001",
+    "retention_mixed_001",
+    "simulator_smoke_001",
+    "simulator_smoke_002",
+    "simulator_smoke_003",
+    "training_audit_001",
+    "training_audit_006"
+  ],
+  "development_gates": {
+    "proposal2_unittest_discover": {
+      "command": "python -m unittest discover -s paper/proposal_paper2/experiments -p 'test_*.py'",
+      "status": "passed",
+      "tests": 11
+    },
+    "ledger_v3_h10_two_episodes": "passed",
+    "ledger_v3_h10_reference": "passed",
+    "reserved_evaluation_outcomes_opened": false
+  }
+}

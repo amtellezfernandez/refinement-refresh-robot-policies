@@ -1,0 +1,290 @@
+{
+  "scope": "fixed declared task set; descriptive paired state bootstrap, not equivalence",
+  "tasks": 2,
+  "episodes_per_cell": 20,
+  "cells": [
+    {
+      "h": 1,
+      "d": 5,
+      "successes": 12,
+      "attempts": 20,
+      "task_weighted_success": 0.6,
+      "mean_wall_s": 68.73012109650044,
+      "pooled_wall_s_per_attempt": 68.73012109650044,
+      "total_wall_s": 1374.6024219300089,
+      "wall_s_per_success": 114.55020182750074,
+      "task_weighted_wall_s_per_success": 114.55020182750074,
+      "generations": 3462,
+      "denoise_nfe": 17310,
+      "steps": 3462,
+      "peak_allocated_bytes": 1607102464,
+      "success_ci": [
+        0.35,
+        0.8500000000000001
+      ],
+      "wall_ci": [
+        50.826246290702336,
+        87.23775740065247
+      ],
+      "paired_difference_vs_native": {
+        "success": -0.04999999999999993,
+        "wall_s": -40.52696073615006,
+        "success_ci": [
+          -0.20000000000000007,
+          0.10000000000000009
+        ],
+        "wall_ci": [
+          -58.389975779847006,
+          -23.091054668312527
+        ]
+      }
+    },
+    {
+      "h": 1,
+      "d": 10,
+      "successes": 13,
+      "attempts": 20,
+      "task_weighted_success": 0.6499999999999999,
+      "mean_wall_s": 109.2570818326505,
+      "pooled_wall_s_per_attempt": 109.25708183265051,
+      "total_wall_s": 2185.14163665301,
+      "wall_s_per_success": 168.0878182040777,
+      "task_weighted_wall_s_per_success": 168.0878182040777,
+      "generations": 3299,
+      "denoise_nfe": 32990,
+      "steps": 3299,
+      "peak_allocated_bytes": 1607102464,
+      "success_ci": [
+        0.4,
+        0.8500000000000001
+      ],
+      "wall_ci": [
+        82.01760470647955,
+        139.56418862899955
+      ],
+      "paired_difference_vs_native": {
+        "success": 0.0,
+        "wall_s": 0.0,
+        "success_ci": [
+          0.0,
+          0.0
+        ],
+        "wall_ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "h": 5,
+      "d": 5,
+      "successes": 8,
+      "attempts": 20,
+      "task_weighted_success": 0.4,
+      "mean_wall_s": 21.259134668150363,
+      "pooled_wall_s_per_attempt": 21.259134668150363,
+      "total_wall_s": 425.1826933630073,
+      "wall_s_per_success": 53.14783667037591,
+      "task_weighted_wall_s_per_success": 53.1478366703759,
+      "generations": 843,
+      "denoise_nfe": 4215,
+      "steps": 4199,
+      "peak_allocated_bytes": 1607102464,
+      "success_ci": [
+        0.2,
+        0.55
+      ],
+      "wall_ci": [
+        18.395437569852668,
+        24.52734353619926
+      ],
+      "paired_difference_vs_native": {
+        "success": -0.2499999999999999,
+        "wall_s": -87.99794716450013,
+        "success_ci": [
+          -0.4,
+          -0.09999999999999998
+        ],
+        "wall_ci": [
+          -115.88650358224984,
+          -62.38421099533159
+        ]
+      }
+    },
+    {
+      "h": 5,
+      "d": 10,
+      "successes": 6,
+      "attempts": 20,
+      "task_weighted_success": 0.30000000000000004,
+      "mean_wall_s": 34.79918123060088,
+      "pooled_wall_s_per_attempt": 34.79918123060088,
+      "total_wall_s": 695.9836246120176,
+      "wall_s_per_success": 115.9972707686696,
+      "task_weighted_wall_s_per_success": 115.99727076866958,
+      "generations": 909,
+      "denoise_nfe": 9090,
+      "steps": 4532,
+      "peak_allocated_bytes": 1607137280,
+      "success_ci": [
+        0.1,
+        0.5
+      ],
+      "wall_ci": [
+        29.46329349265106,
+        40.125752156391314
+      ],
+      "paired_difference_vs_native": {
+        "success": -0.34999999999999987,
+        "wall_s": -74.45790060204962,
+        "success_ci": [
+          -0.55,
+          -0.15000000000000002
+        ],
+        "wall_ci": [
+          -101.77503164434893,
+          -49.221170671499195
+        ]
+      }
+    }
+  ],
+  "task_state_seed_counts": [
+    {
+      "suite": "libero_spatial",
+      "task_id": 5,
+      "states": 5,
+      "policy_seeds_per_state": 2
+    },
+    {
+      "suite": "libero_spatial",
+      "task_id": 6,
+      "states": 5,
+      "policy_seeds_per_state": 2
+    }
+  ],
+  "mean_wall_weighting": "Equal tasks, then equal states, then equal policy-seed repeats within state",
+  "wall_s_per_success_weighting": "Raw total rollout wall time divided by raw successes over all attempts",
+  "runtime_manifest_sha256": "d79cbf18404b2517b7ca7ca6b086f5389ff196616ba18ffb99708b9ff5bc6ad2",
+  "analysis_script_sha256": "5dddcedec6bc6ef76dd207759cdb951afc0ec4d5bdce15be8811ad18f29634ea",
+  "journal_validation_scope": "Recomputed retained producer-action hashes, consumer hashes, generation/noise schedule, initial-state records, outcomes, and episode totals. This is record consistency, not external attestation of simulator execution.",
+  "bootstrap_draws": 10000,
+  "interval_limitation": "Conditional on these tasks; repeated seeds stay within state. Few states limit precision.",
+  "per_task": [
+    {
+      "suite": "libero_spatial",
+      "task_id": 5,
+      "cells": [
+        {
+          "h": 1,
+          "d": 5,
+          "successes": 5,
+          "attempts": 10
+        },
+        {
+          "h": 1,
+          "d": 10,
+          "successes": 6,
+          "attempts": 10
+        },
+        {
+          "h": 5,
+          "d": 5,
+          "successes": 3,
+          "attempts": 10
+        },
+        {
+          "h": 5,
+          "d": 10,
+          "successes": 2,
+          "attempts": 10
+        }
+      ]
+    },
+    {
+      "suite": "libero_spatial",
+      "task_id": 6,
+      "cells": [
+        {
+          "h": 1,
+          "d": 5,
+          "successes": 7,
+          "attempts": 10
+        },
+        {
+          "h": 1,
+          "d": 10,
+          "successes": 7,
+          "attempts": 10
+        },
+        {
+          "h": 5,
+          "d": 5,
+          "successes": 5,
+          "attempts": 10
+        },
+        {
+          "h": 5,
+          "d": 10,
+          "successes": 4,
+          "attempts": 10
+        }
+      ]
+    }
+  ],
+  "factorial_success_contrasts": [
+    {
+      "name": "refinement_at_h1",
+      "estimand": "Q(1,10)-Q(1,5)",
+      "difference": 0.04999999999999993,
+      "bootstrap_95_interval": [
+        -0.10000000000000009,
+        0.20000000000000007
+      ]
+    },
+    {
+      "name": "refinement_at_h5",
+      "estimand": "Q(5,10)-Q(5,5)",
+      "difference": -0.09999999999999998,
+      "bootstrap_95_interval": [
+        -0.25,
+        0.0
+      ]
+    },
+    {
+      "name": "freshness_at_d5",
+      "estimand": "Q(1,5)-Q(5,5)",
+      "difference": 0.19999999999999996,
+      "bootstrap_95_interval": [
+        0.04999999999999999,
+        0.35000000000000003
+      ]
+    },
+    {
+      "name": "freshness_at_d10",
+      "estimand": "Q(1,10)-Q(5,10)",
+      "difference": 0.34999999999999987,
+      "bootstrap_95_interval": [
+        0.15000000000000002,
+        0.55
+      ]
+    },
+    {
+      "name": "principal_joint_vs_native",
+      "estimand": "Q(5,5)-Q(1,10)",
+      "difference": -0.2499999999999999,
+      "bootstrap_95_interval": [
+        -0.4,
+        -0.09999999999999998
+      ]
+    }
+  ],
+  "factorial_interaction": {
+    "estimand": "[Q(5,10)-Q(1,10)]-[Q(5,5)-Q(1,5)]",
+    "difference": -0.1499999999999999,
+    "bootstrap_95_interval": [
+      -0.30000000000000004,
+      -1.1102230246251565e-16
+    ],
+    "interpretation": "Difference between longer-prefix effects at d=10 and d=5."
+  }
+}

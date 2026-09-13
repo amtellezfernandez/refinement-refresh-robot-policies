@@ -1,0 +1,156 @@
+{
+  "protocol_version": 1,
+  "frozen_utc": "2026-09-10T19:39:55.963237+00:00",
+  "design": "4 archived v2 sources x 17 fixed cases x 4 cumulative validation layers; deterministic exhaustive cases, no random sampling.",
+  "primary_estimand": "Observed rejections of the 52 predeclared in-band invalid artifacts, by cumulative layer; descriptive finite-suite counts only.",
+  "controls": "4 untouched artifacts; report false rejections separately.",
+  "unknowns": "12 unobservable-scenario probes excluded from detection denominators; report technical verdict and epistemic unknown separately.",
+  "layer_contract": {
+    "syntax": "Strict JSON parse; rejects nonstandard NaN/Infinity tokens.",
+    "structure": "Syntax plus the archived structural JSON Schema: required fields, local types/ranges, no cross-record reconciliation.",
+    "aggregates": "Structure plus task/group/overall outcomes, episode count, stream lengths, per-phase inference list/count agreement and warm-up total.",
+    "full_ledger": "Aggregates plus existing validate_completed: hashes, stream action equality, identities, seeds, chronology and chunk schedule."
+  },
+  "legacy_applicability": "The aggregate layer is an explicit ablation of v2 evidence, not a claim that historical v1 stored equivalent streams. V1 originals are excluded because they cannot support action/identity mutation trials.",
+  "claim_limits": [
+    "Constructed mutations were chosen with knowledge of validator requirements; this evaluates specified mechanisms, not natural error prevalence.",
+    "Four source artifacts share one task/state and include a replay; they are stress-test contexts, not independent robot replicates.",
+    "No confidence interval, human-reader benefit, policy quality, robustness under physical perturbations, or end-to-end lifecycle completeness is estimated.",
+    "Jointly consistent alterations and out-of-boundary stages require an external oracle; a pass is not proof of truthful or complete collection."
+  ],
+  "sources": [
+    {
+      "path": "real_smolvla/results/infrastructure_v2/h1.json",
+      "sha256_lf_normalized": "6dafdd2b130037e22ea24cb458362c533b732203235cea1fabb35e9765bf2e63"
+    },
+    {
+      "path": "real_smolvla/results/infrastructure_v2/h5.json",
+      "sha256_lf_normalized": "a3288b4c91fcabe50bb3d32a9cfe426c8adca101cd3b7e9656d6418150c28b8e"
+    },
+    {
+      "path": "real_smolvla/results/infrastructure_v2/h10.json",
+      "sha256_lf_normalized": "2eaf5c4960bf9082475575a9e38a2756cb08b1be97eb1e8a07de21e489b4a828"
+    },
+    {
+      "path": "real_smolvla/results/infrastructure_v2/h10_repeat.json",
+      "sha256_lf_normalized": "2439f020940845971eb84a8340d50aa28e5942f02654e5f6e4765b0af16d1cbc"
+    }
+  ],
+  "instrument_code": {
+    "validate_ledger.py": "658b1027f21a1985cdef433c200cb4d2ec41e7380094213f1da81f10bc9bda67",
+    "result_metrics.py": "e64cdab1ad801a2d4a8e2efe32f8008d142ba53d779bbd29d129b82cd7014dda",
+    "ledger_arrays.py": "4051ab3c82c27c185c6f3c9f75a4307b6b4b198acb2863cf4346619328558560"
+  },
+  "runner_sha256_lf_normalized": "5d82ebd210590d855b7a429eb0e0e91f5d926fa4f590a8b54b1be480bbb7bbfb",
+  "structure_schema_sha256_lf_normalized": "aa85076491cb44e4bfe0e5909da1c53534a24dd813fcc1a7c073bc0fe1feb0b3",
+  "case_manifest": [
+    {
+      "id": "untouched",
+      "ground_truth": "control",
+      "label": "Untouched archived artifact",
+      "intervention": "No mutation; accepted in-band data does not establish completeness outside its scope."
+    },
+    {
+      "id": "invalid_json",
+      "ground_truth": "observable_defect",
+      "label": "Invalid JSON",
+      "intervention": "Remove final closing brace; violates JSON grammar."
+    },
+    {
+      "id": "missing_environment_event",
+      "ground_truth": "observable_defect",
+      "label": "Missing environment event",
+      "intervention": "Remove final consumer event but retain producer stream and selection counter."
+    },
+    {
+      "id": "duplicate_environment_event",
+      "ground_truth": "observable_defect",
+      "label": "Duplicate environment event",
+      "intervention": "Append final consumer event without changing independent streams/counters."
+    },
+    {
+      "id": "sampler_count_drift",
+      "ground_truth": "observable_defect",
+      "label": "Independent counter mismatch",
+      "intervention": "Increment measured sampler counter only."
+    },
+    {
+      "id": "stale_action_hash",
+      "ground_truth": "observable_defect",
+      "label": "Action with stale hash",
+      "intervention": "Change first consumer action value while retaining original hash."
+    },
+    {
+      "id": "consumer_action_rewrite",
+      "ground_truth": "observable_defect",
+      "label": "Producer/consumer action mismatch",
+      "intervention": "Change first consumer action and recompute its valid hash; producer stream stays original."
+    },
+    {
+      "id": "identity_drift",
+      "ground_truth": "observable_defect",
+      "label": "Episode identity mismatch",
+      "intervention": "Increment episode task ID only; inference identities and task outcomes stay original."
+    },
+    {
+      "id": "outcome_rate_drift",
+      "ground_truth": "observable_defect",
+      "label": "Outcome aggregate mismatch",
+      "intervention": "Replace overall success percentage with the opposite binary outcome; task/group outcomes stay original."
+    },
+    {
+      "id": "incomplete_result",
+      "ground_truth": "observable_defect",
+      "label": "Missing completed-result wrapper",
+      "intervention": "Remove overall result; remaining ledger alone cannot establish completed evaluator output."
+    },
+    {
+      "id": "reordered_environment_events",
+      "ground_truth": "observable_defect",
+      "label": "Reordered steps",
+      "intervention": "Swap first two consumer events; counts and action hashes stay valid."
+    },
+    {
+      "id": "balanced_duplicate_inference",
+      "ground_truth": "observable_defect",
+      "label": "Duplicate chunk; balanced counts",
+      "intervention": "Append a measured inference and increment both counters; aggregate counts agree but schedule duplicates."
+    },
+    {
+      "id": "missing_timing_unit",
+      "ground_truth": "observable_defect",
+      "label": "Missing timing field/unit",
+      "intervention": "Rename first inference cuda_ms to duration, losing the declared clock/unit field."
+    },
+    {
+      "id": "interleaved_warmup",
+      "ground_truth": "observable_defect",
+      "label": "Warm-up after measured event",
+      "intervention": "Move first warm-up event to end; all event and counter totals stay unchanged."
+    },
+    {
+      "id": "joint_action_rewrite",
+      "ground_truth": "unobservable_scenario",
+      "label": "Joint action rewrite",
+      "intervention": "Change both first action streams and recompute hashes. Without an external expected-action reference, an internally consistent record cannot certify which action occurred."
+    },
+    {
+      "id": "preprocessing_coverage_query",
+      "ground_truth": "unobservable_scenario",
+      "label": "Unlogged preprocessing coverage",
+      "intervention": "Unchanged bytes; ask whether all preprocessing was accounted for. No independent expected-stage manifest or preprocessing cost is available. This is an unknown coverage query, not an invented measured omission."
+    },
+    {
+      "id": "rendering_coverage_query",
+      "ground_truth": "unobservable_scenario",
+      "label": "Unlogged rendering coverage",
+      "intervention": "Unchanged bytes; ask whether rendering costs were fully included. No independent stage-level rendering record is available. This is an unknown coverage query, not an invented measured omission."
+    }
+  ],
+  "layers": [
+    "syntax",
+    "structure",
+    "aggregates",
+    "full_ledger"
+  ]
+}

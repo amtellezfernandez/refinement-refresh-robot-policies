@@ -1,0 +1,176 @@
+"""Recompute the archived evidence audit without running a robot/model.
+
+Run `python audit_archive.py --write` to refresh derived JSON/Markdown/LaTeX.
+Raw results are read only. Run `--check` to detect stale derived artifacts.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+import numpy as np
+
+from result_metrics import summarize
+from validate_ledger import compare, validate_completed
+
+ROOT = Path(__file__).resolve().parent
+
+
+def audit(root=ROOT):
+    rows, data_by_path = [], {}
+    for path in sorted((root / "results").rglob("*.json")):
+        payload = path.read_bytes()
+        data = json.loads(payload)
+        if not isinstance(data, dict) or "robopad_ledger" not in data:
+            continue  # e.g. the historical derived results/summary.json
+        relative = path.relative_to(root).as_posix()
+        # Git may check out text artifacts with CRLF. Keep content digests and
+        # --check reproducible across Windows/Linux without altering raw files.
+        digest = hashlib.sha256(payload.replace(b"\r\n", b"\n")).hexdigest()
+        row = {"path": relative, "sha256_lf_normalized": digest, **summarize(data)}
+        row["task_outcomes"] = [{"suite": task["task_group"], "task_id": task["task_id"],
+                                  "successes": task["metrics"]["successes"]}
+                                 for task in data["per_task"]]
+        ledger = data["robopad_ledger"]
+        if row["ledger_version"] == 2:
+            row.update(h=ledger["h"], denoising_steps=ledger["denoising_steps"],
+                       warmup_chunks=ledger["chunk_calls"]["warmup"],
+                       episode_identities=[e["identity"] for e in ledger["episodes"]])
+            for phase in ("measured", "warmup"):
+                timings = [e["cuda_ms"] for e in ledger["inferences"] if e["phase"] == phase]
+                row[f"{phase}_cuda_event_ms"] = {
+                    "sum": sum(timings), "p50": float(np.percentile(timings, 50)),
+                    "p95": float(np.percentile(timings, 95)), "n": len(timings),
+                }
+        rows.append(row)
+        data_by_path[relative] = data
+
+    comparisons = []
+    base = "results/infrastructure_v2/"
+    for left, right, replay in [("h1.json", "h5.json", False),
+                                ("h1.json", "h10.json", False),
+                                ("h10.json", "h10_repeat.json", True)]:
+        a, b = data_by_path[base + left], data_by_path[base + right]
+        validate_completed(a)
+        validate_completed(b)
+        compare(a, b, replay=replay)
+        comparisons.append({"left": base + left, "right": base + right,
+                            "initial_state_pairing": "verified",
+                            "action_replay": "verified" if replay else "not required across conditions",
+                            "paired_episode_count": len(a["robopad_ledger"]["episodes"]),
+                            "replayed_actions": sum(e["select_calls"] for e in a["robopad_ledger"]["episodes"])
+                                                if replay else None})
+    return {
+        "audit_schema_version": 1,
+        "command": "python audit_archive.py --write",
+        "scope": "completed archived evaluator artifacts; no new policy evaluation",
+        "input_hash_scope": "SHA-256 of UTF-8 file bytes after CRLF-to-LF normalization for cross-platform Git checkouts",
+        "artifact_count": len(rows),
+        "legacy_v1_count": sum(row["ledger_version"] == 1 for row in rows),
+        "v2_count": sum(row["ledger_version"] == 2 for row in rows),
+        "v3_count": sum(row["ledger_version"] == 3 for row in rows),
+        "pooled_success_rate": None,
+        "pooling_exclusion_reason": "Selected tasks and repeated/overlapping episodes across conditions; artifacts are not independent observations.",
+        "comparisons": comparisons,
+        "missing_evidence": [
+            "Legacy v1 lacks initial-state and step-action hashes: pairing/replay cannot be certified retrospectively.",
+            "No broad-suite h=1 completed reference artifacts are archived.",
+            "V2 covers one task and one initial state plus a repeated h=10 run; no powered quality/noninferiority comparison.",
+            "V2 total eval_s includes warm-up, environment, rendering and bookkeeping; do not equate it to measured CUDA-event time.",
+            "No adaptive refresh, independently measured training/adaptation cost, energy, or matched-quality lifecycle break-even experiment.",
+            "No independent per-episode terminal-state/outcome record in the v2 ledger; final evaluator success totals are reconciled by task only.",
+            "Archived v2 ledgers do not embed checkpoint hash, hardware, package versions, task limits, or run order.",
+        ],
+        "results": rows,
+    }
+
+
+def markdown(report):
+    lines = ["# Recomputed SmolVLA archive audit", "",
+             "Generated by `python audit_archive.py --write`. Raw ledgers are unchanged.", "",
+             f"All {report['artifact_count']} completed artifacts reconcile: "
+             f"{report['legacy_v1_count']} legacy v1, {report['v2_count']} v2, "
+             f"and {report['v3_count']} v3. "
+             "Outcome counts and percentages agree with task/group/overall records. "
+             "V1 aggregate timing counts agree with neural chunk counts. "
+             "V2 additionally passes array-hash, independent step/sampler accounting, "
+             "chunk-schedule and warm-up checks.", "",
+             "Do not pool rows into a success rate or benchmark score. Tasks were selected; "
+             "conditions and repeat runs overlap. Ratios below are observed control calls "
+             "per neural chunk, not speedups or quality-preservation estimates.", "",
+             "| Artifact | Version | Success | Controls | Neural chunks | Calls/chunk |", 
+             "|---|---:|---:|---:|---:|---:|"]
+    for row in report["results"]:
+        lines.append(f"| `{row['path'].removeprefix('results/')}` | {row['ledger_version']} | "
+                     f"{row['successes']}/{row['episodes']} | {row['control_steps']} | "
+                     f"{row['neural_chunks']} | {row['control_to_neural']:.2f} |")
+    lines.extend(["", "## Verified comparisons", ""])
+    for comparison in report["comparisons"]:
+        lines.append(f"- `{Path(comparison['left']).name}` vs `{Path(comparison['right']).name}`: "
+                     f"initial-state pairing verified for {comparison['paired_episode_count']} episode; "
+                     f"action replay {comparison['action_replay']}.")
+    replayed = sum(c["replayed_actions"] or 0 for c in report["comparisons"])
+    lines.extend(["", f"The v2 repeat comparisons match {replayed} dispatched action arrays. "
+                  "These are software-boundary and same-stack replay checks. "
+                  "The v1 repeat matches aggregate counters/outcomes only.", "",
+                  "## Missing evidence and claim limits", ""])
+    lines.extend(f"- {finding}" for finding in report["missing_evidence"])
+    lines.extend(["", "The JSON companion includes SHA-256 digests for every input (CRLF normalized to LF), all task outcomes, "
+                  "and separate measured/warm-up CUDA-event summaries for v2. "
+                  "These event percentiles describe calls within these runs; they are not independent "
+                  "replicate estimates or end-to-end deadline measurements.", ""])
+    return "\n".join(lines)
+
+
+def solver_proxy_table(report):
+    """Descriptive v1 example: equal chunk counts do not determine host time."""
+    rows = {row["path"]: row for row in report["results"]}
+    lines = [r"% Generated by audit_archive.py --write; do not edit manually.",
+             r"\begin{table}[t]", r"\centering\small",
+             r"\caption{Legacy v1 records on Spatial tasks 0 and 1 with $h=10$. "
+             r"All three runs record 19 generations, but different host-inference "
+             r"interval sums and rollout times. Host intervals include cold calls "
+             r"and post-call CUDA synchronization; they are not CUDA-event times. "
+             r"Unverified pairing and differing trajectories preclude a causal "
+             r"solver-effect or efficiency claim.}",
+             r"\label{tab:solver-proxy}", r"\begin{tabular}{rrrrrr}",
+             r"\toprule",
+             r"Solver $d$ & Controls & Chunks & Success & Host infer. (s) & Rollout (s)\\",
+             r"\midrule"]
+    for denoising, suffix in [(5, "_d5"), (10, ""), (20, "_d20")]:
+        row = rows[f"results/eval_spatial01_h10{suffix}.json"]
+        if row["ledger_version"] != 1 or row["legacy_inference_host_seconds"] is None:
+            raise ValueError("Solver proxy table requires legacy v1 host intervals")
+        lines.append(f"{denoising} & {row['control_steps']} & {row['neural_chunks']} & "
+                     f"{row['successes']}/{row['episodes']} & "
+                     f"{row['legacy_inference_host_seconds']:.2f} & "
+                     f"{row['rollout_seconds']:.2f}" + r"\\")
+    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}", ""])
+    return "\n".join(lines)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--write", action="store_true")
+    mode.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    report = audit()
+    outputs = {ROOT / "archive_audit.json": json.dumps(report, indent=2, allow_nan=False) + "\n",
+               ROOT / "ARCHIVE_AUDIT.md": markdown(report),
+               ROOT / "solver_proxy_table.tex": solver_proxy_table(report)}
+    if args.write:
+        for path, content in outputs.items():
+            path.write_text(content, encoding="utf-8")
+    elif args.check:
+        for path, content in outputs.items():
+            if not path.exists() or path.read_text(encoding="utf-8") != content:
+                raise SystemExit(f"Stale audit artifact: {path.name}; rerun --write")
+    else:
+        print(outputs[ROOT / "archive_audit.json"], end="")
+    if args.write or args.check:
+        print(f"Verified {report['artifact_count']} artifacts and {len(report['comparisons'])} v2 comparisons.")
+
+
+if __name__ == "__main__":
+    main()

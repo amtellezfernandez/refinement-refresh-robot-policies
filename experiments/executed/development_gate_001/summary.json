@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "checks": {
+    "native_repeat_allclose": true,
+    "at_least_one_image_perturbation_changes_output": true,
+    "independent_profile_counts_match": true,
+    "profile_counter_outputs_allclose": true,
+    "zero_action_not_successful": true,
+    "zero_action_horizon_or_terminal": true,
+    "exactly_eight_chunk_calls": true
+  },
+  "comparisons": {
+    "native_repeat": {
+      "exact_equal": true,
+      "allclose": true,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "rtol": 1e-05,
+      "atol": 1e-06
+    },
+    "camera_swap": {
+      "exact_equal": false,
+      "allclose": false,
+      "max_abs_diff": 0.7794100046157837,
+      "mean_abs_diff": 0.10372361077394869,
+      "rtol": 1e-05,
+      "atol": 1e-06
+    },
+    "zero_images": {
+      "exact_equal": false,
+      "allclose": false,
+      "max_abs_diff": 2.5223728930577636,
+      "mean_abs_diff": 0.47086866503581404,
+      "rtol": 1e-05,
+      "atol": 1e-06
+    }
+  },
+  "profile_counter_parity": {
+    "5": {
+      "exact_equal": true,
+      "allclose": true,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "rtol": 1e-05,
+      "atol": 1e-06
+    },
+    "10": {
+      "exact_equal": true,
+      "allclose": true,
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "rtol": 1e-05,
+      "atol": 1e-06
+    }
+  },
+  "source_profile_counts": {
+    "5": {
+      "sample_actions": {
+        "primitive_calls": 1,
+        "total_calls": 1,
+        "source_file": "/mnt/NVME1/projectx-robopad-proposal2/runtime/lerobot/src/lerobot/policies/smolvla/modeling_smolvla.py",
+        "first_line": 726,
+        "function": "sample_actions"
+      },
+      "denoise_step": {
+        "primitive_calls": 5,
+        "total_calls": 5,
+        "source_file": "/mnt/NVME1/projectx-robopad-proposal2/runtime/lerobot/src/lerobot/policies/smolvla/modeling_smolvla.py",
+        "first_line": 775,
+        "function": "denoise_step"
+      }
+    },
+    "10": {
+      "sample_actions": {
+        "primitive_calls": 1,
+        "total_calls": 1,
+        "source_file": "/mnt/NVME1/projectx-robopad-proposal2/runtime/lerobot/src/lerobot/policies/smolvla/modeling_smolvla.py",
+        "first_line": 726,
+        "function": "sample_actions"
+      },
+      "denoise_step": {
+        "primitive_calls": 10,
+        "total_calls": 10,
+        "source_file": "/mnt/NVME1/projectx-robopad-proposal2/runtime/lerobot/src/lerobot/policies/smolvla/modeling_smolvla.py",
+        "first_line": 775,
+        "function": "denoise_step"
+      }
+    }
+  },
+  "counter_counts": {
+    "5": {
+      "generations": 1,
+      "denoise_steps": 5,
+      "vision_encoder_calls": 2,
+      "prefill_calls": 1,
+      "action_expert_calls": 5
+    },
+    "10": {
+      "generations": 1,
+      "denoise_steps": 10,
+      "vision_encoder_calls": 2,
+      "prefill_calls": 1,
+      "action_expert_calls": 10
+    }
+  },
+  "zero_action": {
+    "success": false,
+    "steps": 280,
+    "horizon": 280,
+    "terminated": false,
+    "truncated": false,
+    "initial_state_sha256": "ba9666bae5375603c4f4552ff66125e3d43bb248b9c4c35cb6c19581868433e1"
+  },
+  "issued_chunk_calls": 8,
+  "completed_chunk_calls": 8,
+  "wall_s": 38.81796601699898,
+  "manifest_sha256": "9c1b5eeafc81d756312371346dc1beaa53132f3bd3ba969a138f62e1d1e86669",
+  "claim_scope": "Development pipeline checks; no held-out quality claim, no FLOP estimate."
+}

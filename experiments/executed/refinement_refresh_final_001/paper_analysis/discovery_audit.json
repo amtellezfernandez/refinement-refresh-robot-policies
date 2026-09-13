@@ -1,0 +1,399 @@
+{
+  "status": "audited_completed_discovery",
+  "attempts": 480,
+  "blocks": 40,
+  "steps": 87364,
+  "cells": [
+    {
+      "h": 1,
+      "d": 2,
+      "successes": 26,
+      "attempts": 40,
+      "success": 0.65,
+      "descriptive_95_interval": [
+        0.475,
+        0.825
+      ],
+      "per_task_successes": [
+        5,
+        7,
+        4,
+        10
+      ],
+      "relative_rate": 0.8571660403704169,
+      "gf_per_control_step": 550.021623808,
+      "mean_tf_per_attempt": 90.56106035998721,
+      "mean_rollout_s": 39.50492392132291
+    },
+    {
+      "h": 1,
+      "d": 5,
+      "successes": 28,
+      "attempts": 40,
+      "success": 0.7,
+      "descriptive_95_interval": [
+        0.5249999999999999,
+        0.875
+      ],
+      "per_task_successes": [
+        5,
+        8,
+        6,
+        9
+      ],
+      "relative_rate": 0.9107287752315106,
+      "gf_per_control_step": 584.391467008,
+      "mean_tf_per_attempt": 91.7056309602304,
+      "mean_rollout_s": 61.84586226535066
+    },
+    {
+      "h": 1,
+      "d": 10,
+      "successes": 25,
+      "attempts": 40,
+      "success": 0.625,
+      "descriptive_95_interval": [
+        0.44999999999999996,
+        0.8
+      ],
+      "per_task_successes": [
+        5,
+        7,
+        6,
+        7
+      ],
+      "relative_rate": 1.0,
+      "gf_per_control_step": 641.674539008,
+      "mean_tf_per_attempt": 109.61405312604161,
+      "mean_rollout_s": 111.90183348767751
+    },
+    {
+      "h": 1,
+      "d": 20,
+      "successes": 25,
+      "attempts": 40,
+      "success": 0.625,
+      "descriptive_95_interval": [
+        0.45,
+        0.8
+      ],
+      "per_task_successes": [
+        5,
+        6,
+        6,
+        8
+      ],
+      "relative_rate": 1.1785424495369787,
+      "gf_per_control_step": 756.240683008,
+      "mean_tf_per_attempt": 129.12809662361602,
+      "mean_rollout_s": 199.8295651124259
+    },
+    {
+      "h": 2,
+      "d": 2,
+      "successes": 26,
+      "attempts": 40,
+      "success": 0.65,
+      "descriptive_95_interval": [
+        0.475,
+        0.825
+      ],
+      "per_task_successes": [
+        5,
+        7,
+        4,
+        10
+      ],
+      "relative_rate": 0.42858302018520844,
+      "gf_per_control_step": 275.010811904,
+      "mean_tf_per_attempt": 45.03302044928,
+      "mean_rollout_s": 21.792803230749634
+    },
+    {
+      "h": 2,
+      "d": 5,
+      "successes": 23,
+      "attempts": 40,
+      "success": 0.575,
+      "descriptive_95_interval": [
+        0.425,
+        0.75
+      ],
+      "per_task_successes": [
+        4,
+        6,
+        4,
+        9
+      ],
+      "relative_rate": 0.4553643876157553,
+      "gf_per_control_step": 292.195733504,
+      "mean_tf_per_attempt": 53.398770297856004,
+      "mean_rollout_s": 38.54577236065124
+    },
+    {
+      "h": 2,
+      "d": 10,
+      "successes": 23,
+      "attempts": 40,
+      "success": 0.575,
+      "descriptive_95_interval": [
+        0.425,
+        0.75
+      ],
+      "per_task_successes": [
+        4,
+        6,
+        4,
+        9
+      ],
+      "relative_rate": 0.5,
+      "gf_per_control_step": 320.837269504,
+      "mean_tf_per_attempt": 57.8469596915712,
+      "mean_rollout_s": 61.611737092649854
+    },
+    {
+      "h": 2,
+      "d": 20,
+      "successes": 24,
+      "attempts": 40,
+      "success": 0.6,
+      "descriptive_95_interval": [
+        0.42500000000000004,
+        0.775
+      ],
+      "per_task_successes": [
+        4,
+        7,
+        4,
+        9
+      ],
+      "relative_rate": 0.5892712247684894,
+      "gf_per_control_step": 378.120341504,
+      "mean_tf_per_attempt": 67.778071214592,
+      "mean_rollout_s": 107.80229230420227
+    },
+    {
+      "h": 5,
+      "d": 2,
+      "successes": 21,
+      "attempts": 40,
+      "success": 0.525,
+      "descriptive_95_interval": [
+        0.325,
+        0.7250000000000001
+      ],
+      "per_task_successes": [
+        6,
+        5,
+        4,
+        6
+      ],
+      "relative_rate": 0.17143320807408338,
+      "gf_per_control_step": 110.0043247616,
+      "mean_tf_per_attempt": 20.4608044056576,
+      "mean_rollout_s": 12.740927005099365
+    },
+    {
+      "h": 5,
+      "d": 5,
+      "successes": 18,
+      "attempts": 40,
+      "success": 0.45,
+      "descriptive_95_interval": [
+        0.32499999999999996,
+        0.6
+      ],
+      "per_task_successes": [
+        2,
+        5,
+        5,
+        6
+      ],
+      "relative_rate": 0.18214575504630212,
+      "gf_per_control_step": 116.8782934016,
+      "mean_tf_per_attempt": 23.755513133875198,
+      "mean_rollout_s": 20.241378932799854
+    },
+    {
+      "h": 5,
+      "d": 10,
+      "successes": 16,
+      "attempts": 40,
+      "success": 0.4,
+      "descriptive_95_interval": [
+        0.25,
+        0.55
+      ],
+      "per_task_successes": [
+        2,
+        4,
+        5,
+        5
+      ],
+      "relative_rate": 0.2,
+      "gf_per_control_step": 128.3349078016,
+      "mean_tf_per_attempt": 27.158874863513596,
+      "mean_rollout_s": 32.00250686747495
+    },
+    {
+      "h": 5,
+      "d": 20,
+      "successes": 14,
+      "attempts": 40,
+      "success": 0.35,
+      "descriptive_95_interval": [
+        0.2,
+        0.5249999999999999
+      ],
+      "per_task_successes": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "relative_rate": 0.2357084899073958,
+      "gf_per_control_step": 151.2481366016,
+      "mean_tf_per_attempt": 33.0855298816,
+      "mean_rollout_s": 55.596686205198786
+    }
+  ],
+  "contrasts_against_native": [
+    {
+      "h": 1,
+      "d": 2,
+      "difference": 0.025000000000000022,
+      "descriptive_95_interval": [
+        -0.10000000000000009,
+        0.1499999999999999
+      ]
+    },
+    {
+      "h": 1,
+      "d": 5,
+      "difference": 0.07499999999999996,
+      "descriptive_95_interval": [
+        0.0,
+        0.15000000000000002
+      ]
+    },
+    {
+      "h": 1,
+      "d": 10,
+      "difference": 0.0,
+      "descriptive_95_interval": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "h": 1,
+      "d": 20,
+      "difference": 0.0,
+      "descriptive_95_interval": [
+        -0.0500000000000001,
+        0.050000000000000044
+      ]
+    },
+    {
+      "h": 2,
+      "d": 2,
+      "difference": 0.025000000000000022,
+      "descriptive_95_interval": [
+        -0.09999999999999987,
+        0.12499999999999994
+      ]
+    },
+    {
+      "h": 2,
+      "d": 5,
+      "difference": -0.050000000000000044,
+      "descriptive_95_interval": [
+        -0.17500000000000004,
+        0.050000000000000044
+      ]
+    },
+    {
+      "h": 2,
+      "d": 10,
+      "difference": -0.050000000000000044,
+      "descriptive_95_interval": [
+        -0.17500000000000004,
+        0.050000000000000044
+      ]
+    },
+    {
+      "h": 2,
+      "d": 20,
+      "difference": -0.025000000000000022,
+      "descriptive_95_interval": [
+        -0.17499999999999982,
+        0.09999999999999998
+      ]
+    },
+    {
+      "h": 5,
+      "d": 2,
+      "difference": -0.09999999999999998,
+      "descriptive_95_interval": [
+        -0.275,
+        0.050000000000000044
+      ]
+    },
+    {
+      "h": 5,
+      "d": 5,
+      "difference": -0.175,
+      "descriptive_95_interval": [
+        -0.3499999999999999,
+        -0.025000000000000022
+      ]
+    },
+    {
+      "h": 5,
+      "d": 10,
+      "difference": -0.22499999999999998,
+      "descriptive_95_interval": [
+        -0.4000000000000001,
+        -0.07499999999999996
+      ]
+    },
+    {
+      "h": 5,
+      "d": 20,
+      "difference": -0.275,
+      "descriptive_95_interval": [
+        -0.44999999999999996,
+        -0.125
+      ]
+    }
+  ],
+  "gpu_monitor": {
+    "calibration": {
+      "samples": 59,
+      "duration_s": 290.9463052749634,
+      "max_sample_gap_s": 5.024385929107666
+    },
+    "discovery": {
+      "samples": 6230,
+      "duration_s": 31245.03323173523,
+      "max_sample_gap_s": 5.028658628463745
+    }
+  },
+  "checks": [
+    "schedule/runtime/summary digests",
+    "every dispatched action and keyed noise",
+    "initial-state pairing",
+    "generation and solver counts",
+    "driver/vector outcomes",
+    "frozen selection input",
+    "disjoint confirmation tasks"
+  ],
+  "uncertainty": "Post-discovery descriptive bootstrap, 20000 draws, seed 20260913; resample five states within each fixed task, preserving both seeds and all cells; no multiplicity correction or noninferiority claim.",
+  "source_sha256": {
+    "discovery/episodes.jsonl": "7ebdec030428652533a0d68e92a4c99d864f037ee0802e14bdc2735ce01697c1",
+    "discovery/steps.jsonl": "7c0c95e515ee536bf84fa661abe5ccb0afca686a70439c6e421848863836ae22",
+    "discovery/runtime_manifest.json": "c95fc4c38c9f76ca7b562205f7cb443b8fc560425cbb748b19afb727fe694f7f",
+    "frozen_prediction.json": "48017553c351960fc840c10b14922046b3b17e0aa09476feb98b9e5a060b056f",
+    "calibration.json": "b5cf102627fac4c56efc19a1975a49584fa0be36e7de4a3106f0a71a495c1b6d"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "design": "Deterministic direct-record query recovery under artificial information suppression",
+  "queries": [
+    {
+      "id": "success_attempts",
+      "label": "Successes / attempts",
+      "unit": "count / count",
+      "boundary": "All completed attempted episodes in the declared condition, including failures",
+      "required_fields": [
+        "success"
+      ]
+    },
+    {
+      "id": "generations",
+      "label": "Actual chunk generations",
+      "unit": "count",
+      "boundary": "Measured rollout generations; excludes model loading, reset and warm-up",
+      "required_fields": [
+        "generations"
+      ]
+    },
+    {
+      "id": "denoise_nfe",
+      "label": "Measured denoise evaluations",
+      "unit": "count",
+      "boundary": "Actual denoise-method entries in measured rollouts; excludes warm-up",
+      "required_fields": [
+        "denoise_nfe"
+      ]
+    },
+    {
+      "id": "rollout_wall_s",
+      "label": "Total outer rollout wall time",
+      "unit": "s",
+      "boundary": "Sum of outer rollout intervals over all attempts; runtime manifest defines included stages",
+      "required_fields": [
+        "rollout_wall_s"
+      ]
+    },
+    {
+      "id": "wall_per_attempt_s",
+      "label": "Mean wall time / attempt",
+      "unit": "s / attempt",
+      "boundary": "Total outer rollout wall time / all completed attempts; raw pooled mean, not equal-task weighting",
+      "required_fields": [
+        "rollout_wall_s"
+      ]
+    },
+    {
+      "id": "wall_per_success_s",
+      "label": "All-attempt wall time / success",
+      "unit": "s / success",
+      "boundary": "Total outer rollout wall time, including failed attempts, / successes; undefined at zero successes",
+      "required_fields": [
+        "rollout_wall_s",
+        "success"
+      ],
+      "zero_denominator_rule": "Known zero successes establishes undefined even when wall time is suppressed"
+    }
+  ],
+  "projections": [
+    {
+      "id": "outcomes_only",
+      "short": "O",
+      "fields": [
+        "attempt_id",
+        "success"
+      ]
+    },
+    {
+      "id": "outcomes_generations",
+      "short": "G",
+      "fields": [
+        "attempt_id",
+        "success",
+        "generations"
+      ]
+    },
+    {
+      "id": "full_ledger",
+      "short": "L",
+      "fields": [
+        "attempt_id",
+        "success",
+        "generations",
+        "denoise_nfe",
+        "rollout_wall_s"
+      ]
+    }
+  ],
+  "reference": "Completed records independently reconciled against retained step journals by this analyzer",
+  "information_contract": "Reduced projections omit solver configuration, source, action-step schedules and timing. Condition identifiers are opaque to the recovery function. Only direct retained fields and the declared arithmetic are queried; the check does not assert that NFE is impossible to derive when solver configuration/source are available.",
+  "status_contract": "recovered = defined value obtained; undefined = enough information establishes zero denominator; unknown = required information suppressed. Recovered and undefined count as answered when they match the reference.",
+  "limits": "Finite deterministic mechanism check, not a reader study, natural disclosure experiment, independent empirical benefit estimate, or evidence of improved decisions. Full-projection success is a consistency check of deliberately retained fields, not a publication-level utility claim."
+}

@@ -1,0 +1,20 @@
+{
+  "campaign": "refinement_refresh_final_001",
+  "captured_at": "2026-09-13T09:25:29+02:00",
+  "remote_root": "/mnt/NVME1/projectx-robopad-proposal2/results/refinement_refresh_final_001",
+  "calibration_status": "completed",
+  "discovery_attempts_completed": 480,
+  "discovery_attempts_planned": 480,
+  "confirmation_attempts_completed": 601,
+  "confirmation_attempts_planned": 1120,
+  "confirmation_fraction_completed": 0.5366071428571428,
+  "current_attempt": 602,
+  "current_stage": "confirmation",
+  "confirmation_process_running": true,
+  "confirmation_summary_present": false,
+  "confirmation_analysis_present": false,
+  "campaign_completed_marker_present": false,
+  "campaign_failure_marker_present": false,
+  "last_observed_attempt": "confirmation.libero_object.task008.state024.seed3000.h5_d5",
+  "manuscript_policy": "Do not report interim confirmation success rates; import outcomes only after the complete scheduled sample reconciles."
+}

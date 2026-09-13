@@ -1,0 +1,245 @@
+{
+  "scope": "Post-start amendment, discovery/calibration only; no confirmation outcomes read",
+  "input_sha256": {
+    "frozen_prediction.json": "48017553c351960fc840c10b14922046b3b17e0aa09476feb98b9e5a060b056f",
+    "calibration.json": "b5cf102627fac4c56efc19a1975a49584fa0be36e7de4a3106f0a71a495c1b6d",
+    "discovery/episodes.jsonl": "7ebdec030428652533a0d68e92a4c99d864f037ee0802e14bdc2735ce01697c1"
+  },
+  "scoring": "Mean natural-log binary cross-entropy; whole-task validation folds",
+  "scores": {
+    "constant_half": 0.6931471805599453,
+    "fold_fitted_intercept": 0.7169751455964416,
+    "compute_ridge_1.0": 0.7085154079532693,
+    "compute_ridge_10.0": 0.7066760655041406,
+    "allocation_ridge_1.0": 0.7074257415784989,
+    "allocation_ridge_10.0": 0.7048017018910679
+  },
+  "intercept_folds": [
+    {
+      "task": 5,
+      "training_prevalence": 0.6111111111111112
+    },
+    {
+      "task": 6,
+      "training_prevalence": 0.55
+    },
+    {
+      "task": 7,
+      "training_prevalence": 0.5916666666666667
+    },
+    {
+      "task": 8,
+      "training_prevalence": 0.4888888888888889
+    }
+  ],
+  "selectors": [
+    {
+      "budget": 0.25,
+      "learned": [
+        5,
+        2
+      ],
+      "empirical": [
+        5,
+        2
+      ],
+      "simple": [
+        5,
+        2
+      ],
+      "compute_only": [
+        5,
+        20
+      ]
+    },
+    {
+      "budget": 0.5,
+      "learned": [
+        2,
+        2
+      ],
+      "empirical": [
+        2,
+        2
+      ],
+      "simple": [
+        2,
+        2
+      ],
+      "compute_only": [
+        2,
+        10
+      ]
+    },
+    {
+      "budget": 1.0,
+      "learned": [
+        1,
+        2
+      ],
+      "empirical": [
+        1,
+        5
+      ],
+      "simple": [
+        1,
+        2
+      ],
+      "compute_only": [
+        1,
+        10
+      ]
+    }
+  ],
+  "compute_model": {
+    "kind": "compute",
+    "ridge": 10.0,
+    "grouped_log_loss": 0.7066760655041406,
+    "coefficients": [
+      0.5800498040932645,
+      0.1606201801893422,
+      -0.19205728791782908
+    ]
+  },
+  "timings": [
+    {
+      "d": 2,
+      "gflops": 550.021623808,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 219.08392935001757,
+          "cuda_ms": 219.0351593017578
+        },
+        {
+          "block": 1,
+          "host_ms": 214.4714127512998,
+          "cuda_ms": 214.4515640258789
+        },
+        {
+          "block": 2,
+          "host_ms": 220.1181632000953,
+          "cuda_ms": 220.09785919189454
+        }
+      ],
+      "host_ms": 217.8911684338042,
+      "cuda_ms": 217.8615275065104
+    },
+    {
+      "d": 3,
+      "gflops": 561.478238208,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 272.5815783494909,
+          "cuda_ms": 272.56023559570315
+        },
+        {
+          "block": 1,
+          "host_ms": 265.2709216992662,
+          "cuda_ms": 265.2509292602539
+        },
+        {
+          "block": 2,
+          "host_ms": 272.1176152001135,
+          "cuda_ms": 272.0974975585938
+        }
+      ],
+      "host_ms": 269.9900384162902,
+      "cuda_ms": 269.9695541381836
+    },
+    {
+      "d": 5,
+      "gflops": 584.391467008,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 378.1055072977324,
+          "cuda_ms": 378.0826721191406
+        },
+        {
+          "block": 1,
+          "host_ms": 366.7724056474981,
+          "cuda_ms": 366.7528350830078
+        },
+        {
+          "block": 2,
+          "host_ms": 378.0852796000545,
+          "cuda_ms": 378.064714050293
+        }
+      ],
+      "host_ms": 374.32106418176164,
+      "cuda_ms": 374.3000737508138
+    },
+    {
+      "d": 8,
+      "gflops": 618.761310208,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 533.3041030986351,
+          "cuda_ms": 533.2826141357422
+        },
+        {
+          "block": 1,
+          "host_ms": 519.8634654494526,
+          "cuda_ms": 519.8442016601563
+        },
+        {
+          "block": 2,
+          "host_ms": 536.0695533003309,
+          "cuda_ms": 536.0500274658203
+        }
+      ],
+      "host_ms": 529.7457072828062,
+      "cuda_ms": 529.7256144205729
+    },
+    {
+      "d": 10,
+      "gflops": 641.674539008,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 623.1920902508136,
+          "cuda_ms": 623.1721374511719
+        },
+        {
+          "block": 1,
+          "host_ms": 623.4422066503612,
+          "cuda_ms": 623.4228057861328
+        },
+        {
+          "block": 2,
+          "host_ms": 642.2387792496011,
+          "cuda_ms": 642.2185180664062
+        }
+      ],
+      "host_ms": 629.6243587169253,
+      "cuda_ms": 629.6044871012369
+    },
+    {
+      "d": 20,
+      "gflops": 756.240683008,
+      "blocks": [
+        {
+          "block": 0,
+          "host_ms": 1133.5037826487678,
+          "cuda_ms": 1133.4859741210937
+        },
+        {
+          "block": 1,
+          "host_ms": 1172.635047697986,
+          "cuda_ms": 1172.5910278320312
+        },
+        {
+          "block": 2,
+          "host_ms": 1169.7657453500142,
+          "cuda_ms": 1169.74775390625
+        }
+      ],
+      "host_ms": 1158.6348585655894,
+      "cuda_ms": 1158.608251953125
+    }
+  ],
+  "timing_scope": "Full-generation intervals only; no component-level timing or component-attributed FLOP counts recorded"
+}

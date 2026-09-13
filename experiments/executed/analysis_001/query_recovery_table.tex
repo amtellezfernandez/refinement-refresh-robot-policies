@@ -1,0 +1,17 @@
+\begingroup\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Query & $(1,5)$ & $(1,10)$ & $(5,5)$ & $(5,10)$ & O & G & L\\
+\midrule
+Successes / attempts & 12/20 & 13/20 & 8/20 & 6/20 & 4/4 & 4/4 & 4/4\\
+Generations (count) & 3462 & 3299 & 843 & 909 & 0/4 & 4/4 & 4/4\\
+Denoise NFE (count) & 17310 & 32990 & 4215 & 9090 & 0/4 & 0/4 & 4/4\\
+Total wall (s) & 1374.60 & 2185.14 & 425.18 & 695.98 & 0/4 & 0/4 & 4/4\\
+Wall / attempt (s) & 68.73 & 109.26 & 21.26 & 34.80 & 0/4 & 0/4 & 4/4\\
+All-attempt wall / success (s) & 114.55 & 168.09 & 53.15 & 116.00 & 0/4 & 0/4 & 4/4\\
+\midrule
+All queries & \multicolumn{4}{c}{Correctly answered / requested} & 4/24 & 8/24 & 24/24\\
+\bottomrule
+\end{tabular}\endgroup
+\par\smallskip
+{\footnotesize Cell headers are $(h,d)$; values are from the completed, reconciled records. O: outcomes; G: outcomes plus generation counts; L: full records. O/G/L show correct answers per four cells; known undefined ratios count as answered. Unknown fields are never set to zero. This is deterministic direct-record recovery under artificial suppression, not a reader study or evidence of better decisions. Reduced views omit solver configuration/source; the test does not rule out deriving NFE when those are available.}

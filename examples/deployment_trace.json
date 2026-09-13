@@ -1,0 +1,147 @@
+{
+  "spec_version": "0.2",
+  "system": "Synthetic frozen-policy deployment fixture",
+  "boundary": {
+    "scope": "deployment",
+    "description": "One hypothetical simulated action; no adaptation is claimed.",
+    "included": [
+      "one policy call",
+      "one simulator step"
+    ],
+    "excluded": [
+      "pretraining",
+      "model loading",
+      "rendering"
+    ]
+  },
+  "pretrained_roots": [
+    "policy_0"
+  ],
+  "states": [
+    {
+      "id": "policy_0",
+      "carrier": "MODEL",
+      "roles": [
+        "POLICY"
+      ],
+      "lifetime": "CHECKPOINT"
+    },
+    {
+      "id": "obs_0",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "OBSERVATION"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "action_0",
+      "carrier": "WORKSPACE",
+      "roles": [
+        "ACTION"
+      ],
+      "lifetime": "CONTROL_CYCLE"
+    },
+    {
+      "id": "sim_0",
+      "carrier": "PHYSICAL",
+      "roles": [
+        "ENVIRONMENT"
+      ],
+      "lifetime": "EXTERNAL"
+    },
+    {
+      "id": "sim_1",
+      "carrier": "PHYSICAL",
+      "roles": [
+        "ENVIRONMENT"
+      ],
+      "lifetime": "EXTERNAL"
+    }
+  ],
+  "events": [
+    {
+      "id": "predict",
+      "operator": "PROPOSE",
+      "inputs": [
+        "policy_0",
+        "obs_0"
+      ],
+      "outputs": [
+        "action_0"
+      ],
+      "specifications": [],
+      "signal": "NONE",
+      "phase": "CONTROL_CYCLE",
+      "required_resources": [
+        "model_calls",
+        "elapsed_time"
+      ],
+      "resources": [
+        {
+          "name": "model_calls",
+          "kind": "ACCELERATOR",
+          "status": "derived",
+          "amount": 1,
+          "unit": "calls",
+          "boundary": "one policy invocation",
+          "aggregation": "sum",
+          "derivation": "One invocation in the synthetic fixture."
+        },
+        {
+          "name": "elapsed_time",
+          "kind": "LATENCY",
+          "status": "unknown",
+          "amount": null,
+          "unit": "s",
+          "boundary": "policy invocation",
+          "aggregation": "interval"
+        }
+      ]
+    },
+    {
+      "id": "step",
+      "operator": "EXECUTE",
+      "inputs": [
+        "action_0",
+        "sim_0"
+      ],
+      "outputs": [
+        "sim_1"
+      ],
+      "specifications": [],
+      "signal": "SIMULATOR",
+      "phase": "CONTROL_CYCLE",
+      "execution_environment": "simulated",
+      "changes_physical_world": false,
+      "required_resources": [
+        "sim_steps",
+        "real_steps"
+      ],
+      "resources": [
+        {
+          "name": "sim_steps",
+          "kind": "SIMULATION",
+          "status": "derived",
+          "amount": 1,
+          "unit": "transitions",
+          "boundary": "one simulator step",
+          "aggregation": "sum",
+          "derivation": "One transition in the synthetic fixture."
+        },
+        {
+          "name": "real_steps",
+          "kind": "REAL_ROBOT",
+          "status": "not_applicable",
+          "amount": null,
+          "unit": "transitions",
+          "boundary": "simulator-only fixture",
+          "aggregation": "sum"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "status": "synthetic software fixture; no benchmark evidence"
+  }
+}

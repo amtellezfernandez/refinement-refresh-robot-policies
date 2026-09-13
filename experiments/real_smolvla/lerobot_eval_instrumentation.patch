@@ -1,0 +1,40 @@
+--- a/src/lerobot/scripts/lerobot_eval.py
++++ b/src/lerobot/scripts/lerobot_eval.py
+@@ -217,10 +217,12 @@
+     assert isinstance(policy, nn.Module), "Policy must be a PyTorch nn module."
+
+     # Reset the policy and environments.
++    policy._robopad.before_episode(env, seeds)
+     policy.reset()
+     # NEW_ROLLOUT_OPTION tells FreezeAfterEpisodeEnd this is a genuine new episode, as
+     # opposed to Gymnasium's argument-less autoreset of a sub-env that already finished.
+     observation, info = env.reset(seed=seeds, options={NEW_ROLLOUT_OPTION: True})
++    policy._robopad.after_episode_reset(env)
+     if render_callback is not None:
+         render_callback(env)
+
+@@ -304,6 +306,7 @@
+             assert action_numpy.ndim == 2, "Action dimensions should be (batch, action_dim)"
+
+             # Apply the next action.
++            policy._robopad.record_action(action_numpy)
+             observation, reward, terminated, truncated, info = env.step(action_numpy)
+             if render_callback is not None:
+                 render_callback(env)
+@@ -765,6 +768,9 @@
+         rename_map=cfg.rename_map,
+     )
+
++    from robopad_ledger import Ledger
++    policy._robopad = Ledger(policy, cfg.output_dir, cfg.env.task, config=cfg)
++
+     policy.eval()
+
+     # The inference device is automatically set to match the detected hardware, overriding any previous device settings from training to ensure compatibility.
+@@ -816,6 +822,7 @@
+     close_envs(envs)
+
+     # Save info
++    info["robopad_ledger"] = policy._robopad.finalize(info)
+     with open(Path(cfg.output_dir) / "eval_info.json", "w") as f:
+         json.dump(info, f, indent=2)
