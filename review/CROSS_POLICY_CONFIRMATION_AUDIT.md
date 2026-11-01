@@ -40,7 +40,11 @@ specified. Its records are not in this repository (see R8).
 | Profiling at d=2, d=5, native | NOT RUN | NOT RUN |
 | GPU identity | Read: RTX 5090, `GPU-ba05e81b-15e9-b15d-44f4-efddf5fa1e5c`, driver 610.88 | Same GPU |
 
-**Overall preflight: not passed for either model, because it has not run.**
+**Update, 1 November 2026: a bounded GPU preflight has now run. See `review/GPU_PREFLIGHT_RESULT.md`, which supersedes
+the NOT RUN entries above for load, d=2 and d=5 support, and evaluator execution, and the estimates in sections 5 and 6.
+Native parity and full profiling remain not run. New open item R16, the meaning of first action divergence, is defined there.**
+
+Status when this audit was written: not passed for either model, because it had not run.
 
 Evidence, all in `experiments/runs/cross_policy_confirmation_v1/preflight_cpu_evidence/`:
 

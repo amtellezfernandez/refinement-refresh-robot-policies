@@ -1,0 +1,33 @@
+=== attempt 1 2026-11-01T19:02:35Z
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py
+Loading weights from local directory
+Creating LIBERO envs | suites=['libero_spatial'] | n_envs(per task)=1 | init_states=True
+Restricting to task_ids=[0]
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built vec env | suite=libero_spatial | task_id=0 | n_envs=1
+Local assets not found. Downloading from HuggingFace Hub...
+Assets already downloaded at /home/warren/.cache/libero/assets
+Creating LIBERO envs | suites=['libero_spatial'] | n_envs(per task)=1 | init_states=True
+Restricting to task_ids=[0]
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built vec env | suite=libero_spatial | task_id=0 | n_envs=1
+2026-11-01 19:05:41.972382: E external/xla/xla/service/slow_operation_alarm.cc:73] Trying algorithm eng11{k2=4,k3=0} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+2026-11-01 19:05:44.220294: E external/xla/xla/service/slow_operation_alarm.cc:140] The operation took 3.25051722s
+Trying algorithm eng11{k2=4,k3=0} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+2026-11-01 19:05:45.270635: E external/xla/xla/service/slow_operation_alarm.cc:73] Trying algorithm eng35{k2=4,k3=0} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+2026-11-01 19:05:50.936797: E external/xla/xla/service/slow_operation_alarm.cc:140] The operation took 6.716378544s
+Trying algorithm eng35{k2=4,k3=0} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+2026-11-01 19:05:51.993894: E external/xla/xla/service/slow_operation_alarm.cc:73] Trying algorithm eng0{} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+2026-11-01 19:05:54.972697: E external/xla/xla/service/slow_operation_alarm.cc:140] The operation took 3.999905822s
+Trying algorithm eng0{} for conv %cudnn-conv-bias-activation.9 = (f32[1,16,16,1152]{3,2,1,0}, u8[0]{0}) custom-call(%bitcast.8594, %bitcast.8831, %bitcast.8833), window={size=14x14 stride=14x14}, dim_labels=b01f_o01i->b01f, custom_call_target="__cudnn$convBiasActivationForward", metadata={op_name="jit(fun)/jit(main)/_Module/embedding/conv_general_dilated" source_file="/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/linen/linear.py" source_line=658}, backend_config={"operation_queue_id":"0","wait_on_operation_queues":[],"cudnn_conv_backend_config":{"conv_result_scale":1,"activation_mode":"kNone","side_input_scale":0,"leakyrelu_alpha":0},"force_earliest_schedule":false} is taking a while...
+Traceback (most recent call last):
+  File "/home/warren/alba-cross-policy-20261101/code-bb86691/experiments/tooling/cross_policy/preflight_pi05_client_small.py", line 61, in <module>
+    main()
+  File "/home/warren/alba-cross-policy-20261101/code-bb86691/experiments/tooling/cross_policy/preflight_pi05_client_small.py", line 29, in main
+    from libero.libero import benchmark
+ModuleNotFoundError: No module named 'libero'

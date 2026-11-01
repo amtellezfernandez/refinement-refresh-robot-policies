@@ -1,0 +1,16 @@
+=== attempt 1 2026-11-01T19:08:14Z
+INFO:websockets.server:server listening on 127.0.0.1:8000
+INFO:websockets.server:connection rejected (426 Upgrade Required)
+ERROR:websockets.server:opening handshake failed
+Traceback (most recent call last):
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/websockets/asyncio/server.py", line 356, in conn_handler
+    await connection.handshake(
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/websockets/asyncio/server.py", line 207, in handshake
+    raise self.protocol.handshake_exc
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/websockets/server.py", line 138, in accept
+    ) = self.process_request(request)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/websockets/server.py", line 233, in process_request
+    raise InvalidUpgrade(
+websockets.exceptions.InvalidUpgrade: missing Connection header
+INFO:websockets.server:connection open

@@ -1,0 +1,5 @@
+reservation=R014
+commit=bb866919673defea572e6aaf90208e921c8e2c2c
+gpu_used_mib_before=719
+NVIDIA GeForce RTX 5090, GPU-ba05e81b-15e9-b15d-44f4-efddf5fa1e5c, 610.88
+compute_apps_seen_by_nvidia_smi: 0

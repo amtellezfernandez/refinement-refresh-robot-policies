@@ -1,0 +1,107 @@
+{
+  "device": {
+    "backend": "gpu",
+    "jax_devices": [
+      "cuda:0"
+    ],
+    "jaxlib_path": "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/jaxlib/__init__.py",
+    "matmul_finite": true,
+    "packages": {
+      "flax": "0.10.2",
+      "jax": "0.5.3",
+      "jaxlib": "0.5.3",
+      "nvidia-cublas-cu12": "12.6.4.1",
+      "nvidia-cuda-cupti-cu12": "12.6.80",
+      "nvidia-cuda-runtime-cu12": "12.6.77"
+    }
+  },
+  "finished_unix": 1793559965.5062006,
+  "gates": {
+    "G3_model": "PASS"
+  },
+  "generation": {
+    "10": {
+      "chunk_shape": [
+        10,
+        7
+      ],
+      "distinct_chunks": 30,
+      "host_s": {
+        "max": 0.09240388998296112,
+        "median": 0.07709927648829762,
+        "min": 0.0742695830122102,
+        "n": 30,
+        "p95": 0.08897797099780291
+      },
+      "memory": {
+        "bytes_in_use": 6875643136,
+        "bytes_limit": 25642844160,
+        "peak_bytes_in_use": 7116991744
+      },
+      "warmup_3_calls_s": 0.26032067599589936
+    },
+    "2": {
+      "chunk_shape": [
+        10,
+        7
+      ],
+      "distinct_chunks": 30,
+      "host_s": {
+        "max": 0.061953712021932006,
+        "median": 0.058537943492410704,
+        "min": 0.05737839001812972,
+        "n": 30,
+        "p95": 0.06089279497973621
+      },
+      "memory": {
+        "bytes_in_use": 6875643136,
+        "bytes_limit": 25642844160,
+        "peak_bytes_in_use": 7116991744
+      },
+      "warmup_3_calls_s": 29.01523767702747
+    },
+    "5": {
+      "chunk_shape": [
+        10,
+        7
+      ],
+      "distinct_chunks": 30,
+      "host_s": {
+        "max": 0.07431286299834028,
+        "median": 0.06550374600919895,
+        "min": 0.06359232301474549,
+        "n": 30,
+        "p95": 0.0704942389857024
+      },
+      "memory": {
+        "bytes_in_use": 6875643136,
+        "bytes_limit": 25642844160,
+        "peak_bytes_in_use": 7116991744
+      },
+      "warmup_3_calls_s": 0.19794248600373976
+    }
+  },
+  "load": {
+    "memory_after": {
+      "bytes_in_use": 6875643136,
+      "bytes_limit": 25642844160,
+      "peak_bytes_in_use": 6875643392
+    },
+    "seconds": 9.151905821985565
+  },
+  "model": "pi05",
+  "not_measured": {
+    "cuda_event": "JAX exposes no CUDA event timer (R5)",
+    "xla_arithmetic": "XLA cost analysis not implemented; no pi0.5 arithmetic count exists (R13)"
+  },
+  "resources": {
+    "cpu_sys_s": 76.322815,
+    "cpu_user_s": 124.684071,
+    "gpu_samples_n": 94,
+    "gpu_used_mib_max": 9484.0,
+    "gpu_util_pct_median": 0.0,
+    "max_rss_gib": 15.963775634765625
+  },
+  "started_unix": 1793559911.8040254,
+  "status": "completed"
+}

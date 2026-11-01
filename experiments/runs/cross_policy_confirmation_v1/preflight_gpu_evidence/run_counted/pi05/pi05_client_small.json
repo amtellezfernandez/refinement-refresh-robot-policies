@@ -1,0 +1,16 @@
+{
+  "error": "ModuleNotFoundError(\"No module named 'libero'\")",
+  "evaluator": {},
+  "finished_unix": 1793559980.6158543,
+  "gates": {
+    "G4_evaluator": "NOT_REACHED"
+  },
+  "model": "pi05_client",
+  "resources": {
+    "cpu_sys_s": 0.017858,
+    "cpu_user_s": 0.028572999999999998,
+    "max_rss_gib": 0.016845703125
+  },
+  "started_unix": 1793559980.615695,
+  "status": "failed"
+}
