@@ -1,0 +1,5 @@
+assets: /home/warren/.cache/libero/assets
+bddl_files: /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/libero/libero/bddl_files
+benchmark_root: /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/libero/libero
+datasets: /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/libero/libero/../datasets
+init_states: /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/libero/libero/init_files

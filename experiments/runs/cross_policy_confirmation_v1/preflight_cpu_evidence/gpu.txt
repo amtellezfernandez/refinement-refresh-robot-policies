@@ -1,0 +1,3 @@
+name, uuid, driver_version, memory.used [MiB], memory.total [MiB]
+NVIDIA GeForce RTX 5090, GPU-ba05e81b-15e9-b15d-44f4-efddf5fa1e5c, 610.88, 719 MiB, 32607 MiB
+pid, used_gpu_memory [MiB]

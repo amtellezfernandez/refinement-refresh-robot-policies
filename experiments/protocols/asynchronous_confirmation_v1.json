@@ -1,0 +1,105 @@
+{
+  "blocker_R1": "The specification requires the official asynchronous or real-time chunking runtime for both policies. Pinned LeRobot async_inference and rollout drive real robots only (constants.py SUPPORTED_ROBOTS) and have no simulator path; its pi05 is the PyTorch path. OpenPI's client runtime is synchronous. Alba must rule; see audit R1.",
+  "claim_limit": "Do not claim that synchronous simulator timing predicts asynchronous or physical-robot latency.",
+  "conditions": [
+    "NATIVE",
+    "R22",
+    "R52"
+  ],
+  "expected_attempts": {
+    "per_model": 1200,
+    "total": 2400
+  },
+  "launch_permitted": false,
+  "models": {
+    "pi05": {
+      "checkpoint": "gs://openpi-assets/checkpoints/pi05_libero/",
+      "evaluation_path": "OpenPI server and client: create_trained_policy + WebsocketPolicyServer, examples/libero/main.py observation and action handling.",
+      "family": "pi0.5 (OpenPI, JAX)",
+      "native": {
+        "chunk_size": 10,
+        "d": 10,
+        "h": 5
+      },
+      "native_source": "examples/libero/main.py replan_steps=5; pi0.py sample_actions num_steps=10; config.py pi05_libero action_horizon=10. READ FROM SOURCE; Alba to confirm.",
+      "normalization_asset": "assets/physical-intelligence/libero/norm_stats.json",
+      "normalization_sha256": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84",
+      "runtime_source": {
+        "repo": "Physical-Intelligence/openpi",
+        "revision": "215abfb217dbac7d5f1273282331b9b1866c0479"
+      }
+    },
+    "smolvla": {
+      "checkpoint": "HuggingFaceVLA/smolvla_libero",
+      "evaluation_path": "Pinned LeRobot SmolVLAPolicy + LiberoEnv, as in run_paired.py.",
+      "family": "SmolVLA (LeRobot, PyTorch)",
+      "model_safetensors_sha256": "71d9563c8295284acba8fc2d5c19de000d6fe9ba58a406832af7ef3d221ed52f",
+      "native": {
+        "chunk_size": 50,
+        "d": 10,
+        "h": 1
+      },
+      "native_source": "Checkpoint config and existing runner requirement (run_paired.py:249).",
+      "revision": "6721902bc4d61e50a3bfdb11dfb4cb626f05d102",
+      "runtime_source": {
+        "repo": "huggingface/lerobot",
+        "revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8"
+      }
+    }
+  },
+  "per_control_step_record": [
+    "image capture timestamp",
+    "observation delivery timestamp",
+    "policy-query start and end timestamp",
+    "action enqueue timestamp",
+    "action execution timestamp",
+    "action queue depth",
+    "observation age at execution",
+    "deadline miss indicator",
+    "queue-starvation indicator",
+    "success and episode length"
+  ],
+  "population": "Same paired identities as the synchronous confirmation; a separate asynchronous cohort.",
+  "protocol_id": "asynchronous_confirmation_v1",
+  "recording": [
+    "git commit",
+    "checkpoint revision",
+    "code hash",
+    "package versions",
+    "CUDA version",
+    "driver",
+    "GPU UUID",
+    "normalization-asset hash",
+    "exact command line",
+    "one write-ahead JSON record per attempt, updated in place",
+    "action arrays",
+    "success flag",
+    "termination reason",
+    "episode length",
+    "simulator-state hash before rollout",
+    "observation hash at each policy query",
+    "timing",
+    "GPU-memory samples",
+    "generated action-chunk hash"
+  ],
+  "report": [
+    "median, p95 and p99 end-to-end action latency",
+    "effective control rate",
+    "missed deadlines",
+    "queue starvation",
+    "success",
+    "GPU memory",
+    "energy if available"
+  ],
+  "rules": [
+    "Retain every planned attempt, including errors, failures, timeouts, and interrupted attempts.",
+    "Never replace an attempt after observing its result.",
+    "Preserve raw journals. Derived tables and figures must be reproducible from raw records.",
+    "Keep model outputs in separate directories. Do not overwrite existing SmolVLA evidence.",
+    "Use one model process per GPU. Do not run multiple model processes on the same GPU.",
+    "Do not alter any past evidence, frozen predictions, submitted PDFs, or prior experiment directories."
+  ],
+  "runs_after": "Synchronous confirmation and observation-age studies complete and audited.",
+  "schema_version": 1,
+  "status": "BLOCKED_NO_OFFICIAL_RUNTIME_FOR_THIS_DESIGN"
+}

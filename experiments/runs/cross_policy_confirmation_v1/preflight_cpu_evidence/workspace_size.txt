@@ -1,0 +1,7 @@
+36G	/home/warren/alba-cross-policy-20261101
+4.6G	envs/client
+7.7G	envs/openpi
+8.4G	envs/smolvla
+143M	envs/tools
+13G	ckpt
+/dev/sdd       1007G  861G   95G  91% /

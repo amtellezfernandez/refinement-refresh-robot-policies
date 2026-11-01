@@ -1,0 +1,15 @@
+=== attempt 1 2026-11-01T09:33:43Z
+gen_len 92 seed_repeat_equal True seeds_differ True success_at_reset False
+roundtrip True
+official_len (50, 92) gen_differs_from_all_official True min_linf_to_official 0.033633137240324205
+saved /home/warren/jobs/alba-render-3/frames.npz
+d56a91e9958fbdce 135
+ envs/smolvla/lib/python3.12/site-packages/libero/libero/bddl_files
+d56a91e9958fbdce 135
+ src/openpi/third_party/libero/libero/libero/bddl_files
+2039a10a6c79517b 250
+ envs/smolvla/lib/python3.12/site-packages/libero/libero/init_files
+2039a10a6c79517b 250
+ src/openpi/third_party/libero/libero/libero/init_files
+__init__.py assets bddl_files benchmark envs init_files utils 405M	src/openpi/third_party/libero/libero/libero/assets
+RENDER3_DONE

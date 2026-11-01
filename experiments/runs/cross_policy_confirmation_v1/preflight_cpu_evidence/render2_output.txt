@@ -1,0 +1,17 @@
+=== attempt 1 2026-11-01T09:31:45Z
+repeat_reset state_equal True obs_equal True
+vs_recorded len 92 92 linf 1.235990476633475e-17 n_diff 8 n_gt_1e-9 0 n_gt_1e-6 0 argmax 50 time 0.5000000000000003 0.5000000000000003
+obs_keys {'pixels': ['image', 'image2'], 'robot_state': ['eef', 'gripper', 'joints']}
+  /pixels/image (1, 360, 360, 3) uint8 a3391d6f97e1 mean 119.854
+  /pixels/image2 (1, 360, 360, 3) uint8 c17c2a18431a mean 124.048
+  /robot_state/eef/mat (1, 3, 3) float64 42acc9f12b60 mean 0.099
+  /robot_state/eef/pos (1, 3) float64 dd22657ebcfb mean 0.317
+  /robot_state/eef/quat (1, 4) float64 8252510040db mean 0.243
+  /robot_state/gripper/qpos (1, 2) float64 7339ad22ac3c mean 0.0
+  /robot_state/gripper/qvel (1, 2) float64 e7f212ae566b mean 0.0
+  /robot_state/joints/pos (1, 7) float64 2c08f9451b2d mean 0.049
+  /robot_state/joints/vel (1, 7) float64 ea35371cd2d4 mean -0.002
+env_step_ms_with_render 125.4
+Model name:                           AMD Ryzen 9 9950X 16-Core Processor
+mujoco 3.8.1 numpy 2.2.6
+RENDER2_DONE

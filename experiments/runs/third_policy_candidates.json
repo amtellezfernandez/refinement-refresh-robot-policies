@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "status": "CANDIDATES_ONLY_NOT_SELECTED",
+  "instruction": "No third policy is chosen, trained or benchmarked. No third-policy campaign runs until Alba provides the exact selected checkpoint and frozen configuration.",
+  "evidence_basis": "Read-only on 2026-11-01: Hugging Face model API, config.json and README at the listed revision; pinned LeRobot source b6ec0060779550c0a157ae34feb89e0cf86012a8. Nothing was downloaded in full, loaded or run. No value here is a measured capability. A gate reads met_by_documentation only when the file or source named in its note says so; unknown means it was not established and does not count as met.",
+  "gates": [
+    "action_chunk_policy",
+    "controllable_solver_steps",
+    "released_checkpoint_or_recipe",
+    "native_evaluator",
+    "same_or_comparable_benchmark",
+    "normalization_and_action_units_documented",
+    "complete_rollout_and_timing_records_possible"
+  ],
+  "strict_reading": "Alba asked for candidates that satisfy ALL gates. No candidate is fully established, because action-unit documentation and record completeness can only be confirmed by reading the code path and running it. The list therefore holds candidates with no gate shown to fail, ranked by evidence.",
+  "candidates": [
+    {
+      "rank": 1,
+      "id": "lerobot/xvla-libero",
+      "revision": "12e8783e996944f5c97e490d37d4c145484ed70a",
+      "family": "X-VLA, flow-matching action denoiser",
+      "license_from_card": "apache-2.0",
+      "size_gib_listed": 3.3,
+      "config": {"type": "xvla", "chunk_size": 30, "n_action_steps": 30, "num_denoising_steps": 10},
+      "gates": {
+        "action_chunk_policy": "met_by_documentation: chunk_size 30 in config.json",
+        "controllable_solver_steps": "met_by_documentation: num_denoising_steps, policies/xvla/configuration_xvla.py:121",
+        "released_checkpoint_or_recipe": "met_by_documentation: public revision",
+        "native_evaluator": "met_by_documentation: policy class in pinned LeRobot, the same evaluator family as SmolVLA",
+        "same_or_comparable_benchmark": "met_by_documentation: card says trained and evaluated on LIBERO",
+        "normalization_and_action_units_documented": "unknown: no separate normalizer safetensors listed; must be read from code",
+        "complete_rollout_and_timing_records_possible": "unknown: not run"
+      },
+      "independence_note": "Different family from SmolVLA and pi0.5. Same LeRobot runtime as SmolVLA, so runtime faults could be shared."
+    },
+    {
+      "rank": 2,
+      "id": "nvidia/gr00t17-lerobot-libero_{spatial,object,goal,10}-640",
+      "revision_spatial_only": "32a6ec786d6509df31b40392b4e4dcdda78c0f11",
+      "family": "GR00T N1.7, flow-matching",
+      "license_from_card": "apache-2.0",
+      "size_gib_listed_spatial_only": 11.7,
+      "config_spatial_only": {"type": "groot", "chunk_size": 16, "n_action_steps": 16, "num_inference_timesteps": 4},
+      "gates": {
+        "action_chunk_policy": "met_by_documentation: chunk_size 16",
+        "controllable_solver_steps": "met_by_documentation: num_inference_timesteps, policies/groot/configuration_groot.py:312",
+        "released_checkpoint_or_recipe": "met_by_documentation: public revision",
+        "native_evaluator": "met_by_documentation: policy class in pinned LeRobot",
+        "same_or_comparable_benchmark": "unknown: one checkpoint per suite, so this is four checkpoints and not one policy; the other three revisions were not read",
+        "normalization_and_action_units_documented": "met_by_documentation: normalizer files listed; action units not read",
+        "complete_rollout_and_timing_records_possible": "unknown: not run"
+      },
+      "independence_note": "The card says no evaluation results were provided. Native solver count of 4 is below the study's d=5, so d=5 would exceed native."
+    },
+    {
+      "rank": 3,
+      "id": "zuoxingdong/evo1_libero",
+      "revision": "515921f4a2c1d3f3ad523721eafa26fdf2af315b",
+      "family": "Evo-1",
+      "license_from_card": "other (read before use)",
+      "size_gib_listed": 2.9,
+      "config": {"type": "evo1", "chunk_size": 50, "n_action_steps": 50, "num_inference_timesteps": 32},
+      "gates": {
+        "action_chunk_policy": "met_by_documentation: chunk_size 50",
+        "controllable_solver_steps": "met_by_documentation: num_inference_timesteps in config.json",
+        "released_checkpoint_or_recipe": "met_by_documentation: public revision and recipe on card",
+        "native_evaluator": "met_by_documentation: policy class in pinned LeRobot",
+        "same_or_comparable_benchmark": "met_by_documentation: card reports LIBERO, 50 episodes per task, 10 tasks per suite",
+        "normalization_and_action_units_documented": "met_by_documentation: normalizer files listed; action units not read",
+        "complete_rollout_and_timing_records_possible": "unknown: not run"
+      },
+      "independence_note": "Community checkpoint. The card reports selecting among evaluated checkpoints, so its numbers are selected ones. Native d=32 makes d=2 a large reduction."
+    },
+    {
+      "rank": 4,
+      "id": "nvidia/Cosmos-Policy-LIBERO-Predict2-2B",
+      "revision": "cb689ec0e3347c13667d70a78a3447388f5c3bb8",
+      "family": "Cosmos Policy, diffusion",
+      "license_from_card": "not stated in card metadata",
+      "size_gib_listed": 3.7,
+      "config": {"model_type": "cosmos-policy", "inference": {"precision": "bf16", "vram_gb": 6.8}},
+      "gates": {
+        "action_chunk_policy": "met_by_documentation: card says chunk size 16",
+        "controllable_solver_steps": "met_by_documentation: card says 5 denoising steps, configurable without retraining",
+        "released_checkpoint_or_recipe": "met_by_documentation: public revision",
+        "native_evaluator": "unknown: separate codebase, not read",
+        "same_or_comparable_benchmark": "met_by_documentation: card reports all four suites",
+        "normalization_and_action_units_documented": "met_by_documentation: libero_dataset_statistics.json listed; action units not read",
+        "complete_rollout_and_timing_records_possible": "unknown: not run"
+      },
+      "independence_note": "Different family and runtime from both confirmed models. Card performance figures are the vendor's and were not checked."
+    }
+  ],
+  "considered_and_set_aside": [
+    {"id": "lerobot/pi0_libero_finetuned_v044", "revision": "45dcc8fc0e02601c8ccf0554fbd1d26a55070c1f", "reason": "Passes the same read-only checks, but it is the pi0 family, close to Model B, and runs on the LeRobot PyTorch route Alba excluded for pi0.5. It adds little family diversity. Alba may overrule this."},
+    {"id": "allenai/MolmoAct2-LIBERO-LeRobot", "revision": "f0c5a9567c2b72faadec901e16e055c8b098c2f5", "reason": "10.1 GiB and the config has num_flow_timesteps 8 with num_inference_steps null, so which field controls solver steps needs reading first. Not excluded on evidence; ranked out on effort."},
+    {"id": "openvla family", "reason": "Not iterative denoising: the controllable solver-step gate fails by construction."}
+  ]
+}

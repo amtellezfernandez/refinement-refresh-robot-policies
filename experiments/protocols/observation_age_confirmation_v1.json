@@ -1,0 +1,142 @@
+{
+  "conditions": [
+    {
+      "definition": "Images and proprioception refreshed every policy query.",
+      "id": "FRESH",
+      "refresh_every_queries": 1
+    },
+    {
+      "definition": "Images and proprioception refreshed every five policy queries.",
+      "id": "STALE",
+      "refresh_every_queries": 5
+    }
+  ],
+  "expected_attempts": {
+    "per_model": 800,
+    "total": 1600
+  },
+  "held_constant": {
+    "d": 5,
+    "h": 1,
+    "noise": "same action-noise key by simulation tick",
+    "same": [
+      "initial state",
+      "task instruction",
+      "generation cadence"
+    ]
+  },
+  "launch_permitted": false,
+  "models": {
+    "pi05": {
+      "checkpoint": "gs://openpi-assets/checkpoints/pi05_libero/",
+      "evaluation_path": "OpenPI server and client: create_trained_policy + WebsocketPolicyServer, examples/libero/main.py observation and action handling.",
+      "family": "pi0.5 (OpenPI, JAX)",
+      "native": {
+        "chunk_size": 10,
+        "d": 10,
+        "h": 5
+      },
+      "native_source": "examples/libero/main.py replan_steps=5; pi0.py sample_actions num_steps=10; config.py pi05_libero action_horizon=10. READ FROM SOURCE; Alba to confirm.",
+      "normalization_asset": "assets/physical-intelligence/libero/norm_stats.json",
+      "normalization_sha256": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84",
+      "runtime_source": {
+        "repo": "Physical-Intelligence/openpi",
+        "revision": "215abfb217dbac7d5f1273282331b9b1866c0479"
+      }
+    },
+    "smolvla": {
+      "checkpoint": "HuggingFaceVLA/smolvla_libero",
+      "evaluation_path": "Pinned LeRobot SmolVLAPolicy + LiberoEnv, as in run_paired.py.",
+      "family": "SmolVLA (LeRobot, PyTorch)",
+      "model_safetensors_sha256": "71d9563c8295284acba8fc2d5c19de000d6fe9ba58a406832af7ef3d221ed52f",
+      "native": {
+        "chunk_size": 50,
+        "d": 10,
+        "h": 1
+      },
+      "native_source": "Checkpoint config and existing runner requirement (run_paired.py:249).",
+      "revision": "6721902bc4d61e50a3bfdb11dfb4cb626f05d102",
+      "runtime_source": {
+        "repo": "huggingface/lerobot",
+        "revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8"
+      }
+    }
+  },
+  "per_query_record": [
+    "current simulator observation hash",
+    "supplied policy-input hash",
+    "supplied observation age",
+    "refresh flag",
+    "generated chunk hash",
+    "executed action",
+    "first action divergence relative to the paired condition",
+    "outcome and termination step"
+  ],
+  "pooling": "Do not pool with confirmation data.",
+  "population": {
+    "identities_per_model": 400,
+    "policy_seeds_PROPOSED_R2": [
+      820001,
+      820002
+    ],
+    "state_slots": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "suites": [
+      "libero_spatial",
+      "libero_object",
+      "libero_goal",
+      "libero_10"
+    ],
+    "task_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "protocol_id": "observation_age_confirmation_v1",
+  "recording": [
+    "git commit",
+    "checkpoint revision",
+    "code hash",
+    "package versions",
+    "CUDA version",
+    "driver",
+    "GPU UUID",
+    "normalization-asset hash",
+    "exact command line",
+    "one write-ahead JSON record per attempt, updated in place",
+    "action arrays",
+    "success flag",
+    "termination reason",
+    "episode length",
+    "simulator-state hash before rollout",
+    "observation hash at each policy query",
+    "timing",
+    "GPU-memory samples",
+    "generated action-chunk hash"
+  ],
+  "rules": [
+    "Retain every planned attempt, including errors, failures, timeouts, and interrupted attempts.",
+    "Never replace an attempt after observing its result.",
+    "Preserve raw journals. Derived tables and figures must be reproducible from raw records.",
+    "Keep model outputs in separate directories. Do not overwrite existing SmolVLA evidence.",
+    "Use one model process per GPU. Do not run multiple model processes on the same GPU.",
+    "Do not alter any past evidence, frozen predictions, submitted PDFs, or prior experiment directories."
+  ],
+  "runs_after": "cross_policy_confirmation_v1",
+  "schema_version": 1,
+  "sole_intervention": "Supplied observation age. Policy-query frequency, denoising, executed action position, task instruction, noise key, simulator timestep and control frequency do not change.",
+  "status": "PREPARED_AWAITING_PREFLIGHT_AND_REVIEW"
+}
