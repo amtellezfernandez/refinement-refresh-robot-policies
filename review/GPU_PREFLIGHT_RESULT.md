@@ -36,7 +36,7 @@ Measured over 30 calls per d after warm-up, on one fixed input per model. Other 
 |---|---|---|
 | GPU memory, framework peak | 1.53 GiB reserved at profile, 1.53 GiB (1.646 GB) in episodes | 7.14 GB XLA peak, with preallocation off |
 | GPU memory, `nvidia-smi` peak (includes 0.7 GiB baseline) | 2.9 GiB | 9.3 GiB |
-| Process RAM peak | 5.4 GiB | 16.0 GiB server-side at load; client 2.2 GiB |
+| Process RAM peak | 5.4 GiB | 16.0 GiB in the generation process; client 2.2 GiB |
 | CPU, whole process | 180 s user + 33 s sys | 125 s user + 76 s sys; client 67 s + 7 s |
 | Simulation with OSMesa | about 156 ms per step at 360 px | about 100 ms per step at 256 px |
 | First-call compile | none | 29 s in the profile, 11 s through the server |
@@ -96,9 +96,9 @@ Built from the timings above, sequential, one host. **Extrapolated from one task
 | Confirmation, 2,000 attempts | 12-53 h | 5-23 h |
 | Observation age, 800 attempts | 7-30 h | 3-13 h |
 | Asynchronous | Blocked (R1) | Blocked (R1) |
-| **Total** | **24-105 h** | **9-40 h** |
+| **Total** | **24-104 h** | **9-40 h** |
 
-Altogether about 33-145 hours, or 1.4 to 6 days. The earlier SmolVLA figure of 33-39 h for confirmation sits inside this range. The pi0.5 figures replace "unmeasured generation".
+Altogether about 33-144 hours, or 1.4 to 6 days. The earlier SmolVLA figure of 33-39 h for confirmation sits inside this range. The pi0.5 figures replace "unmeasured generation".
 
 ## 7. Exact next permitted operation
 
