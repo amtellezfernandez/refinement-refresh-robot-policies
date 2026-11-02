@@ -71,7 +71,7 @@ def input_hash(element):
     return sha({k: digest(v) if k != "prompt" else v for k, v in element.items()})
 
 
-def rollout(row, env, prompt, client, state, record_video=False):
+def rollout(row, env, prompt, client, state, record_video=False, expected_settled_state=None):
     import numpy as np
     ident, h, d = row["episode_identity"], row["h"], row["d"]
     refresh = row.get("refresh_every_queries", 1)
@@ -80,6 +80,8 @@ def rollout(row, env, prompt, client, state, record_video=False):
     for _ in range(WAIT_STEPS):
         obs, _, _, _ = env.step(DUMMY_ACTION)
     settled = digest(np.asarray(env.sim.get_state().flatten()))
+    if expected_settled_state is not None and settled != expected_settled_state:
+        raise ValueError("reset_state_mismatch: expected {}, observed {}".format(expected_settled_state, settled))
     plan = collections.deque()
     actions, queries, frames, server_timing, memory, done = [], [], [], [], None, False
     supplied, supplied_tick, chunk_record = None, 0, None
@@ -158,7 +160,8 @@ def attempts(args):
             state = states[row["state_key"]]
             if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
                 raise ValueError("state hash mismatch")
-            result = rollout(row, env, prompt, client, state)
+            result = rollout(row, env, prompt, client, state,
+                             expected_settled_state=settled.get(row["block_id"]))
             expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
