@@ -1,0 +1,832 @@
+\documentclass{article}
+\PassOptionsToPackage{numbers,sort&compress}{natbib}
+\usepackage[final,dblblindworkshop]{../shared/neurips_2026}
+\workshoptitle{RoboPAD: Post-Training Adaptation of Robot Foundation Models}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{siunitx}
+\sisetup{group-digits=false, table-number-alignment=center, retain-explicit-plus=true}
+\usepackage[hidelinks]{hyperref}
+\usepackage{placeins}
+\title{Refinement versus Refresh:\\
+Compute Allocation for Closed-Loop Robot Policies}
+\author{Alba Mar\'ia T\'ellez Fern\'andez\\
+MAAT Institute\\
+\texttt{alba.tellez@maatinstitute.com}}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Chunked robot policies can spend inference compute on refining the current
+action prediction or on replanning from a newer observation. We study this
+trade-off for one frozen SmolVLA checkpoint in synchronous LIBERO simulation.
+We define nominal compute rate as full-generation arithmetic divided by the
+number of predicted actions executed before replanning. Full-generation
+accounting shows that 82.1\% of native counted arithmetic is independent of
+denoising, so reducing refinement alone cannot proportionally reduce this rate.
+We separate a paired 12-configuration discovery study from confirmation on
+eight tasks excluded from selection, using 160 attempts per confirmed
+configuration. At the primary two-action prefix, reducing denoising from five
+steps to two improves success by 10.6 percentage points, with a
+task-conditional, descriptive 95\% interval of 4.4--16.9 points, while reducing
+reference-calibrated arithmetic rate by 5.9\%. At two denoising steps, the
+five-action and two-action prefixes differ by one observed success, while the
+five-action prefix uses 60.7\% less arithmetic per attempt; the quality
+difference remains unresolved.
+A simple cost-aware rule matches the fitted response model's
+choices across the tested compute ceilings, so fitting provides no demonstrated
+selection advantage. For this checkpoint and task family, additional denoising does
+not reliably improve closed-loop success. The arithmetic results characterize
+this implementation and counting boundary; they do not establish latency gains
+under asynchronous execution or on a physical robot.
+\end{abstract}
+
+\section{Introduction}
+
+A robot policy can reduce inference work in two ways: spend less computation
+refining each action prediction, or execute more actions before requesting a
+new prediction. These interventions affect behavior differently. Reduced
+refinement changes the prediction itself; longer execution prefixes delay
+observation-conditioned revision and expose later positions of the predicted
+action sequence. Their relative value should therefore be evaluated through
+closed-loop outcomes under a common resource constraint.
+
+We ask: \emph{given a fixed inference budget, how should a robot divide
+computation between prediction refinement and observation-conditioned refresh?}
+The cost of a fresh prediction makes this question nontrivial. In our frozen
+SmolVLA implementation \cite{smolvla}, work independent of denoising accounts
+for 82.1\% of native counted arithmetic. Reducing refinement therefore leaves a
+substantial cost per generation: sufficiently tight budgets require less frequent
+refresh even at low denoising counts. This cost boundary determines what is
+feasible, but not which feasible setting controls the robot best.
+
+We separate two empirical questions. First, does additional denoising improve
+success at a fixed execution prefix? Second, does more frequent refresh justify
+its additional expenditure? We evaluate twelve configurations in a paired
+480-attempt discovery study, then seven configurations in 1,120 confirmation
+attempts on eight tasks excluded from selection. Three frozen comparisons test
+the first question. Later-amended descriptive prefix comparisons address the
+second; they neither isolate observation freshness from action-position effects
+nor establish an optimal allocation rule.
+
+At the primary two-action prefix, two denoising steps yield 139/160 successes
+versus 122/160 for five steps, with lower reference arithmetic. At two denoising
+steps, however, a five-action prefix yields 138/160 successes at 60.7\% less
+arithmetic per attempt than the two-action prefix; their quality difference
+remains unresolved. A simple cost-aware rule also matches the fitted response
+model's choices at all three ceilings, with no demonstrated selection advantage
+from fitting.
+
+The contributions are:
+\begin{itemize}[leftmargin=*,nosep]
+    \item a refinement--refresh allocation formulation and full-generation
+    calibration exposing the fixed cost of obtaining a fresh prediction;
+    \item a paired twelve-configuration study reporting both nominal compute
+    rate and realized episode expenditure; and
+    \item a completed task-transfer evaluation separating frozen refinement
+    tests from descriptive refresh comparisons, with their uncertainty and
+    selection provenance retained.
+\end{itemize}
+
+\section{Related Work}
+
+Resource-allocation studies motivate evaluating configurations across explicit
+budgets. Chinchilla studies model-size and training-data allocation
+\cite{chinchilla}; embodied scaling studies consider world modeling, behavior
+cloning, and closed-loop forecasting and planning
+\cite{pearcescaling,motionscaling}. Our comparison instead varies deployment
+refinement and execution prefix within a fixed policy. Work distinguishing
+FLOP-optimal from elapsed- or monetary-cost-optimal allocation
+\cite{beyondchinchilla} also motivates retaining separate resource coordinates.
+
+VLA-Perf characterizes inference performance across denoising, chunk size,
+asynchronous execution, and hardware/runtime choices \cite{vlaperf}.
+SmolVLA studies asynchronous inference and robot behavior \cite{smolvla}.
+Here predicted chunk size remains fixed, while executed prefix changes; task
+success is measured alongside computation. RoboMonkey studies test-time sampling
+and action verification \cite{robomonkey}, an adjacent allocation axis that
+would require counting candidate generation and verification costs.
+
+Adaptive VLA scheduling is directly related. DVAC uses denoising-derived action
+variance to choose an execution prefix before replanning \cite{dvac}.
+ElegantVLA schedules vision--language recomputation or reuse together with action
+denoising modes \cite{elegantvla}. Our study instead compares fixed configurations
+under explicit arithmetic ceilings and freezes separate-task denoising
+comparisons. It neither introduces an adaptive scheduler nor establishes an
+advantage over these methods; their reported speedups have different policies,
+hardware, and measurement boundaries.
+
+\section{Refinement--Refresh Allocation}
+\label{sec:allocation}
+
+\subsection{Compute rate and episode expenditure}
+
+Let $d$ be the denoising count and $h$ the number of successive predicted
+actions executed before replanning. Let $F_{\mathrm{gen}}(d)$ denote reference-calibrated neural arithmetic for a full
+action-chunk generation at denoising setting $d$. For complete execution prefixes, the nominal
+compute rate per simulated control step is
+\[
+ b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}.
+\]
+For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
+\begin{equation}
+ (h^\star,d^\star)(B)\in
+ \arg\max_{(h,d)\in\mathcal C:\,b(h,d)\le B}
+ p_{\mathrm{success}}(h,d).
+ \label{eq:allocation}
+\end{equation}
+A configuration need not exhaust the ceiling. This is a deployment compute-rate
+constraint for a fixed checkpoint, rather than a training-plus-deployment
+objective.
+
+We distinguish this rate from total arithmetic per attempted episode. If attempt
+$e$ executes $T_e$ actions, its generated-chunk expenditure is
+\begin{equation}
+ C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(d).
+ \label{eq:episode-cost}
+\end{equation}
+The final generated chunk is charged even if only part of its execution prefix
+is used. All-attempt means include unsuccessful episodes. Different trajectories
+and termination times can therefore change expenditure at the same nominal rate.
+FLOPs, host elapsed time, and CUDA-stream time retain separate units and
+measurement boundaries.
+
+\subsection{The fixed cost of a fresh prediction}
+\label{sec:results}
+
+Complete-generation profiling counts matrix products, convolutions, and
+attention across vision, language prefill, and the action expert, using two
+FLOPs per multiply-add. Embedding lookups, normalization, activations,
+elementwise arithmetic, and external preprocessing are excluded. We therefore
+refer to \emph{dense neural arithmetic}, not an exact count of every scalar
+operation. Calibration uses one real development observation and fixed tensor
+shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
+
+For the reference input, the measured arithmetic satisfies, to rounding,
+\[
+ F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
+\]
+at all six calibrated denoising settings. Native generation at $d=10$ costs
+641.675 GFLOPs, of which 82.1\% is independent of $d$. Halving denoising from
+ten to five saves 8.9\% of counted generation work; reducing it to two saves
+14.3\%. Equivalently, relative to native deployment $(h,d)=(1,10)$,
+\[
+ \frac{b(h,d)}{b_{\mathrm{native}}}
+ \simeq \frac{0.821+0.179(d/10)}{h}.
+\]
+
+We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
+Eligibility uses measured per-$d$ values, not the rounded affine expression.
+For example, $(1,2)$ costs 0.857 times native rate and is ineligible at half-native
+budget, whereas $(2,2)$ costs 0.429 times native. The denoising-independent work
+alone excludes $h=1$ at half-native budget and $h\leq2$ at quarter-native budget.
+A tighter budget can therefore force a longer execution prefix before any
+quality-based choice is made. This is an implementation-specific arithmetic
+floor under the declared counting boundary, not a universal VLA scaling law.
+
+Calibration uses a fixed input shape; a separate language-length audit leaves
+eligibility unchanged under the original absolute ceilings
+(Appendix~\ref{app:shape-audit}). Reference arithmetic remains distinct from
+task-shaped arithmetic and elapsed time. The cost model defines feasible
+schedules; the following experiments ask which feasible expenditures help
+closed-loop control.
+
+\section{Controlled Study and Frozen Comparisons}
+\label{sec:method}
+
+\subsection{Discovery and confirmation protocol}
+
+We evaluate the public \texttt{HuggingFaceVLA/smolvla\_libero} checkpoint on LIBERO
+\cite{libero}. Predicted chunk length remains 50 actions; native execution uses
+$(h,d)=(1,10)$. We hold weights, sensors, preprocessing, action normalization,
+control period, and task-specific episode horizons fixed.
+
+Discovery crosses $h\in\{1,2,5\}$ and $d\in\{2,5,10,20\}$ on Spatial tasks
+5--8, five initial states per task, and two policy seeds. Each of the 40 paired
+task--state--seed identities receives all twelve configurations, giving
+480 attempts. Tasks 5 and 6 overlap the pilot; tasks 7 and 8 were selected
+before observing their outcomes in this study. Condition order is randomized
+within each paired identity.
+
+Discovery is used to freeze three budget-specific denoising comparisons
+before confirmation. Their selected settings and comparators, together with
+native, give seven configurations. Confirmation evaluates all seven on Goal
+and Object tasks 5--8, ten states per task, and two seeds: 160 attempts per
+configuration, totaling 1,120. These eight tasks are excluded from configuration
+selection; prior exposure during unrelated development is not assessed.
+The sample allocation prioritizes task and state coverage; no
+quality-preservation margin is prespecified. Appendix~\ref{app:analysis-provenance}
+distinguishes the original tests from the later-amended descriptive comparisons.
+
+Initial simulator states and observations match across conditions. Policy noise
+is keyed by task, state, seed, and simulation tick, preserving a common noise
+key whenever conditions generate at the same tick. Solver timesteps and a
+constant-field integration check verify that every $d$ traverses the full
+interval from 1 to 0; fewer steps change the discretization, not the integration
+endpoint. Recorded initial conditions, generated and executed actions, and
+outcomes agree across the evaluation records. LIBERO's sparse reward and success indicator derive
+from the same task-goal evaluation, so their agreement checks record
+consistency rather than supplying an independent outcome measure. The recorded
+outcome path is traced to the benchmark's task-specific goal conditions. These checks
+establish strong internal consistency rather than an independent simulator replay
+(Appendix~\ref{app:verification}).
+
+Success averages both seeds within each state, then states and tasks with equal
+task weights. Descriptive 95\% intervals use 20,000 bootstrap draws of states
+within the fixed tasks, retaining paired seeds and configurations. They condition
+on four discovery or eight confirmation tasks; secondary intervals are
+unadjusted. Arithmetic includes every generated chunk, including failures and
+partly consumed final prefixes. Timing measurements and their monitoring limits
+are reported separately in Appendix~\ref{app:fixed-timing}.
+
+\subsection{Discovery: quality does not increase monotonically with refinement}
+\label{sec:discovery-quality}
+
+Native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
+for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$, successes
+are 21, 18, 16, and 14 out of 40 as $d$ increases from 2 to 20.
+Figure~\ref{fig:frontier}(a) shows every configuration.
+These point estimates do not justify imposing monotonic improvement with
+denoising. The small paired sample also does not certify equal quality for
+configurations with similar observed counts.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/discovery_allocation.pdf}
+\caption{Quality and feasibility are distinct. (a) Discovery success, with
+40 attempts per configuration. Colors and shapes identify executed prefix $h$; bars give
+descriptive, task-conditional 95\% paired state-bootstrap intervals.
+The $d$ axis is categorical; horizontal offsets only separate overlapping bars.
+(b) A minimum-denoising, shortest-feasible-prefix rule selects different
+prefixes under separately normalized arithmetic and fixed-input host-time
+ceilings. The $h$ axis shows the selected prefix categories, not elapsed time.
+These are feasibility-dependent choices, not established quality
+optima; timing details are in Appendix~\ref{app:timing-sensitivity}.}
+\label{fig:frontier}
+\end{figure}
+
+The resource coordinate also matters: nominal rate differs from realized episode
+expenditure, and arithmetic savings differ from elapsed savings.
+Figure~\ref{fig:frontier}(b) illustrates how substituting a host-time constraint
+changes feasible refresh choices. This sensitivity analysis does not change the
+frozen arithmetic-based experiment. Full task and resource tables appear in
+Appendix~\ref{app:calibration}.
+
+\subsection{Frozen tests and the role of selection}
+\label{sec:prediction}
+
+A response model fitted only to discovery selects $(5,2)$, $(2,2)$, and $(1,2)$
+at the quarter-, half-, and full-native ceilings. Their frozen comparators are
+$(5,5)$, $(2,5)$, and $(1,5)$, respectively; the half-native comparison is primary.
+All selected settings are existing discovery grid points, so confirmation tests
+task transfer rather than extrapolation to an untested configuration. Each pair
+changes denoising at a fixed prefix. These are comparisons under common ceilings,
+not equal-rate tests of how to divide compute between refinement and refresh.
+
+At the primary ceiling, $(2,2)$ has the highest eligible discovery success.
+Its comparator $(2,5)$ ties with $(2,10)$ for the highest count among distinct
+eligible alternatives and wins the lower-cost tie-break. A simple rule choosing
+minimum denoising and then the shortest feasible prefix makes the same choices
+as the fitted model at all three ceilings. This baseline was documented after
+collection began and is interpreted descriptively. Transfer outcomes cannot
+demonstrate a selection advantage between rules that make identical choices.
+Model fitting, the full candidate set, and selector diagnostics are retained
+in Appendix~\ref{app:selectors}.
+
+\FloatBarrier
+\section{Refinement and Refresh on Transfer Tasks}
+\label{sec:transfer}
+
+\subsection{Complete confirmation overview}
+
+All 1,120 originally planned confirmation attempts are complete.
+Table~\ref{tab:confirmation-grid} reports the seven configurations on the same
+paired identities. The audit excludes two repeated completed records under the
+documented precedence rule; continuation completes the original design, not
+an independent replication (\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
+We first report the frozen denoising tests, then the amended prefix comparisons.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Confirmation overview: 160 attempts per configuration on eight tasks.
+$h$ is the executed prefix and $d$ the denoising count.
+Nominal rate/native is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
+All-attempt arithmetic uses the length-20 reference calibration and charges
+every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
+\label{tab:primary-transfer}
+\label{tab:confirmation-grid}
+\input{../paper/generated/confirmation_resources.tex}
+\end{table}
+\FloatBarrier
+
+\begin{samepage}
+\subsection{Refinement: the frozen denoising comparisons}
+
+At the primary two-action prefix, two denoising steps yield 139/160 successes
+versus 122/160 for five steps. The paired difference is $+10.6$ percentage
+points, with descriptive 95\% interval $[+4.4,+16.9]$, conditional on the eight
+tasks. The selected setting also uses 5.9\% less nominal reference arithmetic
+per control step: 275.0 versus 292.2 GFLOPs. Thus reducing refinement improves
+observed success while reducing counted work at this fixed prefix.
+\par\end{samepage}
+
+Mean reference arithmetic per attempt falls from 48.7 to 41.1 TFLOPs
+(15.6\%). This larger reduction includes changed trajectories and termination:
+mean episode length is 149.0 versus 166.3 control steps. All failures reach
+the task horizon (21 versus 38); the remaining attempts terminate successfully.
+The primary direction is positive on seven tasks and tied on one, with
+24 paired wins and seven losses. Appendix~\ref{app:primary-costs} gives
+task sensitivity and expenditure intervals. These measurements do not establish
+a controlled physical-latency improvement.
+Figure~\ref{fig:confirmation-effects} places the primary effect alongside all
+other frozen and amended comparisons.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
+\caption{Confirmation effects: 160 paired attempts per setting on eight tasks.
+Rows compare $(h,d)$ as A minus B; bars are task-conditional, descriptive 95\%
+paired state-bootstrap intervals (secondary intervals unadjusted).
+The filled diamond marks the prespecified primary test. All three frozen tests
+and all four amended contrasts appear in their documented order; the latter
+were not fully outcome-blind. Intervals crossing zero do not establish
+equivalence. Predicted and observed gaps are tabulated in
+Tables~\ref{tab:confirmation-predictions} and~\ref{tab:confirmation-secondary}.}
+\label{fig:confirmation-effects}
+\end{figure}
+\FloatBarrier
+
+The other two frozen tests have positive point estimates but intervals spanning
+zero (Figure~\ref{fig:confirmation-effects}). At $h=5$, two versus five
+denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
+137/160 versus 136/160. The largest observed benefit is at the primary prefix.
+The primary gap exceeds its frozen prediction, while matching the signs of
+three point estimates does not establish calibrated effect-size prediction.
+These results do not demonstrate a uniform denoising benefit across prefixes.
+
+\FloatBarrier
+\subsection{Refresh: descriptive prefix comparisons}
+
+We now hold denoising fixed and compare expenditures on different refresh
+schedules. These contrasts were documented after collection began, when
+individual outcomes were visible; they are not originally prespecified or
+fully outcome-blind (Appendix~\ref{app:confirmation-details}).
+
+At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
+a paired difference of $+0.6$ percentage points $[-6.3,+6.9]$. Yet $(5,2)$ uses
+60\% less nominal arithmetic per control step and 60.7\% less reference
+arithmetic per attempt: 16.1 versus 41.1 TFLOPs. The interval permits meaningful
+differences in either direction; similar counts do not certify equivalent
+quality or justify a non-inferiority claim.
+
+Refreshing every action with $(1,2)$ instead of every two actions gives two
+fewer successes, a difference of $-1.3$ points $[-7.5,+5.0]$, at 83.3 versus
+41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
+benefit in these contrasts. Native-relative comparisons, which also change
+denoising, are reported separately in Appendix~\ref{app:confirmation-details}.
+
+The discovery point estimates favor shorter prefixes at $d=2$
+(Section~\ref{sec:discovery-quality}), but their quality advantage is not
+established on transfer. The task populations differ, so this comparison
+does not identify a causal task effect. The cost model explains feasibility,
+but does not determine the quality ranking on new tasks.
+
+\clearpage
+\section{Discussion and Conclusion}
+
+Full-generation cost determines which refresh schedules are feasible, while
+closed-loop outcomes determine which feasible expenditure is useful. The fixed
+cost of a fresh prediction makes refinement reduction alone insufficient at
+tight arithmetic ceilings. Within those constraints, the frozen primary result
+favors less denoising at a two-action prefix. The descriptive prefix comparisons
+identify a much cheaper five-action setting whose quality difference remains
+unresolved. These findings constrain the allocation question without identifying
+a universal optimum, and the fitted selector adds no demonstrated advantage
+over the simple rule.
+
+\paragraph{Interpretation and limits.}
+The two deployment controls are not isolated causal interventions on prediction
+quality and observation freshness. Changing denoising changes numerical
+integration; changing prefix changes both observation age and executed action
+positions. The mechanism behind the benefit of coarser sampling remains open.
+The study covers one checkpoint and twelve fixed tasks in simulation, with
+only four discovery task-level validation folds. Intervals are task-conditional,
+secondary contrasts are unadjusted, and no quality-preservation margin was
+prespecified. Two steps is the minimum denoising tested; $d=1$ is untested.
+The arithmetic boundary excludes several operation classes; language lengths
+are audited but image shape is fixed. Sampled GPU checks have coverage gaps,
+and simulated control steps do not establish real-time responsiveness.
+The recorded outcomes trace to LIBERO's task-goal evaluation, and one
+native-setting parity episode reproduces the reference evaluator's initial state,
+action sequence, episode length, and outcome. However, the confirmation actions
+were not replayed in a separate, version-matched simulator. Outcome validity is
+therefore strongly supported internally but not fully independently established.
+
+\paragraph{Next steps.}
+A controlled stale-input diagnostic is planned to separate observation
+freshness from the action-position effects introduced by changing the executed
+prefix.
+A new, predeclared quality-preservation test for the cheaper $(5,2)$ setting
+and replication on another policy are needed to assess whether its observed
+cost advantage supports deployment. The broader objective is to determine when
+the fixed cost of a fresh prediction is worth paying, and how much refinement
+that prediction needs.
+
+\clearpage
+\bibliographystyle{unsrtnat}
+{\raggedright\bibliography{references}}
+\clearpage
+\appendix
+
+\section{Detailed Outcomes and Resource Measurements}
+\label{app:calibration}
+
+{\raggedright
+The checkpoint is \texttt{HuggingFaceVLA/smolvla\_libero}, revision
+\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk size is 50;
+native execution uses $h=1,d=10$. Discovery uses Spatial tasks 5--8, initial
+states 10--14, and policy seeds 2000 and 2001. The 20 task--state blocks
+contain both seeds and all 12 configurations. Confirmation uses Goal and Object
+tasks 5--8, states 20--29, and policy seeds 3000 and 3001. Its 80 task--state
+blocks each contain both seeds and all seven configurations. Discovery bootstrap
+resampling uses 20,000 draws with analysis seed 20260913.\par}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Discovery successes on Spatial tasks 5--8. Each task contributes five
+states and two seeds per configuration. Rate/native is
+$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized episode cost.
+The best observed count is 28/40 at $(1,5)$; no monotonic denoising trend is
+assumed.}
+\label{tab:discovery-grid}
+\input{../paper/generated/discovery_tasks.tex}
+\end{table}
+
+Calibration uses one real observation from Spatial task 0, initial state 0,
+and common explicit noise. For each $d\in\{2,3,5,8,10,20\}$, profiling records
+solver timesteps and dense operation counts, separately from elapsed timing.
+Each setting receives 20 warm-up generations, followed by three randomized
+timing blocks of 20 measured calls per setting. The rollout evaluator also
+performs 20 warm-up generations once per configuration.
+
+Host generation timing brackets prediction and completion synchronization;
+CUDA events measure the current-stream prediction interval. The outer rollout
+clock additionally includes observation processing, action handling,
+simulation/rendering, and record writing. Model loading, environment creation,
+reset, and warm-up are measured separately. Process sampling occurs approximately
+every five seconds; the largest recorded gap during discovery is below
+5.03 seconds. Display processes remain on the measurement GPU.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Discovery resource measurements. Generated-chunk totals use the declared
+dense-arithmetic boundary and charge partially executed final prefixes.
+Episode means include unsuccessful attempts. $(2,2)$ has 26/40 observed
+successes at 42.9\% of native arithmetic rate.}
+\label{tab:resources}
+\input{../paper/generated/discovery_resources.tex}
+\end{table}
+
+Calibration requires approximately 291 seconds and discovery 31,245 seconds
+(8.68 hours) of host elapsed time, including setup and bookkeeping. This search
+expenditure is additional to subsequent deployments. The experiment does not
+estimate an amortization threshold or a training--deployment cost crossover.
+
+All measurements use an RTX 4060 Ti. Five-second process samples show no
+unrelated CUDA compute process during calibration, discovery, or the initially
+scheduled transfer phase; display processes remain. Process samples were not
+retained for priority completion or the beginning of continuation. Later
+continuation monitoring also shows no unrelated sampled CUDA compute process,
+but these coverage gaps make aggregate transfer rollout times descriptive.
+Host and CUDA-stream generation intervals are measured separately
+from the outer synchronous rollout interval. Warm-up is excluded from these
+rollout measurements.
+
+\subsection{Fixed-input generation timing}
+\label{app:fixed-timing}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Fixed-input full-generation calibration. Each setting has 60 calls in
+three randomized blocks. Range gives the minimum and maximum host block means,
+not a confidence interval. Host time falls more steeply with $d$ than counted
+arithmetic. Host and CUDA columns average separate retained measurements of all
+60 calls; the extra decimals distinguish their means, not timing accuracy.}
+\begin{tabular}{@{}cS[table-format=3.1]S[table-format=4.3]S[table-format=4.3]r@{}}
+\toprule
+$d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
+\midrule
+2 & 550.0 & 217.891 & 217.862 & 214.5--220.1\\
+3 & 561.5 & 269.990 & 269.970 & 265.3--272.6\\
+5 & 584.4 & 374.321 & 374.300 & 366.8--378.1\\
+8 & 618.8 & 529.746 & 529.726 & 519.9--536.1\\
+10 & 641.7 & 629.624 & 629.604 & 623.2--642.2\\
+20 & 756.2 & 1158.635 & 1158.608 & 1133.5--1172.6\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The calibration stores full-generation intervals and global operator arithmetic
+counts, not separate vision, language-prefill, or action-expert timings and
+arithmetic totals. These records cannot attribute elapsed sensitivity to a
+particular component, memory traffic, omitted operation classes, synchronization,
+or software overhead. CUDA-event intervals are elapsed stream measurements,
+not summed active-kernel durations. No component-level decomposition is inferred.
+
+\subsection{Resource-coordinate sensitivity}
+\label{app:timing-sensitivity}
+
+Arithmetic savings and elapsed savings differ. Mean rollout time is 111.9 seconds
+per attempt for native deployment, 61.8 seconds for $(1,5)$, and 21.8 seconds for
+$(2,2)$. Their mean generated-chunk expenditures are 109.6, 91.7, and 45.0 TFLOPs,
+respectively. These are observed all-attempt means under the same task allocation;
+they include different trajectories and outcomes. Table~\ref{tab:resources}
+reports all discovery configurations.
+
+There is also an ordering reversal: $(1,5)$ uses more arithmetic per attempt
+than $(2,20)$ (91.7 versus 67.8 TFLOPs), but less rollout time (61.8 versus
+107.8 seconds). These means include different trajectories. On a fixed input,
+reducing $d$ from 10 to 5 lowers mean generation host time from 629.6 to
+374.3 ms (40.5\%), despite only 8.9\% less counted arithmetic. The calibration
+therefore also separates arithmetic savings from elapsed savings without
+trajectory differences. It does not resolve their component-level cause.
+A FLOP-constrained choice is not necessarily a latency- or throughput-optimal
+choice.
+
+As a descriptive sensitivity analysis, define calibrated host-time rate
+$b_T(h,d)=\overline{T}_{\mathrm{gen}}(d)/h$, the amortized fixed-input generation
+time per simulated control step, and normalize it by native host-time rate.
+For $(1,2)$, $(2,2)$, and $(5,2)$, the normalized arithmetic rates are
+0.857, 0.429, and 0.171, while the normalized host-time rates are 0.346, 0.173,
+and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
+ceiling but eligible at a separately normalized half-native host-time ceiling.
+Figure~\ref{fig:frontier}(b) shows the resulting choices at all three ceilings.
+These resource constraints admit different refresh schedules; the choices do
+not establish quality optima. The frozen experiment remains arithmetic-based.
+
+\subsection{Language-shape transport audit}
+\label{app:shape-audit}
+
+The profiled batch contains one sample, two $3\times360\times360$ image tensors,
+an eight-dimensional state tensor, and language-token and attention-mask tensors
+of length 20. The checkpoint exposes seven-dimensional actions and generates a
+50-action chunk. Evaluation fixes batch size, image preprocessing, state/action
+dimensions, and chunk size. The tokenizer pads language only to the longest
+sequence in a batch. Reconstructing the declared task strings with the pinned
+tokenizer gives 15--17 tokens for discovery and 5--12 for transfer, versus 20
+in calibration. We profile every distinct evaluated length for
+$d\in\{2,5,10\}$, preserving all other shapes, and test eligibility against
+the original absolute ceilings. Table~\ref{tab:shape-audit} reports the range
+over evaluated lengths 5--17 against the original length-20 value.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Dense generation arithmetic across evaluated language shapes. Budget
+tests retain the original absolute ceilings; none of the reported transfer
+configurations changes eligibility.}
+\label{tab:shape-audit}
+\begin{tabular}{@{}crS[table-format=3.1]c@{}}
+\toprule
+$d$ & \shortstack{Evaluated lengths\\GFLOPs (range)} & {\shortstack{Length 20\\GFLOPs}} & \shortstack{Eligibility\\changes}\\
+\midrule
+2  & 539.7--547.9 & 550.0 & 0\\
+5  & 573.5--582.2 & 584.4 & 0\\
+10 & 629.8--639.3 & 641.7 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In particular, $(2,10)$ remains within the original half-native ceiling for all
+evaluated lengths; shorter inputs reduce rather than increase its counted work.
+The audit changes neither policy execution nor the frozen selections.
+
+\subsection{Primary expenditure and runtime}
+\label{app:primary-costs}
+
+The primary selected configuration $(2,2)$ has a higher success count than
+$(2,5)$ on seven tasks and ties on one (Table~\ref{tab:primary-tasks}).
+There are 24 paired wins and seven
+losses. In a descriptive leave-one-task-out sensitivity analysis, the
+equally weighted difference over the remaining seven tasks stays positive,
+ranging from 9.3 to 12.1 percentage points. This post-outcome analysis does not
+extend inference to a new task population. The supplementary paired records
+retain all state and seed identities needed to reproduce the primary interval.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Descriptive primary expenditure differences, selected minus comparator
+at $h=2$, including all attempts. Intervals use the paired state bootstrap
+conditional on the eight tasks and were added after outcomes were observed.
+Timing intervals summarize sampling variation in the observed records; they
+do not account for unmonitored runtime interference during priority completion.}
+\label{tab:primary-costs}
+\input{../paper/generated/primary_resources.tex}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Runtime and protocol shared by all four confirmation execution phases.
+Module versions are the loaded versions reported at evaluation time. The
+supplement retains source digests and distinguishes conflicting installed
+distribution metadata from these loaded versions.}
+\label{tab:runtime}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
+\toprule
+Setting & Value\\
+\midrule
+Hardware & RTX 4060 Ti, 16 GB; driver 595.84\\
+Runtime & Python~3.12.3; PyTorch~2.7.1+cu126; CUDA~12.6;\newline NumPy~2.2.6; MuJoCo~3.8.1\\
+\addlinespace[3pt]
+Evaluation & Batch 1; synchronous simulation; nominal 20 Hz (50 ms control period)\\
+Episode horizons & Spatial and Object: 280 control steps; Goal: 300\\
+\addlinespace[3pt]
+Precision controls & Autocast and TF32 disabled; deterministic algorithms enabled\\
+Attention and reuse & Eager language/action attention with float32 scores; within-generation KV cache enabled\\
+Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
+\addlinespace[3pt]
+Evaluator provenance & Source revision and full digest retained in supplement\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The retained provenance does not characterize numerical precision and attention
+execution for every model component. Table~\ref{tab:runtime} therefore supports
+the stated model configuration, but not component- or kernel-level claims.
+
+\subsection{Complete confirmation outcomes}
+\label{app:confirmation-details}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Confirmation successes by task and configuration. Each task row has
+20 attempts: ten paired initial states, each with two policy seeds. The total
+aggregates 160 attempts per configuration. The primary
+$(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
+\label{tab:primary-tasks}
+\label{tab:confirmation-tasks}
+\input{../paper/generated/confirmation_tasks.tex}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Amended descriptive comparisons using all 160 attempts per setting.
+These contrasts were documented after collection began and are not originally
+prespecified or fully outcome-blind. Intervals are task-conditional,
+unadjusted, and do not test a quality-preservation margin.}
+\label{tab:confirmation-secondary}
+\input{../paper/generated/confirmation_secondary.tex}
+\end{table}
+
+The four amended comparisons are reported in their documented order, using
+20,000 paired state-bootstrap resamples and analysis seed 20260913.
+Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
+In particular, the $(2,2)$ minus $(5,2)$ expenditure difference is
+$+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,+27.5]$.
+This interval describes generated-chunk arithmetic, including the different
+trajectory lengths; it is not an elapsed-time comparison or evidence of
+equivalent quality.
+
+\FloatBarrier
+\paragraph{Measurement verification.}
+\phantomsection
+\label{app:verification}
+
+Evaluation records preserve identities, paired initial states and observations,
+generation and denoising counts, action sequences, and outcomes. Reconciliation
+verifies planned coverage and condition pairing across 87,364 discovery actions.
+The complete confirmation audit covers all 1,120 unique attempts and 171,805
+actions across all four collection phases.
+It reproduces the unchanged primary subset of 320 attempts and 50,451 actions.
+Two additional completed repeats have identical outcomes and action sequences;
+they are checked but excluded from the canonical sample. One interrupted attempt
+contains ten actions and no completed outcome, so it is recorded separately and
+excluded. Checkpoint, reset, noise, and environment controls further strengthen
+the internal-consistency evidence; shared upstream errors remain outside this
+boundary.
+
+A separate outcome audit covers all 1,122 raw completed confirmation records and
+172,243 steps. Every generated action matches the action applied to the
+simulator, and all recorded outcome fields agree. All 171,302 nonsuccess steps
+have reward 0, and all 941 success steps have reward 1. This reward agreement is
+not independent validation because LIBERO derives reward and success from the
+same task-goal evaluation. Source tracing connects that evaluation to the task's
+BDDL goal predicates. In a separate parity check, one native Spatial episode
+also reproduces the upstream evaluator's initial state, observation, 70-action
+sequence, length, and outcome. These checks constrain recording and execution
+errors, but do not replace model-free replay in a separate, version-matched
+simulator with direct inspection of terminal states and task predicates.
+
+\FloatBarrier
+\paragraph{Analysis provenance.}
+\phantomsection
+\label{app:analysis-provenance}
+
+The three budget-specific comparisons, identities, and primary analysis were
+fixed before transfer outcomes. A deadline-driven scheduling amendment changed
+execution order. Its record states that outcomes were not used for scheduling;
+114 attempts per primary setting had already been completed and recorded when it was written.
+Policy execution settings remained fixed and all 320 primary attempts were
+included. Subsequent continuation completes the
+remaining original identities, not an independent replication. Deduplication
+retains the earliest completed record under the documented phase precedence.
+
+The original comparisons use analysis seed 20260912 in quarter-, half-, then
+full-native order; a separate replay resets that seed for the submitted primary
+interval and reproduces its endpoints. The amended contrasts use seed 20260913.
+Their amendment was written after collection began, when individual outcomes
+were visible, and is not fully outcome-blind. The simple, empirical, and
+compute-only baselines were likewise documented after collection began and are
+interpreted descriptively. Task disaggregation, leave-one-task-out sensitivity,
+and expenditure intervals were added after primary outcomes were observed;
+they do not alter the original comparison or stopping condition. No response
+model is refitted on confirmation outcomes.
+
+\paragraph{Analysis artifact.}
+The accompanying supplement contains the primary episode and action records,
+planned identities, paired state values, calibrations, frozen predictions,
+runtime provenance, and analysis code. Its bundled verification procedure
+reproduces the primary counts, interval, task table, and descriptive expenditure
+analysis. Documentation specifies the selector features, penalized objective,
+candidate set, and normalization. Checkpoint weights and simulator assets are
+not bundled. The continuing repository additionally retains a completed
+confirmation snapshot and verification code that reproduce the full
+seven-setting resource table, original and amended comparisons, and task-level
+counts. The submitted supplement remains separate from these post-submission
+additions.
+
+\FloatBarrier
+\section{Frozen Selection and Diagnostic Analyses}
+\label{app:selectors}
+
+We compare two logistic response-model families. A compute-only model uses a
+quadratic in log normalized rate. An allocation model uses $\log h$,
+$\log(d/10)$, both squared terms, and their interaction. Each family is fitted
+with ridge penalty 1 or 10. Leave-one-task-out log loss selects the model, which
+is then refitted on the discovery set. No individual seed repeat is held out
+while another repeat from the same task remains in training.
+
+The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
+the 12 discovery configurations and 12 untested configurations. Their calibrated costs determine
+eligibility; the fitted model selects the highest predicted success under each
+ceiling. Ties favor lower compute, then lexicographic order.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Discovery-based selector choices.
+The learned choices and comparisons were frozen before transfer; additional
+selector baselines were documented after collection began.
+The empirical selector uses the measured grid; other selectors use the declared
+candidate set. The simple rule exactly matches the learned choices. Selected
+rate/native is the learned recommendation's arithmetic rate. Frozen comparators
+and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
+the half-native row is primary.
+}
+\label{tab:selectors}
+\label{tab:predictions}
+\input{../paper/generated/selector_choices.tex}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{All original frozen denoising tests: selected minus comparator,
+holding $h$ fixed within each row. Predicted and observed gaps and intervals are
+percentage points. The half-native row is primary; secondary intervals are
+descriptive, task-conditional, and unadjusted.}
+\label{tab:confirmation-predictions}
+\input{../paper/generated/confirmation_predictions.tex}
+\end{table}
+
+The simple rule minimizes denoising count, then chooses the shortest feasible
+prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
+transfer outcomes cannot distinguish these selectors at the tested budgets.
+The compute-only choices use the original ridge-10 fit. Its quarter- and
+half-budget choices are absent from the transfer plan, so this evaluation
+cannot compare those decisions on transfer tasks.
+
+The selected allocation model has log loss 0.7048, compared with 0.7067 for the
+best compute-only model. This small difference provides no evidence of an added
+predictive advantage. Under the same mean natural-log binary cross-entropy,
+constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
+each training fold scores 0.7170. The response-model probabilities should
+therefore not be read as calibrated task-transfer forecasts. The primary test
+evaluates a recommendation shared with simpler selectors, so it does not
+establish an additional benefit from model-based ranking.
+
+\section*{AI Use Statement}
+We used generative AI tools to help develop the conceptual framing and hypotheses,
+discuss experimental design, interpret results, search literature and sources,
+draft and revise the manuscript, implement and review evaluation and analysis
+code, and prepare tables and figures. The repository records automated
+consistency checks, reproduction
+of the confirmation statistics, and tests comparing plotted values with retained
+reports. These reproducibility checks are not substitutes for author review.
+The authors remain responsible for the final text, research claims, code, and
+artifacts.
+
+\end{document}

@@ -138,9 +138,9 @@ class PaperVisualTests(unittest.TestCase):
         visuals.style()
         figure = plt.figure()
         try:
-            figure.text(0.5, 0.5, "Too small at print size", fontsize=9)
+            figure.text(0.5, 0.5, "Too small at print size", fontsize=8)
             with tempfile.TemporaryDirectory() as directory:
-                with self.assertRaisesRegex(ValueError, "smaller than 10 pt"):
+                with self.assertRaisesRegex(ValueError, "smaller than 8.5 pt"):
                     visuals.save_figure(figure, Path(directory) / "figure.pdf")
         finally:
             plt.close(figure)

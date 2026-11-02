@@ -26,10 +26,16 @@ SOURCES = {
     "selectors": "paper_analysis/selector_diagnostics.json",
     "frozen": "frozen_prediction.json",
 }
-COLORS = ("#0072B2", "#D55E00", "#00856A")
+# Restrained, print-safe palette for the NeurIPS manuscript. Marker shape remains
+# the primary encoding so the figures also work in grayscale.
+ACCENT = "#2B5C8A"
+INK = "#222222"
+MID = "#666666"
+LIGHT = "#A0A0A0"
+COLORS = (INK, ACCENT, MID)
 MARKERS = ("o", "s", "^")
 FIGURE_WIDTH = 5.5  # Inches: the template's actual text width, not a scaled canvas.
-FIGURE_FONT_PT = 10  # Match the manuscript's caption size at final print width.
+FIGURE_FONT_PT = 8.5  # Slightly smaller than the manuscript's 10 pt body text.
 
 
 def digest(path):
@@ -310,6 +316,11 @@ def style():
             "xtick.labelsize": FIGURE_FONT_PT,
             "ytick.labelsize": FIGURE_FONT_PT,
             "axes.linewidth": 0.65,
+            "axes.edgecolor": INK,
+            "axes.labelcolor": INK,
+            "text.color": INK,
+            "xtick.color": INK,
+            "ytick.color": INK,
             "xtick.major.width": 0.65,
             "ytick.major.width": 0.65,
             "savefig.facecolor": "white",
@@ -373,9 +384,9 @@ def discovery_figure(data, path):
     import numpy as np
 
     fig, (ax, rule) = plt.subplots(
-        1, 2, figsize=(FIGURE_WIDTH, 2.8), gridspec_kw={"width_ratios": [1.55, 1]}
+        1, 2, figsize=(FIGURE_WIDTH, 2.22), gridspec_kw={"width_ratios": [1.55, 1]}
     )
-    fig.subplots_adjust(left=0.105, right=0.985, bottom=0.19, top=0.77, wspace=0.43)
+    fig.subplots_adjust(left=0.105, right=0.985, bottom=0.235, top=0.73, wspace=0.43)
     for offset, h, color, marker in zip((-0.14, 0, 0.14), (1, 2, 5), COLORS, MARKERS):
         rows = [r for r in data["discovery"]["cells"] if r["h"] == h]
         means = np.array([r["success"] for r in rows]) * 100
@@ -401,10 +412,10 @@ def discovery_figure(data, path):
         xticklabels=[2, 5, 10, 20],
         yticks=range(0, 101, 20),
     )
-    ax.set_title("(a) Discovery success", loc="left", pad=34)
+    ax.set_title("(a)", loc="left", pad=5, fontweight="bold")
     ax.legend(
         loc="lower center",
-        bbox_to_anchor=(0.5, 1.00),
+        bbox_to_anchor=(0.62, 1.015),
         ncol=3,
         frameon=False,
         handlelength=1,
@@ -416,7 +427,7 @@ def discovery_figure(data, path):
         (-0.075, 0.075),
         selected,
         ("o", "s"),
-        (COLORS[0], COLORS[1]),
+        (ACCENT, MID),
         ("Arithmetic", "Host time"),
     ):
         rule.plot(
@@ -439,10 +450,10 @@ def discovery_figure(data, path):
         yticks=[0, 1, 2],
         yticklabels=["5", "2", "1"],
     )
-    rule.set_title("(b) Refresh at $d=2$", loc="left", pad=34)
+    rule.set_title("(b)", loc="left", pad=5, fontweight="bold")
     rule.legend(
         loc="lower center",
-        bbox_to_anchor=(0.5, 0.99),
+        bbox_to_anchor=(0.68, 1.015),
         frameon=False,
         ncol=1,
         handlelength=1,
@@ -451,7 +462,7 @@ def discovery_figure(data, path):
     )
     for axis in (ax, rule):
         axis.set_axisbelow(True)
-        axis.grid(axis="y", color=".88", lw=0.6)
+        axis.grid(axis="y", color=".90", lw=0.55)
         axis.spines[["top", "right"]].set_visible(False)
     save_figure(fig, path)
     plt.close(fig)
@@ -460,19 +471,20 @@ def discovery_figure(data, path):
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.85))
-    ax = fig.add_axes([0.32, 0.17, 0.37, 0.72])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.12))
+    ax = fig.add_axes([0.32, 0.22, 0.37, 0.66])
     ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
     ax.set(xlim=(-10, 20), ylim=(-0.1, 8.5), xticks=[-10, 0, 10, 20], yticks=[])
     ax.spines[["left", "top", "right"]].set_visible(False)
     ax.tick_params(axis="y", length=0)
-    ax.axvline(0, color=".4", ls=(0, (3, 3)), lw=0.8, zorder=0)
+    ax.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
+    ax.axhline(4.55, color=".86", lw=0.7, zorder=0)
     transform = ax.get_yaxis_transform()
     for i, (y, c) in enumerate(zip(ys, data["confirmation"]["comparisons"])):
         effect = 100 * c["mean_difference"][0]
         lo, hi = [100 * v for v in c["interval95"][0]]
         primary = c["kind"] == "original primary"
-        color = COLORS[0] if i < 3 else ".35"
+        color = ACCENT if primary else (INK if i < 3 else MID)
         marker = "D" if primary else ("o" if i < 3 else "s")
         ax.errorbar(
             effect,
@@ -480,7 +492,7 @@ def confirmation_figure(data, path):
             xerr=[[effect - lo], [hi - effect]],
             color=color,
             fmt=marker,
-            mfc=color if primary else "white",
+            mfc=ACCENT if primary else "white",
             ms=5,
             capsize=2.5,
             elinewidth=1.1,
@@ -510,7 +522,7 @@ def confirmation_figure(data, path):
         (8.42, "Frozen denoising tests (fixed h)"),
         (4.43, "Amended descriptive comparisons"),
     ):
-        ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center")
+        ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
         0.5, 0.025, "Paired success difference, A - B (percentage points)", ha="center"
     )

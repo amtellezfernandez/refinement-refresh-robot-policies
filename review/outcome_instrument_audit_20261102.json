@@ -1,0 +1,67 @@
+{
+  "archive": "experiments/runs/refinement_refresh_final_001/confirmation_completed.tar.gz",
+  "archive_sha256": "36c1d5f2dcaef85664ec7a1bfe7409c849b3be17831566e783d24a00ea4e8df0",
+  "checks": {
+    "actions": "producer and environment-consumer hashes agree at every step",
+    "pairing": "start identity, initial state, and initial observation agree",
+    "pinned_lerobot_libero_source": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+    "reward": "0 for every nonsuccess step and 1 for every success step; consistency only because sparse reward uses the same predicate",
+    "start_and_completion_events": "all completed episodes",
+    "step_counts": "episode, driver, and stream agree",
+    "success": "episode, driver, vector evaluator, and completion recordings of the same upstream predicate agree"
+  },
+  "phases": [
+    {
+      "episodes": 799,
+      "extra_incomplete_streams": 1,
+      "lerobot_libero_source_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+      "phase": "confirmation",
+      "steps": 118491,
+      "successes": 687
+    },
+    {
+      "episodes": 92,
+      "extra_incomplete_streams": 0,
+      "lerobot_libero_source_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+      "phase": "primary_deadline",
+      "steps": 16553,
+      "successes": 67
+    },
+    {
+      "episodes": 6,
+      "extra_incomplete_streams": 0,
+      "lerobot_libero_source_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+      "phase": "confirmation_continuation_partial",
+      "steps": 1409,
+      "successes": 3
+    },
+    {
+      "episodes": 225,
+      "extra_incomplete_streams": 0,
+      "lerobot_libero_source_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71",
+      "phase": "confirmation_continuation_rest",
+      "steps": 35790,
+      "successes": 184
+    }
+  ],
+  "reward_success_crosscheck": [
+    {
+      "reward": 0.0,
+      "steps": 171302,
+      "success": false
+    },
+    {
+      "reward": 1.0,
+      "steps": 941,
+      "success": true
+    }
+  ],
+  "scope": "Internal outcome-path consistency; success fields and sparse reward share LIBERO's task predicate and are not independent outcome oracles. This is not an independent simulator replay.",
+  "status": "passed",
+  "totals": {
+    "episodes": 1122,
+    "extra_incomplete_streams": 1,
+    "steps": 172243,
+    "successes": 941
+  }
+}
