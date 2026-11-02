@@ -71,7 +71,7 @@ def input_hash(element):
     return sha({k: digest(v) if k != "prompt" else v for k, v in element.items()})
 
 
-def rollout(row, env, prompt, client, state, record_video=False, expected_settled_state=None):
+def rollout(row, env, prompt, client, state, record_video=False, expected_reset=None):
     import numpy as np
     ident, h, d = row["episode_identity"], row["h"], row["d"]
     refresh = row.get("refresh_every_queries", 1)
@@ -80,8 +80,9 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
     for _ in range(WAIT_STEPS):
         obs, _, _, _ = env.step(DUMMY_ACTION)
     settled = digest(np.asarray(env.sim.get_state().flatten()))
-    if expected_settled_state is not None and settled != expected_settled_state:
-        raise ValueError("reset_state_mismatch: expected {}, observed {}".format(expected_settled_state, settled))
+    first_observation = input_hash(policy_input(obs, prompt))
+    if expected_reset is not None and (settled, first_observation) != expected_reset:
+        raise ValueError("reset_state_mismatch: state/observation pair differs before policy execution")
     plan = collections.deque()
     actions, queries, frames, server_timing, memory, done = [], [], [], [], None, False
     supplied, supplied_tick, chunk_record = None, 0, None
@@ -121,7 +122,8 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
             break
     return {"outcome": {"success": bool(done), "episode_length": len(actions),
                         "termination_reason": "success" if done else "task_horizon"},
-            "settled_state_sha256": settled, "queries": queries, "actions": np.asarray(actions), "frames": frames,
+            "settled_state_sha256": settled, "first_observation_sha256": first_observation,
+            "queries": queries, "actions": np.asarray(actions), "frames": frames,
             "timing": {"rollout_wall_s": time.perf_counter() - started, "generation": server_timing},
             "memory": memory}
 
@@ -164,15 +166,17 @@ def attempts(args):
             if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
                 raise ValueError("state hash mismatch")
             result = rollout(row, env, prompt, client, state,
-                             expected_settled_state=settled.get(row["block_id"]))
-            expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
+                             expected_reset=settled.get(row["block_id"]))
+            reset_pair = (result["settled_state_sha256"], result["first_observation_sha256"])
+            expected = settled.setdefault(row["block_id"], reset_pair)
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
             array_path = arrays / (path.stem + ".npy")
             np.save(str(array_path), result["actions"])
             journal.update(path, "completed", outcome=result["outcome"], queries=result["queries"],
                            settled_state_sha256=result["settled_state_sha256"],
-                           settled_state_matches_block=expected == result["settled_state_sha256"],
+                           settled_state_matches_block=expected == reset_pair,
+                           first_observation_sha256=result["first_observation_sha256"],
                            action_array=array_path.name, timing=result["timing"], memory=result["memory"], finished_unix=time.time())
         except Exception as error:  # Retained as a record; never replaced.
             journal.update(path, "failed", error=repr(error), finished_unix=time.time())
