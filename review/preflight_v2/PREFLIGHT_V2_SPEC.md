@@ -4,6 +4,10 @@ Protocol `experiments/protocols/cross_policy_preflight_v2.json`. Run ID `cross_p
 
 **Status: PLANNED. Not executed. Not authorised until Alba's release exists.** The 1 November preflight stays PREFLIGHT_FAILED, and its records are not touched.
 
+## Stages
+
+Frozen before any stage below ran. **CPU stage** `cross_policy_preflight_v2.run001.cpu`: no GPU, no reservation, no rollout with a policy. **GPU stage** `cross_policy_preflight_v2.run001`: not started; needs a GPU release. Until both finish, the verdict is PREFLIGHT_INCOMPLETE. CPU checks that pass do not make the preflight pass.
+
 ## Question
 
 Are both pinned models, through their evaluation paths on this host, fit to run the matched R22 vs R25 comparison?
@@ -65,7 +69,7 @@ gate: G2 lock | gpu.lock is free | enforced_at: experiments/tooling/cross_policy
 gate: G1 quiet | under 3072 MiB in use | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:30 | before: all GPU work | qualified_on: 719 MiB -> pass; 19052 MiB -> fail
 selection_risk: low: no scientific estimate is drawn; identities are outside the confirmation population
 stop_on_confirmation: stop, send Alba the commit, verdict, manifest and checksums, and take no confirmation step until her release
-verdicts: PREFLIGHT_PASSED | PREFLIGHT_FAILED | UNINTERPRETABLE
+verdicts: PREFLIGHT_PASSED | PREFLIGHT_FAILED | PREFLIGHT_INCOMPLETE | UNINTERPRETABLE
 review_rounds_max: 1
 ```
 

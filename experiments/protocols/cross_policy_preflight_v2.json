@@ -1,4 +1,9 @@
 {
+  "alba_decisions_2026_11_02": {
+    "attempt_count_conflict": "Her email says 800 across both models; her factors and PR #1 give 800 per model, 1,600 in total. Not resolved here; frozen schedules unchanged.",
+    "invalid_campaign": "Earlier pi0.5 campaign only; official normalization could not be established and denoising steps were not reliably verified. Permanently excluded.",
+    "smolvla": "ARITHMETICALLY REPRODUCED \u2014 INSTRUMENT VALIDITY PENDING"
+  },
   "checks": {
     "action_units_and_shapes": "Seven dimensions; per-dimension minimum and maximum recorded.",
     "checkpoint_provenance": "checkpoint_tree in provenance.json for SmolVLA and pi0.5.",
@@ -76,6 +81,36 @@
     "R5": "Unavailable pi0.5 CUDA-event timing and XLA arithmetic are explicit measurement gaps (Alba, PR #1).",
     "R7": "Freshly generated state slots (Alba, PR #1).",
     "attempt_count": "800 per model, 1,600 in total (Alba, PR #1)."
+  },
+  "stages": {
+    "cpu": {
+      "checks": [
+        "checkpoint provenance",
+        "dependency provenance",
+        "pi0.5 normalization, file and loaded policy",
+        "pi0.5 d=2, 5, 10 loop count with real weights on CPU",
+        "client environment",
+        "generated-state hashes",
+        "generated states restore in the client stack"
+      ],
+      "run_id": "cross_policy_preflight_v2.run001.cpu",
+      "uses_gpu": false
+    },
+    "gpu": {
+      "checks": [
+        "native parity",
+        "first-action hashes",
+        "reset reuse across conditions",
+        "R22, R25, R52, R55 smoke",
+        "videos",
+        "per-call and rollout timing",
+        "reset-mismatch termination",
+        "SmolVLA d count"
+      ],
+      "run_id": "cross_policy_preflight_v2.run001",
+      "status": "NOT STARTED; needs a GPU release",
+      "uses_gpu": true
+    }
   },
   "status": "PLANNED_AWAITING_ALBA_DECISIONS_AND_RELEASE",
   "unresolved_decisions": {

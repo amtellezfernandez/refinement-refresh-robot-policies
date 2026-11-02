@@ -277,6 +277,18 @@ def preflight_protocol():
             "PREFLIGHT_PASSED": "Every mechanical check passes, parity meets Alba's criterion and the videos pass inspection.",
             "note": "preflight_verdict.py alone can report only failure, or mechanical checks passed awaiting review.",
         },
+        "stages": {
+            "cpu": {"run_id": PREFLIGHT_V2 + ".run001.cpu", "uses_gpu": False,
+                    "checks": ["checkpoint provenance", "dependency provenance", "pi0.5 normalization, file and loaded policy",
+                               "pi0.5 d=2, 5, 10 loop count with real weights on CPU", "client environment", "generated-state hashes",
+                               "generated states restore in the client stack"]},
+            "gpu": {"run_id": PREFLIGHT_V2 + ".run001", "uses_gpu": True, "status": "NOT STARTED; needs a GPU release",
+                    "checks": ["native parity", "first-action hashes", "reset reuse across conditions", "R22, R25, R52, R55 smoke",
+                               "videos", "per-call and rollout timing", "reset-mismatch termination", "SmolVLA d count"]}},
+        "alba_decisions_2026_11_02": {
+            "invalid_campaign": "Earlier pi0.5 campaign only; official normalization could not be established and denoising steps were not reliably verified. Permanently excluded.",
+            "smolvla": "ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING",
+            "attempt_count_conflict": "Her email says 800 across both models; her factors and PR #1 give 800 per model, 1,600 in total. Not resolved here; frozen schedules unchanged."},
         "counted_run": "The first execution of run_preflight_v2.sh that passes its entry gates. A failure stays failed; a later attempt needs a new run ID and a recorded reason.",
         "exclusions": ALBA_EXCLUSIONS,
     }
