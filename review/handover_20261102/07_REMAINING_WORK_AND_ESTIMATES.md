@@ -5,7 +5,7 @@
 | Work | Estimate |
 |---|---|
 | Full preflight | 6-26 hours |
-| R22 vs R25, both models, 800 attempts | 6-28 hours after preflight |
+| R22 vs R25, both models, 1,600 attempts (800 per model; corrected 2 November, first written as 800 attempts) | 6-28 hours after preflight |
 | Full confirmation, 4,000 attempts (includes R22 and R25) | 17-76 hours after preflight |
 | Observation-age study, 1,600 attempts | 10-43 hours |
 | Asynchronous study | BLOCKED pending runtime clarification |

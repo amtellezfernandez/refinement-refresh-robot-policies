@@ -1,3 +1,5 @@
+**Superseded by `review/preflight_v2/`. Its commands name retired entry points and phases. Kept as a record.**
+
 # R22/R25 execution plan, 2 November 2026
 
 **Not authorised and not ready.** Commands are for review and none has been run. `<RID>`, `<COMMIT>` and `<RELEASED_COMMIT>` are filled in at the time.

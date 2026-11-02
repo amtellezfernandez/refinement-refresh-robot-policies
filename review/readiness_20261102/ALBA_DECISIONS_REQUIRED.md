@@ -1,3 +1,5 @@
+**Superseded by `review/preflight_v2/DECISION_REGISTER.md`. Kept as a record.**
+
 # Decisions required from Alba, 2 November 2026
 
 Defaults below are what the code does now. They are proposals, and nothing is decided until Alba says so. R numbers are defined in `review/CROSS_POLICY_CONFIRMATION_AUDIT.md`, section 4, and R16 in `review/GPU_PREFLIGHT_RESULT.md`.

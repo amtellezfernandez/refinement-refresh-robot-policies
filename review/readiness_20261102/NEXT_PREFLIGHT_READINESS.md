@@ -1,3 +1,5 @@
+**Superseded by `review/preflight_v2/`, after Alba's decisions. Kept as a record.**
+
 # Next preflight readiness, 2 November 2026
 
 **Verdict: NOT READY for the full preflight.** Engineering that could be done alone is done and unit-tested. The remaining blockers are Alba's decisions, a GPU release and a code transfer. No model rollout, GPU job or RTX write took place in this work.
