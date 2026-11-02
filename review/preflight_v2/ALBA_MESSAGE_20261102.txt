@@ -16,6 +16,6 @@ Your decisions, needed before preflight:
 
 Also, why was the earlier pi0.5 campaign invalid, and could that defect reach SmolVLA? The answer might add a preflight check.
 
-Engineering on my side, none of it pushed yet: merging your PR with my later commits, restoring the frozen script I wrongly patched in 31748c8, and one line in your client check, which raises TypeError because libero.__file__ is None. Still open: the denoising count is measured only on a dummy model so far (2, 5 and 10 loop calls), not with real weights.
+Engineering on my side is on branch reconcile/alba-pr1-20261102, for your review; your PR is untouched. It merges your PR with my later commits, restores the frozen script I wrongly patched in 31748c8, and changes one line in your client check, which raises TypeError because libero.__file__ is None. Still open: the denoising count is measured only on a dummy model so far (2, 5 and 10 loop calls), not with real weights.
 
 Warren
