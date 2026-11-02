@@ -56,8 +56,10 @@ def fake_workspace(root):
     (inner / "__init__.py").write_text("def get_libero_path(key):\n    return __file__.rsplit('/', 1)[0]\n")
     (inner / "benchmark.py").write_text(
         "import os\n"
+        "def reached():\n"
+        "    raise RuntimeError('{} ' + __file__ + ' CONFIG=' + os.environ.get('LIBERO_CONFIG_PATH', ''))\n"
         "def get_benchmark_dict():\n"
-        "    raise RuntimeError('{} ' + __file__ + ' CONFIG=' + os.environ.get('LIBERO_CONFIG_PATH', ''))\n".format(SENTINEL))
+        "    return dict.fromkeys(('libero_spatial', 'libero_object', 'libero_goal', 'libero_10'), reached)\n".format(SENTINEL))
     client = source / "openpi_client"
     client.mkdir()
     (client / "__init__.py").write_text("")
@@ -84,7 +86,11 @@ class Scripts(unittest.TestCase):
         self.assertIn("No module named 'libero'", report["error"], done.stdout)
 
     def test_versioned_entry_point_reaches_openpi_libero(self):
-        done, _, inner, workspace = self.run_script(VERSIONED)
+        done, output, inner, workspace = self.run_script(VERSIONED)
+        # The pre-GPU check ran and passed, then the client's own stage reached OpenPI's LIBERO.
+        check = json.loads((output / "client_environment.json").read_text())
+        self.assertEqual(check["status"], "READY_FOR_CLIENT_IMPORT_CHECK_ONLY")
+        self.assertIn(str(inner), check["libero_module"])
         self.assertNotIn("No module named 'libero'", done.stdout)
         # Identity, not silence: the import resolves to the workspace's OpenPI tree.
         self.assertIn(SENTINEL, done.stdout, done.stdout)

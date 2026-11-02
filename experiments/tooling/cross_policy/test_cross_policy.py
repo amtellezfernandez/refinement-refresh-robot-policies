@@ -328,6 +328,17 @@ class Guard(unittest.TestCase):
             launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
                                processes=lambda: [], model="smolvla")
 
+    def test_confirmation_refused_if_release_approves_other_than_800_attempts(self):
+        root = self.make_root()
+        path = self.write_schedule(root)
+        release = self.write_release(root, path)
+        record = json.loads(release.read_text())
+        record["approved_attempts_per_model"] = 400
+        release.write_text(json.dumps(record))
+        with self.assertRaises(launch_guard.LaunchRefused):
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
+
     def test_confirmation_refused_if_release_approves_extra_arms(self):
         root = self.make_root()
         path = self.write_schedule(root)
