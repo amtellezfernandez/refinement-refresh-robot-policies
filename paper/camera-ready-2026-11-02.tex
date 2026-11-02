@@ -23,25 +23,26 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Robot policies that predict several future actions at once can use inference
-compute in two ways: refine the current prediction for more steps, or replan
-sooner using a newer observation. We study this choice for one frozen SmolVLA
-policy in synchronous LIBERO simulation. We first compare 12 configurations on
-four tasks, then evaluate frozen comparisons on eight different tasks that were
-not used to select the configurations. When the policy replans after every two
-executed actions, using two refinement steps instead of five increases success
-from 122/160 to 139/160. This is an improvement of 10.6 percentage points, with
-a descriptive 95\% interval of 4.4--16.9 points over the eight tasks. Estimated
-neural computation per control step also decreases by 5.9\%. Our accounting
-shows that 82.1\% of the policy's native computation does not depend on the
-number of refinement steps, so reducing refinement alone produces limited
-savings. With two refinement steps, executing five actions before replanning
-produces nearly the same observed success as executing two actions (138/160
-versus 139/160) while using 60.7\% less computation per attempt. However, the
-uncertainty is too large to conclude that the two settings have equivalent
-quality. A simple cost-aware rule selects the same configurations as the fitted
-response model. For this checkpoint and task family, additional refinement does
-not reliably improve closed-loop control.
+Robot policies must continually adapt their actions to changing environments,
+but inference is computationally expensive. Chunked policies therefore face a
+trade-off: spend more computation refining a predicted action sequence, or
+replan sooner using a fresher observation. We investigate whether additional
+refinement justifies its cost using one frozen SmolVLA checkpoint in synchronous
+LIBERO simulation. We evaluate 12 configurations on four Spatial discovery
+tasks (480 attempts), then test seven frozen configurations on eight Goal and
+Object tasks excluded from selection (1,120 attempts). At a fixed two-action
+execution prefix, reducing denoising from five to two steps increases success
+from 122/160 to 139/160 (+10.6 percentage points; descriptive task-conditional
+95\% interval: 4.4--16.9), while reducing reference-calibrated arithmetic per
+control step by 5.9\%. Savings are limited because 82.1\% of native generation
+arithmetic is independent of denoising. At two denoising steps, executing five
+rather than two actions before replanning yields 138/160 versus 139/160
+successes with 60.7\% less arithmetic per attempt, although equivalent quality
+is not established. A simple cost-aware rule matches the fitted response
+model's choices at three compute budgets, with no demonstrated advantage from
+fitting. These findings show that additional refinement need not improve
+closed-loop success and motivate evaluating refinement and replanning jointly
+under explicit compute constraints.
 \end{abstract}
 
 \section{Introduction}
