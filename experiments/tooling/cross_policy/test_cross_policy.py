@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import analyze  # noqa: E402
 import build_protocols as bp  # noqa: E402
 import launch_guard  # noqa: E402
+import make_primary_schedule as primary_schedule  # noqa: E402
 from common import CONFIRMATION_SEEDS, OBSERVATION_AGE_SEEDS, STATE_SLOTS, SUITES, TASK_IDS, file_sha, sha  # noqa: E402
 from journal import AttemptJournal, TerminalRecordError  # noqa: E402
 
@@ -32,7 +33,7 @@ def records_from(rows, probability, rng):
     for row in rows:
         success = rng.random() < probability[row["condition_id"]]
         records.append({"planned_run_id": row["planned_run_id"], "attempt_number": 0, "status": "completed",
-                        "outcome": {"success": success}})
+                        "outcome": {"success": success}, "settled_state_matches_block": True})
     return records
 
 
@@ -195,16 +196,82 @@ class Analysis(unittest.TestCase):
         self.assertFalse(any("pooled_estimate" in key for key in summary))
 
 
+    def test_unverified_reset_never_enters_the_primary_estimate(self):
+        rows = schedule()
+        records = records_from(rows, dict.fromkeys(["NATIVE", "R22", "R25", "R52", "R55"], .5),
+                               random.Random(23))
+        record = next(r for r in records if r["planned_run_id"].endswith(".R22"))
+        record["settled_state_matches_block"] = False
+        report = analyze.analyze_model(rows, records)
+        self.assertEqual(report["primary"]["status"], "incomplete")
+        self.assertIn("reset_state_not_verified",
+                      [x["status"] for x in report["coverage"]["not_completed"]])
+
+    def test_absent_secondary_arm_is_not_a_completed_contrast(self):
+        rows = [r for r in schedule() if r["condition_id"] in ("R22", "R25")]
+        records = records_from(rows, {"R22": .7, "R25": .65}, random.Random(24))
+        result = analyze.analyze_model(rows, records)
+        self.assertEqual(result["primary"]["status"], "complete")
+        self.assertEqual(result["secondary"]["status"], "not_planned")
+        self.assertEqual(result["quality_preservation"]["decision"], "test_incomplete")
+
+
+class PrimarySchedule(unittest.TestCase):
+    def test_primary_schedule_is_exact_and_has_distinct_source_hash(self):
+        rows = schedule()
+        doc = bp.schedule_document(bp.CONFIRMATION, "smolvla", rows,
+                                   {"states_sha256": sha("sample states"), "binding": "BOUND"})
+        result = primary_schedule.derive(doc)
+        self.assertEqual(len(result["schedule"]), 800)
+        self.assertEqual(result["identity_count"], 400)
+        self.assertEqual(set(r["condition_id"] for r in result["schedule"]), {"R22", "R25"})
+        self.assertEqual(result["source_schedule_sha256"], doc["schedule_sha256"])
+        self.assertNotEqual(result["schedule_sha256"], doc["schedule_sha256"])
+
+    def test_unbound_source_is_rejected(self):
+        doc = bp.schedule_document(bp.CONFIRMATION, "smolvla", schedule(),
+                                   {"states_sha256": None, "binding": "PENDING_STATE_GENERATION"})
+        with self.assertRaises(ValueError):
+            primary_schedule.derive(doc)
+
+
 class Guard(unittest.TestCase):
-    """Fire drill: the gate must refuse before any budgeted step."""
+    """A test release is never a real GPU authorization."""
     def make_root(self, status="PREPARED"):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
         (root / "experiments/protocols").mkdir(parents=True)
         for name in launch_guard.PROTOCOLS.values():
-            (root / "experiments/protocols" / (name + ".json")).write_text(json.dumps({"status": status}))
+            (root / "experiments/protocols" / (name + ".json")).write_text(
+                json.dumps({"status": status}))
         return root
+
+    def write_schedule(self, root, model="smolvla"):
+        rows = schedule(model)
+        full = bp.schedule_document(bp.CONFIRMATION, model, rows,
+                                    {"states_sha256": sha("sample states"), "binding": "BOUND"})
+        selected = primary_schedule.derive(full)
+        path = root / "experiments/runs" / bp.CONFIRMATION / model / "primary_r22_r25_schedule.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(selected, sort_keys=True))
+        return path
+
+    def write_release(self, root, schedule_path, approved_by="Alba", protocol_sha=None):
+        name = bp.CONFIRMATION
+        if protocol_sha is None:
+            protocol_sha = file_sha(root / "experiments/protocols" / (name + ".json"))
+        document = json.loads(schedule_path.read_text("utf-8"))
+        record = {"approved_by": approved_by, "protocol_sha256": protocol_sha,
+                  "schedule_sha256_by_model": {document["model"]: document["schedule_sha256"]},
+                  "schedule_file_sha256_by_model": {document["model"]: file_sha(schedule_path)},
+                  "approval_scope": "PRIMARY_R22_R25_ONLY",
+                  "approved_conditions": ["R22", "R25"],
+                  "approved_attempts_per_model": 800}
+        path = root / "review/releases" / (name + ".release.json")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(record))
+        return path
 
     def test_preflight_refused_without_reservation(self):
         with self.assertRaises(launch_guard.LaunchRefused):
@@ -212,42 +279,71 @@ class Guard(unittest.TestCase):
 
     def test_preflight_refused_when_gpu_is_occupied(self):
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("preflight", environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: ["1, 10 MiB"])
+            launch_guard.check("preflight", environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: ["1, 10 MiB"])
 
     def test_preflight_allowed_with_reservation(self):
         self.assertEqual(launch_guard.check("preflight", environ={"ALBA_GPU_RESERVATION": "R1"},
                                             processes=lambda: [])["reservation"], "R1")
 
     def test_confirmation_refused_without_release(self):
+        root = self.make_root()
+        path = self.write_schedule(root)
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("confirmation", root=self.make_root(), environ={"ALBA_GPU_RESERVATION": "R1"},
-                               processes=lambda: [])
-
-    def write_release(self, root, name, approved_by, digest):
-        (root / "review/releases").mkdir(parents=True, exist_ok=True)
-        (root / "review/releases" / (name + ".release.json")).write_text(
-            json.dumps({"approved_by": approved_by, "protocol_sha256": digest}))
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
 
     def test_confirmation_refused_when_protocol_changed_after_release(self):
         root = self.make_root()
-        self.write_release(root, "cross_policy_confirmation_v1", "Alba", "0" * 64)
+        path = self.write_schedule(root)
+        self.write_release(root, path, protocol_sha="0" * 64)
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [])
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
 
     def test_confirmation_allowed_only_by_matching_release(self):
         root = self.make_root()
-        name = "cross_policy_confirmation_v1"
-        digest = file_sha(root / "experiments/protocols" / (name + ".json"))
-        self.write_release(root, name, "Alba", digest)
-        self.assertEqual(launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
-                                            processes=lambda: [])["phase"], "confirmation")
+        path = self.write_schedule(root)
+        self.write_release(root, path)
+        self.assertEqual(launch_guard.check(
+            "confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+            processes=lambda: [], schedule_path=path, model="smolvla")["phase"], "confirmation")
+
+    def test_confirmation_refused_when_schedule_is_modified(self):
+        root = self.make_root()
+        path = self.write_schedule(root)
+        self.write_release(root, path)
+        path.write_text(path.read_text() + " ")
+        with self.assertRaises(launch_guard.LaunchRefused):
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
+
+    def test_confirmation_refused_without_a_schedule_path(self):
+        root = self.make_root()
+        path = self.write_schedule(root)
+        self.write_release(root, path)
+        with self.assertRaises(launch_guard.LaunchRefused):
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], model="smolvla")
+
+    def test_confirmation_refused_if_release_approves_extra_arms(self):
+        root = self.make_root()
+        path = self.write_schedule(root)
+        release = self.write_release(root, path)
+        record = json.loads(release.read_text())
+        record["approved_conditions"] = ["R22", "R25", "R52"]
+        release.write_text(json.dumps(record))
+        with self.assertRaises(launch_guard.LaunchRefused):
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
 
     def test_blocked_protocol_refused_even_with_release(self):
         root = self.make_root(status="BLOCKED_X")
-        name = "asynchronous_confirmation_v1"
-        self.write_release(root, name, "Alba", file_sha(root / "experiments/protocols" / (name + ".json")))
+        path = self.write_schedule(root)
+        self.write_release(root, path)
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("asynchronous", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [])
+            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                               processes=lambda: [], schedule_path=path, model="smolvla")
 
     def test_this_branch_has_no_release(self):
         self.assertFalse((launch_guard.ROOT / "review/releases").exists())
