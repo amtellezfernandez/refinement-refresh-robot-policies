@@ -27,7 +27,8 @@ def check(expected_root=None):
             "LIBERO source into this client interpreter; do not silently import "
             "binary site-packages from a different Python environment.".format(error)
         )
-    package = Path(libero.__file__).resolve()
+    import libero.libero as _inner
+    package = Path(_inner.__file__).resolve()
     bddl = Path(get_libero_path("bddl_files")).resolve()
     if expected_root is not None:
         root = Path(expected_root).resolve()
