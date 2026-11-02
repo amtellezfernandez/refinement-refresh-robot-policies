@@ -114,8 +114,10 @@ def main():
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--schedule", type=Path, help="Required for a released rollout server")
     args = parser.parse_args()
-    launch_guard.check(args.phase)
+    launch_guard.check(args.phase, schedule_path=args.schedule if args.phase != "preflight" else None,
+                       model="pi05" if args.phase != "preflight" else None)
     if args.mode == "profile":
         args.output.mkdir(parents=True, exist_ok=False)
         profile(args)
