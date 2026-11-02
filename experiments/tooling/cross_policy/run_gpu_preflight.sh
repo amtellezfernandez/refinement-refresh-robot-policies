@@ -51,5 +51,7 @@ for _ in $(seq 1 120); do
   kill -0 "$SERVER" || { echo "server exited; see server.log"; exit 5; }
   sleep 5
 done
-timeout 1800 "$W/envs/client/bin/python" "$TOOLS/preflight_pi05_client_small.py" --output "$OUT/pi05" --port 8000
+# envs/client does not install LIBERO; OpenPI's example takes it from this submodule.
+PYTHONPATH="$W/src/openpi/third_party/libero" \
+  timeout 1800 "$W/envs/client/bin/python" "$TOOLS/preflight_pi05_client_small.py" --output "$OUT/pi05" --port 8000
 echo PREFLIGHT_SCRIPT_DONE | tee "$OUT/done.txt"
