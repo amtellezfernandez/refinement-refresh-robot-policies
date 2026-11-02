@@ -220,7 +220,9 @@ def main():
     args = parser.parse_args()
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     # The server owns the GPU. Its process is expected, so the guard cannot require an empty GPU here.
-    launch_guard.check(args.phase, processes=lambda: [])
+    launch_guard.check(args.phase, processes=lambda: [],
+                       schedule_path=args.schedule if args.mode == "attempts" else None,
+                       model="pi05" if args.mode == "attempts" else None)
     (attempts if args.mode == "attempts" else parity)(args)
 
 
