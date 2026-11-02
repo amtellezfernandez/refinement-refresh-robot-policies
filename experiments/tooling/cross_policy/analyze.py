@@ -40,9 +40,10 @@ def coverage(schedule_rows, records):
             extra.append(run_id)
         for attempt in attempts:
             counts[attempt["status"]] += 1
-            if attempt["status"] != "completed":
+            if attempt["status"] != "completed" or attempt.get("settled_state_matches_block") is not True:
+                status = attempt["status"] if attempt["status"] != "completed" else "reset_state_not_verified"
                 not_completed.append({"planned_run_id": run_id, "attempt": attempt["attempt_number"],
-                                      "status": attempt["status"]})
+                                      "status": status})
     return {"planned": len(planned), "records": len(records), "status_counts": dict(counts),
             "missing": missing, "identities_with_multiple_attempts": extra, "not_completed": not_completed}
 
@@ -56,7 +57,8 @@ def success_table(schedule_rows, records, condition):
             continue
         ident = row["episode_identity"]
         attempts = by_plan.get(run_id, [])
-        if len(attempts) != 1 or attempts[0]["status"] != "completed":
+        if (len(attempts) != 1 or attempts[0]["status"] != "completed"
+                or attempts[0].get("settled_state_matches_block") is not True):
             blocked.append(run_id)
             continue
         table[(ident["suite"], ident["task_id"], ident["state_slot"])][ident["policy_seed"]] = \
@@ -95,6 +97,14 @@ def bootstrap(nested, draws=BOOTSTRAP_DRAWS, seed=BOOTSTRAP_SEED):
 
 
 def contrast(schedule_rows, records, a, b):
+    planned_a = {row["block_id"] for row in schedule_rows if row["condition_id"] == a}
+    planned_b = {row["block_id"] for row in schedule_rows if row["condition_id"] == b}
+    if not planned_a or not planned_b:
+        return {"contrast": "{} minus {}".format(a, b), "status": "not_planned",
+                "missing_conditions": [c for c, blocks in ((a, planned_a), (b, planned_b)) if not blocks]}
+    if planned_a != planned_b:
+        return {"contrast": "{} minus {}".format(a, b), "status": "incomplete",
+                "reason": "unmatched_identity_blocks"}
     table_a, blocked_a = success_table(schedule_rows, records, a)
     table_b, blocked_b = success_table(schedule_rows, records, b)
     blocked = blocked_a + blocked_b
