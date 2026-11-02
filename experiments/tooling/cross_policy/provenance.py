@@ -30,6 +30,14 @@ def _version(module):
         return "UNKNOWN: {!r}".format(error)
 
 
+def git_commit(root=ROOT):
+    """The RTX runs a transferred bundle with no .git; its commit is in BUNDLE_COMMIT."""
+    marker = Path(root) / "BUNDLE_COMMIT"
+    if marker.is_file():
+        return marker.read_text("utf-8").strip()
+    return _read(["git", "-C", str(root), "rev-parse", "HEAD"])
+
+
 def code_hashes():
     directory = Path(__file__).resolve().parent
     return {path.name: file_sha(path) for path in sorted(directory.glob("*.py"))}
@@ -47,7 +55,7 @@ def tree_hash(path):
 def capture(model, args, extra):
     arguments = {k: str(v) for k, v in vars(args).items()}
     record = {"schema_version": 1, "model": model, "captured_unix": time.time(),
-              "git_commit": _read(["git", "-C", str(ROOT), "rev-parse", "HEAD"]),
+              "git_commit": git_commit(),
               "git_status_short": _read(["git", "-C", str(ROOT), "status", "--short"]),
               "code_sha256": code_hashes(), "argv": sys.argv, "arguments": arguments,
               "python": sys.version, "platform": platform.platform(), "hostname": platform.node(),

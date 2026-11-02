@@ -3,7 +3,8 @@
 - preflight: needs a named reservation ID in ALBA_GPU_RESERVATION, and refuses unrelated
   GPU compute processes so that one-model-per-GPU holds.
 - confirmation, observation_age and asynchronous: need a release file whose SHA-256 of the
-  protocol matches. Only Alba's review creates that file. It is not committed on this branch,
+  protocol matches and which lists the exact schedule file. Only Alba's review creates that
+  file. It is not committed on this branch,
   and the asynchronous protocol is also refused while its status says blocked.
 """
 import json
@@ -28,7 +29,7 @@ def compute_processes():
     return [line.strip() for line in output.splitlines() if line.strip()]
 
 
-def check(phase, root=ROOT, environ=None, processes=compute_processes):
+def check(phase, root=ROOT, environ=None, processes=compute_processes, schedule=None):
     environ = os.environ if environ is None else environ
     root = Path(root)
     if phase == "preflight":
@@ -47,6 +48,8 @@ def check(phase, root=ROOT, environ=None, processes=compute_processes):
         release = json.loads(release_path.read_text("utf-8"))
         if release.get("approved_by") != "Alba" or release.get("protocol_sha256") != file_sha(protocol_path):
             raise LaunchRefused("REFUSED: release does not match the protocol hash")
+        if schedule is None or file_sha(schedule) not in release.get("schedule_sha256s", []):
+            raise LaunchRefused("REFUSED: release does not cover this schedule file")
         reservation = environ.get("ALBA_GPU_RESERVATION")
         if not reservation:
             raise LaunchRefused("REFUSED: rollouts need ALBA_GPU_RESERVATION")

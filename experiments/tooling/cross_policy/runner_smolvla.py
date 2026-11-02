@@ -20,9 +20,12 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent)]
 import launch_guard  # noqa: E402
-from common import SUITES, TASK_IDS, atomic_write_json, sha  # noqa: E402
+from attempt_loop import check_settled, execute_schedule, summarize_condition_check  # noqa: E402
+from common import SUITES, TASK_IDS, atomic_write_json  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
+CONDITION_CHECK = (("NATIVE", 1, 10), ("R22", 2, 2), ("R25", 2, 5), ("R52", 5, 2), ("R55", 5, 5))
+CONDITION_CHECK_SEED = 790011  # The preflight smoke seed; outside every confirmation identity.
 PROFILE_D = (2, 5, 10)
 PARITY_EPISODES_PER_TASK = 10
 PARITY_SEED = 790001  # Disjoint from every recorded and planned policy seed.
@@ -53,7 +56,7 @@ class ChunkTap:
         self.policy._get_action_chunk = self.original
 
 
-def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False):
+def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_settled=None):
     """One episode. Writes nothing itself; returns arrays and per-query records."""
     import numpy as np
     import run_paired as rp
@@ -75,7 +78,9 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     rp.seed_environment(environment_seed)
     observation, _ = env.reset(seed=[environment_seed], options={NEW_ROLLOUT_OPTION: True})
     settled = rp.array_record(base._env.sim.get_state().flatten())["sha256"]
+    check_settled(settled, expected_settled)  # Before any policy query.
     first_observation = rp.observation_sha(observation)
+    counters = rp.Counters(policy)  # Generation host and CUDA intervals, as in the historical runner.
     tap = rp_tap = ChunkTap(policy)
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
@@ -114,13 +119,17 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
                     break
     finally:
         rp_tap.restore()
+        generation_host_s, generation_cuda_ms = list(counters.host_s), list(counters.cuda_ms)
+        counts = dict(counters.counts)
+        counters.restore()
     return {"outcome": {"success": success, "episode_length": len(actions),
                         "termination_reason": "success" if success else "terminated" if terminated else
                         "truncated" if truncated else "task_horizon"},
             "settled_state_sha256": settled, "first_observation_sha256": first_observation,
             "queries": queries, "actions": np.asarray(actions), "frames": frames,
             "timing": {"rollout_wall_s": time.perf_counter() - started, "query_host_s": host_s,
-                       "cuda_event": "see profile; query-level CUDA events not separated from env post-processing"},
+                       "generation_host_s": generation_host_s, "generation_cuda_ms": generation_cuda_ms,
+                       "generation_counts": counts},
             "memory": {"peak_allocated_bytes": torch.cuda.max_memory_allocated(),
                        "peak_reserved_bytes": torch.cuda.max_memory_reserved()}}
 
@@ -156,42 +165,60 @@ def attempts(args):
     policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
     run_provenance = provenance(args)
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
-    env, key, env_pre, env_post, settled = None, None, None, None, {}
-    for row in rows:
-        if journal.attempts_for(row["planned_run_id"]):
-            continue
-        path = journal.begin(row, run_provenance["sha256"], sys.argv)
-        journal.update(path, "running", started_unix=time.time())
+    current = {"key": None, "env": None, "env_pre": None, "env_post": None, "samples": []}
+
+    def run_one(row, expected_settled):
         stop, samples = threading.Event(), []
+        current["samples"] = samples
         sampler = threading.Thread(target=gpu_sampler, args=(stop, samples), daemon=True)
         sampler.start()
         try:
             ident = row["episode_identity"]
             task_key = (ident["suite"], ident["task_id"])
-            if task_key != key:
-                if env is not None:
-                    env.close()
-                env, env_pre, env_post = make_task_env(ident["suite"], ident["task_id"], policy)
-                key = task_key
+            if task_key != current["key"]:
+                if current["env"] is not None:
+                    current["env"].close()
+                current["env"], current["env_pre"], current["env_post"] = make_task_env(ident["suite"], ident["task_id"], policy)
+                current["key"] = task_key
             state = states[row["state_key"]]
             rp.require(hashlib.sha256(state.tobytes()).hexdigest() == row["state_sha256"], "state hash mismatch")
-            result = rollout(row, env, policy, pre, post, env_pre, env_post, state)
-            expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
+            result = rollout(row, current["env"], policy, pre, post, current["env_pre"], current["env_post"], state,
+                             expected_settled=expected_settled)
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
-            array_path = arrays / (path.stem + ".npy")
+            array_path = arrays / (row["planned_run_id"] + ".npy")
             np.save(array_path, result["actions"])
-            journal.update(path, "completed", outcome=result["outcome"], queries=result["queries"],
-                           settled_state_sha256=result["settled_state_sha256"],
-                           settled_state_matches_block=expected == result["settled_state_sha256"],
-                           first_observation_sha256=result["first_observation_sha256"],
-                           action_array=array_path.name, timing=result["timing"], memory=result["memory"],
-                           gpu_samples=samples, finished_unix=time.time())
-        except Exception as error:  # Retained as a record; never replaced.
-            journal.update(path, "failed", error=repr(error), gpu_samples=samples, finished_unix=time.time())
         finally:
             stop.set()
             sampler.join()
+        return {"outcome": result["outcome"], "queries": result["queries"],
+                "settled_state_sha256": result["settled_state_sha256"],
+                "first_observation_sha256": result["first_observation_sha256"], "action_array": array_path.name,
+                "timing": result["timing"], "memory": result["memory"], "gpu_samples": samples}
+
+    execute_schedule(rows, journal, run_provenance["sha256"], sys.argv, run_one,
+                     failure_fields=lambda: {"gpu_samples": current["samples"]})
+
+
+def conditions(args):
+    """Every condition once on one non-confirmation identity: valid actions and exact reset reuse."""
+    import numpy as np
+    import run_paired as rp
+    os.environ.setdefault("MUJOCO_GL", "osmesa")
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    args.output.mkdir(parents=True, exist_ok=False)
+    policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
+    env, env_pre, env_post = make_task_env("libero_spatial", 0, policy)
+    state = np.array(env.envs[0].unwrapped._init_states)[0]
+    results = {}
+    for name, h, d in CONDITION_CHECK:
+        row = {"h": h, "d": d, "episode_identity": {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0",
+                                                    "policy_seed": CONDITION_CHECK_SEED}}
+        result = rollout(row, env, policy, pre, post, env_pre, env_post, state)
+        results[name] = {"h": h, "d": d, "settled_state_sha256": result["settled_state_sha256"],
+                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"]}
+    env.close()
+    atomic_write_json(args.output / "conditions.json", dict(summarize_condition_check(results), results=results))
 
 
 def preflight(args):
@@ -203,7 +230,8 @@ def preflight(args):
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     args.output.mkdir(parents=True, exist_ok=False)
     policy, pre, post, native = rp.load_policy_and_processors(args.checkpoint)
-    atomic_write_json(args.output / "provenance.json", provenance(args))
+    run_provenance_record = provenance(args)
+    atomic_write_json(args.output / "provenance.json", run_provenance_record)
     # 1. Profile on a fixed input: 100 warm-up then 100 measured calls per d.
     env, env_pre, env_post = make_task_env("libero_spatial", 0, policy)
     base = env.envs[0].unwrapped
@@ -233,7 +261,7 @@ def preflight(args):
     # 2. Native parity, 4 suites x 10 tasks x 10 episodes, on official init states 0-9.
     # Fresh campaign states are not touched, so parity cannot expose a confirmation identity.
     journal = AttemptJournal(args.output / "parity_attempts")
-    run_provenance = sha({"preflight": str(args.output)})
+    run_provenance = run_provenance_record["sha256"]
     videos = args.output / "videos"
     videos.mkdir()
     for suite in SUITES:
@@ -260,7 +288,7 @@ def preflight(args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("preflight", "attempts"))
+    parser.add_argument("mode", choices=("preflight", "attempts", "conditions"))
     parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation", "observation_age"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
@@ -269,8 +297,8 @@ def main():
     args = parser.parse_args()
     if args.mode == "attempts" and args.phase == "preflight":
         raise SystemExit("attempts need --phase confirmation or observation_age")
-    launch_guard.check(args.phase)
-    (preflight if args.mode == "preflight" else attempts)(args)
+    launch_guard.check(args.phase, schedule=args.schedule)
+    {"preflight": preflight, "attempts": attempts, "conditions": conditions}[args.mode](args)
 
 
 if __name__ == "__main__":

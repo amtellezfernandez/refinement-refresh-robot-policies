@@ -32,7 +32,7 @@ def records_from(rows, probability, rng):
     for row in rows:
         success = rng.random() < probability[row["condition_id"]]
         records.append({"planned_run_id": row["planned_run_id"], "attempt_number": 0, "status": "completed",
-                        "outcome": {"success": success}})
+                        "settled_state_sha256": "settled-" + row["block_id"], "outcome": {"success": success}})
     return records
 
 
@@ -238,9 +238,13 @@ class Guard(unittest.TestCase):
         root = self.make_root()
         name = "cross_policy_confirmation_v1"
         digest = file_sha(root / "experiments/protocols" / (name + ".json"))
-        self.write_release(root, name, "Alba", digest)
+        schedule = root / "schedule.json"
+        schedule.write_text("{}")
+        (root / "review/releases").mkdir(parents=True, exist_ok=True)
+        (root / "review/releases" / (name + ".release.json")).write_text(json.dumps(
+            {"approved_by": "Alba", "protocol_sha256": digest, "schedule_sha256s": [file_sha(schedule)]}))
         self.assertEqual(launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
-                                            processes=lambda: [])["phase"], "confirmation")
+                                            processes=lambda: [], schedule=schedule)["phase"], "confirmation")
 
     def test_blocked_protocol_refused_even_with_release(self):
         root = self.make_root(status="BLOCKED_X")

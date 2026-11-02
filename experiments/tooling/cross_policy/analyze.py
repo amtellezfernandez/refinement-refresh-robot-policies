@@ -94,15 +94,38 @@ def bootstrap(nested, draws=BOOTSTRAP_DRAWS, seed=BOOTSTRAP_SEED):
     return np.mean(suite_means, axis=0)
 
 
+def reset_state_failures(schedule_rows, records):
+    """Completed attempts whose block lacks one settled-state hash. Recomputed; the runner's flag is not read.
+
+    A missing hash counts as a failure, never as a match.
+    """
+    planned = {row["planned_run_id"]: row for row in schedule_rows}
+    hashes, failures = defaultdict(set), set()
+    for record in records:
+        if record["status"] != "completed":
+            continue
+        run_id = record["planned_run_id"]
+        settled = record.get("settled_state_sha256")
+        if not settled:
+            failures.add(planned[run_id]["block_id"])
+        hashes[planned[run_id]["block_id"]].add(settled)
+    return failures | {block for block, values in hashes.items() if len(values) > 1}
+
+
 def contrast(schedule_rows, records, a, b):
     table_a, blocked_a = success_table(schedule_rows, records, a)
     table_b, blocked_b = success_table(schedule_rows, records, b)
     blocked = blocked_a + blocked_b
-    if blocked:
-        return {"contrast": "{} minus {}".format(a, b), "status": "incomplete", "blocking_attempts": len(blocked)}
+    reset_failures = reset_state_failures(schedule_rows, records)
+    if blocked or reset_failures:
+        return {"contrast": "{} minus {}".format(a, b), "status": "incomplete", "blocking_attempts": len(blocked),
+                "reset_state_failures": len(reset_failures)}
     nested = state_differences(table_a, table_b)
     samples = bootstrap(nested)
     return {"contrast": "{} minus {}".format(a, b), "status": "complete", "macro_difference_points": macro(nested),
+            "paired_state_differences": [{"suite": suite, "task_id": task, "state_position": index, "points": float(value)}
+                                         for suite in sorted(nested) for task in sorted(nested[suite])
+                                         for index, value in enumerate(nested[suite][task])],
             "ci95_two_sided": [float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5))],
             "lower_bound_one_sided_95": float(np.percentile(samples, 5.0)),
             "bootstrap": {"draws": BOOTSTRAP_DRAWS, "seed": BOOTSTRAP_SEED,
@@ -137,10 +160,37 @@ def condition_summary(schedule_rows, records):
     return result
 
 
+def timing_summary(schedule_rows, records):
+    """Host, CUDA and rollout time stay separate. A quantity not recorded is UNAVAILABLE, never substituted."""
+    condition = {row["planned_run_id"]: row["condition_id"] for row in schedule_rows}
+    grouped = defaultdict(lambda: defaultdict(list))
+    for record in records:
+        if record["status"] != "completed":
+            continue
+        timing, target = record.get("timing") or {}, grouped[condition[record["planned_run_id"]]]
+        if "rollout_wall_s" in timing:
+            target["rollout_wall_s"].append(timing["rollout_wall_s"])
+        target["generation_host_s"].extend(timing.get("generation_host_s", []))
+        target["generation_cuda_ms"].extend(timing.get("generation_cuda_ms", []))
+        for item in timing.get("generation", []):
+            target["generation_host_s"].append(item["host_generation_s"])
+    result = {}
+    for name in sorted(set(condition.values())):
+        result[name] = {key + "_median": float(np.median(grouped[name][key])) if grouped[name][key] else "UNAVAILABLE"
+                        for key in ("rollout_wall_s", "generation_host_s", "generation_cuda_ms")}
+    return result
+
+
+ARITHMETIC_STATUS = ("NOT_IMPLEMENTED: arithmetic per chunk, control step and attempted episode awaits Alba's ruling on "
+                     "R13; SmolVLA has a length-20 calibration and pi0.5 XLA cost analysis does not exist.")
+
+
 def analyze_model(schedule_rows, records):
     primary = contrast(schedule_rows, records, "R22", "R25")
     secondary = contrast(schedule_rows, records, "R52", "R22")
     return {"coverage": coverage(schedule_rows, records), "conditions": condition_summary(schedule_rows, records),
+            "timing": timing_summary(schedule_rows, records), "arithmetic": ARITHMETIC_STATUS,
+            "reset_state_failures": sorted(reset_state_failures(schedule_rows, records)),
             "primary": primary, "secondary": secondary, "quality_preservation": quality_decision(secondary)}
 
 

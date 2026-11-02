@@ -22,9 +22,12 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import launch_guard  # noqa: E402
+from attempt_loop import check_settled, execute_schedule, summarize_condition_check  # noqa: E402
 from common import SUITES, TASK_IDS, atomic_write_json, sha  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
+CONDITION_CHECK = (("NATIVE", 5, 10), ("R22", 2, 2), ("R25", 2, 5), ("R52", 5, 2), ("R55", 5, 5))
+CONDITION_CHECK_SEED = 790012  # The preflight smoke seed; outside every confirmation identity.
 DUMMY_ACTION = [0.0] * 6 + [-1.0]
 ENV_RESOLUTION, RESIZE, WAIT_STEPS = 256, 224, 10
 MAX_STEPS = {"libero_spatial": 220, "libero_object": 280, "libero_goal": 300, "libero_10": 520}
@@ -71,7 +74,7 @@ def input_hash(element):
     return sha({k: digest(v) if k != "prompt" else v for k, v in element.items()})
 
 
-def rollout(row, env, prompt, client, state, record_video=False):
+def rollout(row, env, prompt, client, state, record_video=False, expected_settled=None):
     import numpy as np
     ident, h, d = row["episode_identity"], row["h"], row["d"]
     refresh = row.get("refresh_every_queries", 1)
@@ -80,6 +83,7 @@ def rollout(row, env, prompt, client, state, record_video=False):
     for _ in range(WAIT_STEPS):
         obs, _, _, _ = env.step(DUMMY_ACTION)
     settled = digest(np.asarray(env.sim.get_state().flatten()))
+    check_settled(settled, expected_settled)  # Before any policy query.
     plan = collections.deque()
     actions, queries, frames, server_timing, memory, done = [], [], [], [], None, False
     supplied, supplied_tick, chunk_record = None, 0, None
@@ -100,7 +104,7 @@ def rollout(row, env, prompt, client, state, record_video=False):
                 raise ValueError("unsupported_refinement_setting: chunk {} finite={}".format(chunk.shape, bool(np.isfinite(chunk).all())))
             chunk_record = {"shape": list(chunk.shape), "sha256": digest(chunk)}
             server_timing.append({"tick": tick, "client_round_trip_s": time.perf_counter() - begin,
-                                  "host_generation_s": response["host_generation_s"]})
+                                  "host_generation_s": response["host_generation_s"], "memory": response["memory"]})
             memory = response["memory"]
             plan.extend(chunk[:h])
         action = plan.popleft()
@@ -142,34 +146,47 @@ def attempts(args):
     print("interrupted:", journal.reconcile_interrupted("process restart"), flush=True)
     run_provenance = provenance(args)
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
-    client, suites, env, key, settled = connect(args.port), benchmark.get_benchmark_dict(), None, None, {}
-    for row in rows:
-        if journal.attempts_for(row["planned_run_id"]):
-            continue
-        path = journal.begin(row, run_provenance["sha256"], sys.argv)
-        journal.update(path, "running", started_unix=time.time())
-        try:
-            ident = row["episode_identity"]
-            if (ident["suite"], ident["task_id"]) != key:
-                if env is not None:
-                    env.close()
-                env, prompt = make_env(suites[ident["suite"]]().get_task(ident["task_id"]))
-                key = (ident["suite"], ident["task_id"])
-            state = states[row["state_key"]]
-            if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
-                raise ValueError("state hash mismatch")
-            result = rollout(row, env, prompt, client, state)
-            expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
-            arrays = args.output / "arrays"
-            arrays.mkdir(exist_ok=True)
-            array_path = arrays / (path.stem + ".npy")
-            np.save(str(array_path), result["actions"])
-            journal.update(path, "completed", outcome=result["outcome"], queries=result["queries"],
-                           settled_state_sha256=result["settled_state_sha256"],
-                           settled_state_matches_block=expected == result["settled_state_sha256"],
-                           action_array=array_path.name, timing=result["timing"], memory=result["memory"], finished_unix=time.time())
-        except Exception as error:  # Retained as a record; never replaced.
-            journal.update(path, "failed", error=repr(error), finished_unix=time.time())
+    client, suites = connect(args.port), benchmark.get_benchmark_dict()
+    current = {"key": None, "env": None, "prompt": None}
+
+    def run_one(row, expected_settled):
+        ident = row["episode_identity"]
+        if (ident["suite"], ident["task_id"]) != current["key"]:
+            if current["env"] is not None:
+                current["env"].close()
+            current["env"], current["prompt"] = make_env(suites[ident["suite"]]().get_task(ident["task_id"]))
+            current["key"] = (ident["suite"], ident["task_id"])
+        state = states[row["state_key"]]
+        if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
+            raise ValueError("state hash mismatch")
+        result = rollout(row, current["env"], current["prompt"], client, state, expected_settled=expected_settled)
+        arrays = args.output / "arrays"
+        arrays.mkdir(exist_ok=True)
+        array_path = arrays / (row["planned_run_id"] + ".npy")
+        np.save(str(array_path), result["actions"])
+        return {"outcome": result["outcome"], "queries": result["queries"],
+                "settled_state_sha256": result["settled_state_sha256"], "action_array": array_path.name,
+                "timing": result["timing"], "memory": result["memory"]}
+
+    execute_schedule(rows, journal, run_provenance["sha256"], sys.argv, run_one)
+
+
+def conditions(args):
+    """Every condition once on one non-confirmation identity: valid actions and exact reset reuse."""
+    from libero.libero import benchmark
+    args.output.mkdir(parents=True, exist_ok=False)
+    suite = benchmark.get_benchmark_dict()["libero_spatial"]()
+    env, prompt = make_env(suite.get_task(0))
+    state = suite.get_task_init_states(0)[0]
+    client, results = connect(args.port), {}
+    for name, h, d in CONDITION_CHECK:
+        row = {"h": h, "d": d, "episode_identity": {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0",
+                                                    "policy_seed": CONDITION_CHECK_SEED}}
+        result = rollout(row, env, prompt, client, state)
+        results[name] = {"h": h, "d": d, "settled_state_sha256": result["settled_state_sha256"],
+                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"]}
+    env.close()
+    atomic_write_json(args.output / "conditions.json", dict(summarize_condition_check(results), results=results))
 
 
 def parity(args):
@@ -177,7 +194,8 @@ def parity(args):
     import numpy as np
     from libero.libero import benchmark
     args.output.mkdir(parents=True, exist_ok=False)
-    atomic_write_json(args.output / "provenance.json", provenance(args))
+    run_provenance = provenance(args)
+    atomic_write_json(args.output / "provenance.json", run_provenance)
     journal = AttemptJournal(args.output / "parity_attempts")
     videos = args.output / "videos"
     videos.mkdir()
@@ -192,7 +210,7 @@ def parity(args):
                 ident = {"suite": suite_name, "task_id": task_id, "state_slot": "official{}".format(episode), "policy_seed": PARITY_SEED}
                 row = {"planned_run_id": "parity.pi05.{}.task{:03d}.ep{}".format(suite_name, task_id, episode), "h": NATIVE_H, "d": NATIVE_D,
                        "episode_identity": ident, "condition_id": "NATIVE"}
-                path = journal.begin(row, sha({"preflight": str(args.output)}), sys.argv)
+                path = journal.begin(row, run_provenance["sha256"], sys.argv)
                 journal.update(path, "running")
                 try:
                     result = rollout(row, env, prompt, client, official[episode], record_video=True)
@@ -208,7 +226,7 @@ def parity(args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("attempts", "parity"))
+    parser.add_argument("mode", choices=("attempts", "parity", "conditions"))
     parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation", "observation_age"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
@@ -217,8 +235,8 @@ def main():
     args = parser.parse_args()
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     # The server owns the GPU. Its process is expected, so the guard cannot require an empty GPU here.
-    launch_guard.check(args.phase, processes=lambda: [])
-    (attempts if args.mode == "attempts" else parity)(args)
+    launch_guard.check(args.phase, processes=lambda: [], schedule=args.schedule)
+    {"attempts": attempts, "parity": parity, "conditions": conditions}[args.mode](args)
 
 
 if __name__ == "__main__":
