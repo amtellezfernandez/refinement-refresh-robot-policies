@@ -1,0 +1,16 @@
+installed 187 of 189
+FAILED_PACKAGES
+antlr4-python3-runtime==4.9.3;evdev==1.9.2;
+Using Python 3.11.16 environment at: /Users/warrensmith/alba-macprobe-20261102/venv
+     188
+f7b33973efa27b6c1e8559b995f43d1193eb9727a64b97ba5925cc81840709c6  /Use
+d1dfe0ee2ccc00f9b258db6ddac1feb827e37aad940a2488d0180e7212cd5fa2  /Use
+loaded 4.510447978973389
+{'norm_sha256': 'b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84', 'unnormalize_found': 1, 'use_quantiles': True, 'loaded_stats_equal_file': True}
+d 2 {'loop_calls': 2, 'shape': [10, 7], 'finite': True, 'wall_s': 21.40555691719055}
+d 5 {'loop_calls': 5, 'shape': [10, 7], 'finite': True, 'wall_s': 19.529365062713623}
+/Users/warrensmith/.local/share/uv/python/cpython-3.11.16-macos-aarch64-none/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects 
+  warnings.warn('resource_tracker: There appear to be %d '
+check_status 137
+47d5c7ed5776bfdff49c84c523b19d09ec84004dc35cb089cd3c2e49fdb39610  /Use
+CHECK_JOB_END
