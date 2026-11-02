@@ -1,5 +1,21 @@
 # Decision register, 2 November 2026
 
+**Alba's latest email, relayed by Warren on 2 November, overrides what follows where they differ.** Current position: `run001_cpu/PREFLIGHT_V2_STATUS.md`.
+
+| Item | Her email | Status |
+|---|---|---|
+| Invalid campaign | Exclusively the earlier pi0.5 campaign; official normalization could not be established and requested denoising steps were not reliably verified. "Exclude that campaign permanently" | RESOLVED |
+| SmolVLA | ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING; the pi0.5 failure does not by itself invalidate it; shared evaluator and journaling need independent validation | RESOLVED as a label; validation still owed |
+| Submitted PDF | Frozen; later work is post-submission | RESOLVED |
+| Stale result | Excluded unless original journals are recovered and audited | RESOLVED |
+| Preflight | 1 November stays PREFLIGHT_FAILED; new versioned protocol and run ID, run from the beginning | Protocol exists; run incomplete |
+| First confirmation | R22 vs R25 only, after a passed preflight. **"Total: 800 attempts across both models"** | **CONFLICT: her factors and PR #1 give 1,600. Reopened; frozen schedules unchanged** |
+| Asynchronous and others | Deferred | RESOLVED |
+| R9, R6, N1, R4 | **Not stated in her email** | OPEN, listed in the status document |
+| Push | Harness and specification to `warren/cross-policy-confirmation` | Warren's action |
+
+---
+
 Sources: Alba's PR #1 (`review/POST_SUBMISSION_CROSS_POLICY_REPAIRS_20261102.md`, commit `d8d9421`, her GitHub account), which is the text we hold in her own words; and her decisions as relayed by Warren. The relayed message itself was not found in Gmail, local Mail, local documents or other transcripts. **Where they differ, the PR overrides.**
 
 ## Current status

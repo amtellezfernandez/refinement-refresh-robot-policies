@@ -1,21 +1,28 @@
-Subject: Preflight v2: four questions
+Subject: Preflight v2 status: incomplete, with commit, manifest and checksums
 
 Hi Alba,
 
-Thanks for PR #1. It settles 800 attempts per model, 1,600 in total, fresh states, and the measurement gaps, so I won't ask about those. No confirmation or GPU work has started.
+Thanks for your email. The verdict is PREFLIGHT_INCOMPLETE, so this is not the clearance for confirmation. No confirmation attempt has run, and the 1 November run stays PREFLIGHT_FAILED.
 
-Your decisions, needed before preflight:
+Complete: checkpoint and dependency provenance for both models, the client environment check, and the pi0.5 normalization file hash.
 
-1. Parity: what must each model meet, and against which reference? No pi0.5 reference exists in the repository. Set it yourself, or I can draft it for your approval.
+Partial: pinned OpenPI on a dummy model ran 2, 5 and 10 loop calls at d=2, 5, 10; simulator-only reset repeatability on sampled tasks; reset-mismatch and release binding in tests only.
 
-2. Renderer: native Linux EGL, which needs another host, or OSMesa preregistered as a separate environment?
+Not run: loaded-policy normalization and d count with real weights, whose CPU job was terminated when the workstation's WSL failed; generated-state hashes, also terminated; and everything needing the GPU: parity, action units, first-action hashes, R22/R25/R52/R55 smoke, videos and timing.
 
-3. States: SmolVLA pins MuJoCo 3.8.1 and the pi0.5 client 3.2.3. One fresh set from the SmolVLA stack, one per model, or align versions?
+Your reasons for the pi0.5 invalidation, normalization and denoising, are therefore implemented as checks but not yet complete with real weights.
 
-4. Noise wrapper: does it count as the official pi0.5 path, or should I use the stock server, leaving noise unpaired?
+I need these from you before the GPU stage:
 
-Also, why was the earlier pi0.5 campaign invalid, and could that defect reach SmolVLA? The answer might add a preflight check.
+1. Your email says 800 attempts across both models, but its factors and PR #1 give 800 per model, 1,600 in total. Which is it? I have not changed the frozen schedules.
+2. What is the parity and action-unit acceptance criterion?
+3. EGL, or OSMesa preregistered as a separate environment?
+4. One state set from the SmolVLA stack, or one per model?
+5. Does the noise wrapper count as the official path?
 
-Engineering on my side is on branch reconcile/alba-pr1-20261102, for your review; your PR is untouched. It merges your PR with my later commits, restores the frozen script I wrongly patched in 31748c8, and changes one line in your client check, which raises TypeError because libero.__file__ is None. Still open: the denoising count is measured only on a dummy model so far (2, 5 and 10 loop calls), not with real weights.
+The GPU stage is roughly 6-26 hours of machine time, so it cannot finish in your two-hour window.
+
+Commit: COMMIT_PLACEHOLDER on warren/cross-policy-confirmation
+Status, manifest and checksums: review/preflight_v2/run001_cpu/
 
 Warren

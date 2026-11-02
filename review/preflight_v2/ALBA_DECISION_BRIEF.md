@@ -1,3 +1,5 @@
+**Superseded by `run001_cpu/PREFLIGHT_V2_STATUS.md` after Alba's latest email. Kept as a record.**
+
 # Decision brief for Alba: cross-policy preflight v2
 
 2 November 2026. Based on your PR #1. Time estimates are extrapolated from one easy task. No confirmation or GPU work has started; only CPU-only checks with no policy weights have run.
