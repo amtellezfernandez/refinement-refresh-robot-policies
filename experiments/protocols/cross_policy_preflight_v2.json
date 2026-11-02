@@ -2,10 +2,11 @@
   "checks": {
     "action_units_and_shapes": "Seven dimensions; per-dimension minimum and maximum recorded.",
     "checkpoint_provenance": "checkpoint_tree in provenance.json for SmolVLA and pi0.5.",
+    "client_environment": "Alba's check_openpi_client_environment.py with the actual client interpreter, before GPU work.",
     "condition_smoke": "NATIVE, R22, R25, R52, R55 once each on one non-confirmation identity (seeds 790011, 790012; state official0).",
     "dependency_provenance": "Installed package list in provenance.json for all three environments.",
     "generated_state_hashes": "200 serialized states with SHA-256 in state_manifest.json.",
-    "implementation_received_d": "SmolVLA denoise count equals generations x d. pi0.5 num_steps observed at the sampler call, and same noise gives different chunks across d=2, 5, 10.",
+    "implementation_received_d": "SmolVLA denoise count equals generations x d. pi0.5 num_steps observed at the sampler call, and same noise gives different chunks across d=2, 5, 10. The echo alone is not proof (Alba, PR #1); loop count measured separately on the pinned source with a dummy model (alba-v2-probe-7b).",
     "matched_reset_first_action_hashes": "Same reset, noise and d give identical first actions: R22 = R52, R25 = R55.",
     "native_parity": "Four suites, ten tasks, ten episodes per task, per model: 400 per model.",
     "official_normalization": "norm_stats.json hash, plus loaded Unnormalize statistics equal to the file and quantile mode on.",
@@ -15,8 +16,12 @@
     "timing": "100 warm-up + 100 measured calls per d; per-generation and per-rollout timing.",
     "video_inspection": "Every parity video readable, not blank, not frozen; contact sheet per task inspected by a person."
   },
-  "confirmation_it_gates": "matched_r22_r25_confirmation_v1",
+  "confirmation_it_gates": "Primary R22/R25 only, derived from cross_policy_confirmation_v1 by make_primary_schedule.py: 800 attempts per model, 1,600 in total.",
   "counted_run": "The first execution of run_preflight_v2.sh that passes its entry gates. A failure stays failed; a later attempt needs a new run ID and a recorded reason.",
+  "engineering_defaults": {
+    "N2": "Client uses OpenPI's own LIBERO tree (40 of 40 tasks identical, alba-v2-probe-6).",
+    "R12": "pi0.5 NATIVE h=5, d=10, chunk 10, from pinned source, unless Alba objects."
+  },
   "exclusions": [
     "The earlier invalid pi0.5 campaign of 160 attempts is permanently excluded and is never relabelled or reused.",
     "The stale-observation 20/40 versus 28/40 result and its contribution claim are excluded unless the original journals are recovered and audited.",
@@ -67,14 +72,16 @@
   "protocol_id": "cross_policy_preflight_v2",
   "run_id": "cross_policy_preflight_v2.run001",
   "schema_version": 1,
+  "settled": {
+    "R5": "Unavailable pi0.5 CUDA-event timing and XLA arithmetic are explicit measurement gaps (Alba, PR #1).",
+    "R7": "Freshly generated state slots (Alba, PR #1).",
+    "attempt_count": "800 per model, 1,600 in total (Alba, PR #1)."
+  },
   "status": "PLANNED_AWAITING_ALBA_DECISIONS_AND_RELEASE",
   "unresolved_decisions": {
     "N1": "MuJoCo 3.8.1 (SmolVLA) and 3.2.3 (pi0.5 client): one state set generated in the SmolVLA stack, or one per model?",
-    "N2": "Client reads BDDL and init files from the SmolVLA environment, and assets from a tree containing every OpenPI asset byte-identical plus others. Acceptable as official?",
-    "R12": "pi0.5 NATIVE h=5, d=10, chunk 10, read from source.",
     "R4": "Does the server wrapper setting num_steps and noise count as the official path?",
     "R6": "OSMesa with disclosure, or native Linux with EGL. The harness implements OSMesa only.",
-    "R7": "Newly generated states, or unused official IDs. The required check names generated-state hashes; explicit confirmation needed.",
     "R9": "Native-parity pass criterion and action-unit acceptance, set before parity data exists."
   },
   "verdict_rule": {

@@ -40,9 +40,10 @@ def coverage(schedule_rows, records):
             extra.append(run_id)
         for attempt in attempts:
             counts[attempt["status"]] += 1
-            if attempt["status"] != "completed":
+            if attempt["status"] != "completed" or attempt.get("settled_state_matches_block") is not True:
+                status = attempt["status"] if attempt["status"] != "completed" else "reset_state_not_verified"
                 not_completed.append({"planned_run_id": run_id, "attempt": attempt["attempt_number"],
-                                      "status": attempt["status"]})
+                                      "status": status})
     return {"planned": len(planned), "records": len(records), "status_counts": dict(counts),
             "missing": missing, "identities_with_multiple_attempts": extra, "not_completed": not_completed}
 
@@ -56,7 +57,8 @@ def success_table(schedule_rows, records, condition):
             continue
         ident = row["episode_identity"]
         attempts = by_plan.get(run_id, [])
-        if len(attempts) != 1 or attempts[0]["status"] != "completed":
+        if (len(attempts) != 1 or attempts[0]["status"] != "completed"
+                or attempts[0].get("settled_state_matches_block") is not True):
             blocked.append(run_id)
             continue
         table[(ident["suite"], ident["task_id"], ident["state_slot"])][ident["policy_seed"]] = \
@@ -113,6 +115,14 @@ def reset_state_failures(schedule_rows, records):
 
 
 def contrast(schedule_rows, records, a, b):
+    planned_a = {row["block_id"] for row in schedule_rows if row["condition_id"] == a}
+    planned_b = {row["block_id"] for row in schedule_rows if row["condition_id"] == b}
+    if not planned_a or not planned_b:
+        return {"contrast": "{} minus {}".format(a, b), "status": "not_planned",
+                "missing_conditions": [c for c, blocks in ((a, planned_a), (b, planned_b)) if not blocks]}
+    if planned_a != planned_b:
+        return {"contrast": "{} minus {}".format(a, b), "status": "incomplete",
+                "reason": "unmatched_identity_blocks"}
     table_a, blocked_a = success_table(schedule_rows, records, a)
     table_b, blocked_b = success_table(schedule_rows, records, b)
     blocked = blocked_a + blocked_b
@@ -133,8 +143,6 @@ def contrast(schedule_rows, records, a, b):
 
 
 def quality_decision(secondary):
-    if secondary["status"] == "not_in_this_design":
-        return {"decision": "not_in_this_design"}
     if secondary["status"] != "complete":
         return {"decision": "test_incomplete"}
     bound = secondary["lower_bound_one_sided_95"]
@@ -189,10 +197,7 @@ ARITHMETIC_STATUS = ("NOT_IMPLEMENTED: arithmetic per chunk, control step and at
 
 def analyze_model(schedule_rows, records):
     primary = contrast(schedule_rows, records, "R22", "R25")
-    if "R52" in {row["condition_id"] for row in schedule_rows}:
-        secondary = contrast(schedule_rows, records, "R52", "R22")
-    else:  # Alba's matched design has R22 and R25 only; R52 is deferred.
-        secondary = {"contrast": "R52 minus R22", "status": "not_in_this_design"}
+    secondary = contrast(schedule_rows, records, "R52", "R22")
     return {"coverage": coverage(schedule_rows, records), "conditions": condition_summary(schedule_rows, records),
             "timing": timing_summary(schedule_rows, records), "arithmetic": ARITHMETIC_STATUS,
             "reset_state_failures": sorted(reset_state_failures(schedule_rows, records)),

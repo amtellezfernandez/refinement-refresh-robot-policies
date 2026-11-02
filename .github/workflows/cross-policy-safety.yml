@@ -1,0 +1,33 @@
+name: Cross-policy safety checks
+
+on:
+  push:
+    branches:
+      - audit/preflight-schedule-reset-20261102
+  pull_request:
+    branches:
+      - warren/cross-policy-confirmation
+    paths:
+      - 'experiments/tooling/cross_policy/**'
+      - '.github/workflows/cross-policy-safety.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install only offline-test dependencies
+        run: python -m pip install --disable-pip-version-check numpy==1.26.4
+      - name: Compile cross-policy tooling
+        run: python -m compileall -q experiments/tooling/cross_policy
+      - name: Test journaling, pairing, release binding and analysis
+        run: python -m unittest discover -s experiments/tooling/cross_policy -p 'test_*.py' -v
+      - name: Verify frozen protocol and full schedule generation
+        run: python experiments/tooling/cross_policy/build_protocols.py --check

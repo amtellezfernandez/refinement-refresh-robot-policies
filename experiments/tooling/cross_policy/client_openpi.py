@@ -22,7 +22,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import launch_guard  # noqa: E402
-from attempt_loop import ResetStateMismatch, check_settled, execute_schedule, summarize_condition_check  # noqa: E402
+from attempt_loop import ResetStateMismatch, check_reset, execute_schedule, summarize_condition_check  # noqa: E402
 from common import SUITES, TASK_IDS, atomic_write_json, sha  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
@@ -74,7 +74,7 @@ def input_hash(element):
     return sha({k: digest(v) if k != "prompt" else v for k, v in element.items()})
 
 
-def rollout(row, env, prompt, client, state, record_video=False, expected_settled=None):
+def rollout(row, env, prompt, client, state, record_video=False, expected_reset=None):
     import numpy as np
     ident, h, d = row["episode_identity"], row["h"], row["d"]
     refresh = row.get("refresh_every_queries", 1)
@@ -83,7 +83,8 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
     for _ in range(WAIT_STEPS):
         obs, _, _, _ = env.step(DUMMY_ACTION)
     settled = digest(np.asarray(env.sim.get_state().flatten()))
-    check_settled(settled, expected_settled)  # Before any policy query.
+    first_observation = input_hash(policy_input(obs, prompt))
+    check_reset((settled, first_observation), expected_reset)  # Before any policy query.
     plan = collections.deque()
     actions, queries, frames, server_timing, memory, done = [], [], [], [], None, False
     supplied, supplied_tick, chunk_record = None, 0, None
@@ -99,6 +100,8 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
             request = dict(supplied, __d__=d, __noise_key__=json.dumps([ident, tick]))
             begin = time.perf_counter()
             response = client.infer(request)
+            if response.get("server_configured_num_steps") != d:
+                raise ValueError("unsupported_refinement_setting: server did not attest configured d={}".format(d))
             chunk = np.asarray(response["actions"])
             if chunk.ndim != 2 or chunk.shape[1] != 7 or not np.isfinite(chunk).all() or len(chunk) < h:
                 raise ValueError("unsupported_refinement_setting: chunk {} finite={}".format(chunk.shape, bool(np.isfinite(chunk).all())))
@@ -106,7 +109,8 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
                 raise ValueError("unsupported_refinement_setting: asked d={}, sampler received {}".format(d, response["received_num_steps"]))
             chunk_record = {"shape": list(chunk.shape), "sha256": digest(chunk), "received_num_steps": response["received_num_steps"]}
             server_timing.append({"tick": tick, "client_round_trip_s": time.perf_counter() - begin,
-                                  "host_generation_s": response["host_generation_s"], "memory": response["memory"]})
+                                  "host_generation_s": response["host_generation_s"], "memory": response["memory"],
+                                  "server_configured_num_steps": response["server_configured_num_steps"]})
             memory = response["memory"]
             plan.extend(chunk[:h])
         action = plan.popleft()
@@ -122,7 +126,7 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
             break
     return {"outcome": {"success": bool(done), "episode_length": len(actions),
                         "termination_reason": "success" if done else "task_horizon"},
-            "settled_state_sha256": settled, "queries": queries, "actions": np.asarray(actions), "frames": frames,
+            "settled_state_sha256": settled, "first_observation_sha256": first_observation, "queries": queries, "actions": np.asarray(actions), "frames": frames,
             "timing": {"rollout_wall_s": time.perf_counter() - started, "generation": server_timing},
             "memory": memory}
 
@@ -150,7 +154,7 @@ def attempts(args):
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
     client, suites = connect(args.port), benchmark.get_benchmark_dict()
 
-    def run_one(row, expected_settled):
+    def run_one(row, expected_reset):
         ident = row["episode_identity"]
         state = states[row["state_key"]]
         if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
@@ -159,7 +163,7 @@ def attempts(args):
         # depending on what ran before (probe alba-v2-probe-4); a fresh one repeats exactly.
         env, prompt = make_env(suites[ident["suite"]]().get_task(ident["task_id"]))
         try:
-            result = rollout(row, env, prompt, client, state, expected_settled=expected_settled)
+            result = rollout(row, env, prompt, client, state, expected_reset=expected_reset)
         finally:
             env.close()
         arrays = args.output / "arrays"
@@ -167,7 +171,8 @@ def attempts(args):
         array_path = arrays / (row["planned_run_id"] + ".npy")
         np.save(str(array_path), result["actions"])
         return {"outcome": result["outcome"], "queries": result["queries"],
-                "settled_state_sha256": result["settled_state_sha256"], "action_array": array_path.name,
+                "settled_state_sha256": result["settled_state_sha256"],
+                "first_observation_sha256": result["first_observation_sha256"], "action_array": array_path.name,
                 "timing": result["timing"], "memory": result["memory"]}
 
     execute_schedule(rows, journal, run_provenance["sha256"], sys.argv, run_one)
@@ -195,7 +200,7 @@ def conditions(args):
     env, prompt = make_env(suite.get_task(0))
     refused = False
     try:  # Negative control on the real simulator: a wrong reference must stop before any policy query.
-        rollout({"h": 2, "d": 2, "episode_identity": identity_row}, env, prompt, client, state, expected_settled="negative-control")
+        rollout({"h": 2, "d": 2, "episode_identity": identity_row}, env, prompt, client, state, expected_reset=("negative-control", "negative-control"))
     except ResetStateMismatch:
         refused = True
     env.close()
@@ -243,7 +248,7 @@ def parity(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("attempts", "parity", "conditions"))
-    parser.add_argument("--phase", default="preflight", choices=("preflight", "matched_r22_r25"))
+    parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
     parser.add_argument("--output", type=Path, required=True)
@@ -251,7 +256,9 @@ def main():
     args = parser.parse_args()
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     # The server owns the GPU. Its process is expected, so the guard cannot require an empty GPU here.
-    launch_guard.check(args.phase, processes=lambda: [], schedule=args.schedule)
+    launch_guard.check(args.phase, processes=lambda: [],
+                       schedule_path=args.schedule if args.mode == "attempts" else None,
+                       model="pi05" if args.mode == "attempts" else None)
     {"attempts": attempts, "parity": parity, "conditions": conditions}[args.mode](args)
 
 

@@ -46,7 +46,9 @@ class KeyedPolicy:
         self._policy = policy
         self.metadata = policy.metadata
         self._received = None
-        sampler = policy._sample_actions
+        sampler = getattr(policy, "_sample_actions", None)
+        if sampler is None:  # A policy without this hook attests nothing; the client then refuses it.
+            return
 
         def recording_sampler(rng, observation, **kwargs):
             # What actually reaches model.sample_actions, as distinct from what was asked for.
@@ -60,12 +62,16 @@ class KeyedPolicy:
         if d not in ALLOWED_D:
             raise ValueError("unsupported_refinement_setting: d={}".format(d))
         self._policy._sample_kwargs = {"num_steps": d}
+        # The echo is necessary but not sufficient: it shows the setting, not the JAX loop count.
+        if self._policy._sample_kwargs.get("num_steps") != d:
+            raise ValueError("unsupported_refinement_setting: num_steps not applied")
         self._received = None
         started = time.perf_counter()
         result = self._policy.infer(obs, noise=noise_for(key))
         result["host_generation_s"] = time.perf_counter() - started
         result["memory"] = memory_stats()
         result["received_num_steps"] = self._received
+        result["server_configured_num_steps"] = d
         return result
 
     def reset(self):
@@ -158,12 +164,14 @@ def serve(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("serve", "profile"))
-    parser.add_argument("--phase", default="preflight", choices=("preflight",))  # The client enforces the release.
+    parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation", "observation_age"))
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--schedule", type=Path, help="Required for a released rollout server")
     args = parser.parse_args()
-    launch_guard.check(args.phase)
+    launch_guard.check(args.phase, schedule_path=args.schedule if args.phase != "preflight" else None,
+                       model="pi05" if args.phase != "preflight" else None)
     if args.mode == "profile":
         profile(args)
     else:

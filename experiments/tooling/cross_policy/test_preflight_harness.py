@@ -46,7 +46,7 @@ def fake_workspace(root):
     listener = ("import socket,time;s=socket.socket();s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);"
                 "s.bind(('127.0.0.1',8000));s.listen(8);time.sleep(60)")
     write_exe(workspace / "envs/openpi/bin/python",
-              '#!/bin/bash\ncase "$*" in\n*"server_openpi.py" *serve*) exec "{}" -c "{}";;\n'
+              '#!/bin/bash\ncase "$*" in\n*server_openpi.py*serve*) exec "{}" -c "{}";;\n'
               '*) while [ $# -gt 0 ]; do [ "$1" = --output ] && mkdir -p "$2"; shift; done;;\nesac\n'.format(sys.executable, listener))
     # The client environment has no libero of its own, exactly like envs/client on the RTX.
     write_exe(workspace / "envs/client/bin/python", '#!/bin/sh\nexec "{}" "$@"\n'.format(sys.executable))
@@ -89,6 +89,7 @@ class Scripts(unittest.TestCase):
         # Identity, not silence: the import resolves to the workspace's OpenPI tree.
         self.assertIn(SENTINEL, done.stdout, done.stdout)
         self.assertIn(str(inner / "benchmark.py"), done.stdout)
+        self.assertIn("client-libero-config", done.stdout)  # N2: OpenPI's own tree, not the SmolVLA environment's.
 
 
 class FrozenIdentity(unittest.TestCase):

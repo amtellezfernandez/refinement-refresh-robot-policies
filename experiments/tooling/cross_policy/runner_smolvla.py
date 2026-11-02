@@ -15,12 +15,13 @@ import os
 import sys
 import threading
 import time
+from contextlib import nullcontext
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent)]
 import launch_guard  # noqa: E402
-from attempt_loop import ResetStateMismatch, check_settled, execute_schedule, summarize_condition_check  # noqa: E402
+from attempt_loop import ResetStateMismatch, check_reset, execute_schedule, summarize_condition_check  # noqa: E402
 from common import SUITES, TASK_IDS, atomic_write_json  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
@@ -56,7 +57,7 @@ class ChunkTap:
         self.policy._get_action_chunk = self.original
 
 
-def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_settled=None):
+def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_reset=None):
     """One episode. Writes nothing itself; returns arrays and per-query records."""
     import numpy as np
     import run_paired as rp
@@ -78,8 +79,8 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     rp.seed_environment(environment_seed)
     observation, _ = env.reset(seed=[environment_seed], options={NEW_ROLLOUT_OPTION: True})
     settled = rp.array_record(base._env.sim.get_state().flatten())["sha256"]
-    check_settled(settled, expected_settled)  # Before any policy query.
     first_observation = rp.observation_sha(observation)
+    check_reset((settled, first_observation), expected_reset)  # Before any policy query.
     counters = rp.Counters(policy)  # Generation host and CUDA intervals, as in the historical runner.
     tap = rp_tap = ChunkTap(policy)
     torch.cuda.synchronize()
@@ -89,7 +90,7 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     supplied, supplied_tick = None, 0
     started = time.perf_counter()
     try:
-        with torch.inference_mode():
+        with torch.inference_mode(), (torch.autocast(device_type="cuda") if policy.config.use_amp else nullcontext()):
             for tick in range(int(base._max_episode_steps)):
                 refreshed = tick % refresh == 0
                 if refreshed:
@@ -164,12 +165,16 @@ def attempts(args):
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     import torch
     torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    rp.seed_environment(0)
     policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
     run_provenance = provenance(args)
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
     current = {"key": None, "env": None, "env_pre": None, "env_post": None, "samples": []}
 
-    def run_one(row, expected_settled):
+    def run_one(row, expected_reset):
         stop, samples = threading.Event(), []
         current["samples"] = samples
         sampler = threading.Thread(target=gpu_sampler, args=(stop, samples), daemon=True)
@@ -185,7 +190,7 @@ def attempts(args):
             state = states[row["state_key"]]
             rp.require(hashlib.sha256(state.tobytes()).hexdigest() == row["state_sha256"], "state hash mismatch")
             result = rollout(row, current["env"], policy, pre, post, current["env_pre"], current["env_post"], state,
-                             expected_settled=expected_settled)
+                             expected_reset=expected_reset)
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
             array_path = arrays / (row["planned_run_id"] + ".npy")
@@ -211,6 +216,10 @@ def conditions(args):
     args.output.mkdir(parents=True, exist_ok=False)
     import torch
     torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    rp.seed_environment(0)
     policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
     env, env_pre, env_post = make_task_env("libero_spatial", 0, policy)
     state = np.array(env.envs[0].unwrapped._init_states)[0]
@@ -227,7 +236,7 @@ def conditions(args):
     refused = False
     try:  # Negative control on the real simulator: a wrong reference must stop before any policy query.
         rollout({"h": 2, "d": 2, "episode_identity": identity_row}, env, policy, pre, post, env_pre, env_post, state,
-                expected_settled="negative-control")
+                expected_reset=("negative-control", "negative-control"))
     except ResetStateMismatch:
         refused = True
     env.close()
@@ -242,7 +251,12 @@ def preflight(args):
     import torch
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
-    torch.use_deterministic_algorithms(True)  # Same setting as attempts, so parity tests the same stack.
+    # Same settings as attempts, so parity tests the same stack.
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    rp.seed_environment(0)
     args.output.mkdir(parents=True, exist_ok=False)
     policy, pre, post, native = rp.load_policy_and_processors(args.checkpoint)
     run_provenance_record = provenance(args)
@@ -306,15 +320,16 @@ def preflight(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("preflight", "attempts", "conditions"))
-    parser.add_argument("--phase", default="preflight", choices=("preflight", "matched_r22_r25"))
+    parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.mode == "attempts" and args.phase == "preflight":
-        raise SystemExit("attempts need --phase matched_r22_r25")
-    launch_guard.check(args.phase, schedule=args.schedule)
+        raise SystemExit("attempts need --phase confirmation")
+    launch_guard.check(args.phase, schedule_path=args.schedule if args.mode == "attempts" else None,
+                       model="smolvla" if args.mode == "attempts" else None)
     {"preflight": preflight, "attempts": attempts, "conditions": conditions}[args.mode](args)
 
 

@@ -28,7 +28,8 @@ def rows_for(model="smolvla"):
 def complete_records(rows, seed=1):
     rng = random.Random(seed)
     return [{"planned_run_id": r["planned_run_id"], "attempt_number": 0, "status": "completed", "schedule_row": r,
-             "settled_state_sha256": "settled-" + r["block_id"], "outcome": {"success": rng.random() < .7}} for r in rows]
+             "settled_state_sha256": "settled-" + r["block_id"], "settled_state_matches_block": True,
+             "outcome": {"success": rng.random() < .7}} for r in rows]
 
 
 class ResetStateInAnalysis(unittest.TestCase):
@@ -72,39 +73,6 @@ class ReportedOutputs(unittest.TestCase):
         self.assertIn("R13", analyze.analyze_model(rows, complete_records(rows))["arithmetic"])
 
 
-class ScheduleBoundToRelease(unittest.TestCase):
-    def setUp(self):
-        temporary = tempfile.TemporaryDirectory()
-        self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name)
-        (self.root / "experiments/protocols").mkdir(parents=True)
-        self.name = "matched_r22_r25_confirmation_v1"
-        self.protocol = self.root / "experiments/protocols" / (self.name + ".json")
-        self.protocol.write_text(json.dumps({"status": "PREPARED"}))
-        self.schedule = self.root / "schedule.json"
-        self.schedule.write_text('{"schedule": [1]}')
-        (self.root / "review/releases").mkdir(parents=True)
-        (self.root / "review/releases" / (self.name + ".release.json")).write_text(json.dumps({
-            "approved_by": "Alba", "protocol_sha256": file_sha(self.protocol),
-            "schedule_sha256s": [file_sha(self.schedule)]}))
-
-    def check(self, **kwargs):
-        return launch_guard.check("matched_r22_r25", root=self.root, environ={"ALBA_GPU_RESERVATION": "R1"},
-                                  processes=lambda: [], **kwargs)
-
-    def test_released_schedule_allowed(self):
-        self.assertEqual(self.check(schedule=self.schedule)["phase"], "matched_r22_r25")
-
-    def test_schedule_changed_after_release_refused(self):
-        self.schedule.write_text('{"schedule": [2]}')
-        with self.assertRaises(launch_guard.LaunchRefused):
-            self.check(schedule=self.schedule)
-
-    def test_rollout_without_a_schedule_refused(self):
-        with self.assertRaises(launch_guard.LaunchRefused):
-            self.check()
-
-
 class RunnerStopsAndEnforces(unittest.TestCase):
     """Drives the real client_openpi.attempts with the simulator and policy replaced."""
     def setUp(self):
@@ -141,11 +109,11 @@ class RunnerStopsAndEnforces(unittest.TestCase):
     def fake_rollout(self, settled_by_call):
         import numpy as np
         calls = iter(settled_by_call)
-        def rollout(row, env, prompt, client, state, record_video=False, expected_settled=None):
+        def rollout(row, env, prompt, client, state, record_video=False, expected_reset=None):
             settled = next(calls)
-            from attempt_loop import check_settled
-            check_settled(settled, expected_settled)
-            return {"outcome": {"success": True}, "settled_state_sha256": settled, "queries": [],
+            from attempt_loop import check_reset
+            check_reset((settled, "observation"), expected_reset)
+            return {"outcome": {"success": True}, "settled_state_sha256": settled, "first_observation_sha256": "observation", "queries": [],
                     "actions": np.zeros((1, 7)), "timing": {}, "memory": None}
         return rollout
 
@@ -180,8 +148,10 @@ class RunnerStopsAndEnforces(unittest.TestCase):
         env, policy_client = mock.Mock(), mock.Mock()
         env.step.return_value = ({}, 0, False, {})
         env.sim.get_state.return_value.flatten.return_value = np.zeros(4)
-        with self.assertRaises(ResetStateMismatch):
-            self.client.rollout(self.rows[0], env, "prompt", policy_client, np.zeros(4), expected_settled="other")
+        with mock.patch.object(self.client, "policy_input", lambda o, p: {"prompt": p}):
+            for expected in (("other", "x"), (self.client.digest(np.zeros(4)), "other-observation")):
+                with self.assertRaises(ResetStateMismatch):
+                    self.client.rollout(self.rows[0], env, "prompt", policy_client, np.zeros(4), expected_reset=expected)
         policy_client.infer.assert_not_called()
 
 

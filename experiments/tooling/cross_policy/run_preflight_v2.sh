@@ -16,6 +16,8 @@ GUARD_PYTHON=${PYTHON_FOR_GUARD:-$W/envs/tools/bin/python}
 : "${ALBA_GPU_RESERVATION:?G0 REFUSED: no reservation}"
 "$GUARD_PYTHON" "$TOOLS/launch_guard.py" preflight_v2 || { echo "G0 REFUSED: see above"; exit 6; }
 [ ! -e "$OUT" ] || { echo "REFUSED: $OUT exists; a counted run is never overwritten"; exit 2; }
+LIBERO_SOURCE="$W/src/openpi/third_party/libero"
+LIBERO_TREE="$LIBERO_SOURCE/libero/libero"
 
 export MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa LIBERO_CONFIG_PATH="$W/libero-config"
 export LD_LIBRARY_PATH="$W/syslibs/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
@@ -29,7 +31,18 @@ if [ "$used" -ge 3072 ]; then
   echo "G1 REFUSED: ${used} MiB already in use"
   exit 4
 fi
-mkdir -p "$OUT"
+mkdir -p "$OUT/client-libero-config"
+# The client reads tasks, init states and assets from OpenPI's own tree (alba-v2-probe-6).
+cat > "$OUT/client-libero-config/config.yaml" <<EOF
+assets: $LIBERO_TREE/assets
+bddl_files: $LIBERO_TREE/bddl_files
+benchmark_root: $LIBERO_TREE
+datasets: $LIBERO_TREE/../datasets
+init_states: $LIBERO_TREE/init_files
+EOF
+# Alba's pre-GPU check, with the actual client interpreter, before any budget is spent.
+PYTHONPATH="$LIBERO_SOURCE" LIBERO_CONFIG_PATH="$OUT/client-libero-config" \
+  "$W/envs/client/bin/python" "$TOOLS/check_openpi_client_environment.py" --expected-libero-root "$LIBERO_SOURCE" > "$OUT/client_environment.json"
 cat > "$OUT/start.json" <<EOF
 {"run_id": "$RUN_ID", "reservation": "$ALBA_GPU_RESERVATION",
  "commit": "$(cat "$REPO/BUNDLE_COMMIT" 2>/dev/null || git -C "$REPO" rev-parse HEAD)",
@@ -39,7 +52,7 @@ cat > "$OUT/start.json" <<EOF
 EOF
 
 # CPU. Identity is the saved state and its hash: the generator's seed does not reproduce every state.
-"$W/envs/smolvla/bin/python" "$TOOLS/generate_states.py" --cohort matched_r22_r25_confirmation_v1 --output "$OUT/states"
+"$W/envs/smolvla/bin/python" "$TOOLS/generate_states.py" --cohort cross_policy_confirmation_v1 --output "$OUT/states"
 
 "$W/envs/smolvla/bin/python" "$TOOLS/runner_smolvla.py" conditions --checkpoint "$W/ckpt/smolvla_libero" --output "$OUT/smolvla_conditions"
 "$W/envs/smolvla/bin/python" "$TOOLS/runner_smolvla.py" preflight --checkpoint "$W/ckpt/smolvla_libero" --output "$OUT/smolvla"
@@ -55,10 +68,11 @@ for _ in $(seq 1 120); do
   sleep 5
 done
 # envs/client does not install LIBERO; OpenPI's example takes it from this submodule.
-export PYTHONPATH="$W/src/openpi/third_party/libero"
+export PYTHONPATH="$LIBERO_SOURCE" LIBERO_CONFIG_PATH="$OUT/client-libero-config"
 "$W/envs/client/bin/python" "$TOOLS/client_openpi.py" conditions --output "$OUT/pi05_conditions" --port 8000
 "$W/envs/client/bin/python" "$TOOLS/client_openpi.py" parity --output "$OUT/pi05_parity" --port 8000
 unset PYTHONPATH
+export LIBERO_CONFIG_PATH="$W/libero-config"
 kill "$SERVER" 2>/dev/null || true
 
 "$W/envs/smolvla/bin/python" "$TOOLS/inspect_videos.py" "$OUT/smolvla/videos"

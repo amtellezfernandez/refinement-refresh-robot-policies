@@ -17,55 +17,29 @@ import attempt_loop  # noqa: E402
 import build_protocols as bp  # noqa: E402
 import launch_guard  # noqa: E402
 import preflight_verdict as pv  # noqa: E402
-from common import file_sha  # noqa: E402
+from common import CONFIRMATION_SEEDS, STATE_SLOTS, SUITES, TASK_IDS, file_sha  # noqa: E402
 
-MATCHED = "matched_r22_r25_confirmation_v1"
 PREFLIGHT = "cross_policy_preflight_v2"
 ENV = {"ALBA_GPU_RESERVATION": "R1"}
 
 
-class MatchedDesign(unittest.TestCase):
-    def test_schedules_follow_the_stated_factors(self):
+class AttemptAccounting(unittest.TestCase):
+    def test_alba_primary_design_is_800_per_model_and_1600_in_total(self):
+        import make_primary_schedule as mp
+        states = {"{}.task{:03d}.slot{}".format(s, t, k): {"state_sha256": "h"} for s in SUITES for t in TASK_IDS for k in STATE_SLOTS}
         total = 0
         for model in ("smolvla", "pi05"):
-            document = json.loads((bp.RUNS / MATCHED / model / "schedule.json").read_text())
-            rows = document["schedule"]
-            total += len(rows)
-            self.assertEqual(len(rows), 800)
-            self.assertEqual({r["condition_id"] for r in rows}, {"R22", "R25"})
-            self.assertEqual({(r["condition_id"], r["h"], r["d"]) for r in rows}, {("R22", 2, 2), ("R25", 2, 5)})
-            self.assertEqual({r["episode_identity"]["suite"] for r in rows},
-                             {"libero_spatial", "libero_object", "libero_goal", "libero_10"})
-            self.assertEqual(len({r["episode_identity"]["task_id"] for r in rows}), 10)
-            self.assertEqual(len({r["episode_identity"]["state_slot"] for r in rows}), 5)
-            self.assertEqual(len({r["episode_identity"]["policy_seed"] for r in rows}), 2)
-            self.assertEqual(len({r["block_id"] for r in rows}), 400)
-        # 2 x 4 x 10 x 5 x 2 x 2. Alba's decision also says 800 total, so the protocol is blocked until she rules.
+            conditions = [dict(c, h=bp.resolve(c, model)[0], d=bp.resolve(c, model)[1]) for c in bp.CONDITIONS]
+            rows = bp.make_schedule(bp.CONFIRMATION, model, CONFIRMATION_SEEDS, conditions, states)
+            primary = mp.derive(bp.schedule_document(bp.CONFIRMATION, model, rows, {"states_sha256": "m"}))
+            self.assertEqual((primary["attempt_count"], primary["identity_count"]), (800, 400))
+            self.assertEqual({r["condition_id"] for r in primary["schedule"]}, {"R22", "R25"})
+            total += primary["attempt_count"]
         self.assertEqual(total, 1600)
 
-    def test_count_conflict_blocks_launch_even_with_a_release(self):
-        protocol = bp.PROTOCOLS / (MATCHED + ".json")
-        self.assertTrue(json.loads(protocol.read_text())["status"].startswith("BLOCKED"))
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "experiments/protocols").mkdir(parents=True)
-            (root / "review/releases").mkdir(parents=True)
-            copy = root / "experiments/protocols" / (MATCHED + ".json")
-            copy.write_text(protocol.read_text())
-            schedule = root / "s.json"
-            schedule.write_text("{}")
-            (root / "review/releases" / (MATCHED + ".release.json")).write_text(json.dumps(
-                {"approved_by": "Alba", "protocol_sha256": file_sha(copy), "schedule_sha256s": [file_sha(schedule)]}))
-            with self.assertRaises(launch_guard.LaunchRefused):
-                launch_guard.check("matched_r22_r25", root=root, environ=ENV, processes=lambda: [], schedule=schedule)
-
-    def test_protocol_records_every_decision_that_was_written_down(self):
-        protocol = json.loads((bp.PROTOCOLS / (MATCHED + ".json")).read_text())
-        self.assertFalse(protocol["launch_permitted"])
-        self.assertEqual(protocol["expected_attempts"], {"per_model_from_factors": 800, "total_from_factors": 1600, "total_stated_by_alba": 800})
-        text = json.dumps(protocol).lower()
-        for needle in ("160", "20/40", "append-only", "instrument validity pending"):
-            self.assertIn(needle, text)
+    def test_no_separate_cohort_competes_with_alba_design(self):
+        self.assertFalse((bp.PROTOCOLS / "matched_r22_r25_confirmation_v1.json").exists())
+        self.assertFalse((bp.RUNS / "matched_r22_r25_confirmation_v1").exists())
 
     def test_committed_files_match_the_builder(self):
         for path, text in bp.outputs().items():
@@ -76,6 +50,7 @@ class MatchedDesign(unittest.TestCase):
         self.assertEqual(protocol["run_id"], "cross_policy_preflight_v2.run001")
         self.assertIn("PREFLIGHT_FAILED", json.dumps(protocol["prior_preflight"]))
         self.assertEqual(set(protocol["unresolved_decisions"]), set(launch_guard.REQUIRED_PREFLIGHT_DECISIONS))
+        self.assertEqual(set(launch_guard.REQUIRED_PREFLIGHT_DECISIONS), {"R4", "R6", "R9", "N1"})
 
 
 class Guard(unittest.TestCase):
@@ -90,14 +65,12 @@ class Guard(unittest.TestCase):
         return root, path
 
     def test_deferred_cohorts_are_refused_even_with_a_release(self):
-        for phase, name in (("confirmation", "cross_policy_confirmation_v1"), ("observation_age", "observation_age_confirmation_v1")):
+        for phase, name in (("observation_age", "observation_age_confirmation_v1"), ("asynchronous", "asynchronous_confirmation_v1")):
             root, path = self.root_with(name)
-            schedule = root / "s.json"
-            schedule.write_text("{}")
             (root / "review/releases" / (name + ".release.json")).write_text(json.dumps(
-                {"approved_by": "Alba", "protocol_sha256": file_sha(path), "schedule_sha256s": [file_sha(schedule)]}))
+                {"approved_by": "Alba", "protocol_sha256": file_sha(path)}))
             with self.assertRaises(launch_guard.LaunchRefused):
-                launch_guard.check(phase, root=root, environ=ENV, processes=lambda: [], schedule=schedule)
+                launch_guard.check(phase, root=root, environ=ENV, processes=lambda: [], schedule_path=root / "s.json", model="smolvla")
 
     def preflight(self, root, **release):
         (root / "review/releases" / (PREFLIGHT + ".release.json")).write_text(json.dumps(release))
@@ -189,12 +162,13 @@ class Receipt(unittest.TestCase):
         import numpy as np
         import client_openpi
         client, env = mock.Mock(), mock.Mock()
-        client.infer.return_value = {"actions": np.zeros((10, 7)), "host_generation_s": 0.0, "memory": {}, "received_num_steps": 10}
+        client.infer.return_value = {"actions": np.zeros((10, 7)), "host_generation_s": 0.0, "memory": {}, "received_num_steps": 10,
+                                     "server_configured_num_steps": 2}
         env.step.return_value = ({}, 0, False, {})
         env.sim.get_state.return_value.flatten.return_value = np.zeros(4)
         row = {"episode_identity": {"suite": "libero_goal"}, "h": 2, "d": 2}
         with mock.patch.object(client_openpi, "policy_input", lambda o, p: {"prompt": p, "observation/image": np.zeros((2, 2))}):
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, "sampler received 10"):
                 client_openpi.rollout(row, env, "p", client, np.zeros(4))
 
 
@@ -255,8 +229,8 @@ class FreshEnvironmentPerAttempt(unittest.TestCase):
                 env.close.side_effect = lambda: closed.append(1)
                 built.append(env)
                 return env, "p"
-            def rollout(row, env, prompt, client, state, record_video=False, expected_settled=None):
-                return {"outcome": {"success": True}, "settled_state_sha256": "s", "queries": [], "actions": np.zeros((1, 7)), "timing": {}, "memory": None}
+            def rollout(row, env, prompt, client, state, record_video=False, expected_reset=None):
+                return {"outcome": {"success": True}, "settled_state_sha256": "s", "first_observation_sha256": "o", "queries": [], "actions": np.zeros((1, 7)), "timing": {}, "memory": None}
             with mock.patch.dict(sys.modules, {"libero": types.ModuleType("libero"), "libero.libero": inner}), \
                     mock.patch.object(client_openpi, "provenance", lambda a: {"sha256": "0" * 64}), \
                     mock.patch.object(client_openpi, "connect", lambda p: object()), \
@@ -307,7 +281,7 @@ class SurvivingMutants(unittest.TestCase):
         self.assertEqual(attempt_loop.summarize_condition_check(results, negative_control_refused=True)["status"], "FAIL")
 
     def test_a_block_with_no_settled_hash_at_all_is_a_failure(self):
-        rows = json.loads((bp.RUNS / MATCHED / "smolvla" / "schedule.json").read_text())["schedule"]
+        rows = json.loads((bp.RUNS / bp.CONFIRMATION / "smolvla" / "schedule.json").read_text())["schedule"]
         records = [{"planned_run_id": r["planned_run_id"], "attempt_number": 0, "status": "completed",
                     "settled_state_sha256": r["block_id"], "outcome": {"success": True}} for r in rows]
         block = rows[0]["block_id"]
@@ -330,13 +304,14 @@ class SurvivingMutants(unittest.TestCase):
 
 class MatchedAnalysis(unittest.TestCase):
     def test_two_condition_schedule_reports_primary_only(self):
-        rows = json.loads((bp.RUNS / MATCHED / "smolvla" / "schedule.json").read_text())["schedule"]
-        records = [{"planned_run_id": r["planned_run_id"], "attempt_number": 0, "status": "completed",
+        rows = [r for r in json.loads((bp.RUNS / bp.CONFIRMATION / "smolvla" / "schedule.json").read_text())["schedule"]
+                if r["condition_id"] in ("R22", "R25")]
+        records = [{"planned_run_id": r["planned_run_id"], "attempt_number": 0, "status": "completed", "settled_state_matches_block": True,
                     "settled_state_sha256": r["block_id"], "outcome": {"success": i % 3 > 0}} for i, r in enumerate(rows)]
         report = analyze.analyze_model(rows, records)
         self.assertEqual(report["primary"]["status"], "complete")
-        self.assertEqual(report["secondary"]["status"], "not_in_this_design")
-        self.assertEqual(report["quality_preservation"]["decision"], "not_in_this_design")
+        self.assertEqual(report["secondary"]["status"], "not_planned")
+        self.assertEqual(report["quality_preservation"]["decision"], "test_incomplete")
 
 
 class VideoCheck(unittest.TestCase):
