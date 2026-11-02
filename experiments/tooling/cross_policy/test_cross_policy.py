@@ -11,6 +11,7 @@ import analyze  # noqa: E402
 import build_protocols as bp  # noqa: E402
 import launch_guard  # noqa: E402
 import make_primary_schedule as primary_schedule  # noqa: E402
+import server_openpi  # noqa: E402
 from common import CONFIRMATION_SEEDS, OBSERVATION_AGE_SEEDS, STATE_SLOTS, SUITES, TASK_IDS, file_sha, sha  # noqa: E402
 from journal import AttemptJournal, TerminalRecordError  # noqa: E402
 
@@ -347,6 +348,25 @@ class Guard(unittest.TestCase):
 
     def test_this_branch_has_no_release(self):
         self.assertFalse((launch_guard.ROOT / "review/releases").exists())
+
+
+class OpenPIRequestTrace(unittest.TestCase):
+    def test_server_echoes_the_configured_solver_steps(self):
+        from unittest.mock import patch
+
+        class FakePolicy:
+            metadata = {}
+            def infer(self, obs, noise):
+                return {"actions": [[0.0] * 7]}
+
+        policy = FakePolicy()
+        wrapper = server_openpi.KeyedPolicy(policy)
+        with patch.object(server_openpi, "noise_for", return_value=None), \
+             patch.object(server_openpi, "memory_stats", return_value={}):
+            result = wrapper.infer({"observation/state": [0], "__d__": 2,
+                                    "__noise_key__": json.dumps(["identity", 0])})
+        self.assertEqual(result["server_configured_num_steps"], 2)
+        self.assertEqual(policy._sample_kwargs, {"num_steps": 2})
 
 
 if __name__ == "__main__":
