@@ -1,0 +1,85 @@
+{
+  "checks": {
+    "action_units_and_shapes": "Seven dimensions; per-dimension minimum and maximum recorded.",
+    "checkpoint_provenance": "checkpoint_tree in provenance.json for SmolVLA and pi0.5.",
+    "condition_smoke": "NATIVE, R22, R25, R52, R55 once each on one non-confirmation identity (seeds 790011, 790012; state official0).",
+    "dependency_provenance": "Installed package list in provenance.json for all three environments.",
+    "generated_state_hashes": "200 serialized states with SHA-256 in state_manifest.json.",
+    "implementation_received_d": "SmolVLA denoise count equals generations x d. pi0.5 num_steps observed at the sampler call, and same noise gives different chunks across d=2, 5, 10.",
+    "matched_reset_first_action_hashes": "Same reset, noise and d give identical first actions: R22 = R52, R25 = R55.",
+    "native_parity": "Four suites, ten tasks, ten episodes per task, per model: 400 per model.",
+    "official_normalization": "norm_stats.json hash, plus loaded Unnormalize statistics equal to the file and quantile mode on.",
+    "protocol_and_schedule_binding": "Release bound to protocol hash; the confirmation release must list the exact schedule file; deferred cohorts refused.",
+    "reset_mismatch_termination": "Negative control on the real simulator: a wrong reference stops before any policy query.",
+    "reset_reuse": "Settled state hash identical across all conditions of one identity.",
+    "timing": "100 warm-up + 100 measured calls per d; per-generation and per-rollout timing.",
+    "video_inspection": "Every parity video readable, not blank, not frozen; contact sheet per task inspected by a person."
+  },
+  "confirmation_it_gates": "matched_r22_r25_confirmation_v1",
+  "counted_run": "The first execution of run_preflight_v2.sh that passes its entry gates. A failure stays failed; a later attempt needs a new run ID and a recorded reason.",
+  "exclusions": [
+    "The earlier invalid pi0.5 campaign of 160 attempts is permanently excluded and is never relabelled or reused.",
+    "The stale-observation 20/40 versus 28/40 result and its contribution claim are excluded unless the original journals are recovered and audited.",
+    "The submitted NeurIPS RoboPAD PDF stays unchanged."
+  ],
+  "launch_permitted": false,
+  "models": {
+    "pi05": {
+      "checkpoint": "gs://openpi-assets/checkpoints/pi05_libero/",
+      "evaluation_path": "OpenPI server and client: create_trained_policy + WebsocketPolicyServer, examples/libero/main.py observation and action handling.",
+      "family": "pi0.5 (OpenPI, JAX)",
+      "native": {
+        "chunk_size": 10,
+        "d": 10,
+        "h": 5
+      },
+      "native_source": "examples/libero/main.py replan_steps=5; pi0.py sample_actions num_steps=10; config.py pi05_libero action_horizon=10. READ FROM SOURCE; Alba to confirm.",
+      "normalization_asset": "assets/physical-intelligence/libero/norm_stats.json",
+      "normalization_sha256": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84",
+      "runtime_source": {
+        "repo": "Physical-Intelligence/openpi",
+        "revision": "215abfb217dbac7d5f1273282331b9b1866c0479"
+      }
+    },
+    "smolvla": {
+      "checkpoint": "HuggingFaceVLA/smolvla_libero",
+      "evaluation_path": "Pinned LeRobot SmolVLAPolicy + LiberoEnv, as in run_paired.py.",
+      "family": "SmolVLA (LeRobot, PyTorch)",
+      "model_safetensors_sha256": "71d9563c8295284acba8fc2d5c19de000d6fe9ba58a406832af7ef3d221ed52f",
+      "native": {
+        "chunk_size": 50,
+        "d": 10,
+        "h": 1
+      },
+      "native_source": "Checkpoint config and existing runner requirement (run_paired.py:249).",
+      "revision": "6721902bc4d61e50a3bfdb11dfb4cb626f05d102",
+      "runtime_source": {
+        "repo": "huggingface/lerobot",
+        "revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8"
+      }
+    }
+  },
+  "prior_preflight": {
+    "date": "2026-11-01",
+    "treatment": "Preserved; never overwritten or re-labelled.",
+    "verdict": "PREFLIGHT_FAILED"
+  },
+  "protocol_id": "cross_policy_preflight_v2",
+  "run_id": "cross_policy_preflight_v2.run001",
+  "schema_version": 1,
+  "status": "PLANNED_AWAITING_ALBA_DECISIONS_AND_RELEASE",
+  "unresolved_decisions": {
+    "N1": "MuJoCo 3.8.1 (SmolVLA) and 3.2.3 (pi0.5 client): one state set generated in the SmolVLA stack, or one per model?",
+    "N2": "Client reads BDDL and init files from the SmolVLA environment, and assets from a tree containing every OpenPI asset byte-identical plus others. Acceptable as official?",
+    "R12": "pi0.5 NATIVE h=5, d=10, chunk 10, read from source.",
+    "R4": "Does the server wrapper setting num_steps and noise count as the official path?",
+    "R6": "OSMesa with disclosure, or native Linux with EGL. The harness implements OSMesa only.",
+    "R7": "Newly generated states, or unused official IDs. The required check names generated-state hashes; explicit confirmation needed.",
+    "R9": "Native-parity pass criterion and action-unit acceptance, set before parity data exists."
+  },
+  "verdict_rule": {
+    "PREFLIGHT_FAILED": "Any mechanical check fails or evidence is missing, or Alba's parity criterion or the video inspection fails.",
+    "PREFLIGHT_PASSED": "Every mechanical check passes, parity meets Alba's criterion and the videos pass inspection.",
+    "note": "preflight_verdict.py alone can report only failure, or mechanical checks passed awaiting review."
+  }
+}
