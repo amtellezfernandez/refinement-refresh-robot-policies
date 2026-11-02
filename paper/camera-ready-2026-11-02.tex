@@ -23,28 +23,25 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Chunked robot policies can spend inference compute on refining the current
-action prediction or on replanning from a newer observation. We study this
-trade-off for one frozen SmolVLA checkpoint in synchronous LIBERO simulation.
-We define nominal compute rate as full-generation arithmetic divided by the
-number of predicted actions executed before replanning. Full-generation
-accounting shows that 82.1\% of native counted arithmetic is independent of
-denoising, so reducing refinement alone cannot proportionally reduce this rate.
-We separate a paired 12-configuration discovery study from confirmation on
-eight tasks excluded from selection, using 160 attempts per confirmed
-configuration. At the primary two-action prefix, reducing denoising from five
-steps to two improves success by 10.6 percentage points, with a
-task-conditional, descriptive 95\% interval of 4.4--16.9 points, while reducing
-reference-calibrated arithmetic rate by 5.9\%. At two denoising steps, the
-five-action and two-action prefixes differ by one observed success, while the
-five-action prefix uses 60.7\% less arithmetic per attempt; the quality
-difference remains unresolved.
-A simple cost-aware rule matches the fitted response model's
-choices across the tested compute ceilings, so fitting provides no demonstrated
-selection advantage. For this checkpoint and task family, additional denoising does
-not reliably improve closed-loop success. The arithmetic results characterize
-this implementation and counting boundary; they do not establish latency gains
-under asynchronous execution or on a physical robot.
+Robot policies that predict several future actions at once can use inference
+compute in two ways: refine the current prediction for more steps, or replan
+sooner using a newer observation. We study this choice for one frozen SmolVLA
+policy in synchronous LIBERO simulation. We first compare 12 configurations on
+four tasks, then evaluate frozen comparisons on eight different tasks that were
+not used to select the configurations. When the policy replans after every two
+executed actions, using two refinement steps instead of five increases success
+from 122/160 to 139/160. This is an improvement of 10.6 percentage points, with
+a descriptive 95\% interval of 4.4--16.9 points over the eight tasks. Estimated
+neural computation per control step also decreases by 5.9\%. Our accounting
+shows that 82.1\% of the policy's native computation does not depend on the
+number of refinement steps, so reducing refinement alone produces limited
+savings. With two refinement steps, executing five actions before replanning
+produces nearly the same observed success as executing two actions (138/160
+versus 139/160) while using 60.7\% less computation per attempt. However, the
+uncertainty is too large to conclude that the two settings have equivalent
+quality. A simple cost-aware rule selects the same configurations as the fitted
+response model. For this checkpoint and task family, additional refinement does
+not reliably improve closed-loop control.
 \end{abstract}
 
 \section{Introduction}
