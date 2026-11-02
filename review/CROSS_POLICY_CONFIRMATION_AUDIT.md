@@ -1,8 +1,9 @@
 # Cross-policy confirmation audit
 
-**Status: preparation only. The review checkpoint is not ready yet.** No rollout, preflight or GPU
-work has run for this campaign. Preflight is waiting for the RTX GPU to be released. Generating the
-initial states is waiting for authorisation to copy files to the RTX.
+**Status: preparation only. The review checkpoint is not ready.** No confirmation, observation-age or
+asynchronous rollout has run. The first version of this sentence, written before the bounded GPU
+preflight of 1 November, said no GPU work had run; section 2 records what ran since. Generated
+initial states do not exist.
 
 Branch `warren/cross-policy-confirmation`, from `8c92e66`. Local commit, not pushed.
 
@@ -40,9 +41,10 @@ specified. Its records are not in this repository (see R8).
 | Profiling at d=2, d=5, native | NOT RUN | NOT RUN |
 | GPU identity | Read: RTX 5090, `GPU-ba05e81b-15e9-b15d-44f4-efddf5fa1e5c`, driver 610.88 | Same GPU |
 
-**Update, 1 November 2026: a bounded GPU preflight has now run. See `review/GPU_PREFLIGHT_RESULT.md`, which supersedes
+**Update, 1 November 2026, corrected 2 November 2026: a bounded GPU preflight has now run. Its recorded verdict is PREFLIGHT_FAILED, because the
+counted pi0.5 evaluator run failed on a harness path error; a separate rerun finished. See `review/GPU_PREFLIGHT_RESULT.md`, which supersedes
 the NOT RUN entries above for load, d=2 and d=5 support, and evaluator execution, and the estimates in sections 5 and 6.
-Native parity and full profiling remain not run. New open item R16, the meaning of first action divergence, is defined there.**
+Native parity and full profiling remain not run, so the mandatory preflight is incomplete. New open item R16, the meaning of first action divergence, is defined there.**
 
 Status when this audit was written: not passed for either model, because it had not run.
 

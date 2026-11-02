@@ -2,12 +2,15 @@
 
 ## 1. Verdict
 
-**PREFLIGHT_PASS_WITH_NARROWING.** Both models load, generate at d=2, 5 and 10, and run their evaluators on the RTX 5090.
-Under the frozen rule this is the best outcome reachable now, because the asynchronous cohort is blocked and pi0.5 action parity is UNTESTED.
+**PREFLIGHT_FAILED.** This is the verdict the frozen rule in `review/GPU_PREFLIGHT_PREREG.md` gives the counted run.
 
-**Engineering readiness is not scientific approval.** No confirmation, observation-age or third-policy run took place. No protocol or schedule changed. Alba has approved nothing, and her open decisions are in section 5.
+**Correction, 2 November 2026.** The first version of this report, at commit `734dec3`, recorded a pass with narrowing and relied on a later rerun. That verdict is withdrawn. The prereg sets the counted run as the first to pass G0 to G2, makes a G4 failure PREFLIGHT_FAILED, and leaves no verdict choice after data. A rerun cannot change that outcome. The raw logs are unchanged.
 
-**One thing to weigh.** In the counted run the pi0.5 evaluator failed before starting, because my client script lacked a path to OpenPI's LIBERO package. Read strictly, gate G4 failed in that run. I treat it as a harness defect and rely on the rerun the frozen rule allows, with the same code bundle and only `PYTHONPATH` set. The failure is kept in `run_counted/`.
+**What happened.** In the counted run, `alba-preflight-2`, the pi0.5 evaluator failed before starting, because the client script lacked a path to OpenPI's LIBERO package. The rerun, with the same code bundle and only `PYTHONPATH` set, finished its 3 episodes. It is separate engineering evidence and the failure stays in `run_counted/`. The rerun also used separate jobs instead of the entry-point script.
+
+**This was not the mandatory preflight in Alba's specification.** Native parity, 100 + 100 profiling, videos, R52, R55, reset-state reuse across conditions and generated states were not completed. Alba's condition for the review checkpoint is not met, and confirmation readiness is not established.
+
+No confirmation, observation-age or third-policy run took place. No protocol or schedule changed. Alba has approved nothing, and her open decisions are in section 5.
 
 ## 2. Model compatibility
 
@@ -102,9 +105,9 @@ Altogether about 33-144 hours, or 1.4 to 6 days. The earlier SmolVLA figure of 3
 
 ## 7. Exact next permitted operation
 
-**Warren decides whether to authorise one push of `warren/cross-policy-confirmation` and one reply to Alba.** This meets her condition to reply once protocols, schedules and preflight are committed, and hands her section 5.
+**Corrected 2 November 2026.** Alba's condition to reply once protocols, schedules and preflight are committed is not met, because the mandatory preflight is not complete. Any status reply must say so and put section 5 to her as open decisions.
 
-Everything else waits for her: state generation needs R7, parity needs R9, and any rollout needs her release file, which the launch guard requires. The GPU is released and no further GPU work is permitted under this task.
+State generation needs R7, parity needs R9, and any rollout needs her release file, which the launch guard requires. The GPU is released and no further GPU work is permitted under this task.
 
 ## 8. Limits and deviations
 
