@@ -15,6 +15,7 @@ import os
 import sys
 import threading
 import time
+from contextlib import nullcontext
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -53,7 +54,7 @@ class ChunkTap:
         self.policy._get_action_chunk = self.original
 
 
-def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_settled_state=None):
+def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_reset=None):
     """One episode. Writes nothing itself; returns arrays and per-query records."""
     import numpy as np
     import run_paired as rp
@@ -76,8 +77,8 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     observation, _ = env.reset(seed=[environment_seed], options={NEW_ROLLOUT_OPTION: True})
     settled = rp.array_record(base._env.sim.get_state().flatten())["sha256"]
     first_observation = rp.observation_sha(observation)
-    if expected_settled_state is not None and settled != expected_settled_state:
-        raise ValueError("reset_state_mismatch: expected {}, observed {}".format(expected_settled_state, settled))
+    if expected_reset is not None and (settled, first_observation) != expected_reset:
+        raise ValueError("reset_state_mismatch: state/observation pair differs before policy execution")
     tap = rp_tap = ChunkTap(policy)
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
@@ -86,7 +87,7 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     supplied, supplied_tick = None, 0
     started = time.perf_counter()
     try:
-        with torch.inference_mode():
+        with torch.inference_mode(), (torch.autocast(device_type="cuda") if policy.config.use_amp else nullcontext()):
             for tick in range(int(base._max_episode_steps)):
                 refreshed = tick % refresh == 0
                 if refreshed:
@@ -155,6 +156,10 @@ def attempts(args):
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     import torch
     torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    rp.seed_environment(0)
     policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
     run_provenance = provenance(args)
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
@@ -178,15 +183,16 @@ def attempts(args):
             state = states[row["state_key"]]
             rp.require(hashlib.sha256(state.tobytes()).hexdigest() == row["state_sha256"], "state hash mismatch")
             result = rollout(row, env, policy, pre, post, env_pre, env_post, state,
-                             expected_settled_state=settled.get(row["block_id"]))
-            expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
+                             expected_reset=settled.get(row["block_id"]))
+            reset_pair = (result["settled_state_sha256"], result["first_observation_sha256"])
+            expected = settled.setdefault(row["block_id"], reset_pair)
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
             array_path = arrays / (path.stem + ".npy")
             np.save(array_path, result["actions"])
             journal.update(path, "completed", outcome=result["outcome"], queries=result["queries"],
                            settled_state_sha256=result["settled_state_sha256"],
-                           settled_state_matches_block=expected == result["settled_state_sha256"],
+                           settled_state_matches_block=expected == reset_pair,
                            first_observation_sha256=result["first_observation_sha256"],
                            action_array=array_path.name, timing=result["timing"], memory=result["memory"],
                            gpu_samples=samples, finished_unix=time.time())
@@ -204,6 +210,11 @@ def preflight(args):
     import torch
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.use_deterministic_algorithms(True)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+    rp.seed_environment(0)
     args.output.mkdir(parents=True, exist_ok=False)
     policy, pre, post, native = rp.load_policy_and_processors(args.checkpoint)
     atomic_write_json(args.output / "provenance.json", provenance(args))
