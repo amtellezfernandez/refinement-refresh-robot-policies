@@ -38,6 +38,15 @@ def git_commit(root=ROOT):
     return _read(["git", "-C", str(root), "rev-parse", "HEAD"])
 
 
+def installed_packages():
+    """The model environments were built with uv and have no pip module, so pip freeze cannot be used."""
+    try:
+        from importlib import metadata
+        return sorted({"{}=={}".format(d.metadata["Name"], d.version) for d in metadata.distributions()})
+    except Exception as error:  # Provenance must survive; the failure is itself recorded.
+        return "UNKNOWN: {!r}".format(error)
+
+
 def code_hashes():
     directory = Path(__file__).resolve().parent
     return {path.name: file_sha(path) for path in sorted(directory.glob("*.py"))}
@@ -59,7 +68,7 @@ def capture(model, args, extra):
               "git_status_short": _read(["git", "-C", str(ROOT), "status", "--short"]),
               "code_sha256": code_hashes(), "argv": sys.argv, "arguments": arguments,
               "python": sys.version, "platform": platform.platform(), "hostname": platform.node(),
-              "packages": _read([sys.executable, "-m", "pip", "freeze"]),
+              "packages": installed_packages(),
               "versions": {m: _version(m) for m in ("numpy", "torch", "jax", "mujoco", "robosuite", "lerobot", "openpi")},
               "gpu": _read(["nvidia-smi", "--query-gpu=name,uuid,driver_version,memory.total", "--format=csv,noheader"]),
               "cuda_driver_header": _read(["nvidia-smi", "--version"]),

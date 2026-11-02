@@ -133,6 +133,8 @@ def contrast(schedule_rows, records, a, b):
 
 
 def quality_decision(secondary):
+    if secondary["status"] == "not_in_this_design":
+        return {"decision": "not_in_this_design"}
     if secondary["status"] != "complete":
         return {"decision": "test_incomplete"}
     bound = secondary["lower_bound_one_sided_95"]
@@ -187,7 +189,10 @@ ARITHMETIC_STATUS = ("NOT_IMPLEMENTED: arithmetic per chunk, control step and at
 
 def analyze_model(schedule_rows, records):
     primary = contrast(schedule_rows, records, "R22", "R25")
-    secondary = contrast(schedule_rows, records, "R52", "R22")
+    if "R52" in {row["condition_id"] for row in schedule_rows}:
+        secondary = contrast(schedule_rows, records, "R52", "R22")
+    else:  # Alba's matched design has R22 and R25 only; R52 is deferred.
+        secondary = {"contrast": "R52 minus R22", "status": "not_in_this_design"}
     return {"coverage": coverage(schedule_rows, records), "conditions": condition_summary(schedule_rows, records),
             "timing": timing_summary(schedule_rows, records), "arithmetic": ARITHMETIC_STATUS,
             "reset_state_failures": sorted(reset_state_failures(schedule_rows, records)),

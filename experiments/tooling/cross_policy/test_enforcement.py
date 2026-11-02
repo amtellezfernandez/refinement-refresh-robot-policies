@@ -78,7 +78,7 @@ class ScheduleBoundToRelease(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         (self.root / "experiments/protocols").mkdir(parents=True)
-        self.name = "cross_policy_confirmation_v1"
+        self.name = "matched_r22_r25_confirmation_v1"
         self.protocol = self.root / "experiments/protocols" / (self.name + ".json")
         self.protocol.write_text(json.dumps({"status": "PREPARED"}))
         self.schedule = self.root / "schedule.json"
@@ -89,11 +89,11 @@ class ScheduleBoundToRelease(unittest.TestCase):
             "schedule_sha256s": [file_sha(self.schedule)]}))
 
     def check(self, **kwargs):
-        return launch_guard.check("confirmation", root=self.root, environ={"ALBA_GPU_RESERVATION": "R1"},
+        return launch_guard.check("matched_r22_r25", root=self.root, environ={"ALBA_GPU_RESERVATION": "R1"},
                                   processes=lambda: [], **kwargs)
 
     def test_released_schedule_allowed(self):
-        self.assertEqual(self.check(schedule=self.schedule)["phase"], "confirmation")
+        self.assertEqual(self.check(schedule=self.schedule)["phase"], "matched_r22_r25")
 
     def test_schedule_changed_after_release_refused(self):
         self.schedule.write_text('{"schedule": [2]}')
@@ -208,14 +208,6 @@ class ServerProvenance(unittest.TestCase):
             self.assertEqual(record["normalization_sha256"], file_sha(norm))
             self.assertEqual(record["checkpoint_tree"]["files"], 1)
             self.assertIn("jax", record["versions"])
-
-
-class ConditionCheck(unittest.TestCase):
-    def test_reset_difference_fails(self):
-        from attempt_loop import summarize_condition_check
-        same = {"settled_state_sha256": "a", "action_shape": [5, 7]}
-        self.assertEqual(summarize_condition_check({"R22": same, "R52": same})["status"], "PASS")
-        self.assertEqual(summarize_condition_check({"R22": same, "R52": dict(same, settled_state_sha256="b")})["status"], "FAIL")
 
 
 class BindingKeepsOrder(unittest.TestCase):

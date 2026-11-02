@@ -50,10 +50,21 @@ def execute_schedule(rows, journal, provenance_sha256, argv, run_one, failure_fi
             raise AttemptStopped("{} failed: {!r}".format(row["planned_run_id"], error)) from error
 
 
-def summarize_condition_check(results):
-    """results: {condition: {"settled_state_sha256", "action_shape", "outcome"}} on one non-confirmation identity."""
+REQUIRED_CONDITIONS = {"NATIVE", "R22", "R25", "R52", "R55"}
+# Same reset, noise key and d at tick 0, so the first action must be identical. h has not yet acted.
+MATCHED_FIRST_ACTION = (("R22", "R52"), ("R25", "R55"))
+
+
+def summarize_condition_check(results, negative_control_refused):
+    """One non-confirmation identity through every condition. Outcomes are not evidence."""
+    complete = set(results) == REQUIRED_CONDITIONS
     settled = {r["settled_state_sha256"] for r in results.values()}
     shapes_ok = all(len(r["action_shape"]) == 2 and r["action_shape"][1] == 7 for r in results.values())
-    return {"reset_state_reused": len(settled) == 1, "valid_action_shapes": shapes_ok,
-            "conditions": sorted(results), "status": "PASS" if len(settled) == 1 and shapes_ok and results else "FAIL",
-            "scope": "One non-confirmation identity. Outcomes are not evidence."}
+    received = all(r["received_d"] for r in results.values())
+    matched = {"{}={}".format(a, b): a in results and b in results and
+               results[a]["first_action_sha256"] == results[b]["first_action_sha256"] for a, b in MATCHED_FIRST_ACTION}
+    passed = complete and len(settled) == 1 and shapes_ok and received and all(matched.values()) and negative_control_refused
+    return {"all_conditions_present": complete, "reset_state_reused": len(settled) == 1, "valid_action_shapes": shapes_ok,
+            "implementation_received_d": received, "matched_first_actions": matched,
+            "reset_negative_control_refused": negative_control_refused, "conditions": sorted(results),
+            "status": "PASS" if passed else "FAIL", "scope": "One non-confirmation identity. Outcomes are not evidence."}

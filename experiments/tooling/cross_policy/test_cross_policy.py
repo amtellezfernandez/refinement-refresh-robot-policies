@@ -220,7 +220,7 @@ class Guard(unittest.TestCase):
 
     def test_confirmation_refused_without_release(self):
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("confirmation", root=self.make_root(), environ={"ALBA_GPU_RESERVATION": "R1"},
+            launch_guard.check("matched_r22_r25", root=self.make_root(), environ={"ALBA_GPU_RESERVATION": "R1"},
                                processes=lambda: [])
 
     def write_release(self, root, name, approved_by, digest):
@@ -230,28 +230,32 @@ class Guard(unittest.TestCase):
 
     def test_confirmation_refused_when_protocol_changed_after_release(self):
         root = self.make_root()
-        self.write_release(root, "cross_policy_confirmation_v1", "Alba", "0" * 64)
+        self.write_release(root, "matched_r22_r25_confirmation_v1", "Alba", "0" * 64)
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [])
+            launch_guard.check("matched_r22_r25", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [])
 
     def test_confirmation_allowed_only_by_matching_release(self):
         root = self.make_root()
-        name = "cross_policy_confirmation_v1"
+        name = "matched_r22_r25_confirmation_v1"
         digest = file_sha(root / "experiments/protocols" / (name + ".json"))
         schedule = root / "schedule.json"
         schedule.write_text("{}")
         (root / "review/releases").mkdir(parents=True, exist_ok=True)
         (root / "review/releases" / (name + ".release.json")).write_text(json.dumps(
             {"approved_by": "Alba", "protocol_sha256": digest, "schedule_sha256s": [file_sha(schedule)]}))
-        self.assertEqual(launch_guard.check("confirmation", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
-                                            processes=lambda: [], schedule=schedule)["phase"], "confirmation")
+        self.assertEqual(launch_guard.check("matched_r22_r25", root=root, environ={"ALBA_GPU_RESERVATION": "R1"},
+                                            processes=lambda: [], schedule=schedule)["phase"], "matched_r22_r25")
 
     def test_blocked_protocol_refused_even_with_release(self):
         root = self.make_root(status="BLOCKED_X")
-        name = "asynchronous_confirmation_v1"
+        name = "matched_r22_r25_confirmation_v1"
         self.write_release(root, name, "Alba", file_sha(root / "experiments/protocols" / (name + ".json")))
+        schedule = root / "schedule.json"
+        schedule.write_text("{}")
+        release = root / "review/releases" / (name + ".release.json")
+        release.write_text(json.dumps(dict(json.loads(release.read_text()), schedule_sha256s=[file_sha(schedule)])))
         with self.assertRaises(launch_guard.LaunchRefused):
-            launch_guard.check("asynchronous", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [])
+            launch_guard.check("matched_r22_r25", root=root, environ={"ALBA_GPU_RESERVATION": "R1"}, processes=lambda: [], schedule=schedule)
 
     def test_this_branch_has_no_release(self):
         self.assertFalse((launch_guard.ROOT / "review/releases").exists())

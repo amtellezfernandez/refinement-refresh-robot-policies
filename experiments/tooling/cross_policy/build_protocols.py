@@ -23,6 +23,8 @@ RUNS = ROOT / "experiments/runs"
 CONFIRMATION = "cross_policy_confirmation_v1"
 AGE = "observation_age_confirmation_v1"
 ASYNC = "asynchronous_confirmation_v1"
+MATCHED = "matched_r22_r25_confirmation_v1"
+PREFLIGHT_V2 = "cross_policy_preflight_v2"
 
 MODELS = {
     "smolvla": {
@@ -228,10 +230,99 @@ def async_protocol():
     }
 
 
+ALBA_EXCLUSIONS = [
+    "The earlier invalid pi0.5 campaign of 160 attempts is permanently excluded and is never relabelled or reused.",
+    "The stale-observation 20/40 versus 28/40 result and its contribution claim are excluded unless the original "
+    "journals are recovered and audited.",
+    "The submitted NeurIPS RoboPAD PDF stays unchanged.",
+]
+
+
+def matched_protocol():
+    conditions = [c for c in CONDITIONS if c["id"] in ("R22", "R25")]
+    return {
+        "schema_version": 1, "protocol_id": MATCHED, "status": "BLOCKED_ATTEMPT_COUNT_CONFLICT",
+        "attempt_count_conflict": "Alba's decision states two models, four suites, ten tasks, five states, two seeds and two "
+                                  "conditions, and 800 total attempts. The factors multiply to 1,600, and 800 is the count "
+                                  "per model. Schedules follow the stated factors. Alba must say which holds.",
+        "launch_permitted": False, "requires_preflight": PREFLIGHT_V2,
+        "launch_condition": "Do not launch until Alba has received the preflight commit, verdict, artifact manifest "
+                            "and checksums, and has written the release.",
+        "question": "At a fixed two-action prefix, how do two and five denoising steps compare, separately in each pinned model?",
+        "models": MODELS,
+        "population": {"suites": list(SUITES), "task_ids": list(TASK_IDS), "state_slots": list(STATE_SLOTS),
+                       "policy_seeds": list(CONFIRMATION_SEEDS),
+                       "policy_seeds_source": "Alba's original confirmation specification; her latest decision says two seeds per state.",
+                       "identity_definition": "suite / task_id / state_slot / policy_seed", "identities_per_model": 400},
+        "conditions": conditions,
+        "conditions_resolved": {m: {c["id"]: dict(zip("hd", resolve(c, m))) for c in conditions} for m in MODELS},
+        "expected_attempts": {"per_model_from_factors": 800, "total_from_factors": 1600, "total_stated_by_alba": 800},
+        "stop_rule_pi05": confirmation_protocol()["stop_rule_pi05"],
+        "exclusions": ALBA_EXCLUSIONS,
+        "smolvla_historical_label": "ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING",
+        "deferred": ["R52", "R55", "observation age", "asynchronous", "third policy"],
+        "primary_analysis": {
+            "selector": "Do not fit or refit a selector model.", "primary_contrast": "R22 minus R25",
+            "bootstrap_draws": BOOTSTRAP_DRAWS, "bootstrap_seed": BOOTSTRAP_SEED,
+            "pooling": "Never pool the models. Report model effects separately, then state descriptively whether signs agree or disagree."},
+        "journals": "Append-only. One write-ahead record per attempt. Failed attempts are preserved and never replaced.",
+        "recording": COMMON_RECORDING, "rules": COMMON_RULES,
+    }
+
+
+def preflight_protocol():
+    return {
+        "schema_version": 1, "protocol_id": PREFLIGHT_V2, "run_id": PREFLIGHT_V2 + ".run001",
+        "status": "PLANNED_AWAITING_ALBA_DECISIONS_AND_RELEASE", "launch_permitted": False,
+        "prior_preflight": {"date": "2026-11-01", "verdict": "PREFLIGHT_FAILED", "treatment": "Preserved; never overwritten or re-labelled."},
+        "models": MODELS,
+        "confirmation_it_gates": MATCHED,
+        "unresolved_decisions": {
+            "R9": "Native-parity pass criterion and action-unit acceptance, set before parity data exists.",
+            "R6": "OSMesa with disclosure, or native Linux with EGL. The harness implements OSMesa only.",
+            "R7": "Newly generated states, or unused official IDs. The required check names generated-state hashes; explicit confirmation needed.",
+            "N1": "MuJoCo 3.8.1 (SmolVLA) and 3.2.3 (pi0.5 client): one state set generated in the SmolVLA stack, or one per model?",
+            "N2": "Client reads BDDL and init files from the SmolVLA environment, and assets from a tree containing every OpenPI asset byte-identical plus others. Acceptable as official?",
+            "R4": "Does the server wrapper setting num_steps and noise count as the official path?",
+            "R12": "pi0.5 NATIVE h=5, d=10, chunk 10, read from source.",
+        },
+        "checks": {
+            "checkpoint_provenance": "checkpoint_tree in provenance.json for SmolVLA and pi0.5.",
+            "dependency_provenance": "Installed package list in provenance.json for all three environments.",
+            "official_normalization": "norm_stats.json hash, plus loaded Unnormalize statistics equal to the file and quantile mode on.",
+            "native_parity": "Four suites, ten tasks, ten episodes per task, per model: 400 per model.",
+            "action_units_and_shapes": "Seven dimensions; per-dimension minimum and maximum recorded.",
+            "implementation_received_d": "SmolVLA denoise count equals generations x d. pi0.5 num_steps observed at the sampler call, and same noise gives different chunks across d=2, 5, 10.",
+            "matched_reset_first_action_hashes": "Same reset, noise and d give identical first actions: R22 = R52, R25 = R55.",
+            "reset_reuse": "Settled state hash identical across all conditions of one identity.",
+            "condition_smoke": "NATIVE, R22, R25, R52, R55 once each on one non-confirmation identity (seeds 790011, 790012; state official0).",
+            "video_inspection": "Every parity video readable, not blank, not frozen; contact sheet per task inspected by a person.",
+            "timing": "100 warm-up + 100 measured calls per d; per-generation and per-rollout timing.",
+            "generated_state_hashes": "200 serialized states with SHA-256 in state_manifest.json.",
+            "reset_mismatch_termination": "Negative control on the real simulator: a wrong reference stops before any policy query.",
+            "protocol_and_schedule_binding": "Release bound to protocol hash; the confirmation release must list the exact schedule file; deferred cohorts refused.",
+        },
+        "verdict_rule": {
+            "PREFLIGHT_FAILED": "Any mechanical check fails or evidence is missing, or Alba's parity criterion or the video inspection fails.",
+            "PREFLIGHT_PASSED": "Every mechanical check passes, parity meets Alba's criterion and the videos pass inspection.",
+            "note": "preflight_verdict.py alone can report only failure, or mechanical checks passed awaiting review.",
+        },
+        "counted_run": "The first execution of run_preflight_v2.sh that passes its entry gates. A failure stays failed; a later attempt needs a new run ID and a recorded reason.",
+        "exclusions": ALBA_EXCLUSIONS,
+    }
+
+
 def outputs():
     files = {}
     def add(path, value):
         files[path] = json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n"
+    add(PROTOCOLS / (MATCHED + ".json"), matched_protocol())
+    add(PROTOCOLS / (PREFLIGHT_V2 + ".json"), preflight_protocol())
+    matched_manifest, matched_states = load_states(MATCHED)
+    for model in MODELS:
+        chosen = [dict(c, h=resolve(c, model)[0], d=resolve(c, model)[1]) for c in CONDITIONS if c["id"] in ("R22", "R25")]
+        rows = make_schedule(MATCHED, model, CONFIRMATION_SEEDS, chosen, matched_states)
+        add(RUNS / MATCHED / model / "schedule.json", schedule_document(MATCHED, model, rows, matched_manifest))
     add(PROTOCOLS / (CONFIRMATION + ".json"), confirmation_protocol())
     add(PROTOCOLS / (AGE + ".json"), age_protocol())
     add(PROTOCOLS / (ASYNC + ".json"), async_protocol())

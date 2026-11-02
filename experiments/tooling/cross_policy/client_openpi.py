@@ -22,7 +22,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import launch_guard  # noqa: E402
-from attempt_loop import check_settled, execute_schedule, summarize_condition_check  # noqa: E402
+from attempt_loop import ResetStateMismatch, check_settled, execute_schedule, summarize_condition_check  # noqa: E402
 from common import SUITES, TASK_IDS, atomic_write_json, sha  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
@@ -102,7 +102,9 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
             chunk = np.asarray(response["actions"])
             if chunk.ndim != 2 or chunk.shape[1] != 7 or not np.isfinite(chunk).all() or len(chunk) < h:
                 raise ValueError("unsupported_refinement_setting: chunk {} finite={}".format(chunk.shape, bool(np.isfinite(chunk).all())))
-            chunk_record = {"shape": list(chunk.shape), "sha256": digest(chunk)}
+            if response["received_num_steps"] != d:
+                raise ValueError("unsupported_refinement_setting: asked d={}, sampler received {}".format(d, response["received_num_steps"]))
+            chunk_record = {"shape": list(chunk.shape), "sha256": digest(chunk), "received_num_steps": response["received_num_steps"]}
             server_timing.append({"tick": tick, "client_round_trip_s": time.perf_counter() - begin,
                                   "host_generation_s": response["host_generation_s"], "memory": response["memory"]})
             memory = response["memory"]
@@ -147,19 +149,19 @@ def attempts(args):
     run_provenance = provenance(args)
     atomic_write_json(args.output / "provenance.{}.json".format(run_provenance["sha256"][:12]), run_provenance)
     client, suites = connect(args.port), benchmark.get_benchmark_dict()
-    current = {"key": None, "env": None, "prompt": None}
 
     def run_one(row, expected_settled):
         ident = row["episode_identity"]
-        if (ident["suite"], ident["task_id"]) != current["key"]:
-            if current["env"] is not None:
-                current["env"].close()
-            current["env"], current["prompt"] = make_env(suites[ident["suite"]]().get_task(ident["task_id"]))
-            current["key"] = (ident["suite"], ident["task_id"])
         state = states[row["state_key"]]
         if hashlib.sha256(state.tobytes()).hexdigest() != row["state_sha256"]:
             raise ValueError("state hash mismatch")
-        result = rollout(row, current["env"], current["prompt"], client, state, expected_settled=expected_settled)
+        # One environment per attempt. Reusing one leaves libero_object settling up to about 1e-14 apart,
+        # depending on what ran before (probe alba-v2-probe-4); a fresh one repeats exactly.
+        env, prompt = make_env(suites[ident["suite"]]().get_task(ident["task_id"]))
+        try:
+            result = rollout(row, env, prompt, client, state, expected_settled=expected_settled)
+        finally:
+            env.close()
         arrays = args.output / "arrays"
         arrays.mkdir(exist_ok=True)
         array_path = arrays / (row["planned_run_id"] + ".npy")
@@ -176,17 +178,29 @@ def conditions(args):
     from libero.libero import benchmark
     args.output.mkdir(parents=True, exist_ok=False)
     suite = benchmark.get_benchmark_dict()["libero_spatial"]()
-    env, prompt = make_env(suite.get_task(0))
     state = suite.get_task_init_states(0)[0]
     client, results = connect(args.port), {}
+    identity_row = {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0", "policy_seed": CONDITION_CHECK_SEED}
     for name, h, d in CONDITION_CHECK:
-        row = {"h": h, "d": d, "episode_identity": {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0",
-                                                    "policy_seed": CONDITION_CHECK_SEED}}
+        row = {"h": h, "d": d, "episode_identity": identity_row}
+        env, prompt = make_env(suite.get_task(0))
         result = rollout(row, env, prompt, client, state)
+        env.close()
+        generated = [q["chunk"] for q in result["queries"] if q["chunk"]]
         results[name] = {"h": h, "d": d, "settled_state_sha256": result["settled_state_sha256"],
-                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"]}
+                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"],
+                         "first_action_sha256": result["queries"][0]["executed_action_sha256"],
+                         "received_d": bool(generated) and all(c["received_num_steps"] == d for c in generated),
+                         "timing": result["timing"]}
+    env, prompt = make_env(suite.get_task(0))
+    refused = False
+    try:  # Negative control on the real simulator: a wrong reference must stop before any policy query.
+        rollout({"h": 2, "d": 2, "episode_identity": identity_row}, env, prompt, client, state, expected_settled="negative-control")
+    except ResetStateMismatch:
+        refused = True
     env.close()
-    atomic_write_json(args.output / "conditions.json", dict(summarize_condition_check(results), results=results))
+    atomic_write_json(args.output / "conditions.json",
+                      dict(summarize_condition_check(results, negative_control_refused=refused), results=results))
 
 
 def parity(args):
@@ -218,6 +232,8 @@ def parity(args):
                     imageio.mimwrite(str(video), result["frames"], fps=10)
                     journal.update(path, "completed", outcome=result["outcome"], first_action_sha256=result["queries"][0]["executed_action_sha256"],
                                    action_shape=list(result["actions"].shape), action_abs_max=float(np.abs(result["actions"]).max()),
+                                   action_min=result["actions"].min(axis=0).tolist(), action_max=result["actions"].max(axis=0).tolist(),
+                                   settled_state_sha256=result["settled_state_sha256"], timing=result["timing"],
                                    queries=result["queries"], video=video.name, memory=result["memory"])
                 except Exception as error:
                     journal.update(path, "failed", error=repr(error))
@@ -227,7 +243,7 @@ def parity(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("attempts", "parity", "conditions"))
-    parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation", "observation_age"))
+    parser.add_argument("--phase", default="preflight", choices=("preflight", "matched_r22_r25"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
     parser.add_argument("--output", type=Path, required=True)

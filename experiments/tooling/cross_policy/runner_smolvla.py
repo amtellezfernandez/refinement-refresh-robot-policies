@@ -20,7 +20,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path[:0] = [str(HERE), str(HERE.parent)]
 import launch_guard  # noqa: E402
-from attempt_loop import check_settled, execute_schedule, summarize_condition_check  # noqa: E402
+from attempt_loop import ResetStateMismatch, check_settled, execute_schedule, summarize_condition_check  # noqa: E402
 from common import SUITES, TASK_IDS, atomic_write_json  # noqa: E402
 from journal import AttemptJournal  # noqa: E402
 
@@ -122,6 +122,8 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
         generation_host_s, generation_cuda_ms = list(counters.host_s), list(counters.cuda_ms)
         counts = dict(counters.counts)
         counters.restore()
+    # What the model boundary actually received, as the historical runner also required.
+    rp.require(counts["denoise_steps"] == counts["generations"] * d, "denoise count does not match d={}".format(d))
     return {"outcome": {"success": success, "episode_length": len(actions),
                         "termination_reason": "success" if success else "terminated" if terminated else
                         "truncated" if truncated else "task_horizon"},
@@ -207,18 +209,30 @@ def conditions(args):
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     args.output.mkdir(parents=True, exist_ok=False)
+    import torch
+    torch.use_deterministic_algorithms(True)
     policy, pre, post, _ = rp.load_policy_and_processors(args.checkpoint)
     env, env_pre, env_post = make_task_env("libero_spatial", 0, policy)
     state = np.array(env.envs[0].unwrapped._init_states)[0]
     results = {}
+    identity_row = {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0", "policy_seed": CONDITION_CHECK_SEED}
     for name, h, d in CONDITION_CHECK:
-        row = {"h": h, "d": d, "episode_identity": {"suite": "libero_spatial", "task_id": 0, "state_slot": "official0",
-                                                    "policy_seed": CONDITION_CHECK_SEED}}
+        row = {"h": h, "d": d, "episode_identity": identity_row}
         result = rollout(row, env, policy, pre, post, env_pre, env_post, state)
         results[name] = {"h": h, "d": d, "settled_state_sha256": result["settled_state_sha256"],
-                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"]}
+                         "action_shape": list(result["actions"].shape), "smoke_outcome_not_evidence": result["outcome"],
+                         "first_action_sha256": result["queries"][0]["executed_action_sha256"],
+                         "received_d": result["timing"]["generation_counts"]["denoise_steps"] ==
+                         result["timing"]["generation_counts"]["generations"] * d, "timing": result["timing"]}
+    refused = False
+    try:  # Negative control on the real simulator: a wrong reference must stop before any policy query.
+        rollout({"h": 2, "d": 2, "episode_identity": identity_row}, env, policy, pre, post, env_pre, env_post, state,
+                expected_settled="negative-control")
+    except ResetStateMismatch:
+        refused = True
     env.close()
-    atomic_write_json(args.output / "conditions.json", dict(summarize_condition_check(results), results=results))
+    atomic_write_json(args.output / "conditions.json",
+                      dict(summarize_condition_check(results, negative_control_refused=refused), results=results))
 
 
 def preflight(args):
@@ -228,6 +242,7 @@ def preflight(args):
     import torch
     os.environ.setdefault("MUJOCO_GL", "osmesa")
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    torch.use_deterministic_algorithms(True)  # Same setting as attempts, so parity tests the same stack.
     args.output.mkdir(parents=True, exist_ok=False)
     policy, pre, post, native = rp.load_policy_and_processors(args.checkpoint)
     run_provenance_record = provenance(args)
@@ -280,6 +295,8 @@ def preflight(args):
                     imageio.mimwrite(str(video), result["frames"], fps=20)
                     journal.update(path, "completed", outcome=result["outcome"], first_action_sha256=result["queries"][0]["executed_action_sha256"],
                                    action_shape=list(result["actions"].shape), action_abs_max=float(np.abs(result["actions"]).max()),
+                                   action_min=result["actions"].min(axis=0).tolist(), action_max=result["actions"].max(axis=0).tolist(),
+                                   settled_state_sha256=result["settled_state_sha256"], timing=result["timing"],
                                    queries=result["queries"], video=video.name, memory=result["memory"])
                 except Exception as error:
                     journal.update(path, "failed", error=repr(error))
@@ -289,14 +306,14 @@ def preflight(args):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=("preflight", "attempts", "conditions"))
-    parser.add_argument("--phase", default="preflight", choices=("preflight", "confirmation", "observation_age"))
+    parser.add_argument("--phase", default="preflight", choices=("preflight", "matched_r22_r25"))
     parser.add_argument("--schedule", type=Path)
     parser.add_argument("--states", type=Path)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.mode == "attempts" and args.phase == "preflight":
-        raise SystemExit("attempts need --phase confirmation or observation_age")
+        raise SystemExit("attempts need --phase matched_r22_r25")
     launch_guard.check(args.phase, schedule=args.schedule)
     {"preflight": preflight, "attempts": attempts, "conditions": conditions}[args.mode](args)
 
