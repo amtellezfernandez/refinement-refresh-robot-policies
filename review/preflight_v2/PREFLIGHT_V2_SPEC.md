@@ -21,15 +21,16 @@ The commit containing this file; SmolVLA `6721902bc4d61e50a3bfdb11dfb4cb626f05d1
 | Official pi0.5 normalization | File hash, then loaded `Unnormalize` statistics equal the file, quantile mode on | `server_openpi.py`; `check_normalization` |
 | Native evaluator parity | 4 suites x 10 tasks x 10 episodes, per model | `runner_smolvla.py preflight`, `client_openpi.py parity`; `check_parity`. **Criterion: R9** |
 | Action units and shapes | 7 dimensions; per-dimension ranges per episode | `check_actions`. **Unit acceptance: R9** |
-| Implementation received d=2, 5, 10 | SmolVLA denoise count equals generations x d. pi0.5 `num_steps` observed at the sampler call, and same noise gives different chunks across d | Both rollouts; `check_received` |
+| Implementation received d=2, 5, 10 | SmolVLA denoise count equals generations x d. pi0.5 `num_steps` observed at the sampler call, and same noise gives different chunks across d. Alba's echo also checked; an echo alone is not proof. Pinned source's loop count measured on a dummy model: 2, 5, 10 (`alba-v2-probe-7b`). **Not yet measured with real weights** | Both rollouts; `check_received` |
 | Matched-reset first-action hashes | R22 = R52 and R25 = R55 | `summarize_condition_check` |
-| Reset reuse | One settled hash across all conditions | `summarize_condition_check`; `attempt_loop.py` |
+| Reset reuse | One settled hash and one first-observation hash across all conditions, with a fresh pi0.5 environment per attempt | `summarize_condition_check`; `attempt_loop.py` |
+| Client environment | Alba's check with the actual client interpreter, before GPU work | `check_openpi_client_environment.py`, called by the entry point |
 | R22, R25, R52, R55 smoke | Plus NATIVE, once each, on a non-confirmation identity | `conditions` mode |
 | Video inspection | Machine check of all, then a person inspects one contact sheet per task | `inspect_videos.py`; **human step** |
 | Per-call and rollout timing | 100 + 100 per d; per-generation and per-rollout | `check_timing` |
-| Generated-state hashes | 200 states with SHA-256 | `generate_states.py`; `check_states`. **Rulings: R7, N1** |
+| Generated-state hashes | 200 freshly generated states with SHA-256 (Alba, PR #1) | `generate_states.py`; `check_states`. **Ruling: N1** |
 | Reset-mismatch termination | A wrong reference on the real simulator stops before any policy query | `conditions` mode negative control |
-| Protocol and schedule hash binding | Release bound to protocol hash; confirmation release lists the schedule file; deferred cohorts refused | `launch_guard.py`; `check_binding` |
+| Protocol and schedule hash binding | Release bound to protocol hash; confirmation needs Alba's PRIMARY_R22_R25_ONLY release with per-model row and file hashes; deferred cohorts refused | `launch_guard.py`; `check_binding` |
 
 ## Authored values, not measured costs
 
@@ -60,8 +61,8 @@ counted_run: the first execution of run_preflight_v2.sh that passes G0 to G2, ru
 rerun_policy: none for this run ID; a failure stays failed, and a further attempt needs Alba's agreement, a new run ID and a recorded reason
 post_data_free: NONE for mechanical checks; the parity criterion is fixed in the release before the run; the human video inspection is a judgement, recorded with inspector and date
 gate: G0 release | Alba's release matches the protocol hash and records every decision | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:17 | before: all GPU work | qualified_on: complete release -> pass; missing decision -> fail
-gate: G2 lock | gpu.lock is free | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:26 | before: all GPU work | qualified_on: free lock -> pass; held lock -> fail
-gate: G1 quiet | under 3072 MiB in use | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:28 | before: all GPU work | qualified_on: 719 MiB -> pass; 19052 MiB -> fail
+gate: G2 lock | gpu.lock is free | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:28 | before: all GPU work | qualified_on: free lock -> pass; held lock -> fail
+gate: G1 quiet | under 3072 MiB in use | enforced_at: experiments/tooling/cross_policy/run_preflight_v2.sh:30 | before: all GPU work | qualified_on: 719 MiB -> pass; 19052 MiB -> fail
 selection_risk: low: no scientific estimate is drawn; identities are outside the confirmation population
 stop_on_confirmation: stop, send Alba the commit, verdict, manifest and checksums, and take no confirmation step until her release
 verdicts: PREFLIGHT_PASSED | PREFLIGHT_FAILED | UNINTERPRETABLE

@@ -1,59 +1,41 @@
 # Decision register, 2 November 2026
 
-Source: Alba's written decisions, as relayed by Warren on 2 November. Her message itself was not found in the mailbox searched, so this register rests on that relay. If her text has more detail, for example on any item marked OPEN, it overrides this file.
+Sources: Alba's PR #1 (`review/POST_SUBMISSION_CROSS_POLICY_REPAIRS_20261102.md`, commit `d8d9421`, her GitHub account), which is the text we hold in her own words; and her decisions as relayed by Warren. The relayed message itself was not found in Gmail, local Mail, local documents or other transcripts. **Where they differ, the PR overrides.**
+
+## Current status
+
+| Item | Her wording | Status |
+|---|---|---|
+| Attempt count | "400 identities x 2 conditions = 800 planned attempts; total across both models is 1,600, correcting the 800-across-both wording in Alba's email" | RESOLVED |
+| R7 | "requires freshly generated state slots, rather than an unapproved substitution of official slots" | RESOLVED |
+| R3 | "Preregister a calibrated method with a synthetic coverage study while the primary outcomes remain unseen" | Direction RESOLVED; method not implemented, OPEN |
+| R5, pi0.5 XLA arithmetic | "explicit measurement gaps, not numbers inferred from host time" | RESOLVED |
+| R6 | EGL "if an equivalent reference stack is required, or explicitly preregister OSMesa as a separate evaluation environment" | **OPEN, blocks preflight** |
+| R9 | "preregister native-parity acceptance criteria against the reference evaluator before looking at outcomes" | **OPEN, blocks preflight**: form given, criterion not |
+| R4 | "The response echo alone is insufficient" | **OPEN, blocks preflight**: whether the wrapper is official. Execution evidence is engineering |
+| N1 | Not addressed | **OPEN, blocks preflight** |
+| N2 | Pin the client's LIBERO source | Engineering; done on the reconciliation branch (`N2_PROBE_20261102.md`) |
+| N6 | Confirmation release format given | Implemented from her PR. Preflight release format is our proposal |
+| R12 | Not addressed | Engineering default from pinned source, unless she objects |
+| R10, N4, N5, R8, R13 for SmolVLA | Not addressed | OPEN, before confirmation only |
+| Invalidation reason | "must stay conditional" | **OPEN, unknown**; SmolVLA stays ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING |
+| Frozen script | "Do not patch the frozen `run_gpu_preflight.sh` retrospectively" | Restored on the reconciliation branch; see `RECONCILIATION_20261102.md` |
 
 ## Alba's decisions and where each is implemented
 
 | # | Decision | Implementation |
 |---|---|---|
-| 1 | Permanently exclude the earlier invalid pi0.5 160-attempt campaign | `exclusions` in both new protocols |
-| 2 | SmolVLA: ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING | `smolvla_historical_label` in the matched protocol |
+| 1 | Permanently exclude the earlier invalid pi0.5 160-attempt campaign | `exclusions` in the preflight protocol |
+| 2 | SmolVLA: ARITHMETICALLY REPRODUCED — INSTRUMENT VALIDITY PENDING | Her PR's label; recorded in this register |
 | 3 | Submitted NeurIPS RoboPAD PDF unchanged | `release/submitted.pdf` untouched |
 | 4 | Stale 20/40 vs 28/40 and its contribution claim excluded from future versions unless original journals are recovered and audited | `exclusions`. `paper/main.tex` still contains it and was not edited; it is Alba's manuscript |
 | 5 | 1 November preflight stays PREFLIGHT_FAILED | `prior_preflight`; raw evidence untouched |
 | 6 | New versioned preflight and unique run ID | `cross_policy_preflight_v2`, `cross_policy_preflight_v2.run001` |
 | 7 | All Alba's checks for both models | `checks` in the protocol; `preflight_verdict.py` |
-| 8 | Only permitted confirmation design: matched R22 vs R25 | `matched_r22_r25_confirmation_v1`; other cohorts refused by `launch_guard.py`. **See the count conflict** |
+| 8 | Only permitted confirmation design: matched R22 vs R25 | Her `make_primary_schedule.py` and `PRIMARY_R22_R25_ONLY` release; 1,600 attempts per her PR |
 | 9 | Append-only journals; failed attempts kept | `journal.py`, `attempt_loop.py` |
 | 10 | No confirmation until Alba has the preflight commit, verdict, manifest and checksums | Guard requires her release; `launch_condition` |
 | 11 | R52, R55, observation age, asynchronous, third policy deferred beyond mandatory smoke checks | Refused by guard; R52 and R55 only in the `conditions` smoke check |
-
-## Attempt-count conflict: Alba must rule
-
-Decision 8 lists 2 models x 4 suites x 10 tasks x 5 states x 2 seeds x 2 conditions, and "800 total attempts".
-
-**Those factors multiply to 1,600. 800 is the count per model.**
-
-The handover contributed to this: `07_REMAINING_WORK_AND_ESTIMATES.md` labelled R22 vs R25 on both models as "800 attempts", while its 6-28 hour estimate had counted 800 for each model. So the figure may come from that error. It has been corrected in the repository.
-
-To reach 800 in total, some factor must change, and which one is a scientific choice. Schedules follow the stated factors, so 1,600 rows. `matched_r22_r25_confirmation_v1` is `BLOCKED_ATTEMPT_COUNT_CONFLICT`, and the guard refuses it until this is settled. This does not block the preflight.
-
-## Status of every open question
-
-| ID | Question | Status after Alba's decisions | Blocks |
-|---|---|---|---|
-| R1 | Asynchronous runtime | DEFERRED (decision 11) | Nothing now |
-| R2 | Observation-age seeds | DEFERRED | Nothing now |
-| R3 | Bootstrap undercoverage | OPEN. R22 vs R25 still has an interval; the -5 point test is not in this design | Confirmation release |
-| R4 | Noise and `num_steps` wrapper as official path | OPEN. Decision 7 asks for official normalization and receipt of d, and does not rule on the wrapper | **Preflight** |
-| R5 | No CUDA-event time for pi0.5 | OPEN. Recorded as unavailable | Confirmation release |
-| R6 | OSMesa or EGL | OPEN | **Preflight** |
-| R7 | Newly generated or unused official states | OPEN. Check list names "generated-state hashes", which suggests generated; not read as a ruling | **Preflight** |
-| R8 | Identity overlap | Decision 1 excludes the campaign. Its records are still unavailable, so overlap stays uncertified | Confirmation release |
-| R9 | Native-parity criterion and action-unit acceptance | OPEN. The check is required with no criterion given | **Preflight** |
-| R10 | How failed attempts enter tests | PARTLY. Decision 9 preserves them; entry into tests is not stated | Confirmation release |
-| R12 | pi0.5 NATIVE h=5, d=10 | OPEN | **Preflight** |
-| R13 | Arithmetic across frameworks | OPEN | Confirmation release |
-| R16 | First action divergence | DEFERRED | Nothing now |
-| N1 | State stack across MuJoCo 3.8.1 and 3.2.3 | OPEN; facts below | **Preflight** |
-| N2 | LIBERO source for the client | OPEN; facts below | **Preflight** |
-| N3 | R22 and R25 first, or all five | RESOLVED by decision 8 | |
-| N4 | Independent outcome verification | OPEN. Not in the decisions | Confirmation release |
-| N5 | Stop on first failed attempt | OPEN. Compatible with decision 9, not confirmed | Confirmation release |
-| N6 | Release format | OPEN; proposed format is implemented | Preflight release |
-| New | 800 or 1,600 attempts | OPEN | Confirmation release |
-| New | Fresh environment per pi0.5 attempt | Technical; implemented because exact reset reuse requires it. Reported to Alba | |
-| — | Why the pi0.5 campaign was invalid | Decision 2 keeps validity pending; reason still unknown | SmolVLA validity |
 
 ## Measured facts for Alba's rulings
 
