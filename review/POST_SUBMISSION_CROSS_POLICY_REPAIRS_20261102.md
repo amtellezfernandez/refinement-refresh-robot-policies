@@ -65,11 +65,18 @@ instrumentation.
    measurements, action-shape/finite checks, R22/R25/R52/R55 smoke checks, and
    per-condition reset comparisons. Audit a new versioned verdict. The prior
    `PREFLIGHT_FAILED` remains unchanged.
-7. Once state manifests are bound, derive **separate** primary schedules for
+7. Resolve **R3 statistical coverage** before analyzing new results. The current
+   five-states-per-task percentile bootstrap undercovered in Warren's synthetic
+   check. Preregister a calibrated method with a synthetic coverage study while
+   the primary outcomes remain unseen; do not retroactively choose a confidence
+   procedure after examining R22/R25 success results. Treat unavailable JAX
+   CUDA-event timing (R5) and XLA arithmetic as explicit measurement gaps,
+   not numbers inferred from host time.
+8. Once state manifests are bound, derive **separate** primary schedules for
    `smolvla` and `pi05` with `make_primary_schedule.py`. Each must contain
    **400 identities × 2 conditions = 800 planned attempts**; total across both
    models is **1,600**, correcting the 800-across-both wording in Alba's email.
-8. Send preflight commit, protocol hashes, per-model primary schedule hashes,
+9. Send preflight commit, protocol hashes, per-model primary schedule hashes,
    native-parity report, failure records and manifest **before** anyone creates
    `review/releases/cross_policy_confirmation_v1.release.json`.
    A matching release must include `approval_scope=PRIMARY_R22_R25_ONLY`,
