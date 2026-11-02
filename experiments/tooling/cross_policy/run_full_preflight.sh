@@ -39,7 +39,7 @@ mkdir -p "$OUT"
 
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 "$W/envs/openpi/bin/python" "$TOOLS/server_openpi.py" profile --checkpoint "$W/ckpt/checkpoints/pi05_libero" --output "$OUT/pi05_profile"
-"$W/envs/openpi/bin/python" "$TOOLS/server_openpi.py" serve --checkpoint "$W/ckpt/checkpoints/pi05_libero" --port 8000 > "$OUT/server.log" 2>&1 &
+"$W/envs/openpi/bin/python" "$TOOLS/server_openpi.py" serve --checkpoint "$W/ckpt/checkpoints/pi05_libero" --output "$OUT/pi05_server" --port 8000 > "$OUT/server.log" 2>&1 &
 SERVER=$!
 trap 'kill "$SERVER" 2>/dev/null || true' EXIT
 for _ in $(seq 1 120); do

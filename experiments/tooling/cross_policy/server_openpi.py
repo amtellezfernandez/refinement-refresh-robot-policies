@@ -72,6 +72,14 @@ def load(checkpoint):
     return policy_config.create_trained_policy(openpi_config.get_config("pi05_libero"), str(checkpoint))
 
 
+def write_provenance(args):
+    import provenance as pv
+    norm = Path(args.checkpoint) / "assets/physical-intelligence/libero/norm_stats.json"
+    args.output.mkdir(parents=True, exist_ok=False)
+    record = pv.capture("pi05_server", args, {"checkpoint_dir": str(args.checkpoint), "normalization_sha256": file_sha(norm)})
+    atomic_write_json(args.output / "provenance.json", record)
+
+
 def profile(args):
     import jax
     import numpy as np
@@ -116,8 +124,9 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     launch_guard.check(args.phase)
+    if args.output is not None:
+        write_provenance(args)
     if args.mode == "profile":
-        args.output.mkdir(parents=True, exist_ok=False)
         profile(args)
     else:
         serve(args)

@@ -193,6 +193,23 @@ class ProvenanceInABundle(unittest.TestCase):
             self.assertEqual(provenance.git_commit(Path(directory)), "abc123")
 
 
+class ServerProvenance(unittest.TestCase):
+    def test_server_records_its_own_runtime_and_normalization_hash(self):
+        import server_openpi
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            norm = root / "ckpt/assets/physical-intelligence/libero/norm_stats.json"
+            norm.parent.mkdir(parents=True)
+            norm.write_text("{}")
+            args = argparse.Namespace(checkpoint=root / "ckpt", output=root / "out", mode="serve", port=8000)
+            server_openpi.write_provenance(args)
+            record = json.loads((root / "out/provenance.json").read_text())
+            self.assertEqual(record["model"], "pi05_server")
+            self.assertEqual(record["normalization_sha256"], file_sha(norm))
+            self.assertEqual(record["checkpoint_tree"]["files"], 1)
+            self.assertIn("jax", record["versions"])
+
+
 class ConditionCheck(unittest.TestCase):
     def test_reset_difference_fails(self):
         from attempt_loop import summarize_condition_check
