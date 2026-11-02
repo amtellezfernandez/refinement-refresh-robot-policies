@@ -97,12 +97,15 @@ def rollout(row, env, prompt, client, state, record_video=False, expected_settle
             request = dict(supplied, __d__=d, __noise_key__=json.dumps([ident, tick]))
             begin = time.perf_counter()
             response = client.infer(request)
+            if response.get("server_configured_num_steps") != d:
+                raise ValueError("unsupported_refinement_setting: server did not attest configured d={}".format(d))
             chunk = np.asarray(response["actions"])
             if chunk.ndim != 2 or chunk.shape[1] != 7 or not np.isfinite(chunk).all() or len(chunk) < h:
                 raise ValueError("unsupported_refinement_setting: chunk {} finite={}".format(chunk.shape, bool(np.isfinite(chunk).all())))
             chunk_record = {"shape": list(chunk.shape), "sha256": digest(chunk)}
             server_timing.append({"tick": tick, "client_round_trip_s": time.perf_counter() - begin,
-                                  "host_generation_s": response["host_generation_s"]})
+                                  "host_generation_s": response["host_generation_s"],
+                                  "server_configured_num_steps": response["server_configured_num_steps"]})
             memory = response["memory"]
             plan.extend(chunk[:h])
         action = plan.popleft()
