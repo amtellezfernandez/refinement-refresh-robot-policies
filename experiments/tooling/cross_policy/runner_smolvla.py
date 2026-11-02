@@ -53,7 +53,7 @@ class ChunkTap:
         self.policy._get_action_chunk = self.original
 
 
-def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False):
+def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=False, expected_settled_state=None):
     """One episode. Writes nothing itself; returns arrays and per-query records."""
     import numpy as np
     import run_paired as rp
@@ -76,6 +76,8 @@ def rollout(row, env, policy, pre, post, env_pre, env_post, state, record_video=
     observation, _ = env.reset(seed=[environment_seed], options={NEW_ROLLOUT_OPTION: True})
     settled = rp.array_record(base._env.sim.get_state().flatten())["sha256"]
     first_observation = rp.observation_sha(observation)
+    if expected_settled_state is not None and settled != expected_settled_state:
+        raise ValueError("reset_state_mismatch: expected {}, observed {}".format(expected_settled_state, settled))
     tap = rp_tap = ChunkTap(policy)
     torch.cuda.synchronize()
     torch.cuda.reset_peak_memory_stats()
@@ -175,7 +177,8 @@ def attempts(args):
                 key = task_key
             state = states[row["state_key"]]
             rp.require(hashlib.sha256(state.tobytes()).hexdigest() == row["state_sha256"], "state hash mismatch")
-            result = rollout(row, env, policy, pre, post, env_pre, env_post, state)
+            result = rollout(row, env, policy, pre, post, env_pre, env_post, state,
+                             expected_settled_state=settled.get(row["block_id"]))
             expected = settled.setdefault(row["block_id"], result["settled_state_sha256"])
             arrays = args.output / "arrays"
             arrays.mkdir(exist_ok=True)
