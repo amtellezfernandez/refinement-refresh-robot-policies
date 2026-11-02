@@ -398,15 +398,25 @@ but does not determine the quality ranking on new tasks.
 \clearpage
 \section{Discussion and Conclusion}
 
-Full-generation cost determines which refresh schedules are feasible, while
-closed-loop outcomes determine which feasible expenditure is useful. The fixed
-cost of a fresh prediction makes refinement reduction alone insufficient at
-tight arithmetic ceilings. Within those constraints, the frozen primary result
-favors less denoising at a two-action prefix. The descriptive prefix comparisons
-identify a much cheaper five-action setting whose quality difference remains
-unresolved. These findings constrain the allocation question without identifying
-a universal optimum, and the fitted selector adds no demonstrated advantage
-over the simple rule.
+Chunked policies allocate inference compute between refining a predicted action
+sequence and replanning from a newer observation. For the frozen SmolVLA
+checkpoint studied here, the separate-task comparison shows that additional
+refinement need not improve closed-loop success. At a fixed two-action execution
+prefix, reducing denoising from five to two steps raises success from 122/160 to
+139/160 while reducing reference-calibrated arithmetic per control step by
+5.9\%. This primary comparison follows a 480-attempt discovery study and is part
+of a 1,120-attempt campaign across seven frozen configurations on eight Goal and
+Object tasks excluded from configuration selection.
+
+Full-generation accounting also shows why reducing refinement alone yields
+limited savings: 82.1\% of native generation arithmetic is independent of
+denoising. At two denoising steps, executing five rather than two actions before
+replanning yields 138/160 versus 139/160 successes with 60.7\% less arithmetic
+per attempt, but equivalent quality is not established. A simple cost-aware rule
+matches the fitted response model's choices at three compute budgets, so fitting
+has no demonstrated decision-making advantage. Together, the results support
+evaluating refinement and replanning jointly through closed-loop success and
+explicit compute constraints; they do not identify a universal allocation.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
@@ -427,14 +437,14 @@ were not replayed in a separate, version-matched simulator. Outcome validity is
 therefore strongly supported internally but not fully independently established.
 
 \paragraph{Next steps.}
-A controlled stale-input diagnostic is planned to separate observation
-freshness from the action-position effects introduced by changing the executed
-prefix.
-A new, predeclared quality-preservation test for the cheaper $(5,2)$ setting
-and replication on another policy are needed to assess whether its observed
-cost advantage supports deployment. The broader objective is to determine when
-the fixed cost of a fresh prediction is worth paying, and how much refinement
-that prediction needs.
+A controlled stale-input diagnostic is needed to separate observation freshness
+from the action-position effects introduced by changing the executed prefix. A
+predeclared quality-preservation test should evaluate the cheaper $(5,2)$
+setting, and independent outcome replay should test the retained primary
+trajectories in a separate, version-matched simulator. Replication across other
+checkpoints, policy architectures, benchmark families, and asynchronous or
+physical-robot execution is required to determine when the fixed cost of a
+fresh prediction is worth paying and how much refinement that prediction needs.
 
 \clearpage
 \bibliographystyle{unsrtnat}
