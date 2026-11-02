@@ -52,9 +52,14 @@ class KeyedPolicy:
         if d not in ALLOWED_D:
             raise ValueError("unsupported_refinement_setting: d={}".format(d))
         self._policy._sample_kwargs = {"num_steps": d}
+        # Explicit echo of the configured setting is necessary but not sufficient
+        # to validate the actual JAX denoising loop; that needs its own preflight.
+        if self._policy._sample_kwargs.get("num_steps") != d:
+            raise ValueError("unsupported_refinement_setting: num_steps not applied")
         started = time.perf_counter()
         result = self._policy.infer(obs, noise=noise_for(key))
         result["host_generation_s"] = time.perf_counter() - started
+        result["server_configured_num_steps"] = d
         result["memory"] = memory_stats()
         return result
 
