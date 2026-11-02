@@ -1,6 +1,6 @@
 {
   "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
-  "script_sha256": "83be0d18afdd6b8b264585d4f98f66e65b63c8b3f91c27d1a84b91e3d4cb4ab8",
+  "script_sha256": "f26818a6b791f7abdc49dad6330b80657e8a5a9039b573d5f5e9530fc1e1582b",
   "input_sha256": {
     "experiments/runs/refinement_refresh_final_001/paper_analysis/discovery_audit.json": "0a4a26754151fe203f06637fcfaec85931f1f40218722f979dbdffd7fbcb4cec",
     "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "93ae4aab553893ffc44b68dd58b160d13eb8c8e0ff9e237dd0c4053e946958bb",
@@ -14,7 +14,7 @@
     "numpy": "2.4.2"
   },
   "figure_width_inches": 5.5,
-  "minimum_figure_font_pt": 10,
+  "minimum_figure_font_pt": 8.5,
   "output_sha256": {
     "confirmation_resources.tex": "c44ca8583a865bbc85bcd77580a5e0adba7e19dc39b1612ec6d4b9ae3d228787",
     "confirmation_predictions.tex": "b1e4d7ab078792a95913b2af49aba0b67e4a0f1c2df14a366d74fe5baa6b53a0",
@@ -24,7 +24,7 @@
     "discovery_resources.tex": "c084af335f8b123ab76ec1f5323faf8496e552562b9e0967fe4fddc3d59d5fa9",
     "primary_resources.tex": "8521e48f8ea5defa3d522fe80eee66baf62e49fa07031a199f0c89b0d0874931",
     "selector_choices.tex": "7c0332da5d2b31555ef24753964ea8c370d538ae05e8f1723352785223936ed8",
-    "discovery_allocation.pdf": "2cf4b97956ec5f5f7a184c9dd0f345212ad2faf43ac477d390fb3482ee0bbe2c",
-    "confirmation_effects.pdf": "1dfa8bf3f878ed9e34de3a83eea3a4d4313e561c08d15b4feef5707c6219def4"
+    "discovery_allocation.pdf": "313a11fc62e3c5a6957553ba165c2711ed9beee7fa690dbdff0e4ba4635e45ff",
+    "confirmation_effects.pdf": "4918241da58123de77ebb57916885b5645252c829455dacf028f88f5a32f040c"
   }
 }
