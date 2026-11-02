@@ -77,7 +77,7 @@ Items 4 and 5 can run in parallel. Whether step 7's prereg needs Alba's approval
 | `n_action_steps` and queue | Plausibly | Wrong prefix | Compare generations with steps and h | **Passes for SmolVLA journals** |
 | Noise shape and injection | Plausibly | `chunk_size`, `max_action_dim` mismatch | Re-derive the shape from config | Manifests: 50, 32 |
 | Image size | Plausibly | 360 evaluated; pi0.5 expects its own resolution | Compare preprocessed tensors | Not checked |
-| Journals and analysis | Plausibly | Recording or success defect | Fresh replay of saved actions | Not checked; |
+| Journals and analysis | Plausibly | Recording or success defect | Fresh replay of recorded actions | Not checked. The archive has no `.npy` arrays, only `steps.jsonl` |
 
 **Result of `audit_shared_instrumentation.py` on `confirmation_completed.tar.gz`:** 1,122 records, 0 violations of: `generations = ceil(steps / h)`; `denoise_steps = generations x d`; `action_expert_calls = denoise_steps`; `prefill_calls = generations`; `vision_encoder_calls = 2 x generations`; steps within horizon; failures only at horizon. Horizons: Object 280, Goal 300.
 
