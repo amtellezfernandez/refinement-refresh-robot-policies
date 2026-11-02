@@ -272,7 +272,8 @@ def main():
     args = parser.parse_args()
     if args.mode == "attempts" and args.phase == "preflight":
         raise SystemExit("attempts need --phase confirmation or observation_age")
-    launch_guard.check(args.phase)
+    launch_guard.check(args.phase, schedule_path=args.schedule if args.mode == "attempts" else None,
+                       model="smolvla" if args.mode == "attempts" else None)
     (preflight if args.mode == "preflight" else attempts)(args)
 
 
