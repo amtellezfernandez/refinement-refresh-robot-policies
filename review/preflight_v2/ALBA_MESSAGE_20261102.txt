@@ -8,7 +8,7 @@ Complete: checkpoint and dependency provenance for both models, the client envir
 
 Partial: pinned OpenPI on a dummy model ran 2, 5 and 10 loop calls at d=2, 5, 10; simulator-only reset repeatability on sampled tasks; reset-mismatch and release binding in tests only.
 
-Not run: loaded-policy normalization and d count with real weights, whose CPU job was terminated when the workstation's WSL failed; generated-state hashes, also terminated; and everything needing the GPU: parity, action units, first-action hashes, R22/R25/R52/R55 smoke, videos and timing.
+Not run: loaded-policy normalization and d count with real weights, whose CPU job was terminated without a result; generated-state hashes, terminated in the same second, with the workstation's WSL failing about two minutes later and the cause not established; and everything needing the GPU: parity, action units, first-action hashes, R22/R25/R52/R55 smoke, videos and timing.
 
 Your reasons for the pi0.5 invalidation, normalization and denoising, are therefore implemented as checks but not yet complete with real weights.
 
@@ -22,7 +22,7 @@ I need these from you before the GPU stage:
 
 The GPU stage is roughly 6-26 hours of machine time, so it cannot finish in your two-hour window.
 
-Commit: COMMIT_PLACEHOLDER on warren/cross-policy-confirmation
+Branch: warren/cross-policy-confirmation
 Status, manifest and checksums: review/preflight_v2/run001_cpu/
 
 Warren
