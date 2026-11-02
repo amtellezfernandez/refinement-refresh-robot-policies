@@ -59,6 +59,15 @@ All on the RTX, CPU only, `--vram 0`, no weights and no policy; GPU at its idle 
 | `alba-v2-probe-7c` | First-observation hash identical over 3 fresh environments on 4 pi0.5 client tasks, and 3 hard resets on 2 SmolVLA tasks |
 | `alba-v2-probe-6` | Client on OpenPI's tree: 40 of 40 tasks; settled state and images identical to the old config |
 
+## Follow-up on local branch `local/preflight-v2-engineering` (after the reconciliation branch)
+
+| Item | Change | Evidence | Not established |
+|---|---|---|---|
+| Real-weight denoising count | `server_openpi.count_denoise_loop` runs `Policy.infer` uncompiled with the loaded model, counting `action_out_proj` calls at d=2, 5, 10. `profile` records `denoise_loop_calls` and, without a gate, how far uncompiled chunks differ from compiled ones. `preflight_verdict.py` fails on a wrong or missing count | Tests on a fake model, including one that ignores `num_steps`. The counting method itself ran on pinned `Pi0` with a dummy model on the RTX (`alba-v2-probe-7b`) | **Never run on the real `Policy` class or real weights.** That needs the checkpoint, which is on the RTX. Uncompiled run time is unknown |
+| Environment false positive | `check_openpi_client_environment.py` now requires `benchmark_root`, `bddl_files`, `init_states` and `assets` under the pinned root, and refuses another interpreter's paths even without a pinned root | Tests with the real check on a fake LIBERO; reproduced the false positive first | **Not re-run in the real client environment.** Assumes `get_libero_path("benchmark_root")` works; config has that key |
+
+Both change Alba's check or our harness only. No frozen protocol or schedule changes, and neither decides R9, R6, N1 or R4.
+
 ## Limits
 
 - No fix has run with real weights, the server, the GPU or the new code on the RTX, whose bundle is still `code-bb86691`.

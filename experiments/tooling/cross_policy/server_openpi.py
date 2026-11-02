@@ -116,6 +116,45 @@ def write_provenance(args, normalization_loaded=None):
     atomic_write_json(args.output / "provenance.json", record)
 
 
+def count_denoise_loop(keyed, example, chunks=None):
+    """Loop calls actually made through Policy.infer with the loaded weights, at each d.
+
+    The compiled sampler hides its loop, so these calls run uncompiled, with the real model and the same
+    noise as the fixed-noise chunks. pi0.py applies action_out_proj once per Euler step. An echo or a
+    keyword seen at the sampler shows what was asked for; this counts what ran.
+    """
+    import jax
+    import numpy as np
+    policy = keyed._policy
+    model, recorded = policy._model, policy._sample_actions
+    target = model.action_out_proj
+    layer = type(target)
+    original, calls, counts = layer.__call__, [0], {}
+
+    def counting(self, *args, **kwargs):
+        if self is target:
+            calls[0] += 1
+        return original(self, *args, **kwargs)
+
+    def uncompiled(rng, observation, **kwargs):
+        return model.sample_actions(rng, observation, **kwargs)
+
+    layer.__call__ = counting
+    policy._sample_actions = uncompiled
+    try:
+        with jax.disable_jit():
+            for d in ALLOWED_D:
+                calls[0] = 0
+                result = keyed.infer(dict(example, __d__=d, __noise_key__=json.dumps(["fixed-noise"])))
+                counts[str(d)] = calls[0]
+                if chunks is not None:
+                    chunks[str(d)] = np.asarray(result["actions"])
+    finally:
+        layer.__call__ = original
+        policy._sample_actions = recorded
+    return counts
+
+
 def profile(args):
     import jax
     import numpy as np
@@ -125,6 +164,8 @@ def profile(args):
     policy = KeyedPolicy(loaded)
     example = make_libero_example()
     report = {"cuda_event": CUDA_EVENT_UNAVAILABLE, "jax_devices": [str(x) for x in jax.local_devices()], "points": {}}
+    uncompiled_chunks = {}
+    report["denoise_loop_calls"] = count_denoise_loop(policy, example, uncompiled_chunks)
     for d in ALLOWED_D:
         request = dict(example, __d__=d)
         for index in range(100):
@@ -146,7 +187,9 @@ def profile(args):
         report["points"][str(d)] = {"host_s": host, "chunk_shape": list(actions.shape), "memory": result["memory"],
                                     "distinct_chunks": len(chunks), "warm_shape": list(np.asarray(warm["actions"]).shape),
                                     "received_num_steps": received,
-                                    "fixed_noise_chunk_sha256": hashlib.sha256(fixed.tobytes()).hexdigest()}
+                                    "fixed_noise_chunk_sha256": hashlib.sha256(fixed.tobytes()).hexdigest(),
+                                    # Reported, not gated: how closely the counted path matches the compiled one.
+                                    "uncompiled_vs_compiled_max_abs": float(np.abs(fixed - uncompiled_chunks[str(d)]).max())}
     report["status"] = "completed"
     atomic_write_json(args.output / "profile.json", report)
 

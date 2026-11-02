@@ -55,13 +55,16 @@ def check_received(root):
         counts = smol[str(d)]["counts"]
         if counts["denoise_steps"] != counts["generations"] * d or counts["generations"] != PROFILE_CALLS:
             return False, "smolvla d={}: counts {}".format(d, counts)
-    points = read(root / "pi05_profile/profile.json")["points"]
+    profile = read(root / "pi05_profile/profile.json")
+    points = profile["points"]
+    if profile["denoise_loop_calls"] != {str(d): d for d in DENOISING}:
+        return False, "pi05: loop calls {} with the loaded weights".format(profile["denoise_loop_calls"])
     for d in DENOISING:
         if points[str(d)]["received_num_steps"] != [d] * PROFILE_CALLS:
             return False, "pi05 d={}: sampler did not receive it on every call".format(d)
     if len({points[str(d)]["fixed_noise_chunk_sha256"] for d in DENOISING}) != len(DENOISING):
         return False, "pi05: same noise gave the same chunk at different d"
-    return True, "counted at the model boundary (SmolVLA); received at the sampler and changes the chunk (pi0.5)"
+    return True, "counted at the model boundary (SmolVLA); loop calls counted with loaded weights, received at the sampler, and changes the chunk (pi0.5)"
 
 
 def check_timing(root):

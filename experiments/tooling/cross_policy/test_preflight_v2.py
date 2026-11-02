@@ -338,7 +338,7 @@ def fabricated_run(root):
     write(root / "pi05_parity/provenance.json", {"packages": ["numpy==1"], "git_commit": "abc", "gpu": "GPU-1", "versions": {}})
     write(root / "smolvla/profile.json", {str(d): {"host_s": [.1] * 100, "cuda_ms": [1.] * 100, "chunk_shape": [1, 50, 7],
                                                    "counts": {"generations": 100, "denoise_steps": 100 * d}, "peak_reserved_bytes": 1} for d in (2, 5, 10)})
-    write(root / "pi05_profile/profile.json", {"status": "completed", "points": {str(d): {"host_s": [.1] * 100, "chunk_shape": [10, 7], "received_num_steps": [d] * 100,
+    write(root / "pi05_profile/profile.json", {"status": "completed", "denoise_loop_calls": {"2": 2, "5": 5, "10": 10}, "points": {str(d): {"host_s": [.1] * 100, "chunk_shape": [10, 7], "received_num_steps": [d] * 100,
                                                "memory": {"peak_bytes_in_use": 1}, "fixed_noise_chunk_sha256": "c" + str(d)} for d in (2, 5, 10)}})
     for model, directory in (("smolvla", "smolvla_conditions"), ("pi05", "pi05_conditions")):
         write(root / directory / "conditions.json", {"status": "PASS"})
