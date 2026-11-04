@@ -151,9 +151,13 @@ def verify_population(bundles, sample):
             "sample": len(sample_keys), "sample_selection_sha256": SAMPLE_SELECTION_SHA256}
 
 
-def _strict_release(release_path, protocol_path, bundles_path, sample_path, through):
+def _strict_release(release_path, protocol_path, bundles_path, sample_path, through, mode="frozen"):
     if through not in (0, 1, 2):
         raise ReplayRefused("requested --through must be one of 0, 1, 2")
+    if mode not in ("frozen", "sample_first_57_v1"):
+        raise ReplayRefused("unknown execution mode")
+    if mode == "sample_first_57_v1" and through != 1:
+        raise ReplayRefused("sample-first diagnostic is limited to 57 attempts (stage 1)")
     if not all((release_path, protocol_path, bundles_path, sample_path)):
         raise ReplayRefused("release, protocol, bundle and sample file paths are mandatory")
     try:
@@ -163,16 +167,31 @@ def _strict_release(release_path, protocol_path, bundles_path, sample_path, thro
         raise ReplayRefused(f"cannot read approved inputs: {exc}") from exc
     if not isinstance(release, dict) or not isinstance(sample, dict):
         raise ReplayRefused("release and sample must be JSON objects")
-    if sha_file(protocol_path) != PROTOCOL_SHA256 or release.get("protocol_sha256") != PROTOCOL_SHA256:
-        raise ReplayRefused("frozen protocol hash mismatch")
+    if mode == "sample_first_57_v1":
+        alternate = ROOT / "protocol" / "SAMPLE_FIRST_57_PROTOCOL.md"
+        if Path(protocol_path).resolve() != alternate.resolve():
+            raise ReplayRefused("sample-first run requires the separate, versioned protocol")
+        expected_protocol = sha_file(alternate)
+        if release.get("execution_mode") != mode:
+            raise ReplayRefused("release does not approve sample-first execution mode")
+    else:
+        expected_protocol = PROTOCOL_SHA256
+        if release.get("execution_mode") not in (None, "frozen"):
+            raise ReplayRefused("frozen release has incompatible execution mode")
+    if sha_file(protocol_path) != expected_protocol or release.get("protocol_sha256") != expected_protocol:
+        raise ReplayRefused("chosen versioned protocol hash mismatch")
     if release.get("approved_by") != APPROVER or release.get("decision") != "APPROVED":
         raise ReplayRefused("release lacks the named author's explicit approval")
     scope = release.get("scope")
-    if (not isinstance(scope, list) or not scope or
-            scope != list(range(len(scope))) or any(s not in (0, 1, 2) for s in scope)):
-        raise ReplayRefused("approval scope must be exactly [0], [0,1] or [0,1,2]")
-    if through > max(scope):
-        raise ReplayRefused(f"Stage {through} not included in approval scope {scope}")
+    if mode == "sample_first_57_v1":
+        if scope != [1]:
+            raise ReplayRefused("sample-first diagnostic requires scope [1] only")
+    else:
+        if (not isinstance(scope, list) or not scope or
+                scope != list(range(len(scope))) or any(s not in (0, 1, 2) for s in scope)):
+            raise ReplayRefused("approval scope must be exactly [0], [0,1] or [0,1,2]")
+        if through > max(scope):
+            raise ReplayRefused(f"Stage {through} not included in approval scope {scope}")
     if sha_file(bundles_path) != BUNDLES_SHA256 or release.get("bundles_sha256") != BUNDLES_SHA256:
         raise ReplayRefused("bundle bytes are not the pinned archived population")
     if release.get("sample_manifest_sha256") != sha_file(sample_path):
@@ -209,17 +228,19 @@ def runtime_versions():
     return versions
 
 
-def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, through, render):
+def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, through, render,
+               mode="frozen"):
     """Validate everything before any output directory or simulator can be created."""
     if not render:
         raise ReplayRefused("confirmatory replay requires rendering")
     release, sample, code_hashes, amendments = _strict_release(
-        release_path, protocol_path, bundles_path, sample_path, through)
+        release_path, protocol_path, bundles_path, sample_path, through, mode=mode)
     pop = verify_population(bundles, sample)
     versions = runtime_versions()
     return {"approval_scope": release["scope"], "requested_through": through,
+            "execution_mode": mode,
             "release_sha256": sha_file(release_path),
-            "protocol_sha256": PROTOCOL_SHA256,
+            "protocol_sha256": sha_file(protocol_path),
             "amendments_sha256": amendments, "code_sha256": code_hashes,
             "bundles_sha256": BUNDLES_SHA256, "sample_manifest_sha256": sha_file(sample_path),
             "sample_selection_sha256": SAMPLE_SELECTION_SHA256, "population": pop,
