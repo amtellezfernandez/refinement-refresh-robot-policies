@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import math
 import sys
 from collections import Counter
 from pathlib import Path
@@ -28,6 +29,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import libero_replay as lr  # noqa: E402
 import replay as R  # noqa: E402
+import governance as gov  # noqa: E402
 
 PROCEED = {"PASS_EXACT", "PASS_WITHIN_TOLERANCE"}
 PRIMARY = {"h2_d2", "h2_d5"}
@@ -55,7 +57,8 @@ def stage0(bundles, out, render):
                      "max_abs_diff": diff, "init_file_sha256": src.get("file_sha256")})
     if rep:
         rep.close()
-    if any(r["max_abs_diff"] is None or r["max_abs_diff"] > R.RESET_TOL for r in rows):
+    if any(r["max_abs_diff"] is None or not math.isfinite(r["max_abs_diff"])
+           or r["max_abs_diff"] > R.RESET_TOL for r in rows):
         verdict = "FAIL_RESET"
     elif all(r["exact"] for r in rows):
         verdict = "PASS_EXACT"
@@ -89,14 +92,17 @@ def sensitivity_probe(b, render, rng):
     return outcomes
 
 
-def episode_stage(n, bundles, out, render, release, protocol, stage0_verdict, double=True):
+def episode_stage(n, bundles, out, render, release, protocol, stage0_verdict, double=True,
+                  artifact_paths=None):
     sd = out / f"stage{n}"
     sd.mkdir(parents=True, exist_ok=False)
     runs = {}
     for name, mode in (("reset_path_a", "reset_path"), ("reset_path_b", "reset_path"), ("inject", "inject")):
         if name == "reset_path_b" and not double:
             continue
-        code = R.run(bundles, sd / name, mode=mode, render=render, release=release, protocol=protocol)
+        code = R.run(bundles, sd / name, mode=mode, render=render, release=release,
+                     protocol=protocol, stage=n, artifact_paths=artifact_paths,
+                     capability=gov._ORCHESTRATOR_CAPABILITY if artifact_paths else None)
         if code != 0:
             return {"stage": n, "verdict": "REFUSED", "code": code}
         runs[name] = [json.loads(l) for l in (sd / name / "results.jsonl").read_text().splitlines()]
@@ -158,36 +164,79 @@ def main():
     ap.add_argument("out")
     ap.add_argument("--release", required=True)
     ap.add_argument("--protocol", required=True)
-    ap.add_argument("--through", type=int, default=2)
+    ap.add_argument("--through", type=int, choices=(0, 1, 2), default=2)
     ap.add_argument("--no-render", action="store_true")
     a = ap.parse_args()
     bundles = R.read_bundles(a.bundles)
-    refusal = R.gate(bundles, a.release, a.protocol)
-    if refusal:
-        print(refusal, file=sys.stderr)
-        sys.exit(5)
+    render = not a.no_render
+    real = gov.is_real_archive(bundles)
+    artifact_paths = None
+    if real:
+        try:
+            report = gov.verify_run(bundles, a.bundles, a.sample, a.release,
+                                    a.protocol, a.through, render)
+        except (gov.ReplayRefused, OSError, ValueError, KeyError) as error:
+            print("REFUSED: {}".format(error), file=sys.stderr)
+            sys.exit(5)
+        artifact_paths = {"bundles": a.bundles, "sample": a.sample,
+                          "release_sha256": report["release_sha256"]}
+    else:
+        # Retain Warren's existing fixture-only fire drills. These fixtures
+        # have no standing as scientific evidence or approval for paper data.
+        refusal = R.gate(bundles, a.release, a.protocol)
+        if refusal:
+            print(refusal, file=sys.stderr)
+            sys.exit(5)
+        report = None
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=False)
-    render = not a.no_render
+    if report is not None:
+        report["command_line"] = sys.argv
+        report["output_directory"] = str(out.resolve())
+        gov.record_preflight(out / "counted_run_identity.json", report)
     s0 = stage0(bundles, out, render)
     print("stage0", s0["verdict"], s0["exact"], "/", s0["n_task_states"], flush=True)
-    if a.through < 1:
-        sys.exit(0)
+    if real and s0["n_task_states"] != 80:
+        print("STOP: Stage 0 did not check all 80 task-states", file=sys.stderr)
+        sys.exit(6)
     if s0["verdict"] not in PROCEED:
-        print("STOP: stage 0 did not pass; stage 1 not started", file=sys.stderr)
+        print("STOP: Stage 0 did not pass; no further stage started", file=sys.stderr)
         sys.exit(6)
-    sample = set(json.loads(Path(a.sample).read_text())["stage1_sample"])
-    s1 = episode_stage(1, [b for b in bundles if b["episode_key"] in sample], out, render, a.release, a.protocol,
-                       s0["verdict"])
-    print("stage1", s1["verdict"], s1.get("verdict_counts"), flush=True)
-    if a.through < 2:
+    if a.through == 0:
         sys.exit(0)
-    if s1["verdict"] not in PROCEED | {"PASS_OUTCOME_ONLY"}:
-        print("STOP: stage 1 did not pass; stage 2 not started", file=sys.stderr)
+    manifest = json.loads(Path(a.sample).read_text("utf-8"))
+    sample_ids = set(manifest["stage1_sample"])
+    sample = [b for b in bundles if b["episode_key"] in sample_ids]
+    if real and len(sample) != 57:
+        print("STOP: Stage 1 must contain exactly 57 frozen attempts", file=sys.stderr)
         sys.exit(6)
-    s2 = episode_stage(2, [b for b in bundles if b.get("condition") in PRIMARY], out, render, a.release,
-                       a.protocol, s0["verdict"], double=False)
+    s1 = episode_stage(1, sample, out, render, a.release, a.protocol,
+                       s0["verdict"], artifact_paths=artifact_paths)
+    print("stage1", s1["verdict"], s1.get("verdict_counts"), flush=True)
+    if s1["verdict"] not in PROCEED | {"PASS_OUTCOME_ONLY"}:
+        print("STOP: Stage 1 failed; Stage 2 not started", file=sys.stderr)
+        sys.exit(6)
+    if a.through == 1:
+        sys.exit(0)
+    primary = [b for b in bundles if b.get("condition") in PRIMARY]
+    if real and len(primary) != 320:
+        print("STOP: Stage 2 must contain exactly 320 primary attempts", file=sys.stderr)
+        sys.exit(6)
+    s2 = episode_stage(2, primary, out, render, a.release, a.protocol,
+                       s0["verdict"], double=False, artifact_paths=artifact_paths)
     print("stage2", s2["verdict"], s2.get("counts_by_condition"), flush=True)
+    if s2["verdict"] not in PROCEED | {"PASS_OUTCOME_ONLY"}:
+        print("STOP: Stage 2 did not confirm archived outcomes", file=sys.stderr)
+        sys.exit(6)
+    if real:
+        counts = s2["counts_by_condition"]
+        if (counts.get("h2_d2", {}).get("n") != 160
+                or counts.get("h2_d5", {}).get("n") != 160
+                or counts["h2_d2"]["replayed_successes"] != 139
+                or counts["h2_d5"]["replayed_successes"] != 122):
+            print("STOP: replay-derived primary counts do not match the frozen study", file=sys.stderr)
+            sys.exit(6)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
