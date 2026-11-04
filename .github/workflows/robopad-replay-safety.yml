@@ -1,0 +1,43 @@
+name: RoboPAD replay governance (offline)
+
+on:
+  push:
+    branches:
+      - warren/independent-replay-validation
+  pull_request:
+    paths:
+      - 'review/independent_validation_20261104/replay/**'
+      - 'review/independent_validation_20261104/protocol/**'
+      - '.github/workflows/robopad-replay-safety.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal offline-test dependency
+        run: python -m pip install --disable-pip-version-check numpy==2.2.6
+      - name: Compile replay source without launching a simulator
+        run: python -m compileall -q review/independent_validation_20261104/replay
+      - name: Guard against changes to frozen scientific protocol
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          path = Path("review/independent_validation_20261104/protocol/PROTOCOL.md")
+          expected = "ede3eb8570487b7e2eda8e47f39c6afc1d12e40bece590e8c4590d34341ea737"
+          actual = hashlib.sha256(path.read_bytes()).hexdigest()
+          assert actual == expected, f"FROZEN PROTOCOL DRIFT: {actual}"
+          PY
+      - name: Exercise release binding, exact sampling and failure exits
+        run: |
+          python -m unittest discover \
+            -s review/independent_validation_20261104/replay \
+            -p 'test_governance.py' -v
