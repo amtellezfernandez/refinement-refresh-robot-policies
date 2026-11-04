@@ -120,7 +120,8 @@ def gate(bundles, release, protocol, *, capability=None, stage=None, artifact_pa
             return "REFUSED: archived replay requires the approved staged orchestrator"
         try:
             rel, _, _, _ = gov._strict_release(
-                release, protocol, artifact_paths["bundles"], artifact_paths["sample"], stage)
+                release, protocol, artifact_paths["bundles"], artifact_paths["sample"], stage,
+                mode=artifact_paths.get("mode", "frozen"))
             if rel["scope"][-1] < stage:
                 return "REFUSED: current stage exceeds approval scope"
             if gov.sha_file(release) != artifact_paths["release_sha256"]:
@@ -162,6 +163,11 @@ def replay_one(rep, b, mode, cache):
     ours = rep.reset(pre, b["environment_seed"])
     reset_exact = ours.shape == recorded.shape and np.array_equal(ours, recorded)
     reset_maxabs = float(np.max(np.abs(ours - recorded))) if ours.shape == recorded.shape else None
+    if (b.get("provenance") == "archived_paper_evidence"
+            and b.get("episode_key", "").startswith("confirmation.")
+            and (reset_maxabs is None or not np.isfinite(reset_maxabs)
+                 or reset_maxabs > RESET_TOL)):
+        raise ValueError("REFUSED: sampled archived reset differs before action dispatch")
     if mode == "inject" and ours.shape == recorded.shape:
         rep.inject(recorded)
     flags, first = [], None
