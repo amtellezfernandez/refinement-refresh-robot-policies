@@ -118,8 +118,8 @@ def gate(bundles, release, protocol):
     if not release or not protocol:
         return (f"REFUSED: {len(archived)} bundle(s) are not synthetic fixtures; archived replay "
                 "needs --release and --protocol (Alba's approval of the frozen protocol)")
-    rel = json.loads(Path(release).read_text())
-    psha = hashlib.sha256(Path(protocol).read_bytes()).hexdigest()
+    rel, psha = _read_release_and_protocol(release, protocol)  # ({}, "unreadable") on any failure
+    # a missing or malformed file can therefore never satisfy the equality below
     if rel.get("protocol_sha256") != psha or not rel.get("approved_by") or rel.get("decision") != "APPROVED":
         return "REFUSED: release does not approve this exact protocol"
     return None
@@ -198,7 +198,7 @@ def environment_identity():
     pk = {p: m.version(p) for p in ("mujoco", "robosuite", "hf_libero", "bddl", "numpy", "torch")}
     from libero.libero import get_libero_path
     return {"platform": platform.platform(), "machine": platform.machine(), "python": platform.python_version(),
-            "packages": pk, "assets_path": str(Path(get_libero_path("assets")).resolve())}
+            "packages": pk, "assets_dir_name": Path(get_libero_path("assets")).resolve().name}
 
 
 def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol=None):
@@ -265,6 +265,18 @@ def main():
     r.add_argument("--protocol")
     a = ap.parse_args()
     sys.exit(run(read_bundles(a.bundles), a.out, a.mode, not a.no_render, a.release, a.protocol))
+
+
+def _read_release_and_protocol(release, protocol):
+    """Read the release JSON and hash the protocol; fail closed with a refusal, never an exception."""
+    try:
+        rel = json.loads(Path(release).read_text())
+        psha = hashlib.sha256(Path(protocol).read_bytes()).hexdigest()
+    except (OSError, ValueError):
+        return {}, "unreadable"
+    if not isinstance(rel, dict):
+        return {}, "unreadable"
+    return rel, psha
 
 
 if __name__ == "__main__":

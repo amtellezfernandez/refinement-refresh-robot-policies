@@ -61,7 +61,10 @@
   "pass": true
  },
  "C_missing_release": {
-  "exit": 1,
+  "exit": 5,
+  "stderr_tail": [
+   "REFUSED: release does not approve this exact protocol"
+  ],
   "pass": true
  }
 }

@@ -60,6 +60,7 @@ res["E_drift_plus_mislabel_probe"] = {"exit": code, "stdout": out, "adjudication
 r = subprocess.run([sys.executable, "-I", str(HERE / "run_protocol.py"), str(scr / "drillA.jsonl"), str(sample),
                     str(scr / "drillC"), "--release", str(scr / "missing.json"), "--protocol", str(proto)],
                    capture_output=True, text=True)
-res["C_missing_release"] = {"exit": r.returncode, "pass": r.returncode != 0 and not (scr / "drillC").exists()}
+res["C_missing_release"] = {"exit": r.returncode, "stderr_tail": r.stderr.strip().splitlines()[-1:],
+                            "pass": r.returncode == 5 and not (scr / "drillC").exists()}
 Path(sys.argv[3]).write_text(json.dumps(res, indent=1) + "\n")
 print(json.dumps(res, indent=1))

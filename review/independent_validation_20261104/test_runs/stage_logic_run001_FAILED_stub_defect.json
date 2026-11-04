@@ -1,0 +1,25 @@
+{
+ "A_reachable": {
+  "verdict": "CHAOTIC_INCONCLUSIVE",
+  "expected": "CHAOTIC_INCONCLUSIVE",
+  "stage2_allowed": false,
+  "pass": true
+ },
+ "B_unreachable": {
+  "verdict": "CHAOTIC_INCONCLUSIVE",
+  "expected": "DISAGREEMENT",
+  "stage2_allowed": false,
+  "pass": false
+ },
+ "probe_called_only_on_mismatch": {
+  "calls": [],
+  "pass": true
+ },
+ "C_exact_stage0_no_probe": {
+  "verdict": "DISAGREEMENT",
+  "calls": [],
+  "pass": true
+ },
+ "passed": 3,
+ "total": 4
+}

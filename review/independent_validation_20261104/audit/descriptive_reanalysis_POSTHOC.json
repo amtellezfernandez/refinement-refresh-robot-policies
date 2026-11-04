@@ -1,0 +1,88 @@
+{
+ "status": "POST_HOC_EXPLORATORY",
+ "pairs": 160,
+ "A_horizon_censoring": [
+  {
+   "horizon_cap": 100,
+   "d2": 51,
+   "d5": 44,
+   "difference_pp": 4.38
+  },
+  {
+   "horizon_cap": 150,
+   "d2": 102,
+   "d5": 84,
+   "difference_pp": 11.25
+  },
+  {
+   "horizon_cap": 200,
+   "d2": 131,
+   "d5": 117,
+   "difference_pp": 8.75
+  },
+  {
+   "horizon_cap": 220,
+   "d2": 135,
+   "d5": 119,
+   "difference_pp": 10.0
+  },
+  {
+   "horizon_cap": 240,
+   "d2": 137,
+   "d5": 120,
+   "difference_pp": 10.62
+  },
+  {
+   "horizon_cap": 260,
+   "d2": 138,
+   "d5": 120,
+   "difference_pp": 11.25
+  },
+  {
+   "horizon_cap": 280,
+   "d2": 139,
+   "d5": 121,
+   "difference_pp": 11.25
+  },
+  {
+   "horizon_cap": 300,
+   "d2": 139,
+   "d5": 122,
+   "difference_pp": 10.62
+  }
+ ],
+ "B_success_timing_both_succeed": {
+  "pairs": 115,
+  "d2_earlier": 54,
+  "d5_earlier": 45,
+  "ties": 16,
+  "mean_tick_d2": 123.55652173913043,
+  "mean_tick_d5": 123.8695652173913,
+  "d2_successes_after_tick_200": 8,
+  "d5_successes_after_tick_200": 5
+ },
+ "C_task_random_t_interval": {
+  "task_differences": [
+   0.15,
+   0.1,
+   0.05,
+   0.05,
+   0.15,
+   0.2,
+   0.0,
+   0.15
+  ],
+  "mean": 0.10625,
+  "sd": 0.06781013409302687,
+  "t95": [
+   0.04955930919971335,
+   0.16294069080028664
+  ],
+  "df": 7
+ },
+ "D_seed_pairs_same_outcome": {
+  "d2": 69,
+  "d5": 52,
+  "of": 80
+ }
+}

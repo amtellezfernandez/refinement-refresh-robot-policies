@@ -1,0 +1,28 @@
+{
+ "A_reachable": {
+  "verdict": "CHAOTIC_INCONCLUSIVE",
+  "expected": "CHAOTIC_INCONCLUSIVE",
+  "stage2_allowed": false,
+  "pass": true
+ },
+ "B_unreachable": {
+  "verdict": "DISAGREEMENT",
+  "expected": "DISAGREEMENT",
+  "stage2_allowed": false,
+  "pass": true
+ },
+ "probe_called_only_on_mismatch": {
+  "calls": [
+   "fixture.libero_object.t2.demo_demo_0",
+   "fixture.libero_object.t2.demo_demo_0"
+  ],
+  "pass": true
+ },
+ "C_exact_stage0_no_probe": {
+  "verdict": "DISAGREEMENT",
+  "calls": [],
+  "pass": true
+ },
+ "passed": 4,
+ "total": 4
+}

@@ -1,0 +1,386 @@
+{
+ "characterisation": {
+  "action_perturbation_tick20": {
+   "n": 15,
+   "verdict_counts": {
+    "0.0001": {
+     "OUTCOME_MATCH_TICK_DIVERGED": 1,
+     "REPRODUCED": 14
+    },
+    "0.01": {
+     "OUTCOME_MATCH_TICK_DIVERGED": 1,
+     "REPRODUCED": 14
+    },
+    "0.3": {
+     "OUTCOME_MATCH_TICK_DIVERGED": 1,
+     "OUTCOME_MISMATCH": 4,
+     "REPRODUCED": 10
+    },
+    "1e-07": {
+     "REPRODUCED": 15
+    }
+   }
+  },
+  "consistent_deletion_forgery_tick30": {
+   "n": 15,
+   "verdict_counts": {
+    "OUTCOME_MATCH_TICK_DIVERGED": 2,
+    "REPRODUCED": 13
+   }
+  },
+  "inject_without_settle": {
+   "n_success_fixtures": 15,
+   "rows": [
+    {
+     "inject_no_settle_tick": 112,
+     "key": "fixture.libero_object.t2.demo_demo_1",
+     "recorded_tick": 112
+    },
+    {
+     "inject_no_settle_tick": 118,
+     "key": "fixture.libero_object.t2.demo_demo_2",
+     "recorded_tick": 118
+    },
+    {
+     "inject_no_settle_tick": 112,
+     "key": "fixture.libero_object.t2.demo_demo_3",
+     "recorded_tick": 112
+    },
+    {
+     "inject_no_settle_tick": 193,
+     "key": "fixture.libero_object.t2.demo_demo_4",
+     "recorded_tick": 193
+    },
+    {
+     "inject_no_settle_tick": 106,
+     "key": "fixture.libero_object.t2.demo_demo_5",
+     "recorded_tick": 106
+    },
+    {
+     "inject_no_settle_tick": 114,
+     "key": "fixture.libero_object.t2.demo_demo_6",
+     "recorded_tick": 114
+    },
+    {
+     "inject_no_settle_tick": 112,
+     "key": "fixture.libero_object.t2.demo_demo_7",
+     "recorded_tick": 112
+    },
+    {
+     "inject_no_settle_tick": 82,
+     "key": "fixture.libero_goal.t1.demo_demo_0",
+     "recorded_tick": 82
+    },
+    {
+     "inject_no_settle_tick": 92,
+     "key": "fixture.libero_goal.t1.demo_demo_1",
+     "recorded_tick": 92
+    },
+    {
+     "inject_no_settle_tick": 90,
+     "key": "fixture.libero_goal.t1.demo_demo_2",
+     "recorded_tick": 90
+    },
+    {
+     "inject_no_settle_tick": 84,
+     "key": "fixture.libero_goal.t1.demo_demo_3",
+     "recorded_tick": 85
+    },
+    {
+     "inject_no_settle_tick": 81,
+     "key": "fixture.libero_goal.t1.demo_demo_4",
+     "recorded_tick": 81
+    },
+    {
+     "inject_no_settle_tick": 88,
+     "key": "fixture.libero_goal.t1.demo_demo_5",
+     "recorded_tick": 88
+    },
+    {
+     "inject_no_settle_tick": 92,
+     "key": "fixture.libero_goal.t1.demo_demo_6",
+     "recorded_tick": 92
+    },
+    {
+     "inject_no_settle_tick": 79,
+     "key": "fixture.libero_goal.t1.demo_demo_7",
+     "recorded_tick": 80
+    }
+   ],
+   "same_success_tick": 13,
+   "success_lost": 0
+  }
+ },
+ "checks": [
+  {
+   "detail": "20/20 REPRODUCED (15 success, 5 failure fixtures)",
+   "name": "all_fixtures_reproduce_render",
+   "pass": true,
+   "section": "P"
+  },
+  {
+   "detail": "terminal MuJoCo state hash, replay vs recorder",
+   "name": "terminal_state_equals_recording",
+   "pass": true,
+   "section": "P"
+  },
+  {
+   "detail": "second full run, same process family",
+   "name": "rerun_identical",
+   "pass": true,
+   "section": "P"
+  },
+  {
+   "detail": "terminal state hashes with cameras on vs off",
+   "name": "render_vs_no_render_physics_identical",
+   "pass": true,
+   "section": "P"
+  },
+  {
+   "detail": "20/20",
+   "name": "inject_mode_reproduces",
+   "pass": true,
+   "section": "P"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "label_flip_only",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got OUTCOME_MISMATCH; allowed ['OUTCOME_MISMATCH']",
+   "name": "consistent_false_success",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got OUTCOME_MISMATCH; allowed ['OUTCOME_MISMATCH']",
+   "name": "consistent_false_failure_0",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got OUTCOME_MISMATCH; allowed ['OUTCOME_MISMATCH']",
+   "name": "consistent_false_failure_1",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got OUTCOME_MISMATCH; allowed ['OUTCOME_MISMATCH']",
+   "name": "consistent_false_failure_2",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "truncated_stale_metadata",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "truncated_consistent",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "action_modified_hash_stale",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_tick_gap",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_renumbered_stream_hash_stale_0",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_renumbered_stream_hash_stale_1",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_renumbered_stream_hash_stale_2",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_renumbered_stream_hash_stale_3",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_step_renumbered_stream_hash_stale_4",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got RESET_MISMATCH; allowed ['RESET_MISMATCH']",
+   "name": "wrong_initial_state_id_consistent_seed_0",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got RESET_MISMATCH; allowed ['RESET_MISMATCH']",
+   "name": "wrong_initial_state_id_consistent_seed_1",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got RESET_MISMATCH; allowed ['RESET_MISMATCH']",
+   "name": "recorded_initial_state_perturbed_rehashed",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got REPRODUCED_RESET_DRIFT; allowed ['REPRODUCED_RESET_DRIFT']",
+   "name": "recorded_initial_state_below_tolerance",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "wrong_environment_seed",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "wrong_horizon",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got RESET_MISMATCH; allowed ['RESET_MISMATCH', 'UNREPLAYABLE']",
+   "name": "wrong_task_id_vector_source",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "action_dtype_changed",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got INPUT_INVALID; allowed ['INPUT_INVALID']",
+   "name": "missing_label_field",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got DUPLICATE; allowed ['DUPLICATE']",
+   "name": "duplicate_episode",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "got DUPLICATE; allowed ['DUPLICATE']",
+   "name": "duplicate_stream_new_key",
+   "pass": true,
+   "section": "M"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_without_release",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_with_wrong_protocol_hash",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_when_decision_not_approved",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5 (clean refusal, no exception)",
+   "name": "archived_refused_missing_release_file",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_malformed_release",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_non_object_release",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 5",
+   "name": "archived_refused_missing_protocol_and_hashless_release",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "exit 0",
+   "name": "gate_opens_with_matching_release",
+   "pass": true,
+   "section": "G"
+  },
+  {
+   "detail": "verdict with validation disabled: REPRODUCED",
+   "name": "validation_disabled_hash_defect_goes_blind",
+   "pass": true,
+   "section": "K"
+  },
+  {
+   "detail": "verdict with outcome comparison disabled: REPRODUCED",
+   "name": "outcome_comparison_disabled_false_success_goes_blind",
+   "pass": true,
+   "section": "K"
+  }
+ ],
+ "summary": {
+  "environment": {
+   "assets_dir_name": "libero-assets-0b3ea86",
+   "machine": "arm64",
+   "packages": {
+    "bddl": "1.0.1",
+    "hf_libero": "0.1.4",
+    "mujoco": "3.8.1",
+    "numpy": "2.2.6",
+    "robosuite": "1.4.0",
+    "torch": "2.7.1"
+   },
+   "platform": "macOS-15.7.3-arm64-arm-64bit",
+   "python": "3.12.3"
+  },
+  "fixtures_sha256": "1dd982f8066d154de19b5be7e9971a35be592bb51a34c4915919bab836f6edb6",
+  "harness_sha256": {
+   "drill_protocol.py": "e69cff55d89829d3416a1913779a615e0f96197d221e036c00b813fb4aa1bb38",
+   "extract_bundles.py": "266e1ccbcfd0bd58f61e83f2a6babd8f0d4ced27b044bb1cf63737b014f4976e",
+   "libero_replay.py": "b589084fd752b0fb2b706b06a7c142ad4ecbf1194371fdb0524c8057277a84d4",
+   "make_fixtures.py": "1005050af31ae44ac5bf4c490ad32ad21755b56935a22cce35d04c475d28404e",
+   "replay.py": "6c5a75cee80df8718196ad36a60ed4df7de6fb47c5e91ffa228732f371a420d9",
+   "run_protocol.py": "866474231400b6c79d6d95a0847d4f937da06f6b57d45139750ca71d4a552d48",
+   "test_harness.py": "fd1411fee04ed1d2f3f2cad1ba037bdbbd19f47e4406115f490ebe62c5166758",
+   "test_stage_logic.py": "c5fccfce932272acb1ffac88919386297eb1a14c418b2073290c9167550f351d"
+  },
+  "passed": 40,
+  "render_used_for_mutations": false,
+  "total": 40
+ }
+}
