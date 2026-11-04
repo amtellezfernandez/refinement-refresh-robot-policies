@@ -168,6 +168,9 @@ def main():
     ap.add_argument("--no-render", action="store_true")
     a = ap.parse_args()
     bundles = R.read_bundles(a.bundles)
+    if not bundles:
+        print("REFUSED: empty replay population", file=sys.stderr)
+        sys.exit(5)
     render = not a.no_render
     real = gov.is_real_archive(bundles)
     artifact_paths = None
@@ -175,7 +178,7 @@ def main():
         try:
             report = gov.verify_run(bundles, a.bundles, a.sample, a.release,
                                     a.protocol, a.through, render)
-        except (gov.ReplayRefused, OSError, ValueError, KeyError) as error:
+        except (gov.ReplayRefused, OSError, ValueError, TypeError, KeyError) as error:
             print("REFUSED: {}".format(error), file=sys.stderr)
             sys.exit(5)
         artifact_paths = {"bundles": a.bundles, "sample": a.sample,
