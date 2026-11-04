@@ -1,0 +1,67 @@
+{
+ "A_clean": {
+  "exit": 0,
+  "stdout": [
+   "stage0 PASS_EXACT 20 / 20",
+   "stage1 PASS_EXACT {'REPRODUCED': 7}",
+   "stage2 PASS_EXACT {'h2_d5': {'n': 10, 'archived_successes': 7, 'replayed_successes': 7}, 'h2_d2': {'n': 10, 'archived_successes': 8, 'replayed_successes': 8}}"
+  ],
+  "stage1_started": true,
+  "stage2_started": true,
+  "pass": true
+ },
+ "B_forged_reset": {
+  "exit": 6,
+  "stdout": [
+   "stage0 FAIL_RESET 19 / 20"
+  ],
+  "stderr_tail": [
+   "STOP: stage 0 did not pass; stage 1 not started"
+  ],
+  "stage1_started": false,
+  "pass": true
+ },
+ "D_planted_mislabel_in_sample": {
+  "exit": 6,
+  "stdout": [
+   "stage0 PASS_EXACT 20 / 20",
+   "stage1 DISAGREEMENT {'OUTCOME_MISMATCH': 1, 'REPRODUCED': 6}"
+  ],
+  "stderr_tail": [
+   "STOP: stage 1 did not pass; stage 2 not started"
+  ],
+  "stage2_started": false,
+  "pass": true
+ },
+ "E_drift_plus_mislabel_probe": {
+  "exit": 6,
+  "stdout": [
+   "stage0 PASS_WITHIN_TOLERANCE 0 / 20",
+   "stage1 DISAGREEMENT {'OUTCOME_MISMATCH': 1, 'REPRODUCED_RESET_DRIFT': 6}"
+  ],
+  "adjudication": [
+   {
+    "episode_key": "fixture.libero_object.t2.demo_demo_0",
+    "archived": true,
+    "ensemble": [
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false,
+     false
+    ],
+    "archived_outcome_reachable": false
+   }
+  ],
+  "pass": true
+ },
+ "C_missing_release": {
+  "exit": 1,
+  "pass": true
+ }
+}

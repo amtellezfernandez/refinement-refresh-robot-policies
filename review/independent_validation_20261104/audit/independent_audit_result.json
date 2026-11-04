@@ -1,0 +1,423 @@
+{
+ "archive_sha256": "36c1d5f2dcaef85664ec7a1bfe7409c849b3be17831566e783d24a00ea4e8df0",
+ "checks": [
+  {
+   "check": "plan_size",
+   "detail": "1120 rows, 1120 unique, expected 1120",
+   "pass": true
+  },
+  {
+   "check": "plan_schedule_sha",
+   "detail": "recomputed sha of schedule vs recorded",
+   "pass": true
+  },
+  {
+   "check": "confirmation:episode_run_ids_unique",
+   "detail": "799 records",
+   "pass": true
+  },
+  {
+   "check": "primary_deadline:episode_run_ids_unique",
+   "detail": "92 records",
+   "pass": true
+  },
+  {
+   "check": "confirmation_continuation_partial:episode_run_ids_unique",
+   "detail": "6 records",
+   "pass": true
+  },
+  {
+   "check": "confirmation_continuation_rest:episode_run_ids_unique",
+   "detail": "225 records",
+   "pass": true
+  },
+  {
+   "check": "raw_episode_count",
+   "detail": "1122 completed raw records",
+   "pass": true
+  },
+  {
+   "check": "raw_step_count",
+   "detail": "172243 completed steps",
+   "pass": true
+  },
+  {
+   "check": "per_episode_trace_consistency",
+   "detail": "0 episodes with problems; first: ",
+   "pass": true
+  },
+  {
+   "check": "canonical_covers_plan_exactly",
+   "detail": "1120 selected; missing 0; extra 0",
+   "pass": true
+  },
+  {
+   "check": "canonical_matches_archived_canonical_file",
+   "detail": "0 planned runs where the archived canonical file picked a different attempt",
+   "pass": true
+  },
+  {
+   "check": "canonical_file_success_equals_trace",
+   "detail": "0 disagree",
+   "pass": true
+  },
+  {
+   "check": "paired_initial_state_within_block",
+   "detail": "0 blocks with >1 initial state",
+   "pass": true
+  },
+  {
+   "check": "same_initial_state_across_seeds",
+   "detail": "0 task-states with >1 initial state; 80 task-states",
+   "pass": true
+  },
+  {
+   "check": "distinct_task_states_have_distinct_initial_states",
+   "detail": "0 hashes shared across task-states",
+   "pass": true
+  },
+  {
+   "check": "primary_pairs_160",
+   "detail": "160 pairs",
+   "pass": true
+  },
+  {
+   "check": "primary_counts_139_122",
+   "detail": "139/160 vs 122/160",
+   "pass": true
+  },
+  {
+   "check": "h5_d2_138",
+   "detail": "{'n': 160, 'successes': 138}",
+   "pass": true
+  },
+  {
+   "check": "primary_dispatched_actions_50451",
+   "detail": "50451",
+   "pass": true
+  },
+  {
+   "check": "primary_control_step_means",
+   "detail": "149.025 vs 166.29375",
+   "pass": true
+  },
+  {
+   "check": "per_task_table_matches_report",
+   "detail": "0 task rows differ",
+   "pass": true
+  },
+  {
+   "check": "bootstrap_interval_approx_report",
+   "detail": "independent RNG seed 1: [0.0437, 0.1688]; seed 2: [0.0437, 0.1688]; report [0.04375, 0.16875]",
+   "pass": true
+  }
+ ],
+ "condition_counts_canonical": {
+  "h1_d10": {
+   "n": 160,
+   "successes": 135
+  },
+  "h1_d2": {
+   "n": 160,
+   "successes": 137
+  },
+  "h1_d5": {
+   "n": 160,
+   "successes": 136
+  },
+  "h2_d2": {
+   "n": 160,
+   "successes": 139
+  },
+  "h2_d5": {
+   "n": 160,
+   "successes": 122
+  },
+  "h5_d2": {
+   "n": 160,
+   "successes": 138
+  },
+  "h5_d5": {
+   "n": 160,
+   "successes": 133
+  }
+ },
+ "excluded_repeats": [
+  {
+   "excluded_phase": "confirmation_continuation_partial",
+   "excluded_steps": 280,
+   "excluded_success": false,
+   "kept_phase": "primary_deadline",
+   "kept_steps": 280,
+   "kept_success": false,
+   "planned_run_id": "confirmation.libero_object.task007.state029.seed3001.h2_d5",
+   "same_initial_state": true
+  },
+  {
+   "excluded_phase": "confirmation_continuation_partial",
+   "excluded_steps": 158,
+   "excluded_success": true,
+   "kept_phase": "primary_deadline",
+   "kept_steps": 158,
+   "kept_success": true,
+   "planned_run_id": "confirmation.libero_object.task007.state029.seed3001.h2_d2",
+   "same_initial_state": true
+  }
+ ],
+ "findings": [],
+ "implementation": "standard library only; no repository analysis code imported",
+ "phases": {
+  "confirmation": {
+   "episodes": 799,
+   "manifest": {
+    "lerobot_expected_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+    "mujoco_version": "3.8.1",
+    "numpy_version": "2.2.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "torch_version": "2.7.1+cu126"
+   },
+   "manifest_packages": {
+    "bddl": "1.0.1",
+    "gymnasium": "1.3.0",
+    "hf_libero": "0.1.4",
+    "lerobot": "0.6.2",
+    "mujoco": "3.8.1",
+    "numpy": "1.26.4",
+    "robosuite": "1.4.0",
+    "torch": "2.6.0+cu124"
+   },
+   "step_events": 120100,
+   "trace_runs_without_episode_record": [
+    {
+     "kinds": {
+      "episode_start": 1,
+      "step": 10
+     },
+     "run_id": "confirmation.libero_object.task007.state029.seed3001.h5_d5.attempt_3cacad4a8fb9467b815183101b9b1a06"
+    }
+   ],
+   "wrapper_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71"
+  },
+  "confirmation_continuation_partial": {
+   "episodes": 6,
+   "manifest": {
+    "lerobot_expected_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+    "mujoco_version": "3.8.1",
+    "numpy_version": "2.2.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "torch_version": "2.7.1+cu126"
+   },
+   "manifest_packages": {
+    "bddl": "1.0.1",
+    "gymnasium": "1.3.0",
+    "hf_libero": "0.1.4",
+    "lerobot": "0.6.2",
+    "mujoco": "3.8.1",
+    "numpy": "1.26.4",
+    "robosuite": "1.4.0",
+    "torch": "2.6.0+cu124"
+   },
+   "step_events": 1421,
+   "trace_runs_without_episode_record": [],
+   "wrapper_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71"
+  },
+  "confirmation_continuation_rest": {
+   "episodes": 225,
+   "manifest": {
+    "lerobot_expected_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+    "mujoco_version": "3.8.1",
+    "numpy_version": "2.2.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "torch_version": "2.7.1+cu126"
+   },
+   "manifest_packages": {
+    "bddl": "1.0.1",
+    "gymnasium": "1.3.0",
+    "hf_libero": "0.1.4",
+    "lerobot": "0.6.2",
+    "mujoco": "3.8.1",
+    "numpy": "1.26.4",
+    "robosuite": "1.4.0",
+    "torch": "2.6.0+cu124"
+   },
+   "step_events": 36240,
+   "trace_runs_without_episode_record": [],
+   "wrapper_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71"
+  },
+  "primary_deadline": {
+   "episodes": 92,
+   "manifest": {
+    "lerobot_expected_revision": "b6ec0060779550c0a157ae34feb89e0cf86012a8",
+    "mujoco_version": "3.8.1",
+    "numpy_version": "2.2.6",
+    "platform": "Linux-6.8.0-139-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "torch_version": "2.7.1+cu126"
+   },
+   "manifest_packages": {
+    "bddl": "1.0.1",
+    "gymnasium": "1.3.0",
+    "hf_libero": "0.1.4",
+    "lerobot": "0.6.2",
+    "mujoco": "3.8.1",
+    "numpy": "1.26.4",
+    "robosuite": "1.4.0",
+    "torch": "2.6.0+cu124"
+   },
+   "step_events": 16737,
+   "trace_runs_without_episode_record": [],
+   "wrapper_sha256": "97c984f12331527626812ec19967ef399e545535b3571becf044db2417ae9d71"
+  }
+ },
+ "plan_sha256": "ef624126dd5baa32ac8e486f112115e8e41fe5cf5eb7107ba81dbefa20c2b07a",
+ "primary": {
+  "bootstrap_states_within_task": {
+   "draws": 20000,
+   "seed1": [
+    0.04375,
+    0.16875
+   ],
+   "seed2": [
+    0.04375,
+    0.16875
+   ]
+  },
+  "cluster_sign_flip_permutation_p_task_state_clusters": 0.003839923201535969,
+  "comparator_h2_d5": 122,
+  "comparator_only": 7,
+  "control_step_means": [
+   149.025,
+   166.29375
+  ],
+  "difference": 0.10625,
+  "dispatched_actions": 50451,
+  "exact_mcnemar_two_sided_p_pairs_as_independent": 0.003326892852783203,
+  "leave_one_task_out": [
+   {
+    "difference": 0.12142857142857143,
+    "omitted": "libero_object:5"
+   },
+   {
+    "difference": 0.09999999999999999,
+    "omitted": "libero_object:6"
+   },
+   {
+    "difference": 0.09999999999999999,
+    "omitted": "libero_object:7"
+   },
+   {
+    "difference": 0.1142857142857143,
+    "omitted": "libero_object:8"
+   },
+   {
+    "difference": 0.10714285714285714,
+    "omitted": "libero_goal:5"
+   },
+   {
+    "difference": 0.09999999999999999,
+    "omitted": "libero_goal:6"
+   },
+   {
+    "difference": 0.1142857142857143,
+    "omitted": "libero_goal:7"
+   },
+   {
+    "difference": 0.09285714285714286,
+    "omitted": "libero_goal:8"
+   }
+  ],
+  "pairs": 160,
+  "per_task": [
+   {
+    "comparator": 20,
+    "comparator_only": 0,
+    "n": 20,
+    "selected": 20,
+    "selected_only": 0,
+    "suite": "libero_object",
+    "task_id": 5
+   },
+   {
+    "comparator": 17,
+    "comparator_only": 0,
+    "n": 20,
+    "selected": 20,
+    "selected_only": 3,
+    "suite": "libero_object",
+    "task_id": 6
+   },
+   {
+    "comparator": 7,
+    "comparator_only": 3,
+    "n": 20,
+    "selected": 10,
+    "selected_only": 6,
+    "suite": "libero_object",
+    "task_id": 7
+   },
+   {
+    "comparator": 17,
+    "comparator_only": 1,
+    "n": 20,
+    "selected": 18,
+    "selected_only": 2,
+    "suite": "libero_object",
+    "task_id": 8
+   },
+   {
+    "comparator": 14,
+    "comparator_only": 2,
+    "n": 20,
+    "selected": 16,
+    "selected_only": 4,
+    "suite": "libero_goal",
+    "task_id": 5
+   },
+   {
+    "comparator": 15,
+    "comparator_only": 0,
+    "n": 20,
+    "selected": 18,
+    "selected_only": 3,
+    "suite": "libero_goal",
+    "task_id": 6
+   },
+   {
+    "comparator": 18,
+    "comparator_only": 0,
+    "n": 20,
+    "selected": 19,
+    "selected_only": 1,
+    "suite": "libero_goal",
+    "task_id": 7
+   },
+   {
+    "comparator": 14,
+    "comparator_only": 1,
+    "n": 20,
+    "selected": 18,
+    "selected_only": 5,
+    "suite": "libero_goal",
+    "task_id": 8
+   }
+  ],
+  "phases_of_primary_records": {
+   "confirmation": 228,
+   "primary_deadline": 92
+  },
+  "selected_h2_d2": 139,
+  "selected_only": 24,
+  "task_sign_test": {
+   "negative": 0,
+   "positive": 7,
+   "two_sided_p": 0.015625,
+   "zero": 1
+  }
+ },
+ "raw_completed_episodes": 1122,
+ "raw_completed_steps": 172243,
+ "schema": "independent_audit.v1"
+}

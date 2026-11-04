@@ -1,0 +1,135 @@
+{
+ "results": [
+  {
+   "mutation": "unmodified_repack",
+   "must_fail": [],
+   "failed": [],
+   "pass": true
+  },
+  {
+   "mutation": "flip_episode_success_only",
+   "must_fail": [
+    "per_episode_trace_consistency"
+   ],
+   "failed": [
+    "per_episode_trace_consistency"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "flip_final_step_success",
+   "must_fail": [
+    "per_episode_trace_consistency",
+    "primary_counts_139_122"
+   ],
+   "failed": [
+    "canonical_file_success_equals_trace",
+    "per_episode_trace_consistency",
+    "per_task_table_matches_report",
+    "primary_counts_139_122"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "alter_one_action_value",
+   "must_fail": [
+    "per_episode_trace_consistency"
+   ],
+   "failed": [
+    "per_episode_trace_consistency"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "delete_one_step_event",
+   "must_fail": [
+    "per_episode_trace_consistency",
+    "raw_step_count"
+   ],
+   "failed": [
+    "per_episode_trace_consistency",
+    "raw_step_count"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "duplicate_episode_record",
+   "must_fail": [
+    "confirmation:episode_run_ids_unique"
+   ],
+   "failed": [
+    "confirmation:episode_run_ids_unique",
+    "raw_episode_count",
+    "raw_step_count"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "alter_initial_state_value",
+   "must_fail": [
+    "per_episode_trace_consistency"
+   ],
+   "failed": [
+    "paired_initial_state_within_block",
+    "per_episode_trace_consistency",
+    "same_initial_state_across_seeds"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "alter_environment_seed",
+   "must_fail": [
+    "per_episode_trace_consistency"
+   ],
+   "failed": [
+    "per_episode_trace_consistency"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "flip_canonical_file_success",
+   "must_fail": [
+    "canonical_file_success_equals_trace"
+   ],
+   "failed": [
+    "canonical_file_success_equals_trace"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "drop_repeated_deadline_episode",
+   "must_fail": [
+    "canonical_matches_archived_canonical_file",
+    "raw_episode_count"
+   ],
+   "failed": [
+    "canonical_matches_archived_canonical_file",
+    "raw_episode_count",
+    "raw_step_count"
+   ],
+   "pass": true
+  },
+  {
+   "mutation": "drop_unrepeated_deadline_episode",
+   "must_fail": [
+    "canonical_covers_plan_exactly",
+    "raw_episode_count"
+   ],
+   "failed": [
+    "canonical_covers_plan_exactly",
+    "canonical_file_success_equals_trace",
+    "canonical_matches_archived_canonical_file",
+    "per_task_table_matches_report",
+    "primary_control_step_means",
+    "primary_counts_139_122",
+    "primary_dispatched_actions_50451",
+    "primary_pairs_160",
+    "raw_episode_count",
+    "raw_step_count"
+   ],
+   "pass": true
+  }
+ ],
+ "passed": 11,
+ "total": 11
+}

@@ -1,0 +1,106 @@
+[
+ {
+  "task": "libero_goal:5",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    79
+   ]
+  ]
+ },
+ {
+  "task": "libero_goal:6",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    79
+   ]
+  ]
+ },
+ {
+  "task": "libero_goal:7",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    79
+   ]
+  ]
+ },
+ {
+  "task": "libero_goal:8",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    79
+   ]
+  ]
+ },
+ {
+  "task": "libero_object:5",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    110
+   ]
+  ]
+ },
+ {
+  "task": "libero_object:6",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    110
+   ]
+  ]
+ },
+ {
+  "task": "libero_object:7",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    110
+   ]
+  ]
+ },
+ {
+  "task": "libero_object:8",
+  "archived_variants": 1,
+  "bddl_match": true,
+  "init_state_set_match": true,
+  "init_state_dtype_shape": [
+   "float64",
+   [
+    50,
+    110
+   ]
+  ]
+ }
+]

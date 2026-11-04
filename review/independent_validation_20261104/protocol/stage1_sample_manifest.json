@@ -1,0 +1,446 @@
+{
+ "population": 1120,
+ "primary_frame": 320,
+ "strata_nonempty": 29,
+ "stage1_sample_size": 57,
+ "salt": "rrrp-replay-stage1-20261104|",
+ "per_stratum": 2,
+ "stage1_sample": [
+  "confirmation.libero_goal.task005.state027.seed3001.h2_d2",
+  "confirmation.libero_goal.task005.state027.seed3000.h2_d2",
+  "confirmation.libero_goal.task005.state020.seed3000.h2_d2",
+  "confirmation.libero_goal.task005.state026.seed3001.h2_d2",
+  "confirmation.libero_goal.task005.state029.seed3000.h2_d5",
+  "confirmation.libero_goal.task005.state027.seed3000.h2_d5",
+  "confirmation.libero_goal.task005.state025.seed3001.h2_d5",
+  "confirmation.libero_goal.task005.state021.seed3000.h2_d5",
+  "confirmation.libero_goal.task006.state027.seed3001.h2_d2",
+  "confirmation.libero_goal.task006.state024.seed3000.h2_d2",
+  "confirmation.libero_goal.task006.state027.seed3000.h2_d2",
+  "confirmation.libero_goal.task006.state024.seed3001.h2_d2",
+  "confirmation.libero_goal.task006.state022.seed3000.h2_d5",
+  "confirmation.libero_goal.task006.state024.seed3001.h2_d5",
+  "confirmation.libero_goal.task006.state023.seed3001.h2_d5",
+  "confirmation.libero_goal.task006.state020.seed3000.h2_d5",
+  "confirmation.libero_goal.task007.state025.seed3001.h2_d2",
+  "confirmation.libero_goal.task007.state028.seed3000.h2_d2",
+  "confirmation.libero_goal.task007.state023.seed3000.h2_d2",
+  "confirmation.libero_goal.task007.state023.seed3001.h2_d5",
+  "confirmation.libero_goal.task007.state025.seed3001.h2_d5",
+  "confirmation.libero_goal.task007.state020.seed3001.h2_d5",
+  "confirmation.libero_goal.task007.state026.seed3001.h2_d5",
+  "confirmation.libero_goal.task008.state020.seed3001.h2_d2",
+  "confirmation.libero_goal.task008.state020.seed3000.h2_d2",
+  "confirmation.libero_goal.task008.state021.seed3000.h2_d2",
+  "confirmation.libero_goal.task008.state028.seed3001.h2_d2",
+  "confirmation.libero_goal.task008.state021.seed3001.h2_d5",
+  "confirmation.libero_goal.task008.state020.seed3001.h2_d5",
+  "confirmation.libero_goal.task008.state028.seed3000.h2_d5",
+  "confirmation.libero_goal.task008.state026.seed3000.h2_d5",
+  "confirmation.libero_object.task005.state027.seed3001.h2_d2",
+  "confirmation.libero_object.task005.state025.seed3000.h2_d2",
+  "confirmation.libero_object.task005.state029.seed3001.h2_d5",
+  "confirmation.libero_object.task005.state021.seed3000.h2_d5",
+  "confirmation.libero_object.task006.state029.seed3001.h2_d2",
+  "confirmation.libero_object.task006.state027.seed3000.h2_d2",
+  "confirmation.libero_object.task006.state024.seed3001.h2_d5",
+  "confirmation.libero_object.task006.state021.seed3001.h2_d5",
+  "confirmation.libero_object.task006.state021.seed3000.h2_d5",
+  "confirmation.libero_object.task006.state024.seed3000.h2_d5",
+  "confirmation.libero_object.task007.state023.seed3001.h2_d2",
+  "confirmation.libero_object.task007.state025.seed3001.h2_d2",
+  "confirmation.libero_object.task007.state028.seed3001.h2_d2",
+  "confirmation.libero_object.task007.state027.seed3000.h2_d2",
+  "confirmation.libero_object.task007.state026.seed3000.h2_d5",
+  "confirmation.libero_object.task007.state022.seed3000.h2_d5",
+  "confirmation.libero_object.task007.state026.seed3001.h2_d5",
+  "confirmation.libero_object.task007.state020.seed3000.h2_d5",
+  "confirmation.libero_object.task008.state028.seed3001.h2_d2",
+  "confirmation.libero_object.task008.state021.seed3001.h2_d2",
+  "confirmation.libero_object.task008.state023.seed3000.h2_d2",
+  "confirmation.libero_object.task008.state024.seed3000.h2_d2",
+  "confirmation.libero_object.task008.state029.seed3001.h2_d5",
+  "confirmation.libero_object.task008.state021.seed3001.h2_d5",
+  "confirmation.libero_object.task008.state021.seed3000.h2_d5",
+  "confirmation.libero_object.task008.state024.seed3001.h2_d5"
+ ],
+ "stage1_sample_sha256": "3ffe84b0ef2d055a6c22667406c9d8eca370bf66ab7999c46e99a7114f73df56",
+ "strata": [
+  {
+   "stratum": [
+    "libero_goal",
+    5,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 4,
+   "sampled": [
+    "confirmation.libero_goal.task005.state027.seed3001.h2_d2",
+    "confirmation.libero_goal.task005.state027.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    5,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 16,
+   "sampled": [
+    "confirmation.libero_goal.task005.state020.seed3000.h2_d2",
+    "confirmation.libero_goal.task005.state026.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    5,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 6,
+   "sampled": [
+    "confirmation.libero_goal.task005.state029.seed3000.h2_d5",
+    "confirmation.libero_goal.task005.state027.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    5,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 14,
+   "sampled": [
+    "confirmation.libero_goal.task005.state025.seed3001.h2_d5",
+    "confirmation.libero_goal.task005.state021.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    6,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 2,
+   "sampled": [
+    "confirmation.libero_goal.task006.state027.seed3001.h2_d2",
+    "confirmation.libero_goal.task006.state024.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    6,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 18,
+   "sampled": [
+    "confirmation.libero_goal.task006.state027.seed3000.h2_d2",
+    "confirmation.libero_goal.task006.state024.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    6,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 5,
+   "sampled": [
+    "confirmation.libero_goal.task006.state022.seed3000.h2_d5",
+    "confirmation.libero_goal.task006.state024.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    6,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 15,
+   "sampled": [
+    "confirmation.libero_goal.task006.state023.seed3001.h2_d5",
+    "confirmation.libero_goal.task006.state020.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    7,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 1,
+   "sampled": [
+    "confirmation.libero_goal.task007.state025.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    7,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 19,
+   "sampled": [
+    "confirmation.libero_goal.task007.state028.seed3000.h2_d2",
+    "confirmation.libero_goal.task007.state023.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    7,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 2,
+   "sampled": [
+    "confirmation.libero_goal.task007.state023.seed3001.h2_d5",
+    "confirmation.libero_goal.task007.state025.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    7,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 18,
+   "sampled": [
+    "confirmation.libero_goal.task007.state020.seed3001.h2_d5",
+    "confirmation.libero_goal.task007.state026.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    8,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 2,
+   "sampled": [
+    "confirmation.libero_goal.task008.state020.seed3001.h2_d2",
+    "confirmation.libero_goal.task008.state020.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    8,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 18,
+   "sampled": [
+    "confirmation.libero_goal.task008.state021.seed3000.h2_d2",
+    "confirmation.libero_goal.task008.state028.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    8,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 6,
+   "sampled": [
+    "confirmation.libero_goal.task008.state021.seed3001.h2_d5",
+    "confirmation.libero_goal.task008.state020.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_goal",
+    8,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 14,
+   "sampled": [
+    "confirmation.libero_goal.task008.state028.seed3000.h2_d5",
+    "confirmation.libero_goal.task008.state026.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    5,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 20,
+   "sampled": [
+    "confirmation.libero_object.task005.state027.seed3001.h2_d2",
+    "confirmation.libero_object.task005.state025.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    5,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 20,
+   "sampled": [
+    "confirmation.libero_object.task005.state029.seed3001.h2_d5",
+    "confirmation.libero_object.task005.state021.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    6,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 20,
+   "sampled": [
+    "confirmation.libero_object.task006.state029.seed3001.h2_d2",
+    "confirmation.libero_object.task006.state027.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    6,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 3,
+   "sampled": [
+    "confirmation.libero_object.task006.state024.seed3001.h2_d5",
+    "confirmation.libero_object.task006.state021.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    6,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 17,
+   "sampled": [
+    "confirmation.libero_object.task006.state021.seed3000.h2_d5",
+    "confirmation.libero_object.task006.state024.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    7,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 10,
+   "sampled": [
+    "confirmation.libero_object.task007.state023.seed3001.h2_d2",
+    "confirmation.libero_object.task007.state025.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    7,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 10,
+   "sampled": [
+    "confirmation.libero_object.task007.state028.seed3001.h2_d2",
+    "confirmation.libero_object.task007.state027.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    7,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 13,
+   "sampled": [
+    "confirmation.libero_object.task007.state026.seed3000.h2_d5",
+    "confirmation.libero_object.task007.state022.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    7,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 7,
+   "sampled": [
+    "confirmation.libero_object.task007.state026.seed3001.h2_d5",
+    "confirmation.libero_object.task007.state020.seed3000.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    8,
+    "h2_d2",
+    "failure"
+   ],
+   "frame": 2,
+   "sampled": [
+    "confirmation.libero_object.task008.state028.seed3001.h2_d2",
+    "confirmation.libero_object.task008.state021.seed3001.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    8,
+    "h2_d2",
+    "success"
+   ],
+   "frame": 18,
+   "sampled": [
+    "confirmation.libero_object.task008.state023.seed3000.h2_d2",
+    "confirmation.libero_object.task008.state024.seed3000.h2_d2"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    8,
+    "h2_d5",
+    "failure"
+   ],
+   "frame": 3,
+   "sampled": [
+    "confirmation.libero_object.task008.state029.seed3001.h2_d5",
+    "confirmation.libero_object.task008.state021.seed3001.h2_d5"
+   ]
+  },
+  {
+   "stratum": [
+    "libero_object",
+    8,
+    "h2_d5",
+    "success"
+   ],
+   "frame": 17,
+   "sampled": [
+    "confirmation.libero_object.task008.state021.seed3000.h2_d5",
+    "confirmation.libero_object.task008.state024.seed3001.h2_d5"
+   ]
+  }
+ ]
+}
