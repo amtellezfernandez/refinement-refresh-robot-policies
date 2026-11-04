@@ -7,6 +7,7 @@ not paper evidence and are not subject to the archived-data release.
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import os
 import platform
@@ -20,6 +21,8 @@ PROTOCOL_SHA256 = "ede3eb8570487b7e2eda8e47f39c6afc1d12e40bece590e8c4590d34341ea
 BUNDLES_SHA256 = "99587b7e3ea594572f18ee3b933109eaf57dfa0ce4cc74deea83b3bc1b43f372"
 SAMPLE_SELECTION_SHA256 = "3ffe84b0ef2d055a6c22667406c9d8eca370bf66ab7999c46e99a7114f73df56"
 SAMPLE_SALT = "rrrp-replay-stage1-20261104|"
+ENV_VERSIONS = {"mujoco": "3.8.1", "robosuite": "1.4.0", "hf_libero": "0.1.4",
+                "bddl": "1.0.1", "numpy": "2.2.6", "torch": "2.7.1"}
 EXECUTION_FILES = ("governance.py", "run_protocol.py", "replay.py", "libero_replay.py",
                    "extract_bundles.py")
 AMENDMENT_FILES = ("PROTOCOL_AMENDMENT_01.md", "PROTOCOL_AMENDMENT_02.md")
@@ -56,6 +59,16 @@ def is_real_archive(bundles):
                for b in bundles)
 
 
+FROZEN_CONDITIONS = ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5))
+
+
+def expected_all_keys():
+    return {f"confirmation.{suite}.task{task:03d}.state{state:03d}.seed{seed}.h{h}_d{d}"
+            for suite in ("libero_goal", "libero_object")
+            for task in (5, 6, 7, 8) for state in range(20, 30)
+            for seed in (3000, 3001) for h, d in FROZEN_CONDITIONS}
+
+
 def expected_primary_keys():
     return {f"confirmation.{suite}.task{task:03d}.state{state:03d}.seed{seed}.h2_d{d}"
             for suite in ("libero_goal", "libero_object")
@@ -74,6 +87,8 @@ def verify_population(bundles, sample):
     keys = [b.get("episode_key") for b in bundles]
     if any(not isinstance(k, str) for k in keys) or len(set(keys)) != 1120:
         raise ReplayRefused("duplicate/missing archive attempt identity")
+    if set(keys) != expected_all_keys():
+        raise ReplayRefused("archive identities do not exactly match the seven frozen settings")
     by_key = dict(zip(keys, bundles))
     primary = {k for k, b in by_key.items() if b.get("condition") in PRIMARY}
     if primary != expected_primary_keys():
@@ -87,6 +102,11 @@ def verify_population(bundles, sample):
             raise ReplayRefused("archive uses an unplanned initial-state ID")
         if b.get("reset_source", {}).get("kind") != "official":
             raise ReplayRefused("archive must use official, immutable init-state IDs")
+        model_key = ".{}.".format(b["suite"])
+        if (model_key not in b["episode_key"]
+                or f".task{b['task_id']:03d}.state{sid:03d}." not in b["episode_key"]
+                or not b["episode_key"].endswith("." + str(b.get("condition")))):
+            raise ReplayRefused("archive row metadata disagrees with the planned identity")
         key = (b["suite"], b["task_id"], sid)
         start = b.get("recorded_initial_state", {}).get("sha256")
         if not isinstance(start, str) or len(start) != 64:
@@ -172,6 +192,23 @@ def _strict_release(release_path, protocol_path, bundles_path, sample_path, thro
     return release, sample, expected_code, expected_amendments
 
 
+def runtime_versions():
+    import sys
+    python_version = ".".join(map(str, sys.version_info[:3]))
+    if python_version != "3.12.3":
+        raise ReplayRefused("pinned replay interpreter must be Python 3.12.3, found " + python_version)
+    versions = {}
+    for name, expected in ENV_VERSIONS.items():
+        try:
+            actual = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError as error:
+            raise ReplayRefused("required replay package missing: " + name) from error
+        if actual != expected:
+            raise ReplayRefused(f"version drift for {name}: expected {expected}, found {actual}")
+        versions[name] = actual
+    return versions
+
+
 def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, through, render):
     """Validate everything before any output directory or simulator can be created."""
     if not render:
@@ -179,6 +216,7 @@ def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, 
     release, sample, code_hashes, amendments = _strict_release(
         release_path, protocol_path, bundles_path, sample_path, through)
     pop = verify_population(bundles, sample)
+    versions = runtime_versions()
     return {"approval_scope": release["scope"], "requested_through": through,
             "release_sha256": sha_file(release_path),
             "protocol_sha256": PROTOCOL_SHA256,
@@ -186,6 +224,7 @@ def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, 
             "bundles_sha256": BUNDLES_SHA256, "sample_manifest_sha256": sha_file(sample_path),
             "sample_selection_sha256": SAMPLE_SELECTION_SHA256, "population": pop,
             "platform": platform.platform(), "machine": platform.machine(),
+            "runtime_versions": versions,
             "checked_utc": datetime.now(timezone.utc).isoformat()}
 
 
