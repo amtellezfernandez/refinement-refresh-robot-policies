@@ -30,6 +30,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import libero_replay as lr  # noqa: E402
+import governance as gov  # noqa: E402
 
 SCHEMA = "replay_bundle.v1"
 VERDICTS = ["INPUT_INVALID", "DUPLICATE", "UNREPLAYABLE", "RESET_MISMATCH", "OUTCOME_MISMATCH",
@@ -111,8 +112,21 @@ def validate(b):
 
 
 # ---------------------------------------------------------------- governance gate
-def gate(bundles, release, protocol):
+def gate(bundles, release, protocol, *, capability=None, stage=None, artifact_paths=None):
     archived = [b for b in bundles if b.get("provenance") != "synthetic_fixture"]
+    if gov.is_real_archive(bundles):
+        # A direct CLI call cannot skip Stage 0 or invoke an unapproved stage.
+        if capability is not gov._ORCHESTRATOR_CAPABILITY or stage not in (1, 2) or not artifact_paths:
+            return "REFUSED: archived replay requires the approved staged orchestrator"
+        try:
+            rel, _, _, _ = gov._strict_release(
+                release, protocol, artifact_paths["bundles"], artifact_paths["sample"], stage)
+            if rel["scope"][-1] < stage:
+                return "REFUSED: current stage exceeds approval scope"
+            if gov.sha_file(release) != artifact_paths["release_sha256"]:
+                return "REFUSED: release changed since counted run began"
+        except (gov.ReplayRefused, OSError, ValueError, KeyError) as error:
+            return "REFUSED: invalid archived replay approval: {}".format(error)
     if not archived:
         return None
     if not release or not protocol:
@@ -201,8 +215,10 @@ def environment_identity():
             "packages": pk, "assets_dir_name": Path(get_libero_path("assets")).resolve().name}
 
 
-def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol=None):
-    refusal = gate(bundles, release, protocol)
+def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol=None,
+        *, capability=None, stage=None, artifact_paths=None):
+    refusal = gate(bundles, release, protocol, capability=capability, stage=stage,
+                   artifact_paths=artifact_paths)
     if refusal:
         print(refusal, file=sys.stderr)
         return 5
