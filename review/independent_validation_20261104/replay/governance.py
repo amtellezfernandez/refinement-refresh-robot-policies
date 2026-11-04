@@ -10,7 +10,6 @@ import hashlib
 import json
 import os
 import platform
-import re
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -102,17 +101,11 @@ def verify_population(bundles, sample):
     if (not isinstance(sample_keys, list) or len(sample_keys) != 57
             or len(set(sample_keys)) != 57 or not set(sample_keys).issubset(primary)):
         raise ReplayRefused("Stage 1 manifest is not 57 distinct primary attempts")
-    if (sample.get("population"), sample.get("primary_frame"), sample.get("strata_nonempty"),
-            sample.get("stage1_sample_size"), sample.get("salt"), sample.get("per_stratum")) != (
-            1120, 320, 29, 57, SAMPLE_SALT.rstrip("|"), 2):
-        # The salt field is the prefix with final delimiter in the original
-        # manifest; checked separately below for compatibility with that format.
-        if sample.get("salt") != SAMPLE_SALT:
-            raise ReplayRefused("Stage 1 manifest design metadata differs from the frozen design")
-        if (sample.get("population"), sample.get("primary_frame"),
-                sample.get("strata_nonempty"), sample.get("stage1_sample_size"),
-                sample.get("per_stratum")) != (1120, 320, 29, 57, 2):
-            raise ReplayRefused("Stage 1 manifest population/strata metadata mismatch")
+    if (sample.get("population"), sample.get("primary_frame"),
+            sample.get("strata_nonempty"), sample.get("stage1_sample_size"),
+            sample.get("salt"), sample.get("per_stratum")) != (
+            1120, 320, 29, 57, SAMPLE_SALT, 2):
+        raise ReplayRefused("Stage 1 manifest design metadata differs from the frozen design")
     if sample.get("stage1_sample_sha256") != SAMPLE_SELECTION_SHA256:
         raise ReplayRefused("frozen sample digest field differs")
     if sha_json(sorted(sample_keys)) != SAMPLE_SELECTION_SHA256:
