@@ -156,9 +156,12 @@ compares against archived evidence and its result shapes the run.
 
 ## I. Awaiting Alba's approval
 
-The protocol as written (tolerance, sample, verdict table, host, inject arm), then Stages 0 to 2.
-Opportunities 1 and 2 also need it.
-
+The current implementation requires an external release bound to the exact
+protocol, archive bundles, sample manifest, executable files and protocol
+amendments. A Stage 0-only decision must use `scope: [0]`; this does not
+authorize Stages 1 or 2. No release file exists and no archived reset or action
+replay has run. The current runtime-provenance edits have not yet been
+qualified.
 ## Implemented / executed / checked / unverified
 
 - **Implemented:** the audit, 11 audit mutations, the harness, the fixtures, 36 harness tests, 5 drills, the protocol, and the post-hoc re-analysis.
