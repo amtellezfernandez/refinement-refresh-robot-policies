@@ -38,22 +38,22 @@
 \vspace{20mm}
 \begin{center}
 \begin{minipage}{748mm}
-{\fontsize{47}{57}\selectfont\bfseries THE SAME BUDGET HAS TWO JOBS}\par
+{\fontsize{47}{57}\selectfont\bfseries A RECIPE FOR CLOSED-LOOP INFERENCE}\par
 \vspace{7mm}
-{\fontsize{39}{49}\selectfont\color{muted} Refine the current action chunk—or generate again from a fresher observation.}
+{\fontsize{39}{49}\selectfont\color{muted} Choose how long to refine, how long to execute, and when to observe again.}
 \end{minipage}
 \vspace{12mm}
 \begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{39}{48}\selectfont\bfseries},note/.style={align=center,font=\fontsize{36}{44}\selectfont,text=muted}]
-  \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {NEW\\OBSERVATION};
-  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {FROZEN\\SmolVLA};
-  \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {REFINE\\$d$ steps};
-  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {EXECUTE\\$h$ actions};
+  \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {01\\OBSERVE};
+  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {02\\PREDICT};
+  \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {03\\REFINE\\$d$ steps};
+  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {04\\EXECUTE\\$h$ actions};
   \draw[flow,navy] (observe) -- (policy);
   \draw[flow,orange] (policy) -- (refine);
   \draw[flow,blue] (refine) -- (act);
   \draw[flow,blue] (act.south) -- ++(0,-60mm) -| (observe.south);
-  \node[note] at (0,-105mm) {\textbf{REFRESH:} obtain a new observation-conditioned prediction};
-  \node[draw=black,fill=white,text=black,line width=3pt,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {WHAT SHOULD THE POLICY DO WITH ITS NEXT UNIT OF COMPUTE?};
+  \node[note] at (0,-105mm) {\textbf{05 REPEAT:} obtain a new observation-conditioned prediction};
+  \node[draw=black,fill=white,text=black,line width=3pt,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {CHOOSE $d$ AND $h$ UNDER THE AVAILABLE COMPUTE BUDGET};
 \end{tikzpicture}
 \end{center}
 \vspace{8mm}
@@ -95,7 +95,7 @@
   \draw[black,line width=2pt] (264mm,18mm)--(264mm,125mm);
   \node[anchor=west,text=black,align=left,text width=215mm,font=\fontsize{34}{43}\selectfont] at (292mm,57mm) {7 frozen configurations\\8 held-out tasks\\1,120 confirmation attempts};
   \draw[black,line width=2pt] (533mm,18mm)--(533mm,125mm);
-  \node[anchor=west,text=black,align=left,text width=185mm,font=\fontsize{32}{40}\selectfont\bfseries] at (558mm,63mm) {One frozen checkpoint\\Synchronous LIBERO\\Paired evaluation};
+  \node[anchor=west,text=black,align=left,text width=185mm,font=\fontsize{32}{40}\selectfont\bfseries] at (558mm,63mm) {Frozen SmolVLA\\Synchronous LIBERO\\Paired evaluation};
 \end{tikzpicture}
 \end{minipage}
 \end{center}
