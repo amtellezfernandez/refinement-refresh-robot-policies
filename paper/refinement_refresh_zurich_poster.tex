@@ -162,34 +162,26 @@ One frozen SmolVLA checkpoint; synchronous LIBERO simulation; separate discovery
 \vspace{10mm}
 \hrule height 2pt
 \vspace{10mm}
-{\fontsize{42}{50}\selectfont\bfseries THREE DEPLOYMENT MESSAGES}\par
+{\fontsize{46}{54}\selectfont\bfseries THREE DEPLOYMENT PRINCIPLES}\par
 \vspace{6mm}
 \begin{tikzpicture}[every node/.style={align=center},>=Latex]
-\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (a) at (115mm,0)
-  {{\fontsize{46}{52}\selectfont\bfseries +10.6~pp}\\[4mm]
-   {\fontsize{30}{37}\selectfont success from less refinement}\\[3mm]
-   {\fontsize{26}{33}\selectfont $-5.9\%$ arithmetic per control step}};
-\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (b) at (375mm,0)
-  {{\fontsize{46}{52}\selectfont\bfseries $-60.7\%$}\\[4mm]
-   {\fontsize{30}{37}\selectfont arithmetic per attempt}\\[3mm]
-   {\fontsize{26}{33}\selectfont 138/160 vs.\ 139/160; equivalence unproven}};
-\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (d) at (635mm,0)
-  {{\fontsize{46}{52}\selectfont\bfseries 82.1\%}\\[4mm]
-   {\fontsize{30}{37}\selectfont generation cost is denoising-independent}\\[3mm]
-   {\fontsize{26}{33}\selectfont counted arithmetic is not deployment latency}};
+\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (a) at (115mm,0)
+  {{\fontsize{42}{48}\selectfont\bfseries REFINE WITH\\EVIDENCE}\\[7mm]
+   {\fontsize{34}{42}\selectfont Additional denoising\\is not automatically better\\for closed-loop control.}};
+\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (b) at (375mm,0)
+  {{\fontsize{42}{48}\selectfont\bfseries REFRESH\\DELIBERATELY}\\[7mm]
+   {\fontsize{34}{42}\selectfont Longer prefixes save compute,\\but quality preservation\\must be tested.}};
+\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (d) at (635mm,0)
+  {{\fontsize{42}{48}\selectfont\bfseries MEASURE THE\\SYSTEM}\\[7mm]
+   {\fontsize{34}{42}\selectfont Report task success, arithmetic,\\latency, and observation-\\update frequency.}};
 \end{tikzpicture}\par
 \vspace{10mm}
 \noindent\fcolorbox{blackink}{panelgray}{%
 \begin{minipage}{0.965\textwidth}
-\vspace{7mm}
-{\fontsize{40}{48}\selectfont\bfseries TAKEAWAY}\par\vspace{5mm}
-{\fontsize{38}{46}\selectfont\bfseries
-Inference efficiency is a closed-loop allocation problem.}\par\vspace{4mm}
-{\fontsize{30}{39}\selectfont
-Evaluate task success together with the cost and frequency of
-observation-conditioned replanning, rather than minimizing denoising steps in
-isolation.}\par
-\vspace{5mm}
+\vspace{8mm}
+{\fontsize{38}{46}\selectfont\bfseries TAKEAWAY: Inference efficiency is a
+closed-loop allocation problem.}\par
+\vspace{8mm}
 \end{minipage}}
 \vspace{4mm}
 \vfill
