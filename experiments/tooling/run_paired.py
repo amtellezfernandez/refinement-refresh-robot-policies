@@ -12,6 +12,7 @@ import argparse
 import copy
 import dataclasses
 import hashlib
+import importlib
 import importlib.metadata
 import inspect
 import json
@@ -344,15 +345,55 @@ def runtime_manifest(args, policy, native, schedule, load_wall_s):
     for path in Path(args.checkpoint).resolve().rglob("*"):
         if path.is_file() and ".cache" not in path.parts and not path.name.startswith("."):
             files[str(path.relative_to(Path(args.checkpoint).resolve()))] = file_sha(path)
-    packages = {dist.metadata["Name"]: dist.version for dist in importlib.metadata.distributions()
-                if dist.metadata.get("Name")}
+    # Keep every visible distribution record. Multiple site-packages roots can
+    # expose more than one dist-info record for a package; a dict comprehension
+    # silently let the last one overwrite the others.
+    distribution_records = defaultdict(list)
+    for dist in importlib.metadata.distributions():
+        display_name = dist.metadata.get("Name")
+        if not display_name:
+            continue
+        key = display_name.lower().replace("_", "-").replace(".", "-")
+        distribution_records[key].append({
+            "name": display_name,
+            "version": dist.version,
+            "metadata_path": str(getattr(dist, "_path", "")),
+            "install_root": str(Path(dist.locate_file("")).resolve()),
+        })
+    distribution_records = {
+        name: sorted(records, key=lambda row: (row["version"], row["metadata_path"]))
+        for name, records in sorted(distribution_records.items())
+    }
+    # The imported module is authoritative for what this process executes.
+    # Require matching distribution metadata and record its path/version too.
+    imported_modules = {}
+    for name, module in (("numpy", np), ("torch", torch), ("mujoco", mujoco)):
+        module_version = str(module.__version__)
+        module_file = str(Path(module.__file__).resolve())
+        base_version = module_version.split("+", 1)[0]
+        candidates = distribution_records.get(name, [])
+        if not any(row["version"].split("+", 1)[0] == base_version for row in candidates):
+            raise RuntimeError(
+                f"imported {name} {module_version} from {module_file} has no matching "
+                "installed distribution metadata"
+            )
+        imported_modules[name] = {"version": module_version, "file": module_file}
+    # Preserve a simple mapping only where metadata is unambiguous. Ambiguous
+    # package names are represented by null and fully listed below.
+    packages = {
+        name: (records[0]["version"] if len({row["version"] for row in records}) == 1 else None)
+        for name, records in distribution_records.items()
+    }
+    duplicate_distribution_records = {
+        name: records for name, records in distribution_records.items() if len(records) > 1
+    }
     try:
         gpu = subprocess.check_output(
             ["nvidia-smi", "--query-gpu=name,driver_version,memory.total",
              "--format=csv,noheader"], text=True).strip()
     except (OSError, subprocess.CalledProcessError):
         gpu = "nvidia-smi unavailable"
-    return {"schema_version": 1, "kind": "robopad_paired_runtime",
+    return {"schema_version": 2, "kind": "robopad_paired_runtime",
             "status_at_creation": "scheduled_not_completed",
             "mode": "development" if args.development else "planned",
             "argv": vars(args), "python": sys.version, "platform": platform.platform(),
@@ -364,7 +405,8 @@ def runtime_manifest(args, policy, native, schedule, load_wall_s):
             "numpy_version": np.__version__, "mujoco_version": mujoco.__version__,
             "gpu": gpu, "device_name": torch.cuda.get_device_name(0),
             "device_total_memory_bytes": torch.cuda.get_device_properties(0).total_memory,
-            "packages": packages, "native_checkpoint_config": native,
+            "packages": packages, "package_distribution_candidates": duplicate_distribution_records,
+            "imported_modules": imported_modules, "native_checkpoint_config": native,
             "effective_policy_config": dataclasses.asdict(policy.config),
             "checkpoint_expected_revision": CHECKPOINT_REVISION,
             "checkpoint_revision_marker_verified": True,
