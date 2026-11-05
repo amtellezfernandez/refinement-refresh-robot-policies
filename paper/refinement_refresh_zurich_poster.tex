@@ -21,24 +21,26 @@
 \newcommand{\metric}[3]{\begin{minipage}[t]{0.31\textwidth}\centering{\fontsize{96}{100}\selectfont\bfseries\color{#3}#1}\par\vspace{5mm}{\fontsize{33}{41}\selectfont\bfseries #2}\end{minipage}}
 \newcommand{\tagline}[1]{{\fontsize{34}{41}\selectfont\bfseries\color{blue}\MakeUppercase{#1}}}
 \begin{document}
-\noindent\colorbox{navy}{\begin{minipage}[t][180mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
-\vspace*{33mm}
+\noindent\colorbox{navy}{\begin{minipage}[t][220mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
+\vspace*{25mm}
 \hspace*{46mm}\begin{minipage}{749mm}
-{\fontsize{112}{114}\selectfont\bfseries\color{white} REFINEMENT \color{white}vs.\color{white} REFRESH}\par
-\vspace{10mm}
-{\fontsize{48}{58}\selectfont\color{white} Where should a robot policy spend its inference compute?}\par
-\vspace{19mm}
+{\fontsize{112}{114}\selectfont\bfseries\color{white} REFINEMENT vs. REFRESH}\par
+\vspace{7mm}
+{\fontsize{46}{56}\selectfont\color{white} Compute allocation for closed-loop robot policies}\par
+\vspace{13mm}
 {\fontsize{32}{40}\selectfont\color{white}\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\hfill
 {\fontsize{30}{38}\selectfont\color{white} MAAT Institute \quad\textbullet\quad Z\"urich, 10 Nov 2026}\par
+\vspace{22mm}
+{\fontsize{55}{66}\selectfont\bfseries\color{white} INFERENCE COMPUTE IS A CONTROL DECISION.}\par
 \end{minipage}
 \end{minipage}}\par
 \noindent\colorbox{orange}{\rule{\dimexpr\paperwidth-2\fboxsep\relax}{8mm}}\par
 \vspace{20mm}
 \begin{center}
 \begin{minipage}{748mm}
-{\fontsize{50}{60}\selectfont\bfseries A chunked policy has two ways to react:}\par
+{\fontsize{47}{57}\selectfont\bfseries THE SAME BUDGET HAS TWO JOBS}\par
 \vspace{7mm}
-{\fontsize{38}{48}\selectfont\color{muted} Improve the current prediction, or act briefly and plan again from a fresher observation.}
+{\fontsize{39}{49}\selectfont\color{muted} Refine the current action chunk—or generate again from a fresher observation.}
 \end{minipage}
 \vspace{12mm}
 \begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{39}{48}\selectfont\bfseries},note/.style={align=center,font=\fontsize{36}{44}\selectfont,text=muted}]
@@ -51,14 +53,14 @@
   \draw[flow,blue] (refine) -- (act);
   \draw[flow,blue] (act.south) -- ++(0,-60mm) -| (observe.south);
   \node[note] at (0,-105mm) {\textbf{REFRESH:} obtain a new observation-conditioned prediction};
-  \node[draw=navy,fill=navy,text=white,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {THE DEPLOYMENT CHOICE: how much $d$, how much $h$?};
+  \node[draw=navy,fill=navy,text=white,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {WHAT SHOULD THE POLICY DO WITH ITS NEXT UNIT OF COMPUTE?};
 \end{tikzpicture}
 \end{center}
 \vspace{8mm}
 \begin{center}
 \begin{minipage}{748mm}
-\tagline{Main held-out comparison}\par\vspace{6mm}
-{\fontsize{50}{60}\selectfont\bfseries Less refinement improved closed-loop success}\par
+\tagline{The held-out result}\par\vspace{6mm}
+{\fontsize{56}{66}\selectfont\bfseries FEWER DENOISING STEPS. MORE SUCCESS.}\par
 \vspace{9mm}
 {\fontsize{34}{43}\selectfont\color{muted} Same two-action execution prefix; eight Goal and Object tasks excluded from configuration selection.}\par
 \vspace{14mm}
@@ -101,9 +103,9 @@
 \begin{center}
 \begin{minipage}{748mm}
 \begin{minipage}[t]{482mm}
-{\fontsize{36}{44}\selectfont\bfseries\color{orange}\MakeUppercase{Takeaway}}\par\vspace{6mm}
-{\fontsize{48}{58}\selectfont\bfseries More denoising does not necessarily improve closed-loop control.}\par\vspace{7mm}
-{\fontsize{34}{43}\selectfont Evaluate refinement and replanning together, using both task success and compute.}
+{\fontsize{36}{44}\selectfont\bfseries\color{orange}\MakeUppercase{The idea to remember}}\par\vspace{6mm}
+{\fontsize{48}{58}\selectfont\bfseries Better robot inference is not only about refining longer. It is also about deciding when to look again.}\par\vspace{7mm}
+{\fontsize{34}{43}\selectfont Evaluate refinement and replanning jointly through closed-loop success and compute.}
 \end{minipage}\hfill
 \begin{minipage}[t]{235mm}
 {\fontsize{32}{40}\selectfont\bfseries\color{blue} INTERPRET WITH CARE}\par\vspace{5mm}
