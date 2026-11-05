@@ -333,14 +333,36 @@ def json_line(stream, value):
     stream.flush()
 
 
+def directory_manifest(root):
+    """Hash every file under a resolved runtime dependency directory."""
+    root = Path(root).resolve()
+    if not root.is_dir():
+        raise RuntimeError(f"runtime dependency directory is missing: {root}")
+    entries = []
+    for path in sorted(root.rglob("*")):
+        if path.is_file():
+            entries.append({
+                "path": path.relative_to(root).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": file_sha(path),
+                "symlink_target": os.readlink(path) if path.is_symlink() else None,
+            })
+    if not entries:
+        raise RuntimeError(f"runtime dependency directory is empty: {root}")
+    return {"root": str(root), "file_count": len(entries),
+            "tree_sha256": sha(entries), "files": entries}
+
+
 def runtime_manifest(args, policy, native, schedule, load_wall_s):
     import torch
     import numpy as np
     import lerobot
     import libero
     import mujoco
+    from libero.libero import get_libero_path
     from lerobot.policies.smolvla import modeling_smolvla
     from lerobot.envs import libero as libero_env_module
+    libero_assets = directory_manifest(get_libero_path("assets"))
     files = {}
     for path in Path(args.checkpoint).resolve().rglob("*"):
         if path.is_file() and ".cache" not in path.parts and not path.name.startswith("."):
@@ -414,12 +436,13 @@ def runtime_manifest(args, policy, native, schedule, load_wall_s):
             "lerobot_expected_revision": EXPECTED_REVISION,
             "verified_pinned_source_sha256": verify_source_tree(),
             "source_paths": {"lerobot": str(lerobot.__file__), "libero": str(libero.__file__)},
+            "libero_assets": libero_assets,
             "source_sha256": {str(path): file_sha(path) for path in (
                 Path(__file__), Path(inspect.getfile(modeling_smolvla)),
                 Path(inspect.getfile(libero_env_module)))},
             "model_loading_wall_s": load_wall_s,
             "execution_environment": {key: os.environ.get(key) for key in (
-                "MUJOCO_GL", "PYOPENGL_PLATFORM", "HF_HOME", "HF_HUB_OFFLINE",
+                "MUJOCO_GL", "PYOPENGL_PLATFORM", "HF_HOME", "HF_HUB_OFFLINE", "LIBERO_CONFIG_PATH",
                 "OMP_NUM_THREADS", "MKL_NUM_THREADS", "CUBLAS_WORKSPACE_CONFIG")},
             "selected_schedule_sha256": sha(schedule), "selected_schedule": schedule,
             "external_holdout_status": "not_certified_against_unarchived_runs",
