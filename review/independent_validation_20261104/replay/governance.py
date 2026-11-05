@@ -7,6 +7,7 @@ not paper evidence and are not subject to the archived-data release.
 from __future__ import annotations
 
 import hashlib
+import importlib
 import importlib.metadata
 import json
 import os
@@ -219,16 +220,64 @@ def runtime_versions():
     python_version = ".".join(map(str, sys.version_info[:3]))
     if python_version != "3.12.3":
         raise ReplayRefused("pinned replay interpreter must be Python 3.12.3, found " + python_version)
+
+    # importlib.metadata.version(name) can select a stale duplicate dist-info
+    # record that is not the module Python actually imports. Keep all candidates,
+    # and bind the critical runtime modules to both their imported version and file.
+    distributions = defaultdict(list)
+    for dist in importlib.metadata.distributions():
+        display_name = dist.metadata.get("Name")
+        if not display_name:
+            continue
+        key = display_name.lower().replace("_", "-").replace(".", "-")
+        distributions[key].append({
+            "version": dist.version,
+            "metadata_path": str(getattr(dist, "_path", "")),
+            "install_root": str(Path(dist.locate_file("")).resolve()),
+        })
+    for rows in distributions.values():
+        rows.sort(key=lambda row: (row["version"], row["metadata_path"]))
+
+    imported_modules = {}
+    module_names = {"numpy": "numpy", "torch": "torch", "mujoco": "mujoco"}
     versions = {}
     for name, expected in ENV_VERSIONS.items():
-        try:
-            actual = importlib.metadata.version(name)
-        except importlib.metadata.PackageNotFoundError as error:
-            raise ReplayRefused("required replay package missing: " + name) from error
-        if actual != expected:
-            raise ReplayRefused(f"version drift for {name}: expected {expected}, found {actual}")
-        versions[name] = actual
-    return versions
+        if name in module_names:
+            try:
+                module = importlib.import_module(module_names[name])
+            except ImportError as error:
+                raise ReplayRefused("required replay module missing: " + name) from error
+            actual = str(getattr(module, "__version__", ""))
+            actual_base = actual.split("+", 1)[0]
+            if actual_base != expected:
+                raise ReplayRefused(
+                    f"imported module version drift for {name}: expected {expected}, found {actual}"
+                )
+            module_file = Path(module.__file__).resolve()
+            candidates = distributions.get(name, [])
+            matching = [
+                row for row in candidates
+                if row["version"].split("+", 1)[0] == actual_base
+                and module_file.is_relative_to(Path(row["install_root"]))
+            ]
+            if not matching:
+                raise ReplayRefused(
+                    f"cannot bind imported {name} module {actual} at {module_file} "
+                    "to matching distribution metadata"
+                )
+            versions[name] = sorted({row["version"] for row in candidates})
+            imported_modules[name] = {"version": actual, "file": str(module_file),
+                                      "matching_distributions": matching}
+        else:
+            try:
+                actual = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError as error:
+                raise ReplayRefused("required replay package missing: " + name) from error
+            if actual != expected:
+                raise ReplayRefused(f"version drift for {name}: expected {expected}, found {actual}")
+            versions[name] = actual
+
+    return {"distributions": versions, "imported_modules": imported_modules}
 
 
 def verify_assets(asset_root, manifest_path):
