@@ -104,11 +104,13 @@ retroactively resolved from that manifest alone.
 
 The PR now changes the runner to preserve duplicate distribution candidates,
 leave ambiguous package versions unset in the legacy summary, and record each
-critical imported module's version and file path. The replay gate now checks
-the imported NumPy, Torch and MuJoCo module versions and binds them to matching
+critical imported module's version and file path. It also hashes the resolved
+LIBERO assets tree in future experiment manifests. The replay gate checks the
+imported NumPy, Torch and MuJoCo module versions and binds them to matching
 distribution metadata under the same installation root, rather than trusting
-a single metadata lookup. The schema change applies to future manifests; it
-does not rewrite archived records or change the frozen scientific protocol.
+a single metadata lookup. These changes apply to future manifests and replay
+preflights; they do not rewrite archived records or change the frozen
+scientific protocol. They have not yet been tested after this amendment.
 
 The original LIBERO asset tree was not hashed by the experiment, so its exact
 revision remains unknown. The replay's pinned asset tree is verified against
