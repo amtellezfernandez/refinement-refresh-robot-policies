@@ -12,16 +12,20 @@
 \definecolor{softgray}{gray}{0.38}
 \definecolor{rulegray}{gray}{0.72}
 \definecolor{panelgray}{gray}{0.95}
+\definecolor{accent}{RGB}{31,78,121}
+\definecolor{accentlight}{RGB}{231,240,248}
 \color{blackink}
 \newcommand{\Section}[2]{\vspace{8mm}{\fontsize{40}{47}\selectfont\bfseries #1\quad #2}\par\vspace{2mm}\hrule height 1.6pt\vspace{7mm}}
 \newcommand{\BigNumber}[2]{{\fontsize{78}{82}\selectfont\bfseries #1}\par\vspace{3mm}{\fontsize{26}{33}\selectfont #2}\par}
 \newcommand{\SmallCaps}[1]{{\fontsize{24}{29}\selectfont\bfseries\MakeUppercase{#1}}}
 \newcommand{\Panel}[1]{\noindent\fcolorbox{blackink}{panelgray}{\begin{minipage}{0.92\linewidth}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
-\newcommand{\ResultBar}[3]{%
+\newcommand{\PrimaryPanel}[1]{\noindent\fcolorbox{accent}{accent}{\begin{minipage}{0.92\linewidth}\color{white}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
+\newcommand{\SecondaryPanel}[1]{\noindent\fcolorbox{accent}{accentlight}{\begin{minipage}{0.92\linewidth}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
+\newcommand{\ResultBar}[4]{%
 \begin{tikzpicture}[baseline]
 \node[anchor=west,font=\fontsize{28}{34}\selectfont\bfseries] at (0,0) {#1};
 \draw[line width=0.8pt] (35mm,-3mm) rectangle (143mm,11mm);
-\fill[black] (35mm,-3mm) rectangle ({35mm + #2*1.08mm},11mm);
+\fill[#4] (35mm,-3mm) rectangle ({35mm + #2*1.08mm},11mm);
 \node[anchor=west,font=\fontsize{28}{34}\selectfont] at (151mm,3mm) {#3};
 \end{tikzpicture}\par\vspace{4mm}}
 \begin{document}
@@ -76,7 +80,7 @@ For full execution prefixes, the nominal neural arithmetic rate is
 where $F_{\mathrm{gen}}(d)$ is the reference-calibrated arithmetic for one full chunk generation.
 
 \vspace{3mm}
-\Panel{\BigNumber{82.1\%}{of native counted generation arithmetic is independent of the denoising-step count.}
+\SecondaryPanel{\BigNumber{82.1\%}{of native counted generation arithmetic is independent of the denoising-step count.}
 Reducing denoising alone leaves most of the cost of generating a new prediction intact.}
 
 \Section{03}{Evaluation split}
@@ -91,20 +95,20 @@ The eight confirmation tasks were excluded from configuration selection. The pri
 
 \columnbreak
 
-\Section{04}{Main result: refine less}
+\Section{04}{\textcolor{accent}{Main result: refine less}}
 At a fixed two-action execution prefix ($h=2$), compare two versus five denoising steps.
 
 \vspace{7mm}
 \SmallCaps{Closed-loop success}\par\vspace{8mm}
-\ResultBar{$d=2$}{86.875}{139/160}
-\ResultBar{$d=5$}{76.25}{122/160}
+\ResultBar{$d=2$}{86.875}{139/160}{accent}
+\ResultBar{$d=5$}{76.25}{122/160}{softgray}
 
 \vspace{9mm}
-\Panel{\BigNumber{+10.6 pp}{paired success difference, $d=2$ minus $d=5$}
+\PrimaryPanel{\BigNumber{+10.6 pp}{paired success difference, $d=2$ minus $d=5$}
 \fontsize{26}{34}\selectfont Descriptive, task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
 
 \vspace{14mm}
-\Panel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2 at $h=2$.}}
+\SecondaryPanel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2 at $h=2$.}}
 
 \Section{05}{Refresh less often?}
 Hold denoising fixed at $d=2$. Compare executing two versus five actions before replanning.
@@ -120,7 +124,7 @@ $h=5,\ d=2$ & 138/160 & 16.1\\
 \end{tabular}
 
 \vspace{15mm}
-\Panel{\BigNumber{$-60.7\%$}{reference-calibrated arithmetic per attempted episode for $h=5$ versus $h=2$, at $d=2$.}}
+\SecondaryPanel{\BigNumber{$-60.7\%$}{reference-calibrated arithmetic per attempted episode for $h=5$ versus $h=2$, at $d=2$.}}
 
 \vspace{8mm}
 \textbf{Important:} Similar observed success is \emph{not} evidence of equivalent quality. The uncertainty interval does not establish non-inferiority or equivalence.
@@ -166,18 +170,19 @@ One frozen SmolVLA checkpoint; synchronous LIBERO simulation; separate discovery
 \vspace{6mm}
 \begin{tikzpicture}[every node/.style={align=center},>=Latex]
 \node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (a) at (115mm,0)
-  {{\fontsize{42}{48}\selectfont\bfseries REFINE WITH\\EVIDENCE}\\[7mm]
+  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries REFINE WITH\\EVIDENCE}\\[7mm]
    {\fontsize{34}{42}\selectfont Additional denoising\\is not automatically better\\for closed-loop control.}};
 \node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (b) at (375mm,0)
-  {{\fontsize{42}{48}\selectfont\bfseries REFRESH\\DELIBERATELY}\\[7mm]
+  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries REFRESH\\DELIBERATELY}\\[7mm]
    {\fontsize{34}{42}\selectfont Longer prefixes save compute,\\but quality preservation\\must be tested.}};
 \node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (d) at (635mm,0)
-  {{\fontsize{42}{48}\selectfont\bfseries MEASURE THE\\SYSTEM}\\[7mm]
+  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries MEASURE THE\\SYSTEM}\\[7mm]
    {\fontsize{34}{42}\selectfont Report task success, arithmetic,\\latency, and observation-\\update frequency.}};
 \end{tikzpicture}\par
 \vspace{10mm}
-\noindent\fcolorbox{blackink}{panelgray}{%
+\noindent\fcolorbox{accent}{accent}{%
 \begin{minipage}{0.965\textwidth}
+\color{white}
 \vspace{8mm}
 {\fontsize{38}{46}\selectfont\bfseries TAKEAWAY: Inference efficiency is a
 closed-loop allocation problem.}\par
