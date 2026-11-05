@@ -1,0 +1,33 @@
+{
+ "mode": "jit",
+ "devices": [
+  "cuda:0"
+ ],
+ "mem_after_load": {
+  "bytes_in_use": 6.42,
+  "peak_bytes_in_use": 6.42,
+  "bytes_limit": 23.88
+ },
+ "jit": {
+  "2": {
+   "first_call_s": 30.757790327072144,
+   "warm_median_s": 0.058016061782836914,
+   "sha256": "a62bd9d1f1036d05fa64e2f4b7866af15a8f2ff9fdc335a47d306708fd339601"
+  },
+  "5": {
+   "first_call_s": 0.06275582313537598,
+   "warm_median_s": 0.0624241828918457,
+   "sha256": "82207306a862d02f7fe144606254466e7fff926758f62133399f0c876fab49bd"
+  },
+  "10": {
+   "first_call_s": 0.07275176048278809,
+   "warm_median_s": 0.0727996826171875,
+   "sha256": "32f0a290913eec8a9b64bf465ec207e5d7be48323dd3f90e96ac76d5bf0773e7"
+  }
+ },
+ "mem_end": {
+  "bytes_in_use": 6.42,
+  "peak_bytes_in_use": 6.64,
+  "bytes_limit": 23.88
+ }
+}

@@ -1,0 +1,13 @@
+# Computed on the MacBook, 5 Nov 2026, from the .npy files in this folder
+# command: uv run --no-project --python 3.11 --with numpy python -I -c '<below>'
+#   import numpy as np
+#   A={d:np.load(f"actions_jit_d{d}.npy") for d in (2,5,10)}
+#   for d,a in A.items(): print(d,a.shape,a.dtype,"finite",bool(np.isfinite(a).all()),"min",np.round(a.min(0),3).tolist(),"max",np.round(a.max(0),3).tolist())
+#   print("maxabs d2-d5",float(abs(A[2]-A[5]).max()),"d5-d10",float(abs(A[5]-A[10]).max()))
+c9d7b5167173615f65126039caf554ce388cfb9638196eb6cdbf9ea061be2a9c  actions_jit_d10.npy
+20e699272231c50e491ebfadbb93faaece4c75f06badb3b036d4aaabd968264b  actions_jit_d2.npy
+60d848b750fd1eed782ff4e6244d3dfb651f43f2d101a780d2be59fb2f4d2307  actions_jit_d5.npy
+2 (10, 7) float64 finite True min [-0.295, 0.476, -0.242, -0.002, -0.034, 0.041, 0.856] max [-0.26, 0.58, -0.217, 0.004, -0.017, 0.062, 0.933]
+5 (10, 7) float64 finite True min [-0.276, 0.542, -0.238, -0.01, -0.045, 0.013, 0.989] max [-0.209, 0.73, -0.198, -0.0, -0.004, 0.036, 1.007]
+10 (10, 7) float64 finite True min [-0.268, 0.562, -0.257, -0.015, -0.057, 0.006, 0.992] max [-0.164, 0.78, -0.191, -0.001, -0.001, 0.026, 0.998]
+maxabs d2-d5 0.17663783251953125 d5-d10 0.053506711853027245

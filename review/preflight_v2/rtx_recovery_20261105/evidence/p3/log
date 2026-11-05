@@ -1,0 +1,31 @@
+=== attempt 1 2026-11-05T18:07:02Z
+python_rc=0
+guard {"phase": "preflight", "reservation": "R015"}
+PARITY_BLOCKED_BY_PROBE: AttemptJournal((PosixPath('/home/warren/jobs/alba-v3-p3-smolvla-profile/out/parity_attempts'),)) refused; no parity environment or episode created
+parity artefacts: 0
+profile.json
+provenance.json
+d 2 counts {'action_expert_calls': 200, 'denoise_steps': 200, 'generations': 100, 'prefill_calls': 100, 'vision_encoder_calls': 200} denoise_eq_generations_x_d True generations_eq_100 True host_median_s 0.1339 cuda_median_ms 125.93 n_host 100 n_cuda 100 peak_alloc_GiB 1.5 chunk_shape [1, 50, 7]
+d 5 counts {'action_expert_calls': 500, 'denoise_steps': 500, 'generations': 100, 'prefill_calls': 100, 'vision_encoder_calls': 200} denoise_eq_generations_x_d True generations_eq_100 True host_median_s 0.2238 cuda_median_ms 210.58 n_host 100 n_cuda 100 peak_alloc_GiB 1.5 chunk_shape [1, 50, 7]
+d 10 counts {'action_expert_calls': 1000, 'denoise_steps': 1000, 'generations': 100, 'prefill_calls': 100, 'vision_encoder_calls': 200} denoise_eq_generations_x_d True generations_eq_100 True host_median_s 0.3902 cuda_median_ms 367.55 n_host 100 n_cuda 100 peak_alloc_GiB 1.5 chunk_shape [1, 50, 7]
+peak_line 18:09:52 memavail_gib=41 gpu_used_mib=2899
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/alba-v3-p3-smolvla-profile/attempts
+4233b2724af713b612485ffd4ff2f9a446e9e7197166e36db4d795e31b7cd224  /home/warren/jobs/alba-v3-p3-smolvla-profile/cmd
+11390b06a863b12c384bf9942c6e486ab0dc4c36e9114b74d56fed65ecbf5f4f  /home/warren/jobs/alba-v3-p3-smolvla-profile/cmdpid
+ee6ce3103b2ca03f0bc49d0cb3d534e95ed721c46f626e2f10175a1fc65c232f  /home/warren/jobs/alba-v3-p3-smolvla-profile/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/alba-v3-p3-smolvla-profile/cwd
+c6c6b9f9561b226113b09c776ac44456411bcb067aff9f8569763787e78ee8d4  /home/warren/jobs/alba-v3-p3-smolvla-profile/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/alba-v3-p3-smolvla-profile/hb
+56191ee64c32b72ce608818e69a356caa260b55f433e4648bf30abcd6c7b56c1  /home/warren/jobs/alba-v3-p3-smolvla-profile/log
+1c6b91b6bd8ad2e1d78791a6d0e51d44d21f2eacee48b4b74de010b93245ca76  /home/warren/jobs/alba-v3-p3-smolvla-profile/out/profile.json
+92590a4935e4e966735beff308cfd3f26d7f964822a83458d17d38ccab77bdc4  /home/warren/jobs/alba-v3-p3-smolvla-profile/out/provenance.json
+c5400d821506e80db2e52089a11a47789602dfae31ea3168fcc0ba5185a5bfd5  /home/warren/jobs/alba-v3-p3-smolvla-profile/p3_profile_only.py
+66489ad4d04b9f4528c1ed14b570eaea031fbbcc249fbcc7e853cae0a7cb7ca1  /home/warren/jobs/alba-v3-p3-smolvla-profile/pid
+fe09d4e4b168a55c9ecb27d0c8963aa34bdebef4cba705e8f7621b9fd766a514  /home/warren/jobs/alba-v3-p3-smolvla-profile/python.log
+74095d0b4139b3eeaa8950251004a259e31905637ed5fe6343c3af2c3901f2e9  /home/warren/jobs/alba-v3-p3-smolvla-profile/rc.txt
+b8ccc64f604c13e061d681facd97db8c609580e6b29f5b75fa1a688baec56d17  /home/warren/jobs/alba-v3-p3-smolvla-profile/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/alba-v3-p3-smolvla-profile/retries
+1be281e84f37450084fa347aa8a8f0865e300cfc269c990d767ab908e49df533  /home/warren/jobs/alba-v3-p3-smolvla-profile/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/alba-v3-p3-smolvla-profile/status
+d1134a2338d051d2a1a8049fa045c962c71fe994af529bc61bac27780d15692f  /home/warren/jobs/alba-v3-p3-smolvla-profile/summary.txt
+0fdd63a4e307adefbdd831ff65e1b46c18d6bb7fc35138e05e37f0e95bf39600  /home/warren/jobs/alba-v3-p3-smolvla-profile/tag

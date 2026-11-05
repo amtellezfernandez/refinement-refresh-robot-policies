@@ -1,0 +1,24 @@
+=== attempt 1 2026-11-05T17:10:43Z
+== d5
+E1105 17:12:03.680691   32924 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes. [tf-allocator-allocation-error='']
+Traceback (most recent call last):
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes.
+rc_d5=
+== d10
+E1105 17:13:25.886073   34821 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes. [tf-allocator-allocation-error='']
+Traceback (most recent call last):
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes.
+rc_d10=
+== neg
+E1105 17:14:44.300192   36719 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes. [tf-allocator-allocation-error='']
+Traceback (most recent call last):
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes.
+rc_neg=
+== jit
+RESULT {"mode": "jit", "devices": ["cuda:0"], "mem_after_load": {"bytes_in_use": 6.42, "peak_bytes_in_use": 6.42, "bytes_limit": 23.88}, "jit": {"2": {"first_call_s": 30.757790327072144, "warm_median_s": 0.058016061782836914, "sha256": "a62bd9d1f1036d05fa64e2f4b7866af15a8f2ff9fdc335a47d306708fd339601"}, "5": {"first_call_s": 0.06275582313537598, "warm_median_s": 0.0624241828918457, "sha256": "82207306a862d02f7fe144606254466e7fff926758f62133399f0c876fab49bd"}, "10": {"first_call_s": 0.07275176048278809, "warm_median_s": 0.0727996826171875, "sha256": "32f0a290913eec8a9b64bf465ec207e5d7be48323dd3
+rc_jit=
+60c68cf4eda1caf435795321461d711aea2c42822eb6e7aa804dc3dc77b3f3a0  /home/warren/jobs/alba-v3-pi05-cuda-probe-r1/result_jit.json
+c9d7b5167173615f65126039caf554ce388cfb9638196eb6cdbf9ea061be2a9c  /home/warren/jobs/alba-v3-pi05-cuda-probe-r1/actions_jit_d10.npy
+20e699272231c50e491ebfadbb93faaece4c75f06badb3b036d4aaabd968264b  /home/warren/jobs/alba-v3-pi05-cuda-probe-r1/actions_jit_d2.npy
+60d848b750fd1eed782ff4e6244d3dfb651f43f2d101a780d2be59fb2f4d2307  /home/warren/jobs/alba-v3-pi05-cuda-probe-r1/actions_jit_d5.npy
+814 MiB, 42

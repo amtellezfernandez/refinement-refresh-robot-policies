@@ -1,0 +1,36 @@
+=== attempt 1 2026-11-05T17:08:08Z
+== alloc recheck
+alloc_20GB_all_ones True numel 5000000000
+openpi_commit 215abfb217dbac7d5f1273282331b9b1866c0479
+    "actions": self._sample_actions(sample_rng_or_pytorch_device, observation, **sample_kwargs),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<stdin>", line 22, in <lambda>
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/pi0.py", line 234, in sample_actions
+    prefix_tokens, prefix_mask, prefix_ar_mask = self.embed_prefix(observation)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/jaxtyping/_decorator.py", line 559, in wrapped_fn
+    return wrapped_fn_impl(args, kwargs, bound, memos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/jaxtyping/_decorator.py", line 483, in wrapped_fn_impl
+    out = fn(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/pi0.py", line 114, in embed_prefix
+    image_tokens, _ = self.PaliGemma.img(obs.images[name], train=False)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/nnx/bridge/wrappers.py", line 164, in __call__
+    out = self.module.apply(variables, *args, rngs=_rngs, method=method, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/siglip.py", line 241, in __call__
+    x, out["encoder"] = Encoder(
+                        ^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/siglip.py", line 133, in __call__
+    x, scan_out = nn.scan(
+                  ^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/core/axes_scan.py", line 166, in scan_fn
+    c, ys = lax.scan(
+            ^^^^^^^^^
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 9916416 bytes.
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+f391c58e55871f9f3529484c7b8e4584f2ac514738c07a0693c2543fffb26381  /home/warren/jobs/alba-v3-pi05-cuda-probe/result.json
+814 MiB, 37

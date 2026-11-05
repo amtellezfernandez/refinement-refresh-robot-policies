@@ -1,0 +1,5 @@
+MUJOCO_GL egl PYOPENGL_PLATFORM egl
+mujoco 3.2.3
+STEP context_created
+STEP make_current_ok
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)'

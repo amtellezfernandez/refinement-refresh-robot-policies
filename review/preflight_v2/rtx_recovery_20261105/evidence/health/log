@@ -1,0 +1,41 @@
+=== attempt 1 2026-11-05T17:07:00Z
+== identity
+DESKTOP-J7AGHMV
+Linux 6.6.87.2-microsoft-standard-WSL2 x86_64
+293547.63 9389174.24
+Thu Nov  5 17:07:00 UTC 2026
+== nvidia
+name, driver_version, vbios_version, memory.used [MiB], memory.total [MiB], temperature.gpu, power.draw [W], pstate, clocks_event_reasons.active
+NVIDIA GeForce RTX 5090, 610.88, 98.02.2e.00.c9, 819 MiB, 32607 MiB, 35, 16.97 W, P8, 0x0000000000000000
+| NVIDIA-SMI 610.57.01              KMD Version: 610.88        CUDA UMD Version: 13.3     |
+pid, used_gpu_memory [MiB]
+== host
+               total        used        free      shared  buff/cache   available
+Mem:              47           1          21           0          24          45
+Swap:             16           0          16
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  886G   71G  93% /
+-rw-r--r-- 1 warren warren 0 Nov  1 19:02 /home/warren/local-science-programme-20261008/gpu.lock
+    PID     ELAPSED   RSS COMMAND
+    179  3-09:32:26 37536 /usr/local/bin/ollama serve
+    223  3-09:32:26 22016 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+     40  3-09:32:26 17492 /usr/lib/systemd/systemd-journald
+    148  3-09:32:26 12288 /usr/lib/systemd/systemd-resolved
+== dmesg (may be denied)
+== ckpt pi05 rehash vs mini reference
+16
+files_on_disk: 16
+== ckpt smolvla
+71d9563c8295284acba8fc2d5c19de000d6fe9ba58a406832af7ef3d221ed52f  /home/warren/alba-cross-policy-20261101/ckpt/smolvla_libero/model.safetensors
+== torch (smolvla env)
+torch 2.7.1+cu128 cuda 12.8 avail True dev NVIDIA GeForce RTX 5090 cap (12, 0)
+matmul_50x8192_s 1.02 TFLOPS 53.9
+max_abs_err_vs_fp64 0.0013300686289881014 finite True
+alloc_20GB_sum_ok False
+peak_alloc_GiB 19.39
+torch_rc=0
+== jax (openpi env)
+jax 0.5.3 [CudaDevice(id=0)]
+jax_matmul_finite True
+jax_rc=0
+819 MiB, 38

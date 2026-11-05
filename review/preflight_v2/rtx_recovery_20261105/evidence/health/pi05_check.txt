@@ -1,0 +1,16 @@
+./assets/physical-intelligence/libero/norm_stats.json: OK
+./params/_METADATA: OK
+./params/_sharding: OK
+./params/array_metadatas/process_0: OK
+./params/d/98a77a52a8eb845ae4830eb7fe983979: OK
+./params/manifest.ocdbt: OK
+./params/ocdbt.process_0/d/0eaaecefaa9720d30a32cc56e65fd345: OK
+./params/ocdbt.process_0/d/155391c1cbf93a1be16266de052e5b48: OK
+./params/ocdbt.process_0/d/2b6985f48e9da86f68627a7608c5bc25: OK
+./params/ocdbt.process_0/d/475fab3ee8821662585a8cde3eb32e22: OK
+./params/ocdbt.process_0/d/6c54da5a6f62c20a09c0f3f8c3329e00: OK
+./params/ocdbt.process_0/d/896bf93c5cf2e8ddd274a6ea0a2feec0: OK
+./params/ocdbt.process_0/d/bc613ff288a162563e622d01bb60622a: OK
+./params/ocdbt.process_0/d/bda87d9791f23df771cd2d15293780cc: OK
+./params/ocdbt.process_0/d/efbb46173882cb35ed41ffe0c2db8a5e: OK
+./params/ocdbt.process_0/manifest.ocdbt: OK

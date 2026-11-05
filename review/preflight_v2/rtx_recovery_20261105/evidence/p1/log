@@ -1,0 +1,25 @@
+=== attempt 1 2026-11-05T18:03:03Z
+python_rc=1
+E1105 18:04:35.301366   42145 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2654208 bytes. [tf-allocator-allocation-error='']
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2654208 bytes.
+18:04:29 memavail_gib=37 gpu_used_mib=25805
+18:04:32 memavail_gib=37 gpu_used_mib=25805
+18:04:33 memavail_gib=37 gpu_used_mib=25805
+peak_line 18:04:33 memavail_gib=37 gpu_used_mib=25805
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/alba-v3-p1-pi05-profile/attempts
+2c0bbdc030cd7e5d4a66f6aa459e57c66cce84b302d493aac037c8b15d3b76cd  /home/warren/jobs/alba-v3-p1-pi05-profile/cmd
+c3914442e19b988c477f4a463d92f8ea34eef5b7f38e1fb829f9ccdb11021f63  /home/warren/jobs/alba-v3-p1-pi05-profile/cmdpid
+c065d32fe15860c01241249f23d655fcb12c1b29281c791d51dc2587a02f610e  /home/warren/jobs/alba-v3-p1-pi05-profile/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/alba-v3-p1-pi05-profile/cwd
+5216754544310acbea072bf7d64b4ad7bd92ffc1412afeff4400b198f77bc76b  /home/warren/jobs/alba-v3-p1-pi05-profile/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/alba-v3-p1-pi05-profile/hb
+1e5dca0deba8de07b91591cad4d428d44f20017b52d7f317d6c53fec1364fc41  /home/warren/jobs/alba-v3-p1-pi05-profile/log
+04e70f795a2e1f315bde7f67dc72c6978f51800b063783f5d78cc3a3ec76e74f  /home/warren/jobs/alba-v3-p1-pi05-profile/out/provenance.json
+bf089dae9f11d8b703f2ab362328b3f7ba661b8b083279651a61ffd5d0ebe49d  /home/warren/jobs/alba-v3-p1-pi05-profile/pid
+7ae0f857b5aaf0be06554d5011787f8394dc3933b0313be49cd0e40f7ab2d8ea  /home/warren/jobs/alba-v3-p1-pi05-profile/python.log
+9513a8a8e092f28929c577b5c538795dc18fb5dbb4145e14322d88efa8ac53aa  /home/warren/jobs/alba-v3-p1-pi05-profile/rc.txt
+b4ecfdf7a07d849a2765c9da2257a983b7cfbf43656f211ca9c350ed9fb87e20  /home/warren/jobs/alba-v3-p1-pi05-profile/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/alba-v3-p1-pi05-profile/retries
+1aaf61911e683d768a1e731226ff9c067d24fc6160bc7bd69215d3e120c9e8c4  /home/warren/jobs/alba-v3-p1-pi05-profile/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/alba-v3-p1-pi05-profile/status
+35f2b1393fcc938c7248ded994504403d91573f106ad9571cf3fa1e21780a6c5  /home/warren/jobs/alba-v3-p1-pi05-profile/tag

@@ -1,0 +1,25 @@
+=== attempt 1 2026-11-05T19:27:02Z
+python_rc=1
+E1105 19:28:32.282043   49822 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes. [tf-allocator-allocation-error='']
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 134217728 bytes.
+19:28:26 memavail_gib=39 gpu_used_mib=32037
+19:28:29 memavail_gib=39 gpu_used_mib=32037
+19:28:32 memavail_gib=39 gpu_used_mib=32037
+peak_line 19:28:32 memavail_gib=39 gpu_used_mib=32037
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/attempts
+591d9de0fc6469809b8b8778868ace3f309374d32f5857b595beeba9a727f4d8  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/cmd
+bf1be20c644669f5e3ba54c2c4d5fa5a11bad66ea567eb7d3bc86d674ccc9ee6  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/cmdpid
+c065d32fe15860c01241249f23d655fcb12c1b29281c791d51dc2587a02f610e  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/cwd
+03bcccd8ec6ae3ec6295336641ec3ee50ee405322f7aec9e37db4558e18349ef  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/hb
+6ffbe00d6bd1339bc99bdf478741ed370141ee00c06761344e68c4746249ccab  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/log
+8f2b684dc22616a61b5a3c8e6604dd6ea7d5f114ea801eae4ff31b9c75f8b880  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/out/provenance.json
+d99f51f4255fca17ba80dae7ed89f368e78f7578a2705393a68e0731b089bc71  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/pid
+349a9a700cfd0d4f1601f833b3c9cac83bc8dfc5dd6d15a7d4536ef0f1d3454e  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/python.log
+9513a8a8e092f28929c577b5c538795dc18fb5dbb4145e14322d88efa8ac53aa  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/rc.txt
+20e2960273e802cb3407a2380c81dec446d02673ba1bf1f58bda4c268e1e2dfb  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/retries
+98abb4c09e6ca94d41eabdcff5853b9cedcc63a39ba0e0cd5ece8f36795bc311  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/status
+ac4ea222aa779fe63c18b830186310b3983d96a0bdefd948b5712bec817cb102  /home/warren/jobs/alba-v3-p5-pi05-profile-memfrac100/tag

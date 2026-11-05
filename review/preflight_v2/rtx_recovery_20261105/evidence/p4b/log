@@ -1,0 +1,23 @@
+=== attempt 1 2026-11-05T17:58:33Z
+shell: /usr/bin/zsh
+== env=smolvla MUJOCO_GL=egl rc=0
+mujoco 3.8.1
+STEP context_created
+STEP make_current_ok
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)'
+== env=client MUJOCO_GL=egl rc=0
+mujoco 3.2.3
+STEP context_created
+STEP make_current_ok
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)'
+== env=openpi MUJOCO_GL=egl rc=0
+mujoco 2.3.7
+STEP context_created
+STEP make_current_ok
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)'
+6b29f58996f8f18cd3e050dd6b344aca930e60eff96dfba83ad489e3fff1d71c  egl_client.txt
+ea97c89e3f254b6eed45821484c7c36fbbf0e623a183f08b052c91251766f0a7  egl_inventory.txt
+e58639167e9dbacd334d79b7d2606de7a8fab26de27880f13641c523f3558b5b  egl_openpi.txt
+412d729d8fc6920dd9d1fae78c5d9115b94153ebcfd65f4c9cf9174a64d1ecf2  egl_smolvla.txt
+ea97c89e3f254b6eed45821484c7c36fbbf0e623a183f08b052c91251766f0a7  egl_inventory.txt
+26cc971a83b8881ce299c9803fda6e30e253149cee6dc464b990d4c9f55e575e  probe_egl.py

@@ -1,0 +1,15 @@
+guard {"phase": "preflight", "reservation": "R015"}
+[robosuite WARNING] No private macro file found! (__init__.py:7)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (__init__.py:8)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py (__init__.py:9)
+WARNING:robosuite_logs:To setup, run: python /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/robosuite/scripts/setup_macros.py
+Loading weights from local directory
+Creating LIBERO envs | suites=['libero_spatial'] | n_envs(per task)=1 | init_states=True
+Restricting to task_ids=[0]
+[info] using task orders [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Built vec env | suite=libero_spatial | task_id=0 | n_envs=1
+Local assets not found. Downloading from HuggingFace Hub...
+Assets already downloaded at /home/warren/.cache/libero/assets
+PARITY_BLOCKED_BY_PROBE: AttemptJournal((PosixPath('/home/warren/jobs/alba-v3-p3-smolvla-profile/out/parity_attempts'),)) refused; no parity environment or episode created

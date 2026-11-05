@@ -1,0 +1,38 @@
+=== attempt 1 2026-11-05T17:58:08Z
+== EGL libraries visible
+libcuda.so
+	libEGL.so.1 (libc6,x86-64) => /lib/x86_64-linux-gnu/libEGL.so.1
+50_mesa.json
+== env=smolvla MUJOCO_GL=egl
+  File "/home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 138, in __del__
+  File "/home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/mujoco/egl/__init__.py", line 133, in free
+  File "/home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3.12/site-packages/OpenGL/error.py", line 230, in glCheckError
+OpenGL.raw.EGL._errors.EGLError: <exception str() failed>
+rc_smolvla_egl=
+== env=smolvla MUJOCO_GL=osmesa
+mujoco 3.8.1
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)' version b'4.5 (Compatibility Profile) Mesa 25.1.7-1ubuntu2~24.04.2'
+render_ok shape (64, 64, 3) nonzero 1150 sha256 67d353d66eb427b5
+rc_smolvla_osmesa=
+== env=client MUJOCO_GL=egl
+  File "/home/warren/alba-cross-policy-20261101/envs/client/lib/python3.8/site-packages/mujoco/egl/__init__.py", line 131, in __del__
+  File "/home/warren/alba-cross-policy-20261101/envs/client/lib/python3.8/site-packages/mujoco/egl/__init__.py", line 126, in free
+  File "/home/warren/alba-cross-policy-20261101/envs/client/lib/python3.8/site-packages/OpenGL/error.py", line 230, in glCheckError
+OpenGL.raw.EGL._errors.EGLError: <exception str() failed>
+rc_client_egl=
+== env=client MUJOCO_GL=osmesa
+mujoco 3.2.3
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)' version b'4.5 (Compatibility Profile) Mesa 25.1.7-1ubuntu2~24.04.2'
+render_ok shape (64, 64, 3) nonzero 1150 sha256 67d353d66eb427b5
+rc_client_osmesa=
+== env=openpi MUJOCO_GL=egl
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/mujoco/egl/__init__.py", line 130, in __del__
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/mujoco/egl/__init__.py", line 125, in free
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/OpenGL/error.py", line 230, in glCheckError
+OpenGL.raw.EGL._errors.EGLError: <exception str() failed>
+rc_openpi_egl=
+== env=openpi MUJOCO_GL=osmesa
+mujoco 2.3.7
+vendor b'Mesa' renderer b'llvmpipe (LLVM 20.1.2, 256 bits)' version b'4.5 (Compatibility Profile) Mesa 25.1.7-1ubuntu2~24.04.2'
+render_ok shape (64, 64, 3) nonzero 1150 sha256 67d353d66eb427b5
+rc_openpi_osmesa=

@@ -1,0 +1,28 @@
+=== attempt 1 2026-11-05T19:43:59Z
+driver_sha256 f92586cfda406a9c78b942f400f1789f72a9d7a705bbee33b69efe3bdf6c35e5 expected f92586cfda406a9c78b942f400f1789f72a9d7a705bbee33b69efe3bdf6c35e5
+python_rc=1
+E1105 19:45:48.993127   55303 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 9916416 bytes. [tf-allocator-allocation-error='']
+EV {"t": 1793907949.029, "d": 5, "step": 0, "event": "exception", "jax_in_use_gib": 23.871, "jax_peak_gib": 23.881, "jax_limit_gib": 23.882, "jax_num_allocs": 33663, "jax_largest_alloc_gib": 2.25, "smi_used_mib": 25226, "smi_free_mib": 6962, "error": "ValueError: RESOURCE_EXHAUSTED: Out of memory wh
+STATUS exception
+19:45:42 memavail_gib=39 gpu_used_mib=25226
+19:45:45 memavail_gib=39 gpu_used_mib=25226
+19:45:48 memavail_gib=39 gpu_used_mib=25226
+peak_line 19:45:48 memavail_gib=39 gpu_used_mib=25226
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/alba-v3-p7a-diag-seq/attempts
+766d6fbcd3a2c0b612c8f47efae9fd5e48bca564f4cc92f29d8d29701aa5ac09  /home/warren/jobs/alba-v3-p7a-diag-seq/cmd
+e6c381fc2a5288ef8d5d140c41d56ca004bf940d652559fc3f119b24c25a3f0e  /home/warren/jobs/alba-v3-p7a-diag-seq/cmdpid
+c065d32fe15860c01241249f23d655fcb12c1b29281c791d51dc2587a02f610e  /home/warren/jobs/alba-v3-p7a-diag-seq/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/alba-v3-p7a-diag-seq/cwd
+4ecddfac946a018256166fc6d3b1effe42dd44d5523e0d856366e43f9a449730  /home/warren/jobs/alba-v3-p7a-diag-seq/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/alba-v3-p7a-diag-seq/hb
+3508240dd00b7e10d77831e771868ac069186d1dc7a8b9c72b58154da380eadb  /home/warren/jobs/alba-v3-p7a-diag-seq/log
+e4f4a33170b1b6c2f43c668400875904a165a0989fec8a129a6dcb9978edd15c  /home/warren/jobs/alba-v3-p7a-diag-seq/out/diag.json
+f92586cfda406a9c78b942f400f1789f72a9d7a705bbee33b69efe3bdf6c35e5  /home/warren/jobs/alba-v3-p7a-diag-seq/p7_diag.py
+5fceda01154e0c492d92e5aed71f2122202cce95e2226442b6bb923f2ce4b51f  /home/warren/jobs/alba-v3-p7a-diag-seq/pid
+2ed1edde41d06f630ba6034a89d027403fd86b404ba939448ea184eda62a780f  /home/warren/jobs/alba-v3-p7a-diag-seq/python.log
+9513a8a8e092f28929c577b5c538795dc18fb5dbb4145e14322d88efa8ac53aa  /home/warren/jobs/alba-v3-p7a-diag-seq/rc.txt
+456bfd2d27f2fde68c7bc6ef6bfe86485e75661d7d826962243139d5d5e27996  /home/warren/jobs/alba-v3-p7a-diag-seq/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/alba-v3-p7a-diag-seq/retries
+f4d8db594a63ff73eec4cd0607ebb584ab129874b48f4015f47239f259edc384  /home/warren/jobs/alba-v3-p7a-diag-seq/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/alba-v3-p7a-diag-seq/status
+4b3c347d377b338ff9896124fdc6e022b087e4d8296f94b2f105a222cf6c524f  /home/warren/jobs/alba-v3-p7a-diag-seq/tag

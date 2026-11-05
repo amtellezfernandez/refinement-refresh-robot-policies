@@ -1,0 +1,50 @@
+2026-11-05 18:04:35.300799: W external/xla/xla/tsl/framework/bfc_allocator.cc:501] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.53MiB (rounded to 2654208)requested by op 
+2026-11-05 18:04:35.301352: W external/xla/xla/tsl/framework/bfc_allocator.cc:512] ****************************************************************************************************
+E1105 18:04:35.301366   42145 pjrt_stream_executor_client.cc:3077] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2654208 bytes. [tf-allocator-allocation-error='']
+Traceback (most recent call last):
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 225, in <module>
+    main()
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 219, in main
+    profile(args)
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 168, in profile
+    report["denoise_loop_calls"] = count_denoise_loop(policy, example, uncompiled_chunks)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 148, in count_denoise_loop
+    result = keyed.infer(dict(example, __d__=d, __noise_key__=json.dumps(["fixed-noise"])))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 70, in infer
+    result = self._policy.infer(obs, noise=noise_for(key))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/policies/policy.py", line 94, in infer
+    "actions": self._sample_actions(sample_rng_or_pytorch_device, observation, **sample_kwargs),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/code-078e166/experiments/tooling/cross_policy/server_openpi.py", line 140, in uncompiled
+    return model.sample_actions(rng, observation, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/pi0.py", line 234, in sample_actions
+    prefix_tokens, prefix_mask, prefix_ar_mask = self.embed_prefix(observation)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/jaxtyping/_decorator.py", line 559, in wrapped_fn
+    return wrapped_fn_impl(args, kwargs, bound, memos)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/jaxtyping/_decorator.py", line 483, in wrapped_fn_impl
+    out = fn(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/pi0.py", line 114, in embed_prefix
+    image_tokens, _ = self.PaliGemma.img(obs.images[name], train=False)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/nnx/bridge/wrappers.py", line 164, in __call__
+    out = self.module.apply(variables, *args, rngs=_rngs, method=method, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/siglip.py", line 241, in __call__
+    x, out["encoder"] = Encoder(
+                        ^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/src/openpi/src/openpi/models/siglip.py", line 133, in __call__
+    x, scan_out = nn.scan(
+                  ^^^^^^^^
+  File "/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/flax/core/axes_scan.py", line 166, in scan_fn
+    c, ys = lax.scan(
+            ^^^^^^^^^
+ValueError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 2654208 bytes.
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
