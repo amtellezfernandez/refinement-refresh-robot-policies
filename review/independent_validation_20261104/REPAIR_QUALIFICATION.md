@@ -1,5 +1,18 @@
 # Replay repair qualification (5 November 2026)
 
+## Qualification boundary for the current PR head
+
+The local results below apply to the source set identified by the earlier
+`SOURCE-MANIFEST.sha256`, before the runtime provenance edits now on this
+branch. Commits after that qualification changed
+`experiments/tooling/run_paired.py` and `replay/governance.py` to capture
+imported module versions/paths, expose duplicate distribution records, hash the
+LIBERO asset tree for future experiment manifests, and verify imported replay
+modules against distribution metadata. **Those edits have not been tested or
+requalified.** The earlier counts must not be presented as tests of the current
+head. No CI workflow or run is being used for these changes.
+
+
 PR #3 was fetched at `e8861f2b89ff57f1eece91646e5f2c33c5d157b8`. That head did not contain the three verified protections: complete ordered result-row accounting, independent repeat success/tick/hash comparison, and `ARCHIVE_DEFECT` classification for frozen-input defects.
 
 The repaired source set is identified by `SOURCE-MANIFEST.sha256` (manifest SHA-256 `508049894b25e02065c8dae746c4e083daee50401a89ce0dbb9b64547a77e4e8`). All checks were rerun against a fresh copy matching all 21 manifest entries. The test processes ran under a macOS write-denial sandbox; write, chmod and rename probes were denied, and post-test hashes still match.
