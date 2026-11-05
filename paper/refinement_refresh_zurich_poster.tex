@@ -1,189 +1,132 @@
 \documentclass{article}
-\usepackage[paperwidth=841mm,paperheight=1189mm,margin=34mm]{geometry}
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern,microtype,amsmath,amssymb,array,booktabs,multicol,graphicx,tikz}
-\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{lmodern,microtype,amsmath,booktabs,tikz,graphicx}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
 \usepackage[hidelinks]{hyperref}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{8mm}
-\definecolor{blackink}{gray}{0.04}
-\definecolor{softgray}{gray}{0.38}
-\definecolor{rulegray}{gray}{0.72}
-\definecolor{panelgray}{gray}{0.95}
-\definecolor{accent}{RGB}{31,78,121}
-\definecolor{accentlight}{RGB}{231,240,248}
-\color{blackink}
-\newcommand{\Section}[2]{\vspace{10mm}{\fontsize{44}{52}\selectfont\bfseries #1\quad #2}\par\vspace{3mm}\hrule height 1.8pt\vspace{9mm}}
-\newcommand{\BigNumber}[2]{{\fontsize{88}{92}\selectfont\bfseries #1}\par\vspace{4mm}{\fontsize{30}{38}\selectfont #2}\par}
-\newcommand{\SmallCaps}[1]{{\fontsize{28}{34}\selectfont\bfseries\MakeUppercase{#1}}}
-\newcommand{\Panel}[1]{\noindent\fcolorbox{blackink}{panelgray}{\begin{minipage}{0.92\linewidth}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
-\newcommand{\PrimaryPanel}[1]{\noindent\fcolorbox{accent}{accent}{\begin{minipage}{0.92\linewidth}\color{white}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
-\newcommand{\SecondaryPanel}[1]{\noindent\fcolorbox{accent}{accentlight}{\begin{minipage}{0.92\linewidth}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
-\newcommand{\ResultBar}[4]{%
-\begin{tikzpicture}[baseline]
-\node[anchor=west,font=\fontsize{31}{38}\selectfont\bfseries] at (0,0) {#1};
-\draw[line width=0.8pt] (35mm,-3mm) rectangle (143mm,11mm);
-\fill[#4] (35mm,-3mm) rectangle ({35mm + #2*1.08mm},11mm);
-\node[anchor=west,font=\fontsize{31}{38}\selectfont] at (151mm,3mm) {#3};
-\end{tikzpicture}\par\vspace{4mm}}
+\definecolor{navy}{HTML}{102A43}
+\definecolor{blue}{HTML}{147D92}
+\definecolor{cyan}{HTML}{D9F0F2}
+\definecolor{orange}{HTML}{F28C28}
+\definecolor{peach}{HTML}{FCE7D2}
+\definecolor{cream}{HTML}{F7F4ED}
+\definecolor{ink}{HTML}{18212B}
+\definecolor{muted}{HTML}{52606D}
+\definecolor{white}{HTML}{FFFFFF}
+\pagecolor{cream}
+\color{ink}
+\newcommand{\metric}[3]{\begin{minipage}[t]{0.29\textwidth}\centering{\fontsize{82}{86}\selectfont\bfseries\color{#3}#1}\par\vspace{4mm}{\fontsize{28}{35}\selectfont\bfseries #2}\end{minipage}}
+\newcommand{\tagline}[1]{{\fontsize{28}{34}\selectfont\bfseries\color{blue}\MakeUppercase{#1}}}
 \begin{document}
-\begin{minipage}[t]{\textwidth}
-\vspace*{1mm}
-\noindent\makebox[\textwidth][c]{\resizebox{0.995\textwidth}{!}{\bfseries REFINEMENT VERSUS REFRESH}}\par
+\noindent\colorbox{navy}{\begin{minipage}[t][224mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
+\vspace*{33mm}
+\hspace*{46mm}\begin{minipage}{749mm}
+{\fontsize{104}{105}\selectfont\bfseries\color{white} REFINEMENT \color{orange}vs.\color{white} REFRESH}\par
 \vspace{10mm}
-{\fontsize{42}{50}\selectfont Compute Allocation for Closed-Loop Robot Policies}\par
-\vspace{13mm}
-{\fontsize{28}{35}\selectfont\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\quad
-{\fontsize{27}{34}\selectfont MAAT Institute}\par
-{\fontsize{24}{31}\selectfont Machine Intelligence Summit \,|\, Z\"urich \,|\, 10 November 2026 \hfill
-\texttt{alba.tellez@maatinstitute.com}}\par
-\vspace{13mm}\hrule height 3pt\vspace{12mm}
-{\fontsize{36}{44}\selectfont\bfseries
-A robot can spend compute improving its current action prediction---or use a newer observation to plan again. Which is worth the cost?}\par
-\vspace{15mm}
+{\fontsize{42}{51}\selectfont\color{white} Where should a robot policy spend its inference compute?}\par
+\vspace{19mm}
+{\fontsize{29}{36}\selectfont\color{cyan}\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\hfill
+{\fontsize{27}{34}\selectfont\color{white} MAAT Institute \quad\textbullet\quad Z\"urich, 10 Nov 2026}\par
+\begin{tikzpicture}[overlay,xshift=555mm,yshift=-92mm,line cap=round,line join=round]
+  \draw[white!18,line width=18pt] (-70mm,-18mm) arc (190:350:83mm);
+  \draw[cyan,line width=9pt] (-38mm,-10mm) -- (8mm,30mm) -- (61mm,8mm) -- (91mm,45mm);
+  \fill[orange] (-38mm,-10mm) circle (14mm);
+  \fill[navy] (-38mm,-10mm) circle (6mm);
+  \fill[orange] (8mm,30mm) circle (13mm);
+  \fill[navy] (8mm,30mm) circle (5mm);
+  \fill[orange] (61mm,8mm) circle (11mm);
+  \fill[navy] (61mm,8mm) circle (4mm);
+  \draw[orange,line width=7pt] (91mm,45mm) -- (112mm,59mm);
+  \draw[orange,line width=7pt] (110mm,58mm) -- (126mm,47mm);
+  \draw[orange,line width=7pt] (110mm,58mm) -- (119mm,76mm);
+  \draw[white!55,line width=5pt] (-68mm,-25mm) -- (-8mm,-25mm);
+\end{tikzpicture}
 \end{minipage}
-
-\vspace{10mm}
-{\fontsize{44}{52}\selectfont\bfseries CLOSED-LOOP COMPUTE ALLOCATION}\par
+\end{minipage}}\par
+\noindent\colorbox{orange}{\rule{\dimexpr\paperwidth-2\fboxsep\relax}{8mm}}\par
+\vspace{34mm}
+\begin{center}
+\begin{minipage}{748mm}
+{\fontsize{43}{52}\selectfont\bfseries A chunked policy has two ways to react:}\par
 \vspace{7mm}
-\begin{tikzpicture}[
-  >=Latex,
-  stage/.style={draw=blackink,line width=1.8pt,rounded corners=3mm,
-    minimum width=132mm,minimum height=90mm,text width=116mm,align=center},
-  choice/.style={draw=accent,line width=2.3pt,fill=accentlight,rounded corners=3mm,
-    minimum width=132mm,minimum height=90mm,text width=116mm,align=center}
-]
-\node[stage] (obs) at (70mm,0)
-  {{\fontsize{35}{42}\selectfont\bfseries OBSERVATION}\\[5mm]
-   {\fontsize{29}{36}\selectfont camera + robot state}};
-\node[stage] (policy) at (225mm,0)
-  {{\fontsize{35}{42}\selectfont\bfseries FROZEN SmolVLA}\\[5mm]
-   {\fontsize{29}{36}\selectfont one chunk generation}};
-\node[choice] (denoise) at (380mm,0)
-  {{\color{accent}\fontsize{35}{42}\selectfont\bfseries REFINE}\\[5mm]
-   {\fontsize{30}{37}\selectfont denoise for $d$ steps}};
-\node[stage] (chunk) at (535mm,0)
-  {{\fontsize{35}{42}\selectfont\bfseries ACTION CHUNK}\\[5mm]
-   {\fontsize{29}{36}\selectfont predicted future actions}};
-\node[choice] (execute) at (690mm,0)
-  {{\color{accent}\fontsize{35}{42}\selectfont\bfseries REFRESH}\\[5mm]
-   {\fontsize{30}{37}\selectfont execute $h$ actions}};
-\draw[->,line width=2.6pt] (obs.east) -- (policy.west);
-\draw[->,line width=2.6pt] (policy.east) -- (denoise.west);
-\draw[->,line width=2.6pt] (denoise.east) -- (chunk.west);
-\draw[->,line width=2.6pt] (chunk.east) -- (execute.west);
-\draw[->,accent,line width=3.2pt] (execute.south) -- ++(0,-38mm) -| (obs.south);
-\node[anchor=south west,text=accent,font=\fontsize{28}{35}\selectfont\bfseries]
-  at (0mm,-42mm) {new observation-conditioned prediction};
-\node[anchor=north,align=center,text width=290mm] at (380mm,-54mm)
-  {{\fontsize{30}{38}\selectfont
-  Increase $d$ to refine the current prediction. Decrease $h$ to replan sooner from fresher information.}};
-\end{tikzpicture}\par
-\vspace{20mm}
-\hrule height 2pt
-\vspace{4mm}
-
-\setlength{\columnsep}{23mm}
-\begin{multicols}{3}
-\raggedcolumns
-\fontsize{33}{43}\selectfont
-
-\Section{01}{Study design}
-A paired discovery study evaluates 12 configurations on four LIBERO Spatial tasks (480 attempts). Seven frozen configurations are then tested on eight distinct Goal and Object tasks excluded from selection (1,120 attempts).
-
-\vspace{7mm}
-\begin{tabular}{@{}p{.37\linewidth}p{.56\linewidth}@{}}
-\toprule
-\bfseries Discovery & 12 settings; 4 tasks; 480 attempts\\[3mm]
-\bfseries Confirmation & 7 frozen settings; 8 held-out tasks; 1,120 attempts\\
-\bottomrule
-\end{tabular}
-
-\vspace{9mm}
-\SecondaryPanel{\BigNumber{82.1\%}{of native generation arithmetic is independent of the denoising-step count.}
-Reducing refinement alone leaves most of the cost of a fresh prediction intact.}
-
-\Section{02}{Compute boundary}
-For full execution prefixes, the nominal neural arithmetic rate is
-\[
-\boxed{\displaystyle b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}}.
-\]
-This counts reference-calibrated dense neural FLOPs. It does not measure physical-robot latency, asynchronous overlap, or energy.
-
-\vspace{8mm}
-\textbf{Scope:} one frozen checkpoint in synchronous simulation. The study does not establish cross-policy generalization or a universal scheduler.
-
-\columnbreak
-
-\Section{03}{\textcolor{accent}{Primary result}}
-At a fixed two-action prefix ($h=2$), compare two versus five denoising steps.
-
-\vspace{8mm}
-\SmallCaps{Closed-loop success}\par\vspace{9mm}
-\ResultBar{$d=2$}{86.875}{139/160}{accent}
-\ResultBar{$d=5$}{76.25}{122/160}{softgray}
-
-\vspace{10mm}
-\PrimaryPanel{\BigNumber{+10.6 pp}{paired success difference, $d=2$ minus $d=5$}
-\fontsize{30}{38}\selectfont Descriptive task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
-
-\vspace{14mm}
-\SecondaryPanel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2.}}
-
+{\fontsize{33}{42}\selectfont\color{muted} Improve the current prediction, or act briefly and plan again from a fresher observation.}
+\end{minipage}
 \vspace{12mm}
-\textbf{Result:} for this checkpoint and task family, additional refinement does not reliably improve closed-loop success.
-
-\columnbreak
-
-\Section{04}{Refresh less often?}
-Hold denoising fixed at $d=2$. Compare executing two versus five actions before replanning.
-
+\begin{tikzpicture}[>=Latex,flow/.style={line width=4pt,->,rounded corners=12mm},stage/.style={circle,minimum size=104mm,align=center,line width=3pt,font=\fontsize{30}{36}\selectfont\bfseries},note/.style={align=center,font=\fontsize{26}{32}\selectfont,text=muted}]
+  \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {NEW\\OBSERVATION};
+  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {FROZEN\\SmolVLA};
+  \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {REFINE\\$d$ steps};
+  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {EXECUTE\\$h$ actions};
+  \draw[flow,navy] (observe) -- (policy);
+  \draw[flow,orange] (policy) -- (refine);
+  \draw[flow,blue] (refine) -- (act);
+  \draw[flow,blue] (act.south) -- ++(0,-60mm) -| (observe.south);
+  \node[note] at (0,-105mm) {\textbf{REFRESH:} obtain a new observation-conditioned prediction};
+  \node[draw=navy,fill=navy,text=white,rounded corners=7mm,inner xsep=16mm,inner ysep=10mm,font=\fontsize{31}{38}\selectfont\bfseries] at (0,92mm) {THE DEPLOYMENT CHOICE: how much $d$, how much $h$?};
+\end{tikzpicture}
+\end{center}
 \vspace{8mm}
-\begin{tabular}{@{}lrr@{}}
-\toprule
-\bfseries Setting & \bfseries Success & \bfseries TFLOPs / attempt\\
-\midrule
-$h=2,\ d=2$ & 139/160 & 41.1\\
-$h=5,\ d=2$ & 138/160 & 16.1\\
-\bottomrule
-\end{tabular}
-
-\vspace{13mm}
-\SecondaryPanel{\BigNumber{$-60.7\%$}{arithmetic per attempted episode for $h=5$ versus $h=2$, at $d=2$.}}
-
+\begin{center}
+\begin{minipage}{748mm}
+\tagline{Main held-out comparison}\par\vspace{6mm}
+{\fontsize{43}{52}\selectfont\bfseries Less refinement improved closed-loop success}\par
 \vspace{9mm}
-\textbf{Caution:} similar observed success is not evidence of equivalent quality. Non-inferiority or equivalence was not established.
-
-\Section{05}{Interpretation}
-\begin{itemize}\setlength{\itemsep}{6mm}
-\item More denoising is not uniformly beneficial.
-\item Refresh frequency and refinement must be evaluated jointly.
-\item A simple cost-aware rule matched the fitted model at three compute budgets; fitting showed no demonstrated advantage.
-\end{itemize}
-
-\Section{06}{Reproducibility}
-Paired execution and internal outcome checks support the recorded results. Independent model-free replay remains a subsequent validation step.
-
+{\fontsize{29}{36}\selectfont\color{muted} Same two-action execution prefix; eight Goal and Object tasks excluded from configuration selection.}\par
+\vspace{14mm}
+\begin{tikzpicture}
+  \fill[white,rounded corners=8mm] (0,0) rectangle (748mm,178mm);
+  \node[anchor=west,font=\fontsize{31}{38}\selectfont\bfseries,text=navy] at (22mm,141mm) {2 denoising steps};
+  \fill[blue,rounded corners=5mm] (22mm,91mm) rectangle (485mm,126mm);
+  \node[anchor=west,font=\fontsize{32}{38}\selectfont\bfseries,text=white] at (40mm,108mm) {139 / 160 successes};
+  \node[anchor=west,font=\fontsize{31}{38}\selectfont\bfseries,text=navy] at (22mm,66mm) {5 denoising steps};
+  \fill[navy!35,rounded corners=5mm] (22mm,16mm) rectangle (428mm,51mm);
+  \node[anchor=west,font=\fontsize{32}{38}\selectfont\bfseries,text=white] at (40mm,33mm) {122 / 160 successes};
+  \node[anchor=center,align=center,text=orange,font=\fontsize{63}{66}\selectfont\bfseries] at (617mm,108mm) {+10.6\\pp};
+  \node[anchor=center,align=center,text=muted,font=\fontsize{23}{29}\selectfont] at (617mm,39mm) {descriptive 95\% interval\\+4.4 to +16.9 pp};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+\vspace{32mm}
+\begin{center}
+\begin{minipage}{748mm}
+\metric{$-5.9\%$}{arithmetic per control step\\with 2 instead of 5 denoising steps}{blue}\hfill
+\metric{$82.1\%$}{of generation arithmetic is\\independent of denoising count}{orange}\hfill
+\metric{$-60.7\%$}{arithmetic per attempt for\\$h=5$ versus $h=2$, at $d=2$}{blue}
+\end{minipage}
+\end{center}
+\vspace{35mm}
+\begin{center}
+\begin{minipage}{748mm}
+\begin{tikzpicture}
+  \fill[navy,rounded corners=8mm] (0,0) rectangle (748mm,119mm);
+  \node[anchor=west,text=orange,font=\fontsize{29}{35}\selectfont\bfseries] at (22mm,91mm) {HOW WE TESTED IT};
+  \node[anchor=west,text=white,align=left,text width=220mm,font=\fontsize{28}{35}\selectfont] at (22mm,48mm) {12 configurations\\4 Spatial tasks\\480 discovery attempts};
+  \draw[white!35,line width=2pt] (264mm,18mm)--(264mm,101mm);
+  \node[anchor=west,text=white,align=left,text width=215mm,font=\fontsize{28}{35}\selectfont] at (292mm,48mm) {7 frozen configurations\\8 held-out tasks\\1,120 confirmation attempts};
+  \draw[white!35,line width=2pt] (533mm,18mm)--(533mm,101mm);
+  \node[anchor=west,text=cyan,align=left,text width=185mm,font=\fontsize{25}{32}\selectfont\bfseries] at (558mm,53mm) {One frozen checkpoint\\Synchronous LIBERO\\Paired evaluation};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+\vspace{35mm}
+\begin{center}
+\begin{minipage}{748mm}
+\begin{minipage}[t]{482mm}
+{\fontsize{30}{36}\selectfont\bfseries\color{orange}\MakeUppercase{Takeaway}}\par\vspace{6mm}
+{\fontsize{42}{51}\selectfont\bfseries More denoising does not necessarily improve closed-loop control.}\par\vspace{7mm}
+{\fontsize{29}{37}\selectfont Evaluate refinement and replanning together, using both task success and compute.}
+\end{minipage}\hfill
+\begin{minipage}[t]{235mm}
+{\fontsize{26}{32}\selectfont\bfseries\color{blue} INTERPRET WITH CARE}\par\vspace{5mm}
+{\fontsize{23}{30}\selectfont Similar observed success for $h=2$ and $h=5$ does not establish equivalent quality. Results cover one checkpoint and synchronous simulation.}\par
 \vspace{9mm}
-{\fontsize{31}{38}\selectfont\bfseries Paper and code}\par
-{\fontsize{26}{33}\selectfont
-\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/}\par
-\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{refinement-refresh-robot-policies}}
-
-\end{multicols}
-\vspace{8mm}
-\noindent\fcolorbox{accent}{accent}{%
-\begin{minipage}{0.965\textwidth}
-\color{white}\vspace{9mm}
-{\fontsize{44}{52}\selectfont\bfseries TAKEAWAY: Allocate inference compute using closed-loop outcomes, not denoising count alone.}\par
-\vspace{9mm}
-\end{minipage}}
+{\fontsize{22}{28}\selectfont\bfseries\color{navy}\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/\\refinement-refresh-robot-policies}}
+\end{minipage}
+\end{minipage}
+\end{center}
 \vfill
-\hrule height 2pt
-\vspace{8mm}
-{\fontsize{21}{28}\selectfont
-\textbf{A0 portrait} \hfill \textit{Refinement versus Refresh}, NeurIPS 2026 RoboPAD \hfill \textbf{MAAT Institute}}
-
+\noindent\colorbox{orange}{\rule{\dimexpr\paperwidth-2\fboxsep\relax}{10mm}}
 \end{document}
