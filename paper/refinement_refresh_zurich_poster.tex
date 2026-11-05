@@ -13,16 +13,16 @@
 \definecolor{rulegray}{gray}{0.72}
 \definecolor{panelgray}{gray}{0.95}
 \color{blackink}
-\newcommand{\Section}[2]{\vspace{8mm}{\fontsize{35}{41}\selectfont\bfseries #1\quad #2}\par\vspace{2mm}\hrule height 1.4pt\vspace{7mm}}
-\newcommand{\BigNumber}[2]{{\fontsize{72}{76}\selectfont\bfseries #1}\par\vspace{2mm}{\fontsize{20}{25}\selectfont #2}\par}
-\newcommand{\SmallCaps}[1]{{\fontsize{19}{23}\selectfont\bfseries\MakeUppercase{#1}}}
+\newcommand{\Section}[2]{\vspace{8mm}{\fontsize{40}{47}\selectfont\bfseries #1\quad #2}\par\vspace{2mm}\hrule height 1.6pt\vspace{7mm}}
+\newcommand{\BigNumber}[2]{{\fontsize{78}{82}\selectfont\bfseries #1}\par\vspace{3mm}{\fontsize{26}{33}\selectfont #2}\par}
+\newcommand{\SmallCaps}[1]{{\fontsize{24}{29}\selectfont\bfseries\MakeUppercase{#1}}}
 \newcommand{\Panel}[1]{\noindent\fcolorbox{blackink}{panelgray}{\begin{minipage}{0.92\linewidth}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
 \newcommand{\ResultBar}[3]{%
 \begin{tikzpicture}[baseline]
-\node[anchor=west,font=\fontsize{24}{29}\selectfont\bfseries] at (0,0) {#1};
+\node[anchor=west,font=\fontsize{28}{34}\selectfont\bfseries] at (0,0) {#1};
 \draw[line width=0.8pt] (35mm,-3mm) rectangle (143mm,11mm);
 \fill[black] (35mm,-3mm) rectangle ({35mm + #2*1.08mm},11mm);
-\node[anchor=west,font=\fontsize{24}{29}\selectfont] at (151mm,3mm) {#3};
+\node[anchor=west,font=\fontsize{28}{34}\selectfont] at (151mm,3mm) {#3};
 \end{tikzpicture}\par\vspace{4mm}}
 \begin{document}
 \begin{minipage}[t]{\textwidth}
@@ -31,12 +31,12 @@
 \vspace{8mm}
 {\fontsize{38}{46}\selectfont Compute Allocation for Closed-Loop Robot Policies}\par
 \vspace{13mm}
-{\fontsize{24}{30}\selectfont\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\quad
-{\fontsize{23}{29}\selectfont MAAT Institute}\par
-{\fontsize{20}{26}\selectfont Machine Intelligence Summit \,|\, Z\"urich \,|\, 10 November 2026 \hfill
+{\fontsize{28}{35}\selectfont\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\quad
+{\fontsize{27}{34}\selectfont MAAT Institute}\par
+{\fontsize{24}{31}\selectfont Machine Intelligence Summit \,|\, Z\"urich \,|\, 10 November 2026 \hfill
 \texttt{alba.tellez@maatinstitute.com}}\par
 \vspace{13mm}\hrule height 3pt\vspace{12mm}
-{\fontsize{32}{40}\selectfont\bfseries
+{\fontsize{36}{44}\selectfont\bfseries
 A robot can spend compute improving its current action prediction---or use a newer observation to plan again. Which is worth the cost?}\par
 \vspace{15mm}
 \end{minipage}
@@ -44,7 +44,7 @@ A robot can spend compute improving its current action prediction---or use a new
 \setlength{\columnsep}{23mm}
 \begin{multicols}{3}
 \raggedcolumns
-\fontsize{25}{33}\selectfont
+\fontsize{30}{39}\selectfont
 
 \Section{01}{The question}
 Chunked vision--language--action policies generate a sequence of future actions.
@@ -54,17 +54,17 @@ Inference is costly, so two knobs compete for the same budget:
 \vspace{7mm}
 \begin{tikzpicture}[every node/.style={align=center},>=Latex]
 \node[draw,very thick,minimum width=.94\linewidth,minimum height=38mm] (r) at (0,0)
-  {{\fontsize{26}{31}\selectfont\bfseries REFINE MORE}\\[2mm]
-   {\fontsize{21}{26}\selectfont increase denoising steps $d$}};
+  {{\fontsize{30}{36}\selectfont\bfseries REFINE MORE}\\[2mm]
+   {\fontsize{25}{31}\selectfont increase denoising steps $d$}};
 \node[draw,very thick,minimum width=.94\linewidth,minimum height=38mm] (f) at (0,-55mm)
-  {{\fontsize{26}{31}\selectfont\bfseries REFRESH SOONER}\\[2mm]
-   {\fontsize{21}{26}\selectfont reduce executed prefix $h$}};
-\draw[->,line width=1.5pt] (r.south) -- node[right,font=\fontsize{18}{22}\selectfont]{same inference budget} (f.north);
+  {{\fontsize{30}{36}\selectfont\bfseries REFRESH SOONER}\\[2mm]
+   {\fontsize{25}{31}\selectfont reduce executed prefix $h$}};
+\draw[->,line width=1.5pt] (r.south) -- node[right,font=\fontsize{21}{26}\selectfont]{same inference budget} (f.north);
 \end{tikzpicture}
 
 \vspace{12mm}
-\Panel{\fontsize{26}{34}\selectfont\bfseries Hypothesis to test\par
-\fontsize{22}{29}\selectfont
+\Panel{\fontsize{30}{38}\selectfont\bfseries Hypothesis to test\par
+\fontsize{27}{35}\selectfont
 Does additional denoising improve closed-loop task success enough to justify its cost, or is computation better saved for observation-conditioned replanning?}
 
 \Section{02}{What is measured}
@@ -101,7 +101,7 @@ At a fixed two-action execution prefix ($h=2$), compare two versus five denoisin
 
 \vspace{9mm}
 \Panel{\BigNumber{+10.6 pp}{paired success difference, $d=2$ minus $d=5$}
-\fontsize{21}{28}\selectfont Descriptive, task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
+\fontsize{26}{34}\selectfont Descriptive, task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
 
 \vspace{14mm}
 \Panel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2 at $h=2$.}}
@@ -150,53 +150,51 @@ It does not measure physical-robot latency, asynchronous overlap, or energy.
 One frozen SmolVLA checkpoint; synchronous LIBERO simulation; separate discovery and confirmation tasks. The original study reports paired execution and internal action/outcome consistency checks. Independent model-free replay of the archived primary outcomes is a subsequent validation step, not evidence used for the results shown here.
 
 \vspace{14mm}
-{\fontsize{22}{28}\selectfont\bfseries Paper and code}\par
-{\fontsize{20}{26}\selectfont
+{\fontsize{27}{34}\selectfont\bfseries Paper and code}\par
+{\fontsize{23}{30}\selectfont
 \href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/}\par
 \href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{refinement-refresh-robot-policies}}\par
 \vspace{10mm}
-{\fontsize{20}{27}\selectfont
+{\fontsize{23}{30}\selectfont
 \textit{Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies}. NeurIPS 2026 RoboPAD workshop.}
 
 \end{multicols}
-\vspace{30mm}
-\hrule height 2pt
-\vspace{16mm}
-{\fontsize{35}{42}\selectfont\bfseries THE DEPLOYMENT TRADE-OFF}\par
 \vspace{10mm}
+\hrule height 2pt
+\vspace{10mm}
+{\fontsize{42}{50}\selectfont\bfseries THREE DEPLOYMENT MESSAGES}\par
+\vspace{6mm}
 \begin{tikzpicture}[every node/.style={align=center},>=Latex]
-\node[draw,very thick,minimum width=205mm,minimum height=145mm,text width=188mm] (a) at (110mm,0)
-  {{\fontsize{30}{37}\selectfont\bfseries MORE REFINEMENT}\\[8mm]
-   {\fontsize{25}{32}\selectfont more denoising per chunk}\\[5mm]
-   {\fontsize{23}{29}\selectfont higher cost per prediction}};
-\node[draw,very thick,minimum width=205mm,minimum height=145mm,text width=188mm] (b) at (375mm,0)
-  {{\fontsize{30}{37}\selectfont\bfseries MORE REFRESH}\\[8mm]
-   {\fontsize{25}{32}\selectfont shorter action prefix}\\[5mm]
-   {\fontsize{23}{29}\selectfont more observation updates}};
-\node[draw,very thick,minimum width=205mm,minimum height=145mm,text width=188mm] (d) at (640mm,0)
-  {{\fontsize{30}{37}\selectfont\bfseries EVALUATE BOTH}\\[8mm]
-   {\fontsize{25}{32}\selectfont paired task success}\\[5mm]
-   {\fontsize{23}{29}\selectfont measured compute expenditure}};
-\draw[->,line width=2pt] (a.east) -- node[above,font=\fontsize{23}{28}\selectfont]{versus} (b.west);
-\draw[->,line width=2pt] (b.east) -- (d.west);
+\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (a) at (115mm,0)
+  {{\fontsize{46}{52}\selectfont\bfseries +10.6~pp}\\[4mm]
+   {\fontsize{30}{37}\selectfont success from less refinement}\\[3mm]
+   {\fontsize{26}{33}\selectfont $-5.9\%$ arithmetic per control step}};
+\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (b) at (375mm,0)
+  {{\fontsize{46}{52}\selectfont\bfseries $-60.7\%$}\\[4mm]
+   {\fontsize{30}{37}\selectfont arithmetic per attempt}\\[3mm]
+   {\fontsize{26}{33}\selectfont 138/160 vs.\ 139/160; equivalence unproven}};
+\node[draw,very thick,minimum width=225mm,minimum height=95mm,text width=205mm] (d) at (635mm,0)
+  {{\fontsize{46}{52}\selectfont\bfseries 82.1\%}\\[4mm]
+   {\fontsize{30}{37}\selectfont generation cost is denoising-independent}\\[3mm]
+   {\fontsize{26}{33}\selectfont counted arithmetic is not deployment latency}};
 \end{tikzpicture}\par
-\vspace{20mm}
+\vspace{10mm}
 \noindent\fcolorbox{blackink}{panelgray}{%
 \begin{minipage}{0.965\textwidth}
-\vspace{11mm}
-{\fontsize{34}{41}\selectfont\bfseries TAKEAWAY}\par\vspace{5mm}
-{\fontsize{32}{40}\selectfont\bfseries
+\vspace{7mm}
+{\fontsize{40}{48}\selectfont\bfseries TAKEAWAY}\par\vspace{5mm}
+{\fontsize{38}{46}\selectfont\bfseries
 Inference efficiency is a closed-loop allocation problem.}\par\vspace{4mm}
-{\fontsize{27}{35}\selectfont
+{\fontsize{30}{39}\selectfont
 Evaluate task success together with the cost and frequency of
 observation-conditioned replanning, rather than minimizing denoising steps in
 isolation.}\par
-\vspace{7mm}
+\vspace{5mm}
 \end{minipage}}
 \vspace{4mm}
 \vfill
 \hrule height 2pt
 \vspace{8mm}
-{\fontsize{18}{24}\selectfont
+{\fontsize{21}{28}\selectfont
 \textbf{Poster format:} A0 portrait (841 $\times$ 1189 mm). Black-and-white, vector text and graphics. \hfill \textbf{MAAT Institute}}
 \end{document}
