@@ -15,18 +15,18 @@
 \definecolor{accent}{RGB}{31,78,121}
 \definecolor{accentlight}{RGB}{231,240,248}
 \color{blackink}
-\newcommand{\Section}[2]{\vspace{8mm}{\fontsize{40}{47}\selectfont\bfseries #1\quad #2}\par\vspace{2mm}\hrule height 1.6pt\vspace{7mm}}
-\newcommand{\BigNumber}[2]{{\fontsize{78}{82}\selectfont\bfseries #1}\par\vspace{3mm}{\fontsize{26}{33}\selectfont #2}\par}
-\newcommand{\SmallCaps}[1]{{\fontsize{24}{29}\selectfont\bfseries\MakeUppercase{#1}}}
-\newcommand{\Panel}[1]{\noindent\fcolorbox{blackink}{panelgray}{\begin{minipage}{0.92\linewidth}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
-\newcommand{\PrimaryPanel}[1]{\noindent\fcolorbox{accent}{accent}{\begin{minipage}{0.92\linewidth}\color{white}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
-\newcommand{\SecondaryPanel}[1]{\noindent\fcolorbox{accent}{accentlight}{\begin{minipage}{0.92\linewidth}\vspace{7mm}#1\vspace{6mm}\end{minipage}}}
+\newcommand{\Section}[2]{\vspace{10mm}{\fontsize{44}{52}\selectfont\bfseries #1\quad #2}\par\vspace{3mm}\hrule height 1.8pt\vspace{9mm}}
+\newcommand{\BigNumber}[2]{{\fontsize{88}{92}\selectfont\bfseries #1}\par\vspace{4mm}{\fontsize{30}{38}\selectfont #2}\par}
+\newcommand{\SmallCaps}[1]{{\fontsize{28}{34}\selectfont\bfseries\MakeUppercase{#1}}}
+\newcommand{\Panel}[1]{\noindent\fcolorbox{blackink}{panelgray}{\begin{minipage}{0.92\linewidth}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
+\newcommand{\PrimaryPanel}[1]{\noindent\fcolorbox{accent}{accent}{\begin{minipage}{0.92\linewidth}\color{white}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
+\newcommand{\SecondaryPanel}[1]{\noindent\fcolorbox{accent}{accentlight}{\begin{minipage}{0.92\linewidth}\vspace{9mm}#1\vspace{8mm}\end{minipage}}}
 \newcommand{\ResultBar}[4]{%
 \begin{tikzpicture}[baseline]
-\node[anchor=west,font=\fontsize{28}{34}\selectfont\bfseries] at (0,0) {#1};
+\node[anchor=west,font=\fontsize{31}{38}\selectfont\bfseries] at (0,0) {#1};
 \draw[line width=0.8pt] (35mm,-3mm) rectangle (143mm,11mm);
 \fill[#4] (35mm,-3mm) rectangle ({35mm + #2*1.08mm},11mm);
-\node[anchor=west,font=\fontsize{28}{34}\selectfont] at (151mm,3mm) {#3};
+\node[anchor=west,font=\fontsize{31}{38}\selectfont] at (151mm,3mm) {#3};
 \end{tikzpicture}\par\vspace{4mm}}
 \begin{document}
 \begin{minipage}[t]{\textwidth}
@@ -45,72 +45,99 @@ A robot can spend compute improving its current action prediction---or use a new
 \vspace{15mm}
 \end{minipage}
 
+\vspace{10mm}
+{\fontsize{44}{52}\selectfont\bfseries CLOSED-LOOP COMPUTE ALLOCATION}\par
+\vspace{7mm}
+\begin{tikzpicture}[
+  >=Latex,
+  stage/.style={draw=blackink,line width=1.8pt,rounded corners=3mm,
+    minimum width=132mm,minimum height=90mm,text width=116mm,align=center},
+  choice/.style={draw=accent,line width=2.3pt,fill=accentlight,rounded corners=3mm,
+    minimum width=132mm,minimum height=90mm,text width=116mm,align=center}
+]
+\node[stage] (obs) at (70mm,0)
+  {{\fontsize{35}{42}\selectfont\bfseries OBSERVATION}\\[5mm]
+   {\fontsize{29}{36}\selectfont camera + robot state}};
+\node[stage] (policy) at (225mm,0)
+  {{\fontsize{35}{42}\selectfont\bfseries FROZEN SmolVLA}\\[5mm]
+   {\fontsize{29}{36}\selectfont one chunk generation}};
+\node[choice] (denoise) at (380mm,0)
+  {{\color{accent}\fontsize{35}{42}\selectfont\bfseries REFINE}\\[5mm]
+   {\fontsize{30}{37}\selectfont denoise for $d$ steps}};
+\node[stage] (chunk) at (535mm,0)
+  {{\fontsize{35}{42}\selectfont\bfseries ACTION CHUNK}\\[5mm]
+   {\fontsize{29}{36}\selectfont predicted future actions}};
+\node[choice] (execute) at (690mm,0)
+  {{\color{accent}\fontsize{35}{42}\selectfont\bfseries REFRESH}\\[5mm]
+   {\fontsize{30}{37}\selectfont execute $h$ actions}};
+\draw[->,line width=2.6pt] (obs.east) -- (policy.west);
+\draw[->,line width=2.6pt] (policy.east) -- (denoise.west);
+\draw[->,line width=2.6pt] (denoise.east) -- (chunk.west);
+\draw[->,line width=2.6pt] (chunk.east) -- (execute.west);
+\draw[->,accent,line width=3.2pt] (execute.south) -- ++(0,-38mm) -| (obs.south);
+\node[anchor=south west,text=accent,font=\fontsize{28}{35}\selectfont\bfseries]
+  at (0mm,-42mm) {new observation-conditioned prediction};
+\node[anchor=north,align=center,text width=290mm] at (380mm,-54mm)
+  {{\fontsize{30}{38}\selectfont
+  Increase $d$ to refine the current prediction. Decrease $h$ to replan sooner from fresher information.}};
+\end{tikzpicture}\par
+\vspace{20mm}
+\hrule height 2pt
+\vspace{4mm}
+
 \setlength{\columnsep}{23mm}
 \begin{multicols}{3}
 \raggedcolumns
-\fontsize{30}{39}\selectfont
+\fontsize{33}{43}\selectfont
 
-\Section{01}{The question}
-Chunked vision--language--action policies generate a sequence of future actions.
-A robot executes only a prefix before asking the policy for a new chunk.
-Inference is costly, so two knobs compete for the same budget:
+\Section{01}{Study design}
+A paired discovery study evaluates 12 configurations on four LIBERO Spatial tasks (480 attempts). Seven frozen configurations are then tested on eight distinct Goal and Object tasks excluded from selection (1,120 attempts).
 
 \vspace{7mm}
-\begin{tikzpicture}[every node/.style={align=center},>=Latex]
-\node[draw,very thick,minimum width=.94\linewidth,minimum height=38mm] (r) at (0,0)
-  {{\fontsize{30}{36}\selectfont\bfseries REFINE MORE}\\[2mm]
-   {\fontsize{25}{31}\selectfont increase denoising steps $d$}};
-\node[draw,very thick,minimum width=.94\linewidth,minimum height=38mm] (f) at (0,-55mm)
-  {{\fontsize{30}{36}\selectfont\bfseries REFRESH SOONER}\\[2mm]
-   {\fontsize{25}{31}\selectfont reduce executed prefix $h$}};
-\draw[->,line width=1.5pt] (r.south) -- node[right,font=\fontsize{21}{26}\selectfont]{same inference budget} (f.north);
-\end{tikzpicture}
-
-\vspace{12mm}
-\Panel{\fontsize{30}{38}\selectfont\bfseries Hypothesis to test\par
-\fontsize{27}{35}\selectfont
-Does additional denoising improve closed-loop task success enough to justify its cost, or is computation better saved for observation-conditioned replanning?}
-
-\Section{02}{What is measured}
-Let $d$ denote denoising steps and $h$ the number of actions executed from a predicted chunk before refreshing.
-For full execution prefixes, the nominal neural arithmetic rate is
-\[
-\boxed{\displaystyle b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}}
-\]
-where $F_{\mathrm{gen}}(d)$ is the reference-calibrated arithmetic for one full chunk generation.
-
-\vspace{3mm}
-\SecondaryPanel{\BigNumber{82.1\%}{of native counted generation arithmetic is independent of the denoising-step count.}
-Reducing denoising alone leaves most of the cost of generating a new prediction intact.}
-
-\Section{03}{Evaluation split}
 \begin{tabular}{@{}p{.37\linewidth}p{.56\linewidth}@{}}
 \toprule
-\bfseries Discovery & 12 configurations; four LIBERO Spatial tasks; 480 attempts\\[3mm]
-\bfseries Confirmation & Seven frozen configurations; eight distinct Goal and Object tasks; 1,120 attempts\\
+\bfseries Discovery & 12 settings; 4 tasks; 480 attempts\\[3mm]
+\bfseries Confirmation & 7 frozen settings; 8 held-out tasks; 1,120 attempts\\
 \bottomrule
 \end{tabular}
 
-The eight confirmation tasks were excluded from configuration selection. The principal contrast uses 160 paired attempts per condition, matched by task, initial state and policy seed.
+\vspace{9mm}
+\SecondaryPanel{\BigNumber{82.1\%}{of native generation arithmetic is independent of the denoising-step count.}
+Reducing refinement alone leaves most of the cost of a fresh prediction intact.}
+
+\Section{02}{Compute boundary}
+For full execution prefixes, the nominal neural arithmetic rate is
+\[
+\boxed{\displaystyle b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}}.
+\]
+This counts reference-calibrated dense neural FLOPs. It does not measure physical-robot latency, asynchronous overlap, or energy.
+
+\vspace{8mm}
+\textbf{Scope:} one frozen checkpoint in synchronous simulation. The study does not establish cross-policy generalization or a universal scheduler.
 
 \columnbreak
 
-\Section{04}{\textcolor{accent}{Main result: refine less}}
-At a fixed two-action execution prefix ($h=2$), compare two versus five denoising steps.
+\Section{03}{\textcolor{accent}{Primary result}}
+At a fixed two-action prefix ($h=2$), compare two versus five denoising steps.
 
-\vspace{7mm}
-\SmallCaps{Closed-loop success}\par\vspace{8mm}
+\vspace{8mm}
+\SmallCaps{Closed-loop success}\par\vspace{9mm}
 \ResultBar{$d=2$}{86.875}{139/160}{accent}
 \ResultBar{$d=5$}{76.25}{122/160}{softgray}
 
-\vspace{9mm}
+\vspace{10mm}
 \PrimaryPanel{\BigNumber{+10.6 pp}{paired success difference, $d=2$ minus $d=5$}
-\fontsize{26}{34}\selectfont Descriptive, task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
+\fontsize{30}{38}\selectfont Descriptive task-conditional 95\% interval: +4.4 to +16.9 percentage points.}
 
 \vspace{14mm}
-\SecondaryPanel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2 at $h=2$.}}
+\SecondaryPanel{\BigNumber{$-5.9\%$}{reference-calibrated neural arithmetic per control step when reducing $d$ from 5 to 2.}}
 
-\Section{05}{Refresh less often?}
+\vspace{12mm}
+\textbf{Result:} for this checkpoint and task family, additional refinement does not reliably improve closed-loop success.
+
+\columnbreak
+
+\Section{04}{Refresh less often?}
 Hold denoising fixed at $d=2$. Compare executing two versus five actions before replanning.
 
 \vspace{8mm}
@@ -123,75 +150,40 @@ $h=5,\ d=2$ & 138/160 & 16.1\\
 \bottomrule
 \end{tabular}
 
-\vspace{15mm}
-\SecondaryPanel{\BigNumber{$-60.7\%$}{reference-calibrated arithmetic per attempted episode for $h=5$ versus $h=2$, at $d=2$.}}
+\vspace{13mm}
+\SecondaryPanel{\BigNumber{$-60.7\%$}{arithmetic per attempted episode for $h=5$ versus $h=2$, at $d=2$.}}
 
-\vspace{8mm}
-\textbf{Important:} Similar observed success is \emph{not} evidence of equivalent quality. The uncertainty interval does not establish non-inferiority or equivalence.
+\vspace{9mm}
+\textbf{Caution:} similar observed success is not evidence of equivalent quality. Non-inferiority or equivalence was not established.
 
-\Section{06}{Compute is not latency}
-The reported resource axis counts reference-calibrated dense neural FLOPs.
-It does not measure physical-robot latency, asynchronous overlap, or energy.
-
-\columnbreak
-
-\Section{07}{Interpretation}
-\begin{itemize}\setlength{\itemsep}{7mm}
-\item Additional denoising is \textbf{not uniformly beneficial} for closed-loop success on the evaluated tasks.
-\item The fixed cost of generating a new prediction limits savings from denoising reduction alone.
-\item Less frequent refresh can substantially reduce episode arithmetic, but its effect on quality remains uncertain.
-\item A simple cost-aware selection rule matched the fitted response model at three compute ceilings; fitting showed no demonstrated advantage.
-\end{itemize}
-
-\Section{08}{What the study does not claim}
+\Section{05}{Interpretation}
 \begin{itemize}\setlength{\itemsep}{6mm}
-\item A universally optimal allocation strategy or an adaptive scheduler.
-\item Isolation of observation freshness: changing $h$ also changes which predicted action positions are executed.
-\item Cross-policy generalization, real-time asynchronous gains, or physical-robot transfer.
+\item More denoising is not uniformly beneficial.
+\item Refresh frequency and refinement must be evaluated jointly.
+\item A simple cost-aware rule matched the fitted model at three compute budgets; fitting showed no demonstrated advantage.
 \end{itemize}
 
-\Section{09}{Reproducibility}
-One frozen SmolVLA checkpoint; synchronous LIBERO simulation; separate discovery and confirmation tasks. The original study reports paired execution and internal action/outcome consistency checks. Independent model-free replay of the archived primary outcomes is a subsequent validation step, not evidence used for the results shown here.
+\Section{06}{Reproducibility}
+Paired execution and internal outcome checks support the recorded results. Independent model-free replay remains a subsequent validation step.
 
-\vspace{14mm}
-{\fontsize{27}{34}\selectfont\bfseries Paper and code}\par
-{\fontsize{23}{30}\selectfont
+\vspace{9mm}
+{\fontsize{31}{38}\selectfont\bfseries Paper and code}\par
+{\fontsize{26}{33}\selectfont
 \href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/}\par
-\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{refinement-refresh-robot-policies}}\par
-\vspace{10mm}
-{\fontsize{23}{30}\selectfont
-\textit{Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies}. NeurIPS 2026 RoboPAD workshop.}
+\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{refinement-refresh-robot-policies}}
 
 \end{multicols}
-\vspace{10mm}
-\hrule height 2pt
-\vspace{10mm}
-{\fontsize{46}{54}\selectfont\bfseries THREE DEPLOYMENT PRINCIPLES}\par
-\vspace{6mm}
-\begin{tikzpicture}[every node/.style={align=center},>=Latex]
-\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (a) at (115mm,0)
-  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries REFINE WITH\\EVIDENCE}\\[7mm]
-   {\fontsize{34}{42}\selectfont Additional denoising\\is not automatically better\\for closed-loop control.}};
-\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (b) at (375mm,0)
-  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries REFRESH\\DELIBERATELY}\\[7mm]
-   {\fontsize{34}{42}\selectfont Longer prefixes save compute,\\but quality preservation\\must be tested.}};
-\node[draw,very thick,minimum width=225mm,minimum height=115mm,text width=205mm] (d) at (635mm,0)
-  {{\color{accent}\fontsize{42}{48}\selectfont\bfseries MEASURE THE\\SYSTEM}\\[7mm]
-   {\fontsize{34}{42}\selectfont Report task success, arithmetic,\\latency, and observation-\\update frequency.}};
-\end{tikzpicture}\par
-\vspace{10mm}
+\vspace{8mm}
 \noindent\fcolorbox{accent}{accent}{%
 \begin{minipage}{0.965\textwidth}
-\color{white}
-\vspace{8mm}
-{\fontsize{38}{46}\selectfont\bfseries TAKEAWAY: Inference efficiency is a
-closed-loop allocation problem.}\par
-\vspace{8mm}
+\color{white}\vspace{9mm}
+{\fontsize{44}{52}\selectfont\bfseries TAKEAWAY: Allocate inference compute using closed-loop outcomes, not denoising count alone.}\par
+\vspace{9mm}
 \end{minipage}}
-\vspace{4mm}
 \vfill
 \hrule height 2pt
 \vspace{8mm}
 {\fontsize{21}{28}\selectfont
-\textbf{Poster format:} A0 portrait (841 $\times$ 1189 mm). Black-and-white, vector text and graphics. \hfill \textbf{MAAT Institute}}
+\textbf{A0 portrait} \hfill \textit{Refinement versus Refresh}, NeurIPS 2026 RoboPAD \hfill \textbf{MAAT Institute}}
+
 \end{document}
