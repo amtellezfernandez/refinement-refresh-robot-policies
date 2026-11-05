@@ -11,6 +11,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import tarfile
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 PROTOCOL_SHA256 = "ede3eb8570487b7e2eda8e47f39c6afc1d12e40bece590e8c4590d34341ea737"
 BUNDLES_SHA256 = "99587b7e3ea594572f18ee3b933109eaf57dfa0ce4cc74deea83b3bc1b43f372"
+ARCHIVE_SHA256 = "36c1d5f2dcaef85664ec7a1bfe7409c849b3be17831566e783d24a00ea4e8df0"
+ASSET_MANIFEST_SHA256 = "ad609f416342dcd970eef0fa12d5ab93088a776454350d4c5f6a82b0a076a503"
 SAMPLE_SELECTION_SHA256 = "3ffe84b0ef2d055a6c22667406c9d8eca370bf66ab7999c46e99a7114f73df56"
 SAMPLE_SALT = "rrrp-replay-stage1-20261104|"
 ENV_VERSIONS = {"mujoco": "3.8.1", "robosuite": "1.4.0", "hf_libero": "0.1.4",
@@ -228,21 +231,90 @@ def runtime_versions():
     return versions
 
 
+def verify_assets(asset_root, manifest_path):
+    """Verify the pinned complete asset tree, ignoring downloader metadata only."""
+    root, manifest = Path(asset_root), Path(manifest_path)
+    if sha_file(manifest) != ASSET_MANIFEST_SHA256:
+        raise ReplayRefused("asset manifest bytes differ from the pinned manifest")
+    expected = {}
+    for line in manifest.read_text("utf-8").splitlines():
+        relative, digest = line.split("\t")
+        relative = relative.removeprefix("./")
+        parts = Path(relative).parts
+        if not parts or Path(relative).is_absolute() or ".." in parts or relative in expected:
+            raise ReplayRefused("invalid or repeated asset manifest path")
+        expected[relative] = digest
+    actual = {p.relative_to(root).as_posix() for p in root.rglob("*")
+              if p.is_file() and not ({".cache", ".git"} & set(p.relative_to(root).parts))}
+    if actual != set(expected):
+        raise ReplayRefused("asset tree does not match the pinned file set")
+    for relative, digest in expected.items():
+        if sha_file(root / relative) != digest:
+            raise ReplayRefused("asset file hash mismatch: " + relative)
+    return {"path": str(root.resolve()), "files": len(expected), "manifest_sha256": ASSET_MANIFEST_SHA256}
+
+
+def verify_task_inputs(archive_path):
+    """Match each task BDDL and official state-array hash to the pinned archive."""
+    import libero_replay as lr
+    expected = defaultdict(set)
+    phases = ("confirmation", "primary_deadline", "confirmation_continuation_partial",
+              "confirmation_continuation_rest")
+    with tarfile.open(archive_path, "r:gz") as archive:
+        for phase in phases:
+            with archive.extractfile(phase + "/episodes.jsonl") as stream:
+                for line in stream:
+                    episode = json.loads(line)
+                    ident = episode["episode_identity"]
+                    key = (ident["suite"], ident["task_id"])
+                    expected[key].add((episode["task_bddl_sha256"], episode["initial_state_set_sha256"]))
+    wanted = {(suite, task) for suite in ("libero_goal", "libero_object") for task in (5, 6, 7, 8)}
+    if set(expected) != wanted or any(len(values) != 1 for values in expected.values()):
+        raise ReplayRefused("archive task input identities are missing or inconsistent")
+    checked = []
+    for suite, task in sorted(wanted):
+        _, _, bddl = lr.task_bddl(suite, task)
+        states, init_path = lr.official_init_states(suite, task)
+        actual = (sha_file(bddl), lr.array_sha(states))
+        if actual not in expected[(suite, task)]:
+            raise ReplayRefused(f"task or init-state hash mismatch: {suite}:{task}")
+        checked.append({"suite": suite, "task_id": task, "bddl_sha256": actual[0],
+                        "initial_state_set_sha256": actual[1], "init_file_sha256": sha_file(init_path)})
+    return checked
+
+
 def verify_run(bundles, bundles_path, sample_path, release_path, protocol_path, through, render,
-               mode="frozen"):
+               mode="frozen", archive_path=None):
     """Validate everything before any output directory or simulator can be created."""
     if not render:
         raise ReplayRefused("confirmatory replay requires rendering")
     release, sample, code_hashes, amendments = _strict_release(
         release_path, protocol_path, bundles_path, sample_path, through, mode=mode)
+    if mode == "sample_first_57_v1":
+        # The separate protocol imports the frozen tolerance-mismatch adjudication
+        # while also requiring immediate stop. Resolve this before any simulation;
+        # an approval alone cannot make an unqualified implementation safe.
+        raise ReplayRefused("sample-first implementation not qualified: mismatch adjudication versus immediate stop requires a protocol decision")
     pop = verify_population(bundles, sample)
     versions = runtime_versions()
+    config_dir = os.environ.get("LIBERO_CONFIG_PATH")
+    if not config_dir or not (Path(config_dir) / "config.yaml").is_file():
+        raise ReplayRefused("LIBERO_CONFIG_PATH must name an existing explicit config")
+    from libero.libero import get_libero_path
+    assets = verify_assets(get_libero_path("assets"), ROOT / "protocol" / "libero_assets_0b3ea86_manifest.tsv")
+    tasks = None
+    if mode == "sample_first_57_v1":
+        if not archive_path or sha_file(archive_path) != ARCHIVE_SHA256:
+            raise ReplayRefused("original archive does not match the pinned bytes")
+        tasks = verify_task_inputs(archive_path)
     return {"approval_scope": release["scope"], "requested_through": through,
             "execution_mode": mode,
             "release_sha256": sha_file(release_path),
             "protocol_sha256": sha_file(protocol_path),
             "amendments_sha256": amendments, "code_sha256": code_hashes,
             "bundles_sha256": BUNDLES_SHA256, "sample_manifest_sha256": sha_file(sample_path),
+            "source_archive_sha256_declared": ARCHIVE_SHA256, "assets": assets,
+            "task_inputs": tasks,
             "sample_selection_sha256": SAMPLE_SELECTION_SHA256, "population": pop,
             "platform": platform.platform(), "machine": platform.machine(),
             "runtime_versions": versions,
@@ -264,3 +336,23 @@ def record_preflight(path, report):
         os.fsync(parent_fd)
     finally:
         os.close(parent_fd)
+
+
+def checkpoint_evidence(root):
+    """Atomically seal all currently complete files; called after each durable row."""
+    root = Path(root)
+    entries = []
+    for path in sorted(root.rglob('*')):
+        if path.is_file() and path.name not in ('SHA256SUMS', '.SHA256SUMS.tmp'):
+            entries.append(f"{sha_file(path)}  {path.relative_to(root).as_posix()}\n")
+    tmp = root / '.SHA256SUMS.tmp'
+    with tmp.open('w', encoding='utf-8') as stream:
+        stream.writelines(entries)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(tmp, root / 'SHA256SUMS')
+    fd = os.open(str(root), os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)

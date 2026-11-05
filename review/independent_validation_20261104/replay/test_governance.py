@@ -216,6 +216,25 @@ class Release(unittest.TestCase):
             with self.assertRaisesRegex(gov.ReplayRefused, "arm64"):
                 self.check()
 
+    def test_sample_first_release_requires_own_protocol_and_scope(self):
+        alternate = self.proto_dir / "SAMPLE_FIRST_57_PROTOCOL.md"
+        alternate.write_text("Separate sample protocol\n")
+        self.release.update(execution_mode="sample_first_57_v1", scope=[1],
+                            protocol_sha256=gov.sha_file(alternate))
+        self.save()
+        check = lambda: gov._strict_release(self.release_path, alternate, self.bundles,
+                                            self.sample, 1, mode="sample_first_57_v1")
+        self.assertEqual(check()[0]["scope"], [1])
+        self.release["scope"] = [0, 1]
+        self.save()
+        with self.assertRaises(gov.ReplayRefused):
+            check()
+        self.release["scope"] = [1]
+        self.release["execution_mode"] = "frozen"
+        self.save()
+        with self.assertRaises(gov.ReplayRefused):
+            check()
+
 
 class Orchestrator(unittest.TestCase):
     def test_direct_archived_replay_refused(self):

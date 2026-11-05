@@ -19,7 +19,9 @@ import argparse
 import copy
 import json
 import math
+import os
 import sys
+import traceback
 from collections import Counter
 from pathlib import Path
 
@@ -35,6 +37,55 @@ PROCEED = {"PASS_EXACT", "PASS_WITHIN_TOLERANCE"}
 PRIMARY = {"h2_d2", "h2_d5"}
 SENSITIVITY_DRAWS = 10
 SENSITIVITY_SCALE = 1e-9
+
+
+def sample_reset_screen(bundles, out, render):
+    """Screen every sampled identity, durably stopping at the first failed reset."""
+    cache, rep, rep_key, rows = {}, None, None, []
+    path = out / "sample_reset_screen.jsonl"
+    try:
+        with path.open("x", encoding="utf-8") as stream:
+            for b in bundles:
+                row = {"episode_key": b.get("episode_key"), "environment_seed": b.get("environment_seed")}
+                interrupted = None
+                try:
+                    defects = R.validate(b)
+                    if defects:
+                        raise ValueError("invalid input: " + "; ".join(defects))
+                    key = (b["suite"], b["task_id"])
+                    if key != rep_key:
+                        if rep:
+                            rep.close()
+                        rep = lr.Replayer(*key, render=render)
+                        rep_key = key
+                    pre, src = R.pre_settle_state(b, cache)
+                    ours = rep.reset(pre, b["environment_seed"])
+                    recorded = lr.array_from_record(b["recorded_initial_state"]).astype(np.float64)
+                    diff = float(np.max(np.abs(ours - recorded))) if ours.shape == recorded.shape else None
+                    if diff is None or not math.isfinite(diff) or diff > R.RESET_TOL:
+                        raise ValueError("sample reset mismatch: " + str(diff))
+                    row.update(exact=bool(np.array_equal(ours, recorded)), max_abs_diff=diff,
+                               init_file_sha256=src.get("file_sha256"), verdict="PASS")
+                except Exception:
+                    row.update(verdict="FAIL_SAMPLE_RESET", error=traceback.format_exc())
+                except BaseException as exc:
+                    row.update(verdict="INTERRUPTED", error=traceback.format_exc())
+                    interrupted = exc
+                rows.append(row)
+                stream.write(json.dumps(row, sort_keys=True, allow_nan=False) + "\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+                gov.checkpoint_evidence(out)
+                if interrupted is not None:
+                    raise interrupted
+                if row["verdict"] != "PASS":
+                    return {"verdict": "FAIL_SAMPLE_RESET", "n": len(rows)}
+    finally:
+        if rep:
+            rep.close()
+        gov.checkpoint_evidence(out)
+    return {"verdict": "PASS_EXACT" if all(r["exact"] for r in rows) else "PASS_WITHIN_TOLERANCE",
+            "n": len(rows)}
 
 
 def stage0(bundles, out, render):
@@ -96,21 +147,119 @@ def episode_stage(n, bundles, out, render, release, protocol, stage0_verdict, do
                   artifact_paths=None):
     sd = out / f"stage{n}"
     sd.mkdir(parents=True, exist_ok=False)
+    keys = [b.get("episode_key") for b in bundles]
+    if (not keys or any(not isinstance(k, str) or not k for k in keys)
+            or len(keys) != len(set(keys))):
+        stopped = {"stage": n, "verdict": "IMPLEMENTATION_FAILURE", "error": "invalid scheduled identities"}
+        (sd / "stage_verdict.json").write_text(json.dumps(stopped, indent=1) + "\n")
+        if artifact_paths:
+            gov.checkpoint_evidence(artifact_paths["evidence_root"])
+        return stopped
     runs = {}
     for name, mode in (("reset_path_a", "reset_path"), ("reset_path_b", "reset_path"), ("inject", "inject")):
         if name == "reset_path_b" and not double:
             continue
-        code = R.run(bundles, sd / name, mode=mode, render=render, release=release,
-                     protocol=protocol, stage=n, artifact_paths=artifact_paths,
-                     capability=gov._ORCHESTRATOR_CAPABILITY if artifact_paths else None)
+        try:
+            code = R.run(bundles, sd / name, mode=mode, render=render, release=release,
+                         protocol=protocol, stage=n, artifact_paths=artifact_paths,
+                         capability=gov._ORCHESTRATOR_CAPABILITY if artifact_paths else None,
+                         reference_records=runs.get("reset_path_a") if artifact_paths and artifact_paths.get("mode") == "sample_first_57_v1" and name != "reset_path_a" else None,
+                         exact_reset=stage0_verdict == "PASS_EXACT")
+        except (KeyboardInterrupt, SystemExit):
+            stopped = {"stage": n, "verdict": "INTERRUPTED", "arm": name}
+            (sd / "stage_verdict.json").write_text(json.dumps(stopped, indent=1) + "\n")
+            if artifact_paths:
+                gov.checkpoint_evidence(artifact_paths["evidence_root"])
+            raise
+        except Exception:
+            stopped = {"stage": n, "verdict": "IMPLEMENTATION_FAILURE", "arm": name,
+                       "error": traceback.format_exc()}
+            (sd / "stage_verdict.json").write_text(json.dumps(stopped, indent=1) + "\n")
+            if artifact_paths:
+                gov.checkpoint_evidence(artifact_paths["evidence_root"])
+            return stopped
         if code != 0:
-            return {"stage": n, "verdict": "REFUSED", "code": code}
-        runs[name] = [json.loads(l) for l in (sd / name / "results.jsonl").read_text().splitlines()]
+            result_path = sd / name / "results.jsonl"
+            last = None
+            if result_path.exists():
+                try:
+                    lines = result_path.read_text().splitlines()
+                    if lines:
+                        last = json.loads(lines[-1])
+                except (OSError, ValueError):
+                    last = None
+            last_verdict = last.get("verdict") if isinstance(last, dict) else None
+            if code == 5:
+                verdict = "REFUSED"
+            elif last_verdict in {"INPUT_INVALID", "DUPLICATE"}:
+                verdict = "ARCHIVE_DEFECT"
+            elif last_verdict == "OUTCOME_MISMATCH":
+                verdict = "STOPPED"
+            elif last_verdict in {"RESET_MISMATCH", "UNREPLAYABLE", "NONDETERMINISTIC", "ARM_DISAGREEMENT"}:
+                verdict = "UNINTERPRETABLE"
+            else:
+                verdict = "IMPLEMENTATION_FAILURE"
+            stopped = {"stage": n, "verdict": verdict, "code": code,
+                       "arm": name, "last_result": last}
+            if last_verdict == "OUTCOME_MISMATCH":
+                stopped["note"] = "A mismatch requires protocol-defined adjudication; no adjudication was run."
+            (sd / "stage_verdict.json").write_text(json.dumps(stopped, indent=1) + "\n")
+            if artifact_paths:
+                gov.checkpoint_evidence(artifact_paths["evidence_root"])
+            return stopped
+        try:
+            rows = [json.loads(l) for l in (sd / name / "results.jsonl").read_text().splitlines()]
+            if len(rows) != len(keys):
+                raise ValueError("result count or scheduled identities invalid")
+            for row, key, bundle in zip(rows, keys, bundles):
+                if not isinstance(row, dict) or row.get("episode_key") != key or row.get("verdict") not in R.VERDICTS:
+                    raise ValueError("invalid, duplicate, unexpected, or out-of-order result identity/verdict")
+                if ((row.get("input_defects") and row["verdict"] != "INPUT_INVALID")
+                        or (row.get("duplicate") and row["verdict"] not in {"INPUT_INVALID", "DUPLICATE"})):
+                    raise ValueError("result verdict suppresses an input defect or duplicate")
+                if row["verdict"] not in {"INPUT_INVALID", "DUPLICATE", "UNREPLAYABLE", "RESET_MISMATCH"}:
+                    replay = row.get("replay")
+                    required = {"terminal_state_sha256", "replay_success", "recorded_success",
+                                "replay_first_success_tick", "recorded_first_success_tick", "first_divergent_tick"}
+                    if not isinstance(replay, dict) or not required.issubset(replay):
+                        raise ValueError("result row lacks required replay fields")
+                    if (not isinstance(replay["terminal_state_sha256"], str)
+                            or not replay["terminal_state_sha256"]
+                            or type(replay["replay_success"]) is not bool
+                            or type(replay["recorded_success"]) is not bool):
+                        raise ValueError("result row has invalid replay values")
+                    if replay["recorded_success"] != bundle.get("label", {}).get("success"):
+                        raise ValueError("result row recorded outcome differs from scheduled input")
+                    for field in ("replay_first_success_tick", "recorded_first_success_tick", "first_divergent_tick"):
+                        tick = replay[field]
+                        if tick is not None and (type(tick) is not int or tick < 0):
+                            raise ValueError("result row has invalid tick")
+                    if (replay["replay_success"] != (replay["replay_first_success_tick"] is not None)
+                            or replay["recorded_success"] != (replay["recorded_first_success_tick"] is not None)):
+                        raise ValueError("result row has inconsistent success and tick")
+                    verdict = row["verdict"]
+                    matches = replay["replay_success"] == replay["recorded_success"]
+                    divergent = replay["first_divergent_tick"] is not None
+                    if ((verdict == "OUTCOME_MISMATCH" and matches)
+                            or (verdict == "OUTCOME_MATCH_TICK_DIVERGED" and (not matches or not divergent))
+                            or (verdict in {"REPRODUCED", "REPRODUCED_RESET_DRIFT"}
+                                and (not matches or divergent or replay["replay_first_success_tick"]
+                                     != replay["recorded_first_success_tick"]))):
+                        raise ValueError("result row verdict contradicts replay values")
+            runs[name] = rows
+        except (OSError, ValueError, TypeError, KeyError):
+            stopped = {"stage": n, "verdict": "IMPLEMENTATION_FAILURE", "arm": name,
+                       "error": traceback.format_exc()}
+            (sd / "stage_verdict.json").write_text(json.dumps(stopped, indent=1) + "\n")
+            if artifact_paths:
+                gov.checkpoint_evidence(artifact_paths["evidence_root"])
+            return stopped
     a = runs["reset_path_a"]
     nondet = []
     if "reset_path_b" in runs:
         for x, y in zip(a, runs["reset_path_b"]):
-            if (x["replay"] or {}).get("terminal_state_sha256") != (y["replay"] or {}).get("terminal_state_sha256"):
+            if any((x["replay"] or {}).get(field) != (y["replay"] or {}).get(field) for field in
+                   ("terminal_state_sha256", "replay_success", "replay_first_success_tick", "first_divergent_tick")):
                 nondet.append(x["episode_key"])
     v = Counter(r["verdict"] for r in a)
     bad_input = v["INPUT_INVALID"] + v["DUPLICATE"]
@@ -165,6 +314,8 @@ def main():
     ap.add_argument("--release", required=True)
     ap.add_argument("--protocol", required=True)
     ap.add_argument("--through", type=int, choices=(0, 1, 2), default=2)
+    ap.add_argument("--execution-mode", choices=("frozen", "sample_first_57_v1"), default="frozen")
+    ap.add_argument("--archive", help="original confirmation archive (required for sample-first)")
     ap.add_argument("--no-render", action="store_true")
     a = ap.parse_args()
     bundles = R.read_bundles(a.bundles)
@@ -173,16 +324,28 @@ def main():
         sys.exit(5)
     render = not a.no_render
     real = gov.is_real_archive(bundles)
+    if a.execution_mode != "frozen" and not real:
+        print("REFUSED: sample-first mode requires the pinned archived population", file=sys.stderr)
+        sys.exit(5)
+    if a.execution_mode == "sample_first_57_v1":
+        try:
+            if not a.archive or gov.sha_file(a.archive) != gov.ARCHIVE_SHA256:
+                raise gov.ReplayRefused("sample-first requires the pinned original archive")
+        except (gov.ReplayRefused, OSError) as error:
+            print("REFUSED: {}".format(error), file=sys.stderr)
+            sys.exit(5)
     artifact_paths = None
     if real:
         try:
             report = gov.verify_run(bundles, a.bundles, a.sample, a.release,
-                                    a.protocol, a.through, render)
+                                    a.protocol, a.through, render, mode=a.execution_mode,
+                                    archive_path=a.archive)
         except (gov.ReplayRefused, OSError, ValueError, TypeError, KeyError) as error:
             print("REFUSED: {}".format(error), file=sys.stderr)
             sys.exit(5)
         artifact_paths = {"bundles": a.bundles, "sample": a.sample,
-                          "release_sha256": report["release_sha256"]}
+                          "release_sha256": report["release_sha256"], "mode": a.execution_mode,
+                          "evidence_root": str(Path(a.out).resolve())}
     else:
         # Retain Warren's existing fixture-only fire drills. These fixtures
         # have no standing as scientific evidence or approval for paper data.
@@ -196,7 +359,30 @@ def main():
     if report is not None:
         report["command_line"] = sys.argv
         report["output_directory"] = str(out.resolve())
+        if a.execution_mode == "sample_first_57_v1":
+            report["source_archive"] = {"path": str(Path(a.archive).resolve()),
+                                        "sha256": gov.ARCHIVE_SHA256}
+            sample_ids = json.loads(Path(a.sample).read_text("utf-8"))["stage1_sample"]
+            by_key = {b["episode_key"]: b for b in bundles}
+            sample = [by_key[k] for k in sample_ids]
+            report["sample_attempts"] = [{"episode_key": b["episode_key"],
+                                          "environment_seed": b["environment_seed"]} for b in sample]
         gov.record_preflight(out / "counted_run_identity.json", report)
+        gov.checkpoint_evidence(out)
+    if a.execution_mode == "sample_first_57_v1":
+        try:
+            screen = sample_reset_screen(sample, out, render)
+            if screen["n"] != 57 or screen["verdict"] not in PROCEED:
+                print("STOP: sample reset screen failed", file=sys.stderr)
+                sys.exit(6)
+            result = episode_stage(1, sample, out, render, a.release, a.protocol,
+                                   screen["verdict"], artifact_paths=artifact_paths)
+            if result["verdict"] not in PROCEED | {"PASS_OUTCOME_ONLY"}:
+                print("STOP: sample replay did not pass", file=sys.stderr)
+                sys.exit(6)
+            sys.exit(0)
+        finally:
+            gov.checkpoint_evidence(out)
     s0 = stage0(bundles, out, render)
     print("stage0", s0["verdict"], s0["exact"], "/", s0["n_task_states"], flush=True)
     if real and s0["n_task_states"] != 80:

@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import platform
 import sys
 import time
@@ -222,7 +223,7 @@ def environment_identity():
 
 
 def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol=None,
-        *, capability=None, stage=None, artifact_paths=None):
+        *, capability=None, stage=None, artifact_paths=None, reference_records=None, exact_reset=False):
     refusal = gate(bundles, release, protocol, capability=capability, stage=stage,
                    artifact_paths=artifact_paths)
     if refusal:
@@ -233,19 +234,28 @@ def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol
     seen_keys, seen_streams = {}, {}
     replayers, cache, results = {}, {}, []
     with (out / "results.jsonl").open("x") as f:
-        for b in bundles:
-            defects = validate(b)
+        for index, b in enumerate(bundles):
+            try:
+                defects = validate(b)
+            except Exception:
+                defects = ["input validation raised: " + traceback.format_exc()]
             key = b.get("episode_key")
-            stream = hashlib.sha256(canonical([a.get("sha256") for a in b.get("actions", [])])).hexdigest()
+            try:
+                stream = hashlib.sha256(canonical([a.get("sha256") for a in b.get("actions", [])])).hexdigest()
+            except Exception:
+                stream = None
+                defects.append("malformed action stream")
             dup = []
             if key in seen_keys:
                 dup.append(f"episode_key repeats bundle {seen_keys[key]}")
-            if stream in seen_streams and b.get("actions"):
+            if stream is not None and stream in seen_streams and b.get("actions"):
                 dup.append(f"action stream identical to {seen_streams[stream]}")
             seen_keys.setdefault(key, len(results))
-            seen_streams.setdefault(stream, key)
+            if stream is not None:
+                seen_streams.setdefault(stream, key)
             r, err = None, None
-            if not any(x.startswith("missing field") for x in defects):
+            interrupted = None
+            if not defects and not dup:
                 try:
                     k = (b["suite"], b["task_id"])
                     if k not in replayers:
@@ -255,12 +265,45 @@ def run(bundles, out_dir, mode="reset_path", render=True, release=None, protocol
                     r = replay_one(replayers[k], b, mode, cache)
                 except Exception:
                     err = traceback.format_exc(limit=3)
+                except BaseException as exc:
+                    err = traceback.format_exc()
+                    interrupted = exc
             rec = {"episode_key": key, "provenance": b.get("provenance"), "mode": mode, "render": render,
                    "input_defects": defects, "duplicate": dup, "error": err, "replay": r,
                    "verdict": classify(defects, dup, r)}
+            if reference_records is not None and rec["verdict"] not in {"INPUT_INVALID", "DUPLICATE", "UNREPLAYABLE", "RESET_MISMATCH"}:
+                ref = reference_records[index] if index < len(reference_records) else {}
+                rr = ref.get("replay") or {}
+                if ref.get("episode_key") != key or not rr:
+                    rec["verdict"] = "REFERENCE_MISMATCH"
+                elif mode == "reset_path" and any(rr.get(field) != r.get(field) for field in
+                        ("terminal_state_sha256", "replay_success", "replay_first_success_tick",
+                         "first_divergent_tick")):
+                    rec["verdict"] = "NONDETERMINISTIC"
+                elif mode == "inject" and exact_reset and rr.get("replay_success") != r.get("replay_success"):
+                    rec["verdict"] = "ARM_DISAGREEMENT"
             results.append(rec)
             f.write(json.dumps(rec, sort_keys=True) + "\n")
             f.flush()
+            os.fsync(f.fileno())
+            if artifact_paths:
+                gov.checkpoint_evidence(artifact_paths["evidence_root"])
+                if interrupted is not None:
+                    for rp in replayers.values():
+                        rp.close()
+                    raise interrupted
+                stop = {"INPUT_INVALID", "DUPLICATE", "UNREPLAYABLE", "RESET_MISMATCH",
+                        "REFERENCE_MISMATCH", "NONDETERMINISTIC", "ARM_DISAGREEMENT"}
+                # The frozen protocol requires a tolerance-dependent sensitivity
+                # adjudication for outcome mismatches. Do not silently remove it.
+                if artifact_paths.get("mode") == "sample_first_57_v1":
+                    stop.add("OUTCOME_MISMATCH")
+                if rec["verdict"] in stop:
+                    for rp in replayers.values():
+                        rp.close()
+                    return 6
+            elif interrupted is not None:
+                raise interrupted
     for rp in replayers.values():
         rp.close()
     summary = {"verdicts": dict(Counter(r["verdict"] for r in results)), "n": len(results), "mode": mode,
