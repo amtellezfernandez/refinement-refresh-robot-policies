@@ -88,3 +88,32 @@ protocol. It improves implementation of its gates. It must be reviewed and
 tested before any scientific approval. Do not relabel archived evidence as a
 synthetic fixture, change the frozen protocol, choose another tolerance after
 seeing outputs, or report fixture tests as independent confirmation.
+
+
+## Runtime provenance repair (5 November 2026)
+
+Review of the archived confirmation manifests found a silent ambiguity in
+`experiments/tooling/run_paired.py`: the runtime manifest records
+`numpy.__version__` and `torch.__version__`, but its package inventory builds
+a single-value dictionary from every visible distribution. If multiple
+`.dist-info` records are visible, one can overwrite another without warning.
+The archive therefore reports imported versions 2.2.6 / 2.7.1 and inventory
+versions 1.26.4 / 2.6.0 for NumPy / Torch. The archive does not retain module
+paths or all candidate distribution records, so the mismatch cannot be
+retroactively resolved from that manifest alone.
+
+The PR now changes the runner to preserve duplicate distribution candidates,
+leave ambiguous package versions unset in the legacy summary, and record each
+critical imported module's version and file path. The replay gate now checks
+the imported NumPy, Torch and MuJoCo module versions and binds them to matching
+distribution metadata under the same installation root, rather than trusting
+a single metadata lookup. The schema change applies to future manifests; it
+does not rewrite archived records or change the frozen scientific protocol.
+
+The original LIBERO asset tree was not hashed by the experiment, so its exact
+revision remains unknown. The replay's pinned asset tree is verified against
+its own manifest. A passing Stage 0 on arm64 must therefore be reported as a
+reset diagnostic in the declared replay environment; it cannot establish that
+the original experiment used identical assets or prove cross-architecture
+trajectory equivalence. This provenance correction does not require GitHub
+Actions; the code and its local qualification evidence must still be reviewed.
