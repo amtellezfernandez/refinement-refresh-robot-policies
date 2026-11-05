@@ -170,3 +170,30 @@ Opportunities 1 and 2 also need it.
   - the discovery traces;
   - the arithmetic claims;
   - whether the BDDL predicate matches human judgement.
+
+
+## I. Runtime provenance correction (5 November 2026)
+
+Review found that `experiments/tooling/run_paired.py` made a single-value
+package map from every visible distribution record. Duplicate package
+metadata could therefore overwrite one another, while separate top-level
+`numpy.__version__` and `torch.__version__` fields described the modules
+actually imported. The archived confirmation manifests show this conflict:
+imported NumPy/Torch are recorded as 2.2.6/2.7.1, while the package map says
+1.26.4/2.6.0. The archive does not retain module paths or all distribution
+candidates, so this cannot be resolved retroactively from the manifest alone.
+
+The PR now changes future experiment manifests to retain duplicate distribution
+candidates, record imported module versions and file paths, and hash the
+resolved LIBERO assets tree. The replay gate also verifies imported NumPy,
+Torch and MuJoCo versions and their installation roots alongside distribution
+metadata. These code changes are on the current PR branch but are **not covered
+by the earlier local qualification results**.
+
+The original experiment's LIBERO asset tree was not hashed; its revision remains
+unknown. The replay asset tree is pinned and checked independently. A passing
+Stage 0 on arm64 can therefore establish reset agreement only in the declared
+replay environment, not identity with the original assets or full
+cross-architecture trajectory equivalence. GitHub Actions is not required by
+the protocol; the new source still needs review and local validation before any
+stage-scoped approval.
