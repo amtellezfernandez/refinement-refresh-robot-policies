@@ -21,7 +21,7 @@
 \newcommand{\metric}[3]{\begin{minipage}[t]{0.31\textwidth}\centering{\fontsize{96}{100}\selectfont\bfseries\color{#3}#1}\par\vspace{5mm}{\fontsize{33}{41}\selectfont\bfseries #2}\end{minipage}}
 \newcommand{\tagline}[1]{{\fontsize{34}{41}\selectfont\bfseries\color{blue}\MakeUppercase{#1}}}
 \begin{document}
-\noindent\colorbox{navy}{\begin{minipage}[t][224mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
+\noindent\colorbox{navy}{\begin{minipage}[t][180mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
 \vspace*{33mm}
 \hspace*{46mm}\begin{minipage}{749mm}
 {\fontsize{112}{114}\selectfont\bfseries\color{white} REFINEMENT \color{white}vs.\color{white} REFRESH}\par
@@ -30,20 +30,6 @@
 \vspace{19mm}
 {\fontsize{32}{40}\selectfont\color{white}\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\hfill
 {\fontsize{30}{38}\selectfont\color{white} MAAT Institute \quad\textbullet\quad Z\"urich, 10 Nov 2026}\par
-\begin{tikzpicture}[overlay,xshift=555mm,yshift=-92mm,line cap=round,line join=round]
-  \draw[white!18,line width=18pt] (-70mm,-18mm) arc (190:350:83mm);
-  \draw[white,line width=9pt] (-38mm,-10mm) -- (8mm,30mm) -- (61mm,8mm) -- (91mm,45mm);
-  \fill[white] (-38mm,-10mm) circle (14mm);
-  \fill[navy] (-38mm,-10mm) circle (6mm);
-  \fill[white] (8mm,30mm) circle (13mm);
-  \fill[navy] (8mm,30mm) circle (5mm);
-  \fill[white] (61mm,8mm) circle (11mm);
-  \fill[navy] (61mm,8mm) circle (4mm);
-  \draw[white,line width=7pt] (91mm,45mm) -- (112mm,59mm);
-  \draw[white,line width=7pt] (110mm,58mm) -- (126mm,47mm);
-  \draw[white,line width=7pt] (110mm,58mm) -- (119mm,76mm);
-  \draw[white!55,line width=5pt] (-68mm,-25mm) -- (-8mm,-25mm);
-\end{tikzpicture}
 \end{minipage}
 \end{minipage}}\par
 \noindent\colorbox{orange}{\rule{\dimexpr\paperwidth-2\fboxsep\relax}{8mm}}\par
@@ -55,7 +41,7 @@
 {\fontsize{38}{48}\selectfont\color{muted} Improve the current prediction, or act briefly and plan again from a fresher observation.}
 \end{minipage}
 \vspace{12mm}
-\begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{34}{42}\selectfont\bfseries},note/.style={align=center,font=\fontsize{31}{38}\selectfont,text=muted}]
+\begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{39}{48}\selectfont\bfseries},note/.style={align=center,font=\fontsize{36}{44}\selectfont,text=muted}]
   \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {NEW\\OBSERVATION};
   \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {FROZEN\\SmolVLA};
   \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {REFINE\\$d$ steps};
@@ -85,7 +71,7 @@
   \fill[black!38,rounded corners=5mm] (22mm,26mm) rectangle (428mm,68mm);
   \node[anchor=west,font=\fontsize{38}{46}\selectfont\bfseries,text=white] at (40mm,47mm) {122 / 160 successes};
   \node[anchor=center,align=center,text=black,font=\fontsize{76}{80}\selectfont\bfseries] at (617mm,132mm) {+10.6\\pp};
-  \node[anchor=center,align=center,text=muted,font=\fontsize{28}{35}\selectfont] at (617mm,46mm) {descriptive 95\% interval\\+4.4 to +16.9 pp};
+  \node[anchor=center,align=center,text=muted,font=\fontsize{34}{42}\selectfont] at (617mm,46mm) {descriptive 95\% interval\\+4.4 to +16.9 pp};
 \end{tikzpicture}
 \end{minipage}
 \end{center}
@@ -101,13 +87,13 @@
 \begin{center}
 \begin{minipage}{748mm}
 \begin{tikzpicture}
-  \fill[navy,rounded corners=8mm] (0,0) rectangle (748mm,119mm);
-  \node[anchor=west,text=orange,font=\fontsize{29}{35}\selectfont\bfseries] at (22mm,91mm) {HOW WE TESTED IT};
-  \node[anchor=west,text=white,align=left,text width=220mm,font=\fontsize{28}{35}\selectfont] at (22mm,48mm) {12 configurations\\4 Spatial tasks\\480 discovery attempts};
-  \draw[white!35,line width=2pt] (264mm,18mm)--(264mm,101mm);
-  \node[anchor=west,text=white,align=left,text width=215mm,font=\fontsize{28}{35}\selectfont] at (292mm,48mm) {7 frozen configurations\\8 held-out tasks\\1,120 confirmation attempts};
-  \draw[white!35,line width=2pt] (533mm,18mm)--(533mm,101mm);
-  \node[anchor=west,text=cyan,align=left,text width=185mm,font=\fontsize{25}{32}\selectfont\bfseries] at (558mm,53mm) {One frozen checkpoint\\Synchronous LIBERO\\Paired evaluation};
+  \fill[navy,rounded corners=8mm] (0,0) rectangle (748mm,145mm);
+  \node[anchor=west,text=white,font=\fontsize{36}{44}\selectfont\bfseries] at (22mm,112mm) {HOW WE TESTED IT};
+  \node[anchor=west,text=white,align=left,text width=220mm,font=\fontsize{34}{43}\selectfont] at (22mm,57mm) {12 configurations\\4 Spatial tasks\\480 discovery attempts};
+  \draw[white!45,line width=2pt] (264mm,18mm)--(264mm,125mm);
+  \node[anchor=west,text=white,align=left,text width=215mm,font=\fontsize{34}{43}\selectfont] at (292mm,57mm) {7 frozen configurations\\8 held-out tasks\\1,120 confirmation attempts};
+  \draw[white!45,line width=2pt] (533mm,18mm)--(533mm,125mm);
+  \node[anchor=west,text=white,align=left,text width=185mm,font=\fontsize{32}{40}\selectfont\bfseries] at (558mm,63mm) {One frozen checkpoint\\Synchronous LIBERO\\Paired evaluation};
 \end{tikzpicture}
 \end{minipage}
 \end{center}
@@ -115,15 +101,15 @@
 \begin{center}
 \begin{minipage}{748mm}
 \begin{minipage}[t]{482mm}
-{\fontsize{30}{36}\selectfont\bfseries\color{orange}\MakeUppercase{Takeaway}}\par\vspace{6mm}
-{\fontsize{42}{51}\selectfont\bfseries More denoising does not necessarily improve closed-loop control.}\par\vspace{7mm}
-{\fontsize{29}{37}\selectfont Evaluate refinement and replanning together, using both task success and compute.}
+{\fontsize{36}{44}\selectfont\bfseries\color{orange}\MakeUppercase{Takeaway}}\par\vspace{6mm}
+{\fontsize{48}{58}\selectfont\bfseries More denoising does not necessarily improve closed-loop control.}\par\vspace{7mm}
+{\fontsize{34}{43}\selectfont Evaluate refinement and replanning together, using both task success and compute.}
 \end{minipage}\hfill
 \begin{minipage}[t]{235mm}
-{\fontsize{26}{32}\selectfont\bfseries\color{blue} INTERPRET WITH CARE}\par\vspace{5mm}
-{\fontsize{23}{30}\selectfont Similar observed success for $h=2$ and $h=5$ does not establish equivalent quality. Results cover one checkpoint and synchronous simulation.}\par
+{\fontsize{32}{40}\selectfont\bfseries\color{blue} INTERPRET WITH CARE}\par\vspace{5mm}
+{\fontsize{29}{37}\selectfont Similar observed success for $h=2$ and $h=5$ does not establish equivalent quality. Results cover one checkpoint and synchronous simulation.}\par
 \vspace{9mm}
-{\fontsize{22}{28}\selectfont\bfseries\color{navy}\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/\\refinement-refresh-robot-policies}}
+{\fontsize{27}{34}\selectfont\bfseries\color{navy}\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/\\refinement-refresh-robot-policies}}
 \end{minipage}
 \end{minipage}
 \end{center}
