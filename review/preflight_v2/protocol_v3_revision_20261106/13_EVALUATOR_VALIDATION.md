@@ -56,7 +56,7 @@ As a cross-check, the harness asserts that its parsed goal atoms equal the env's
 2. GOAL_UNMET: both false throughout, and no early termination.
 3. HORIZON: both false throughout. The episode ends exactly at the stack's horizon. The horizon is recorded per suite (for SmolVLA, `_max_episode_steps`, which closes gap G10).
 4. GOAL_REACHED: the goal truth first becomes true at step k, and the recorded success first becomes true at the same step k. Termination at k is recorded per suite (for SmolVLA this records whether success terminates the episode, D7).
-5. **π0.5 `done` semantics, established only if** conditions 1–4 hold for every π0.5 fixture **and** the source read of the pinned OpenPI LIBERO `step` is recorded in the qualification record (gap G11). The statement established is then: "In the pinned π0.5 stack, `done` is true exactly when the BDDL goal conjunction holds; reaching the horizon does not set it." Anything less leaves G11 open.
+5. **π0.5 `done` semantics, established only if** conditions 1–4 hold for every π0.5 fixture **and** the source read of the pinned OpenPI LIBERO `step` is recorded in the qualification record (gap G11). The statement established is then: "In the pinned π0.5 stack, within the client's horizon (`MAX_STEPS[suite]` after 10 wait steps), `done` is true exactly when the BDDL goal conjunction holds." Robosuite's own horizon (1000 steps by LIBERO's `ControlEnv` default in the locally read hf-libero copy) is never reached by the client, so nothing is claimed about it. Anything less leaves G11 open.
 
 A source read of the locally installed hf-libero 0.1.4 (the SmolVLA stack's version, read on the MacBook, not on the planned host) shows `BDDLBaseDomain.step` overwriting robosuite's `done` with `_check_success()`, and `_check_success` as the conjunction of goal predicates. That is a **lead** for the SmolVLA stack only. It is not a qualification, and it says nothing about the OpenPI submodule's copy.
 
@@ -73,6 +73,7 @@ rule: incident=no, agreement=all, fixtures=fixture_invalid -> EVALUATOR_NOT_QUAL
 rule: incident=no, agreement=all, fixtures=complete -> EVALUATOR_QUALIFIED
 ```
 
+- The ISO check is mandatory: the harness refuses to run unless both models' confirmation state manifests are supplied, and stops if any fixture state collides with them.
 - `fixture_invalid`: a goal-reached fixture whose independent goal truth never becomes true. It is evidence about the fixture, not about the evaluator.
 - `EVALUATOR_DISAGREES` is an instrument finding. It blocks that stack from Protocol B. Its cause is investigated before anything is changed.
 

@@ -8,7 +8,7 @@
 > 3. every item of that model's qualification record (`01` A3a) marked PASSED by a separately authorised check;
 > 4. that model's confirmation state manifest generated and bound;
 > 5. the R3 coverage check (B6.4) **run** with the primary outcomes unseen, and its result recorded;
-> 6. a release from Alba bound to this document's sha256 and to that model's schedule hash.
+> 6. a release from Alba bound to this document's sha256, to that model's schedule hash, to that model's qualification record hash, and to the sha256 of every runtime file of the v3 tooling (the executed classifier, runner, adapters, server and analysis are the certified ones).
 >
 > It replaces the design content of the frozen `cross_policy_confirmation_v1.json` (`9310639c...`), which stays unchanged on disk. It does not edit that file.
 >
@@ -159,7 +159,7 @@ R3 found that v1's percentile bootstrap undercovered. The B6.3 interval is repor
 | DELTA_POSITIVE | no stop, no incident, thresholds not breached, L > 0 |
 | DELTA_NEGATIVE | no stop, no incident, thresholds not breached, U < 0 |
 | DELTA_INCONCLUSIVE | no stop, no incident, thresholds not breached, L ≤ 0 ≤ U |
-| UNINTERPRETABLE | a missingness threshold is breached, an instrument incident stopped the run, a pre-run gate failed, or a frozen hash changed |
+| UNINTERPRETABLE | a missingness threshold is breached, an instrument incident stopped the run, the run halted (more than 20 INFRA_POST attempts, or a gate, hash or reservation stop), or a pre-run gate failed |
 | UNSUPPORTED_REFINEMENT_SETTING | PROTOCOL_STOP fired (pi0.5) |
 
 DELTA_INCONCLUSIVE is not evidence of no effect. With complete data and n10 = n01 it means the cohort's R22 and R25 success counts were equal.
