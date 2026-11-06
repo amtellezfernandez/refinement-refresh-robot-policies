@@ -120,7 +120,7 @@ This answers a different question from B6.2: what difference would fresh states,
 - **Reported only if** all 400 pairs are complete **and** the R3 coverage check (B6.4) passed. Otherwise it is recorded as not reported, with the reason, and nothing replaces it.
 - **Estimator.** For task t and state slot s, average the two seeds: Ď_ts = (D_ts,810001 + D_ts,810002) / 2. Task mean m_t = (1/5) Σ_s Ď_ts. Estimate = (1/40) Σ_t m_t, with equal task weights. With complete data it equals the exact cohort contrast.
 - **Within-task variance.** s_t² = (1/4) Σ_s (Ď_ts − m_t)². SE² = (1/40²) Σ_t s_t² / 5.
-- **Interval (95%).** Estimate ± c × SE, with **c = t₀.₉₇₅ at 160 degrees of freedom** (= Σ_t (5 − 1)); c ≈ 1.9746. **PROPOSED**: D1 does not name a reference distribution, and the R3 check evaluates this interval exactly as specified here.
+- **Interval (95%).** Estimate ± c × SE, with **c = t₀.₉₇₅ at 160 degrees of freedom** (= Σ_t (5 − 1)); c ≈ 1.9749. **PROPOSED**: D1 does not name a reference distribution, and the R3 check evaluates this interval exactly as specified here.
 - Tasks are fixed, not sampled. The interval says nothing about other tasks, suites or benchmarks.
 
 ### B6.4 R3 coverage check (preregistered; required for B6.3)
