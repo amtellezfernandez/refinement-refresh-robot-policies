@@ -44,7 +44,3 @@ CONFIRMATION_POPULATION = Population(PROTOCOL_B, SUITES, TASK_IDS, STATE_SLOTS, 
 def state_key(suite, task_id, state_slot):
     return "{}.task{:03d}.slot{}".format(suite, task_id, state_slot)
 
-
-def is_reserved_identity(identity_row):
-    """True for any identity carrying a confirmation policy seed (810001, 810002)."""
-    return identity_row.get("policy_seed") in CONFIRMATION_SEEDS

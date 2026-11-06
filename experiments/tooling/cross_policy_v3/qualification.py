@@ -17,6 +17,8 @@ RECORD_DIR = REPO_ROOT / "experiments/protocols/v3_qualification"
 SCHEMA = "cross_policy_v3_qualification_v1"
 STATUSES = ("UNVERIFIED", "PASSED", "FAILED", "NOT_APPLICABLE")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+# PASSED needs these binding values, and the evidence file's JSON must carry the same value under the same key.
+REQUIRED_VERDICTS = {"evaluator": "EVALUATOR_QUALIFIED", "protocol_a_preflight": "PREFLIGHT_PASS"}
 # Which items apply to which model (01 A3a). NOT_APPLICABLE is legal only where this says False.
 ITEMS = {
     "host_renderer": {"pi05": True, "smolvla": True},
@@ -32,6 +34,143 @@ ITEMS = {
     "protocol_a_preflight": {"pi05": True, "smolvla": True},
 }
 
+# Binding keys of every item, as shipped. A record whose keys differ is refused.
+TEMPLATE_BINDING_KEYS = {
+    "pi05": {
+        "action_normalization_clipping": [
+            "loaded_equals_file",
+            "norm_stats_sha256",
+            "openpi_clipping",
+            "quantile_mode",
+            "robosuite_scale_action_clipping"
+        ],
+        "asset_hashes": [
+            "asset_root",
+            "bddl_manifest_sha256",
+            "libero_asset_manifest_sha256"
+        ],
+        "controller_mapping": [
+            "controller_source_sha256",
+            "controller_type",
+            "delta_frame",
+            "input_range",
+            "output_range",
+            "robosuite_version"
+        ],
+        "count_gate": [
+            "att_drill_record_sha256",
+            "cnt_ind_record_sha256",
+            "server_code_sha256",
+            "startup_gate_record_sha256"
+        ],
+        "determinism_config": [
+            "cnt_t_record_sha256",
+            "xla_flags"
+        ],
+        "driver_package_locks": [
+            "cuda_umd",
+            "lock_file_sha256",
+            "native_stack",
+            "nvidia_smi_driver",
+            "openpi_commit",
+            "wsl_driver_library"
+        ],
+        "evaluator": [
+            "protocol_e_record_sha256",
+            "verdict"
+        ],
+        "host_renderer": [
+            "gl_renderer",
+            "gl_vendor",
+            "gl_version",
+            "gpu_uuid",
+            "hostname",
+            "kernel",
+            "mujoco_gl",
+            "os_release",
+            "planned_host",
+            "uname_m"
+        ],
+        "parity": [
+            "noise_match_record_sha256",
+            "p2a_record_sha256",
+            "r9_record_sha256"
+        ],
+        "protocol_a_preflight": [
+            "preflight_record_sha256",
+            "verdict"
+        ],
+        "smolvla_horizons_termination": []
+    },
+    "smolvla": {
+        "action_normalization_clipping": [
+            "evaluator_boundary_mapping",
+            "loaded_equals_file",
+            "normalization_mode",
+            "policy_input_signature",
+            "postprocessor_stats_sha256",
+            "preprocessor_stats_sha256",
+            "robosuite_scale_action_clipping"
+        ],
+        "asset_hashes": [
+            "asset_root",
+            "bddl_manifest_sha256",
+            "libero_asset_manifest_sha256"
+        ],
+        "controller_mapping": [
+            "controller_source_sha256",
+            "controller_type",
+            "delta_frame",
+            "input_range",
+            "output_range",
+            "robosuite_version"
+        ],
+        "count_gate": [
+            "adapter_code_sha256",
+            "scnt_record_sha256"
+        ],
+        "determinism_config": [
+            "allow_tf32",
+            "cublas_workspace_config",
+            "cudnn_benchmark",
+            "torch_use_deterministic_algorithms"
+        ],
+        "driver_package_locks": [
+            "cuda_umd",
+            "lerobot_commit",
+            "lock_file_sha256",
+            "native_stack",
+            "nvidia_smi_driver",
+            "wsl_driver_library"
+        ],
+        "evaluator": [
+            "protocol_e_record_sha256",
+            "verdict"
+        ],
+        "host_renderer": [
+            "gl_renderer",
+            "gl_vendor",
+            "gl_version",
+            "gpu_uuid",
+            "hostname",
+            "kernel",
+            "mujoco_gl",
+            "os_release",
+            "planned_host",
+            "uname_m"
+        ],
+        "parity": [],
+        "protocol_a_preflight": [
+            "preflight_record_sha256",
+            "verdict"
+        ],
+        "smolvla_horizons_termination": [
+            "horizon_by_suite",
+            "success_terminates_by_suite"
+        ]
+    }
+}
+
 
 class Refused(SystemExit):
     pass
@@ -43,6 +182,20 @@ class RecordError(ValueError):
 
 def record_path(model, directory=RECORD_DIR):
     return Path(directory) / "{}.json".format(model)
+
+
+def template_keys(model):
+    """Binding keys per item, fixed by the record shipped in the commit that introduced this module."""
+    return {name: set(keys) for name, keys in TEMPLATE_BINDING_KEYS[model].items()}
+
+
+def _checked_file(root, relative, expected_sha, what, name):
+    path = (Path(root) / str(relative)).resolve()
+    if Path(root).resolve() not in path.parents or not path.is_file():
+        raise RecordError("{}: {} file missing or outside the repository".format(name, what))
+    if not HEX64.match(str(expected_sha)) or file_sha(path) != expected_sha:
+        raise RecordError("{}: {} file hash mismatch".format(name, what))
+    return path
 
 
 def validate(record, model, root=REPO_ROOT):
@@ -62,6 +215,8 @@ def validate(record, model, root=REPO_ROOT):
             raise RecordError("{} does not apply to {}; it must be NOT_APPLICABLE".format(name, model))
         if not isinstance(item.get("bindings"), dict):
             raise RecordError("{}: bindings must be an object".format(name))
+        if set(item["bindings"]) != template_keys(model)[name]:
+            raise RecordError("{}: binding keys differ from the shipped template".format(name))
         evidence = item.get("evidence")
         if status in ("UNVERIFIED", "NOT_APPLICABLE"):
             if evidence is not None:
@@ -72,16 +227,26 @@ def validate(record, model, root=REPO_ROOT):
             raise RecordError("{}: {} with an unbound value".format(name, status))
         if not isinstance(evidence, dict):
             raise RecordError("{}: {} without evidence".format(name, status))
-        for field in ("run_id", "authorisation_sha256", "evidence_path", "evidence_sha256"):
+        for field in ("run_id", "authorisation_path", "authorisation_sha256", "evidence_path", "evidence_sha256"):
             if not evidence.get(field):
                 raise RecordError("{}: evidence lacks {}".format(name, field))
-        if not HEX64.match(evidence["authorisation_sha256"]) or not HEX64.match(evidence["evidence_sha256"]):
-            raise RecordError("{}: malformed evidence hash".format(name))
-        path = (Path(root) / evidence["evidence_path"]).resolve()
-        if Path(root).resolve() not in path.parents or not path.is_file():
-            raise RecordError("{}: evidence file missing or outside the repository".format(name))
-        if file_sha(path) != evidence["evidence_sha256"]:
-            raise RecordError("{}: evidence file hash mismatch".format(name))
+        authorisation = _checked_file(root, evidence["authorisation_path"], evidence["authorisation_sha256"],
+                                      "authorisation", name)
+        try:
+            approved = json.loads(authorisation.read_text("utf-8")).get("approved_by")
+        except ValueError:
+            approved = None
+        if approved != "Alba":
+            raise RecordError("{}: authorisation is not Alba's".format(name))
+        evidence_file = _checked_file(root, evidence["evidence_path"], evidence["evidence_sha256"], "evidence", name)
+        if status == "PASSED" and name in REQUIRED_VERDICTS:
+            try:
+                claimed = json.loads(evidence_file.read_text("utf-8")).get("verdict")
+            except ValueError:
+                claimed = None
+            if item["bindings"].get("verdict") != REQUIRED_VERDICTS[name] or claimed != REQUIRED_VERDICTS[name]:
+                raise RecordError("{}: PASSED needs verdict {} in the binding and in the evidence".format(
+                    name, REQUIRED_VERDICTS[name]))
     return record
 
 
@@ -103,6 +268,14 @@ def require_qualified(model, directory=RECORD_DIR, root=REPO_ROOT):
     if pending:
         raise Refused("REFUSED: {} not qualified; items not PASSED: {}".format(model, ", ".join(pending)))
     return file_sha(record_path(model, directory))
+
+
+def binding(model, item, key, directory=RECORD_DIR, root=REPO_ROOT):
+    """A PASSED item's bound value. Refuses for any item that is not PASSED."""
+    record = load(model, directory, root)
+    if record["items"][item]["status"] != "PASSED":
+        raise Refused("REFUSED: {}.{} is not PASSED".format(model, item))
+    return record["items"][item]["bindings"][key]
 
 
 def summary(model, directory=RECORD_DIR, root=REPO_ROOT):

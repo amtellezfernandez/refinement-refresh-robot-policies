@@ -322,6 +322,9 @@ def overhead(args):
     report = {"xla_flags": os.environ.get("XLA_FLAGS"), "points": {}}
     for label, instrumented in (("attested", True), ("plain", False)):
         keyed, captured = harness.keyed_with(served if instrumented else harness.jit("stock", False))
+        started = time.perf_counter()
+        harness.run(keyed, captured, example, DS[0], json.dumps(["compile"]), instrumented)
+        report["points"]["{}_first_call_s".format(label)] = time.perf_counter() - started
         for d in DS:
             for index in range(100):
                 harness.run(keyed, captured, example, d, json.dumps(["warmup", d, index]), instrumented)
@@ -330,7 +333,7 @@ def overhead(args):
                 started = time.perf_counter()
                 harness.run(keyed, captured, example, d, json.dumps(["measure", d, index]), instrumented)
                 times.append(time.perf_counter() - started)
-            report["points"]["{}_d{}".format(label, d)] = {"host_s": times}
+            report["points"]["{}_d{}".format(label, d)] = {"host_s": times, "memory": so.memory_stats()}
     args.output.mkdir(parents=True, exist_ok=True)
     atomic_write_json(args.output / "cnt_t_attestation.json", report)
 

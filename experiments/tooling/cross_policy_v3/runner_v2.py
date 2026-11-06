@@ -120,12 +120,17 @@ def run_one(journal, row, adapter, run_dir, provenance_sha256, argv, retry_reaso
     context = AttemptContext(journal, path, row, attempt_number, references.get(row["block_id"]), run_dir)
     try:
         result = adapter.run_attempt(context)
-        attempt_class = C.classify_outcome(result["outcome"])
-        reset = (result["settled_state_sha256"], result["first_observation_sha256"])
+        try:
+            attempt_class = C.classify_outcome(result["outcome"])
+            reset = (result["settled_state_sha256"], result["first_observation_sha256"])
+            provenance = result["action_provenance"]
+        except (KeyError, TypeError, ValueError) as error:
+            # A malformed result is an adapter or evaluator contract fault, never a missing outcome.
+            raise C.InstrumentIncident("malformed attempt result: {!r}".format(error))
         journal.update(path, "completed", finished_unix=time.time(), attempt_class=attempt_class,
                        y=C.outcome_value(attempt_class), outcome=result["outcome"],
                        settled_state_sha256=reset[0], first_observation_sha256=reset[1],
-                       settled_state_matches_block=True, action_provenance=result["action_provenance"],
+                       settled_state_matches_block=True, action_provenance=provenance,
                        action_array=result.get("action_array"), timing=result.get("timing"),
                        first_query_marker=context.first_query_started())
         references.setdefault(row["block_id"], reset)
@@ -178,12 +183,18 @@ def execute(rows, journal, adapter, run_dir, provenance_sha256, argv):
 def summarize(rows, journal, run_dir, schedule_sha256, model, run_status):
     classes = classes_by_row(journal)
     finals, accounting = {}, {"attempt_records": 0, "by_class": {c: 0 for c in C.ALL_CLASSES},
-                               "infra_pre_retries": 0, "not_executed": []}
+                               "by_arm_and_suite": {}, "infra_pre_retries": 0, "not_executed": []}
     for row in rows:
         values = classes.get(row["planned_run_id"], [])
         accounting["attempt_records"] += len(values)
+        cell = accounting["by_arm_and_suite"].setdefault(
+            "{}|{}".format(row["condition_id"], row["episode_identity"]["suite"]),
+            dict({c: 0 for c in C.ALL_CLASSES}, infra_pre_retries=0))
         for value in values:
             accounting["by_class"][value] += 1
+            cell[value] += 1
+        if len(values) > 1:
+            cell["infra_pre_retries"] += 1
         if len(values) > 1:
             accounting["infra_pre_retries"] += 1
         final = C.final_class(values)
@@ -222,7 +233,9 @@ def record_started(run_dir, model, schedule_sha256, argv, bound):
 def load_adapter(model, args):
     if model == "pi05":
         import adapter_pi05
-        return adapter_pi05.Pi05ClientAdapter(states_path=args.states, port=args.port)
+        if args.startup_gate is None:
+            raise SystemExit("REFUSED: pi0.5 needs --startup-gate (the server's startup_gate.json)")
+        return adapter_pi05.Pi05ClientAdapter(states_path=args.states, port=args.port, startup_gate=args.startup_gate)
     import adapter_smolvla
     return adapter_smolvla.SmolVLAAdapter(states_path=args.states, checkpoint=args.checkpoint)
 
@@ -237,6 +250,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--port", type=int, default=8000, help="pi0.5 attesting server port")
     parser.add_argument("--checkpoint", type=Path, help="SmolVLA checkpoint directory")
+    parser.add_argument("--startup-gate", type=Path, help="pi0.5: the attesting server's startup_gate.json")
     args = parser.parse_args()
     # Gates first: nothing below may import a simulator or framework until both pass.
     bound = release.check_release(args.schedule, args.model)

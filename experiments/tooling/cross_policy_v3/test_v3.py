@@ -176,6 +176,9 @@ class FakeAdapter(object):
             raise ConnectionError("websocket lost")
         if action == "incident":
             raise C.InstrumentIncident("attestation check 4 failed")
+        if action == "malformed":
+            return {"outcome": {"success": True, "termination_reason": "task_horizon"},
+                    "settled_state_sha256": "s", "first_observation_sha256": "o", "action_provenance": []}
         success = action == "success"
         return {"outcome": {"success": success, "termination_reason": "success" if success else "task_horizon"},
                 "settled_state_sha256": "s", "first_observation_sha256": "o", "action_provenance": []}
@@ -233,6 +236,17 @@ class Runner(unittest.TestCase):
         self.assertEqual(len(adapter.calls), calls)  # nothing ran after the stop
         summary = R.summarize(self.rows, journal, self.dir, "x", "pi05", status)
         self.assertEqual(len(summary["accounting"]["not_executed"]), 2)
+
+    def test_malformed_result_is_incident(self):
+        planned = self.rows[0]["planned_run_id"]
+        status, code, journal = self.run_until_done(FakeAdapter({(planned, 0): "malformed"}))
+        self.assertEqual(status, "STOPPED_INSTRUMENT_INCIDENT")
+
+    def test_accounting_by_arm_and_suite(self):
+        status, code, journal = self.run_until_done(FakeAdapter({}))
+        summary = R.summarize(self.rows, journal, self.dir, "x", "pi05", status)
+        cells = summary["accounting"]["by_arm_and_suite"]
+        self.assertEqual(sum(c[C.SCI_SUCCESS] for c in cells.values()), 6)
 
     def test_interrupted_after_first_query_is_post(self):
         journal = AttemptJournal(self.dir / "attempts")
@@ -331,11 +345,55 @@ class Qualification(unittest.TestCase):
             with self.assertRaises(Q.Refused):
                 Q.require_qualified(model)
 
+    def test_changed_binding_keys_rejected(self):
+        record = json.loads(Q.record_path("pi05").read_text())
+        record["items"]["evaluator"]["bindings"] = {}
+        with self.assertRaises(Q.RecordError):
+            Q.validate(record, "pi05")
+
+    def test_passed_needs_alba_authorisation_and_verdict(self):
+        root = Path(tempfile.mkdtemp())
+        (root / "auth.json").write_text(json.dumps({"approved_by": "Alba"}))
+        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_DISAGREES"}))
+        record = json.loads(Q.record_path("pi05").read_text())
+        item = record["items"]["evaluator"]
+        item["status"] = "PASSED"
+        item["bindings"] = {"protocol_e_record_sha256": "x", "verdict": "EVALUATOR_QUALIFIED"}
+        item["evidence"] = {"run_id": "r", "authorisation_path": "auth.json",
+                            "authorisation_sha256": Q.file_sha(root / "auth.json"),
+                            "evidence_path": "ev.json", "evidence_sha256": Q.file_sha(root / "ev.json")}
+        with self.assertRaises(Q.RecordError):  # evidence says DISAGREES
+            Q.validate(record, "pi05", root=root)
+        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_QUALIFIED"}))
+        item["evidence"]["evidence_sha256"] = Q.file_sha(root / "ev.json")
+        Q.validate(record, "pi05", root=root)  # well-formed; still a synthetic record, not a qualification
+
     def test_passed_without_evidence_rejected(self):
         record = json.loads(Q.record_path("pi05").read_text())
         record["items"]["parity"]["status"] = "PASSED"
         with self.assertRaises(Q.RecordError):
             Q.validate(record, "pi05")
+
+
+class R3Record(unittest.TestCase):
+    def record(self, coverage):
+        import r3_coverage as R3
+        cells = [dict(c, coverage=(coverage if c["feasible"] else None)) for c in R3.cells()]
+        return {"schema": R3.SCHEMA, "status": "PASS", "criterion": R3.CRITERION, "replicates": R3.REPLICATES,
+                "grid_sha256": R3.grid_sha256(), "analysis_sha256": Q.file_sha(AN.__file__),
+                "authorisation_sha256": "a" * 64, "cells": cells}
+
+    def check(self, record):
+        path = Path(tempfile.mkdtemp()) / "r3.json"
+        path.write_text(json.dumps(record))
+        return AN.check_r3_record(path)[0]
+
+    def test_recomputed_from_cells(self):
+        self.assertTrue(self.check(self.record(0.95)))
+        self.assertFalse(self.check(self.record(0.92)))  # self-declared PASS with failing cells is refused
+        unbound = self.record(0.95)
+        del unbound["authorisation_sha256"]
+        self.assertFalse(self.check(unbound))
 
 
 class Evaluator(unittest.TestCase):

@@ -28,7 +28,7 @@ CERTIFIED_XLA_FLAGS = "--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level
 class Pi05ClientAdapter(object):
     model = "pi05"
 
-    def __init__(self, states_path, port):
+    def __init__(self, states_path, port, startup_gate):
         import numpy as np
         import client_openpi as co  # frozen v2 module, imported unchanged
         from libero.libero import benchmark
@@ -41,6 +41,12 @@ class Pi05ClientAdapter(object):
         self.client = co.connect(port)
         metadata = self.client.get_server_metadata()
         gate = metadata.get("startup_gate_sha256")
+        # 09 C4 check 6: the value comes from the server's startup record on disk, which must say GATE_OK.
+        record = json.loads(Path(startup_gate).read_text("utf-8"))
+        if record.get("GATE_OK") is not True or file_sha(startup_gate) != gate:
+            raise SystemExit("REFUSED: startup gate record missing, not GATE_OK, or not the served one")
+        if record.get("server_code_sha256") != metadata.get("server_code_sha256"):
+            raise SystemExit("REFUSED: startup gate record was written by different server code")
         if metadata.get("xla_flags") != CERTIFIED_XLA_FLAGS:
             raise SystemExit("REFUSED: server XLA flags {!r} are not the certified flags".format(metadata.get("xla_flags")))
         self.verifier = A.Verifier(gate, CERTIFIED_XLA_FLAGS)
@@ -74,9 +80,13 @@ class Pi05ClientAdapter(object):
         except Exception as error:
             raise InfraPre("environment build failed: {!r}".format(error))
         try:
-            return self._rollout(context, env, prompt, state, ident, h, d)
-        finally:
-            env.close()
+            result = self._rollout(context, env, prompt, state, ident, h, d)
+        except BaseException:
+            _close_quietly(env)
+            raise
+        # A close failure after a finished episode must not turn its outcome into a missing value.
+        result["timing"]["env_close_error"] = _close_quietly(env)
+        return result
 
     def _rollout(self, context, env, prompt, state, ident, h, d):
         np, co = self.np, self.co
@@ -138,3 +148,11 @@ class Pi05ClientAdapter(object):
 
     def close(self):
         return None
+
+
+def _close_quietly(env):
+    try:
+        env.close()
+        return None
+    except Exception as error:  # recorded, never raised: the outcome is already fixed
+        return repr(error)

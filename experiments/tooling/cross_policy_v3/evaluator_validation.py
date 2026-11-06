@@ -293,13 +293,16 @@ def run_fixture_smolvla(fixture, root, forbidden_hashes):
             raise EvaluatorIncident("own BDDL parse differs from the env's goal_state")
         horizon = int(base._max_episode_steps)
         trace = []
+        # Step the single underlying env, not the vector wrapper: a vector env may autoreset on termination,
+        # and the goal must be read from the state the step produced.
+        single = env.envs[0]
         for step, action in enumerate(actions_for(fixture, horizon, root)[:horizon]):
-            _, _, terminated, truncated, info = env.step(np.asarray([action], dtype=np.float32))
+            _, _, terminated, truncated, info = single.step(np.asarray(action, dtype=np.float32))
             goal, per_atom = independent_goal(problem, atoms)
-            ended = bool(terminated[0]) or bool(truncated[0])
+            ended = bool(terminated) or bool(truncated)
             trace.append({"step": step, "recorded_success": rp.batch_one_success(info), "independent_goal": goal,
-                          "per_atom": per_atom, "episode_ended": ended, "terminated": bool(terminated[0]),
-                          "truncated": bool(truncated[0])})
+                          "per_atom": per_atom, "episode_ended": ended, "terminated": bool(terminated),
+                          "truncated": bool(truncated)})
             if ended:
                 break
     finally:
@@ -314,8 +317,11 @@ def main():
     parser.add_argument("--fixtures", type=Path, required=True)
     parser.add_argument("--authorisation", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--confirmation-manifest", type=Path, action="append", default=[])
+    parser.add_argument("--confirmation-manifest", type=Path, action="append", required=True,
+                        help="both models' confirmation state manifests; fixture states must not collide (ISO)")
     args = parser.parse_args()
+    if len(args.confirmation_manifest) != 2:
+        raise SystemExit("REFUSED: give both models' confirmation manifests for the ISO check")
     # E-AUTH before any env construction (13 E7).
     release.check_authorisation(args.authorisation, PROTOCOL_E_DOCUMENT,
                                 {"fixtures": args.fixtures, "evaluator_validation.py": __file__},

@@ -238,13 +238,32 @@ def check_r3_record(path):
         return False, "R3 record criterion or replicate count differs"
     if record.get("status") != "PASS":
         return False, "R3 coverage check did not pass"
+    if not record.get("authorisation_sha256"):
+        return False, "R3 record is not bound to an authorisation"
+    # Recompute the pass from the cells; never trust the record's own status alone.
+    expected = r3_coverage.cells()
+    cells = record.get("cells", [])
+    if [{k: c.get(k) for k in ("baseline", "discordance", "delta", "rho", "feasible")} for c in cells] != expected:
+        return False, "R3 record cells differ from the preregistered grid"
+    for cell in cells:
+        if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and cell["coverage"] >= r3_coverage.CRITERION):
+            return False, "R3 record has a feasible cell below the criterion"
     return True, "R3 coverage check passed"
 
 
 # ---------- top level ----------
 
-def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPULATION):
+def check_journal(summary, journal_dir):
+    """The summary's journal checksums must match the journal on disk (finding: summary not trusted alone)."""
+    from journal import AttemptJournal
+    if AttemptJournal(journal_dir).checksums() != summary.get("journal_checksums"):
+        raise ValueError("runner summary does not match the attempt journal on disk")
+
+
+def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPULATION, journal_dir=None):
     model = schedule["model"]
+    if journal_dir is not None:
+        check_journal(summary, journal_dir)
     if summary.get("model") != model or summary.get("schedule_sha256") != schedule["schedule_sha256"]:
         raise ValueError("runner summary is for a different model or schedule")
     status = summary.get("run_status")
@@ -294,13 +313,14 @@ def main():
     parser.add_argument("--schedule", type=Path, required=True)
     parser.add_argument("--summary", type=Path, required=True, help="runner_v2.py run_summary.json")
     parser.add_argument("--r3-record", type=Path)
+    parser.add_argument("--journal", type=Path, required=True, help="the run's attempts/ directory")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("REFUSED: output exists")
     schedule = json.loads(args.schedule.read_text("utf-8"))
     summary = json.loads(args.summary.read_text("utf-8"))
-    report = analyze(schedule, summary, args.r3_record)
+    report = analyze(schedule, summary, args.r3_record, journal_dir=args.journal)
     report["analysis_sha256"] = file_sha(__file__)
     atomic_write_json(args.output, report)
     print(json.dumps({"model": report["model"], "verdict": report["verdict"]}))

@@ -18,6 +18,17 @@ class Refused(SystemExit):
     pass
 
 
+# Every file whose behaviour decides an attempt's class or the analysis (01: certified = executed; 02 B5).
+RUNTIME_FILES = ("v3common.py", "classify.py", "runner_v2.py", "attestation.py", "adapter_pi05.py",
+                 "adapter_smolvla.py", "server_openpi_v3.py", "release.py", "qualification.py", "analysis_v2.py",
+                 "r3_coverage.py", "make_schedule_v2.py")
+
+
+def code_hashes():
+    here = Path(__file__).resolve().parent
+    return {name: file_sha(here / name) for name in RUNTIME_FILES}
+
+
 def release_path(root=REPO_ROOT):
     return Path(root) / "review/releases" / (PROTOCOL_B + ".release.json")
 
@@ -39,6 +50,11 @@ def check_release(schedule_path, model, root=REPO_ROOT, document=PROTOCOL_B_DOCU
         raise Refused("REFUSED: release does not match the Protocol B document hash")
     if model not in release.get("released_models", []):
         raise Refused("REFUSED: {} is not released".format(model))
+    if release.get("v3_code_sha256") != code_hashes():
+        raise Refused("REFUSED: release does not bind this exact v3 code")
+    qualification_record = Path(root) / "experiments/protocols/v3_qualification" / "{}.json".format(model)
+    if release.get("qualification_sha256_by_model", {}).get(model) != file_sha(qualification_record):
+        raise Refused("REFUSED: release does not bind this model's qualification record")
     try:
         bound = launch_guard.verify_released_schedule(Path(root), "confirmation", PROTOCOL_B, release,
                                                       schedule_path, model)

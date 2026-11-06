@@ -8,13 +8,14 @@
         "evaluator_boundary_mapping": null,
         "loaded_equals_file": null,
         "normalization_mode": null,
+        "policy_input_signature": null,
         "postprocessor_stats_sha256": null,
         "preprocessor_stats_sha256": null,
         "robosuite_scale_action_clipping": null
       },
       "decision": "D7",
       "evidence": null,
-      "requirement": "Normalization file hashes, loaded-statistics equality and mode; where any clipping happens, from pinned source",
+      "requirement": "Normalization file hashes, loaded-statistics equality and mode; where any clipping happens, from pinned source; the policy input signature (key -> shape, dtype) recorded at Protocol A defines a valid input in Protocol B (02 B5, D7)",
       "status": "UNVERIFIED"
     },
     "asset_hashes": {

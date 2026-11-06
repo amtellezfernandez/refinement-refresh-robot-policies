@@ -22,19 +22,24 @@ from classify import InfraPre, InstrumentIncident  # noqa: E402
 from v3common import V2, file_sha, sha  # noqa: E402
 
 
-def batch_is_valid(batch):
-    """Valid input (02 B5): a non-empty batch with a task string and every tensor finite and non-empty."""
+def input_signature(batch):
+    """key -> [shape, dtype] for tensors, key -> type name otherwise. Recorded at Protocol A."""
+    import torch
+    return {key: ([list(value.shape), str(value.dtype)] if isinstance(value, torch.Tensor) else type(value).__name__)
+            for key, value in sorted(batch.items())}
+
+
+def batch_is_valid(batch, expected_signature):
+    """Valid input (02 B5): exactly the key set, shapes and dtypes bound at Protocol A, all floats finite."""
     import torch
     if not isinstance(batch, dict) or not batch:
         return False, "batch is not a non-empty dict"
-    if "task" not in batch:
-        return False, "batch has no task"
+    signature = input_signature(batch)
+    if signature != expected_signature:
+        return False, "input signature differs from the qualified one"
     for key, value in batch.items():
-        if isinstance(value, torch.Tensor):
-            if value.numel() == 0:
-                return False, "empty tensor {}".format(key)
-            if value.is_floating_point() and not bool(torch.isfinite(value).all()):
-                return False, "non-finite input {}".format(key)
+        if isinstance(value, torch.Tensor) and value.is_floating_point() and not bool(torch.isfinite(value).all()):
+            return False, "non-finite input {}".format(key)
     return True, None
 
 
@@ -60,6 +65,9 @@ class SmolVLAAdapter(object):
         self.states = np.load(states_path)
         self.checkpoint = checkpoint
         self.policy, self.pre, self.post, self.native = rp.load_policy_and_processors(checkpoint)
+        import qualification
+        self.expected_signature = qualification.binding("smolvla", "action_normalization_clipping",
+                                                        "policy_input_signature")
 
     def stack_config(self):
         return {"model": "smolvla", "stack": "lerobot_liberoenv", "python": sys.version.split()[0],
@@ -87,9 +95,12 @@ class SmolVLAAdapter(object):
         except Exception as error:
             raise InfraPre("environment build failed: {!r}".format(error))
         try:
-            return self._rollout(context, env, env_pre, env_post, state)
-        finally:
-            env.close()
+            result = self._rollout(context, env, env_pre, env_post, state)
+        except BaseException:
+            _close_quietly(env)
+            raise
+        result["timing"]["env_close_error"] = _close_quietly(env)
+        return result
 
     def _rollout(self, context, env, env_pre, env_post, state):
         np, torch, rp, rs = self.np, self.torch, self.rp, self.rs
@@ -124,7 +135,7 @@ class SmolVLAAdapter(object):
                                           else _null()):
                 for tick in range(int(base._max_episode_steps)):
                     batch = rp.prepare_observation(observation, env, env_pre, pre)
-                    valid, why = batch_is_valid(batch)
+                    valid, why = batch_is_valid(batch, self.expected_signature)
                     if not valid:
                         raise InstrumentIncident("invalid policy input at tick {}: {}".format(tick, why), tick=tick)
                     generates = len(policy._queues[ACTION]) == 0
@@ -191,6 +202,14 @@ class SmolVLAAdapter(object):
 
     def close(self):
         return None
+
+
+def _close_quietly(env):
+    try:
+        env.close()
+        return None
+    except Exception as error:  # recorded, never raised: the outcome is already fixed
+        return repr(error)
 
 
 class _null(object):

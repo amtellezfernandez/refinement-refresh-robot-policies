@@ -139,6 +139,7 @@ def main():
     if args.output.exists():
         raise SystemExit("REFUSED: output exists; the check's record is never replaced")
     record = run_check()
+    record["authorisation_sha256"] = file_sha(args.authorisation)
     atomic_write_json(args.output, record)
     print(json.dumps({"status": record["status"], "failing_cells": record["failing_cells"]}))
 
