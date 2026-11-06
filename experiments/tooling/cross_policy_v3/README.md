@@ -62,3 +62,28 @@ Implementation of protocol v3 revision 2 with Alba's decisions D1–D8 (`review/
 - **LeRobot and LIBERO internals.** Attributes such as `base._env.env`, `parsed_problem`, `object_states_dict` and `_max_episode_steps` were read from a local hf-libero 0.1.4 copy. That copy is not the planned host's stack, and the OpenPI submodule's copy was not read.
 - **Fresh-process retry.** It needs a launcher that relaunches on exit code 75. No launcher is written.
 - **B904 style.** `ruff` flags re-raises without `from`, matching the house style of the frozen modules.
+- **Second whole-schedule run.** It is not detected across output directories. `launches.jsonl` records relaunches in one directory and is not read by the analysis.
+- **Attestation digest.** It detects corruption, not forgery: the server computes it. Gaps in sequence numbers are allowed. The order of time values is not checked.
+- **Checks not written.** R9 parity, P2a preprocessing, SRC, UNITS, the SmolVLA normalization and action-mapping checks, ISO for Protocol A, and the CNT-T flags-on/off comparison have no code yet. Only qualification placeholders exist for them.
+- **Release format.** The release must carry `v3_code_sha256` (the hash of every file in `release.RUNTIME_FILES`) and `qualification_sha256_by_model`. This is our proposal; Alba has not seen it.
+
+## Independent review (one round, AI reviewer, read-only, nothing run)
+
+17 findings. Addressed in code or docs:
+- qualification evidence (1);
+- code and qualification hashes bound in the release (2);
+- the client reads the startup gate record and requires GATE_OK (3);
+- a close failure can no longer erase an outcome (4);
+- a malformed result is an instrument incident (5);
+- input validity uses the input signature bound at Protocol A (6);
+- the R3 pass is recomputed from the cells and bound to an authorisation (7);
+- the SmolVLA fixtures step the single env, avoiding autoreset (8; LeRobot source not read, so the risk is avoided rather than verified);
+- the π0.5 `done` claim is narrowed to the client horizon, and the ISO manifests are mandatory (9);
+- the overhead mode records first-call time and memory, and the docs now say the flags comparison is a separate unwritten tool (10);
+- accounting by arm and suite (11);
+- HALTED is listed under UNINTERPRETABLE (12);
+- the journal checksums are checked by the analysis (13);
+- an unused helper was removed (14);
+- the preallocate binding nothing asked for was removed (16).
+
+Not addressed, and listed as limits above: 12 (whole-schedule rerun detection), 15 (attestation minor points) and 17 (checks not written).
