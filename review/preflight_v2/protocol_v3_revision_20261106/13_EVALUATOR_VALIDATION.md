@@ -27,17 +27,17 @@ A fixture is: `{stack, suite, task_id, initial_state, action_source, expected_ca
 - **Action source:** either
   - **scripted:** a fixed, written-down action sequence, such as the stock no-op `[0, 0, 0, 0, 0, 0, −1]` repeated; or
   - **saved:** a version-matched saved action array, bound by its sha256, recorded in the same stack version (D3).
-- **Cases per stack (PROPOSED, small):** for each of the four suites, one task (task 0 unless the fixture needs another):
+- **Cases per stack:** for each of the four suites, one task (task 0 unless the fixture needs another):
 
 | Case | Action source | Expected independent goal truth | Expected evaluator outcome |
 |---|---|---|---|
 | GOAL_UNMET | scripted no-op, 20 steps after settling | false at every step | no success at any step; no termination before step 20 |
 | HORIZON | scripted no-op until the stack's horizon | false at every step | no success; the episode ends exactly at the stack's horizon for that suite, and the horizon value is recorded |
-| GOAL_REACHED | saved, version-matched action array | becomes true at some step k | success at step k, and termination behaviour at k recorded |
+| GOAL_REACHED | saved version-matched actions or a frozen scripted action array | becomes true at some step k | success at step k, and termination behaviour at k recorded |
 
 That is 12 fixtures per stack, 24 in total.
 
-**Goal-reached fixtures do not exist yet for either stack.** No policy may produce them under this protocol. Admissible sources are a version-matched replay of a recorded demonstration, or a scripted sequence, provided its source and sha256 are bound before the counted run. If no admissible goal-reached fixture can be produced for a stack, that stack's evaluator qualification cannot pass, and this is reported rather than worked around. This is open question 4 in `12` §5.
+**Goal-reached fixtures do not exist yet for either stack.** No policy may produce them under this protocol. Admissible sources are a version-matched replay of a recorded demonstration, or a scripted sequence, provided its source and sha256 are bound before the counted run. If no admissible goal-reached fixture can be produced for a stack, that stack's evaluator qualification cannot pass, and this is reported rather than worked around. Prefer saved actions. For a scripted trajectory, freeze the script and its action array with separate hashes. A goal teleport alone does not qualify the rollout path.
 
 ## E4. Independent inspection
 

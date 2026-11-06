@@ -67,17 +67,17 @@ Every attempt record is append-only and is written ahead of the attempt. Each at
 | Class | Condition | Y | Run continues? |
 |---|---|---|---|
 | **SCI_SUCCESS** | the success signal became true | 1 | yes |
-| **SCI_FAILURE** | the horizon was reached, or the env terminated, without success. Includes any policy behaviour: dropping objects, collisions, stalls. **For SmolVLA, also a non-finite policy action under valid inputs (D7):** the action is not applied and the episode ends at that tick | 0 | yes |
+| **SCI_FAILURE** | the horizon was reached, or the env terminated, without success. Includes any policy behaviour: dropping objects, collisions, stalls. **For both models, also a non-finite policy action under valid inputs with verified model attribution:** the action is not applied and the episode ends at that tick | 0 | yes |
 | **INFRA_PRE** | failure **before the first policy query**: env build error, state restore error, settled or first-observation hash mismatch (`check_reset`), server unreachable | missing; one retry (B7) | yes |
 | **INFRA_POST** | failure **after the first policy query** that is not an instrument incident: process crash, OOM, websocket loss, host fault, watchdog timeout | missing; **no retry** | yes, up to the B9 halt |
-| **INSTRUMENT_INCIDENT** | **pi0.5 (D5):** a served chunk whose executed-step attestation is missing, unparseable, not bound to this request identifier and tick, or not equal to d. **SmolVLA (D7):** a broken action contract (wrong shape, dtype or dimension count) or unclear provenance (no generation record behind an executed action; provenance hash mismatch), an input that fails validity at a policy query, or a generation whose counted denoise steps differ from d (the v2 count, checked per generation before the action is applied rather than once per episode). The action is **never applied**. An incident record is written for investigation | missing | **no: the model run stops for review** |
-| **PROTOCOL_STOP** | pi0.5 only, unchanged from v1 `stop_rule_pi05`: non-finite action, wrong chunk shape or a chunk shorter than h, the server not echoing the configured d, or d unsupported (`unsupported_refinement_setting`) | not a missing value | **no: the model's phase stops** |
+| **INSTRUMENT_INCIDENT** | **pi0.5 (D5):** a served chunk whose executed-step attestation is missing, unparseable, not bound to this request identifier and tick, or not equal to d. **Both models:** a broken action contract (wrong shape, dtype or dimension count) or unclear provenance (no generation record behind an executed action; provenance hash mismatch), an input that fails validity at a policy query, or a generation whose counted denoise steps differ from d (the v2 count, checked per generation before the action is applied rather than once per episode). The action is **never applied**. An incident record is written for investigation | missing | **no: the model run stops for review** |
+| **PROTOCOL_STOP** | pi0.5 only: the server not echoing the configured d, or d unsupported (`unsupported_refinement_setting`) | not a missing value | **no: the model's phase stops** |
 
 Scientific failures are outcomes and are never excluded. An infrastructure failure is never recoded as a scientific failure, and a scientific failure is never recoded as an infrastructure failure. An instrument incident is never recoded as either.
 
 **Valid inputs (SmolVLA, D7).** At each policy query the batch passed to the policy has the expected keys and shapes, every numeric field is finite, and the attempt's reset hashes matched. A non-finite action with valid inputs is SCI_FAILURE. A non-finite action with invalid inputs is an INSTRUMENT_INCIDENT.
 
-**π0.5 non-finite actions and wrong shapes** stay PROTOCOL_STOP as written in v1. D7 does not cover π0.5, so the two models classify these events differently. This is open question 1 in `12` §5.
+**π0.5 attribution.** A non-finite action is a scientific failure only when the request and tick have a valid count attestation, transformed inputs were finite, and the raw model output was non-finite. A broken chunk contract or uncertain attribution is an instrument incident.
 
 **The classifier** is written as a function of record fields: `termination_reason`, the exception class (`ResetStateMismatch`, transport error, `RESOURCE_EXHAUSTED`, `unsupported_refinement_setting`, attestation failure, contract failure), and whether a first-query marker exists. It is fixed and hashed before release. It exists as code in the implementation draft PR (`cross_policy_v3/classify.py`) and has not been run on any real attempt.
 
@@ -120,18 +120,18 @@ This answers a different question from B6.2: what difference would fresh states,
 - **Reported only if** all 400 pairs are complete **and** the R3 coverage check (B6.4) passed. Otherwise it is recorded as not reported, with the reason, and nothing replaces it.
 - **Estimator.** For task t and state slot s, average the two seeds: Ď_ts = (D_ts,810001 + D_ts,810002) / 2. Task mean m_t = (1/5) Σ_s Ď_ts. Estimate = (1/40) Σ_t m_t, with equal task weights. With complete data it equals the exact cohort contrast.
 - **Within-task variance.** s_t² = (1/4) Σ_s (Ď_ts − m_t)². SE² = (1/40²) Σ_t s_t² / 5.
-- **Interval (95%).** Estimate ± c × SE, with **c = t₀.₉₇₅ at 160 degrees of freedom** (= Σ_t (5 − 1)); c ≈ 1.9749. **PROPOSED**: D1 does not name a reference distribution, and the R3 check evaluates this interval exactly as specified here.
+- **Interval (95%).** Estimate ± c × SE, with **c = t₀.₉₇₅ at 160 degrees of freedom** (= Σ_t (5 − 1)); c ≈ 1.9749. The R3 check evaluates this candidate exactly as specified here.
 - Tasks are fixed, not sampled. The interval says nothing about other tasks, suites or benchmarks.
 
 ### B6.4 R3 coverage check (preregistered; required for B6.3)
 
 R3 found that v1's percentile bootstrap undercovered. The B6.3 interval is reported only if a synthetic coverage check, run **before release with the outcomes unseen**, passes.
 
-- **Generative model (PROPOSED).** Each pair's joint outcome is one of {11, 10, 01, 00}, with base probabilities from baseline success b = P(R25 = 1), Delta Δ and discordance q = P(R22 ≠ R25): π10 = (q + Δ)/2, π01 = (q − Δ)/2, π11 = b − π01, π00 = 1 − π11 − π10 − π01. Task-level heterogeneity: π_t ~ Dirichlet(κ π) with κ = (1 − ρ)/ρ (none when ρ = 0). State-level heterogeneity inside a task: π_ts ~ Dirichlet(κ π_t), with the same ρ. The two seeds of a state are independent draws from π_ts. The 40 × 5 × 2 layout matches B3.
+- **Generative model.** Each pair's joint outcome is one of {11, 10, 01, 00}, with base probabilities from baseline success b = P(R25 = 1), Delta Δ and discordance q = P(R22 ≠ R25): π10 = (q + Δ)/2, π01 = (q − Δ)/2, π11 = b − π01, π00 = 1 − π11 − π10 − π01. Task-level heterogeneity: π_t ~ Dirichlet(κ_task π) with κ_task = (1 − ρ_task)/ρ_task. State-level heterogeneity inside a task: π_ts ~ Dirichlet(κ_state π_t), with κ_state = (1 − ρ_state)/ρ_state. Zero rho at either level disables that level's heterogeneity. The two seeds of a state are independent draws from π_ts. The 40 × 5 × 2 layout matches B3.
 - **Target in each replicate:** the fresh-state difference on that replicate's 40 tasks, (1/40) Σ_t (π_t,10 − π_t,01). The check measures coverage of the B6.3 question, conditional on the tasks.
-- **Grid (PROPOSED):** b ∈ {0.20, 0.50, 0.80, 0.95}; q ∈ {0.02, 0.10, 0.30}; Δ ∈ {−0.15, −0.05, 0, +0.05, +0.15}; ρ ∈ {0, 0.25, 0.5}.
+- **Grid:** b ∈ {0.20, 0.50, 0.80, 0.95}; q ∈ {0.02, 0.10, 0.30}; Δ ∈ {−0.15, −0.05, 0, +0.05, +0.15}; ρ_task and ρ_state each independently ∈ {0, 0.25, 0.5}.
 - **Feasibility rule:** a cell is evaluated only if q ≥ |Δ| and all four π lie in [0, 1]. Infeasible cells are listed, not evaluated.
-- **Replicates:** 2,000 per feasible cell (Monte Carlo SE about 0.005 at 0.95). Seed 20261107. **PROPOSED**.
+- **Replicates:** 2,000 per feasible cell (Monte Carlo SE about 0.005 at 0.95). Seed 20261107. The check requires a separate authorization.
 - **Criterion:** empirical coverage ≥ 0.93 in **every** feasible cell. Otherwise the check fails, and B6.3 is not reported. Any replacement interval would need a new decision by Alba before release, made from synthetic output only.
 - **Binding:** the check's result record names the sha256 of the analysis code and of the grid. The analysis refuses an R3 record whose hashes differ.
 - **Disclosed expectation, not a prediction about outcomes.** At low discordance (q = 0.02) many tasks will have no discordant pair in a replicate, so s_t² = 0 for those tasks and the interval can be very short. Cells of this kind may fail the criterion. The check is designed to detect exactly this, and its result is reported whichever way it goes.
