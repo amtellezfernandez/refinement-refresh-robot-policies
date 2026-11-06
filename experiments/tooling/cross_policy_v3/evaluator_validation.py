@@ -141,6 +141,10 @@ def validate_fixtures(document, stack, root=Path(".")):
         for field in ("fixture_id", "suite", "task_id", "initial_state", "action_source", "expected_case"):
             if field not in fixture:
                 raise FixtureError("fixture lacks {}".format(field))
+        if not isinstance(fixture["fixture_id"], str) or not re.fullmatch(
+            r"[A-Za-z0-9_-]+", fixture["fixture_id"]
+        ):
+            raise FixtureError("fixture_id must be a safe file-name component")
         if fixture["fixture_id"] in seen:
             raise FixtureError("duplicate fixture_id")
         seen.add(fixture["fixture_id"])
@@ -386,31 +390,80 @@ def run_fixture_smolvla(fixture, root, forbidden_hashes):
     return trace, horizon, {"bddl_sha256": bddl_sha, "goal_atoms": atoms, "benchstudio_samples": samples}
 
 
+def confirmation_inputs(paths):
+    """Verify that the ISO inputs cover the two real model-native populations."""
+    from make_schedule_v2 import validate_manifest
+
+    by_model = {}
+    forbidden = set()
+    for path in paths:
+        document = json.loads(path.read_text("utf-8"))
+        model = document.get("model") if isinstance(document, dict) else None
+        if model not in STACKS or model in by_model:
+            raise FixtureError("supply one confirmation manifest per model")
+        states = validate_manifest(document, model)
+        forbidden.update(row["state_sha256"] for row in states.values())
+        by_model[model] = path
+    return by_model, forbidden
+
+
+def protocol_e_inputs(stack, fixtures, manifests, runtime=None):
+    """Prepare a review payload without initializing a simulator or authorizing a run."""
+    bound = {"fixtures": fixtures, "evaluator_validation.py": __file__}
+    document = json.loads(fixtures.read_text("utf-8"))
+    coverage = validate_fixtures(document, stack, fixtures.resolve().parent)
+    by_model, forbidden = confirmation_inputs(manifests)
+    for model, path in sorted(by_model.items()):
+        bound["confirmation_manifest_" + model] = path
+    if runtime is not None:
+        identity = json.loads(runtime.read_text("utf-8"))
+        required = {"runner", "checkpoint", "simulator_stack", "renderer", "assets", "normalization"}
+        if (
+            not isinstance(identity, dict) or not required.issubset(identity)
+            or not all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+                       for value in identity.values())
+        ):
+            raise FixtureError("BenchStudio runtime identity is incomplete or invalid")
+        bound["benchstudio_runtime"] = runtime
+    report = {
+        "scope": "PROTOCOL_E_" + stack.upper(),
+        "document_sha256": file_sha(PROTOCOL_E_DOCUMENT),
+        "bound": {name: file_sha(path) for name, path in sorted(bound.items())},
+        "missing_confirmation_manifests": sorted(set(STACKS) - set(by_model)),
+        "missing_cases": coverage["missing_cases"],
+    }
+    report["ready_for_review"] = not (
+        report["missing_confirmation_manifests"] or report["missing_cases"]
+    )
+    return report, bound, document, coverage, forbidden
+
+
 def main():
-    import release
     parser = argparse.ArgumentParser(description="Protocol E evaluator validation (needs Alba's authorisation).")
     parser.add_argument("--stack", required=True, choices=STACKS)
     parser.add_argument("--fixtures", type=Path, required=True)
-    parser.add_argument("--authorisation", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--authorisation", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--check-inputs", action="store_true", help="Review inputs only. No native imports.")
     parser.add_argument("--benchstudio-runtime", type=Path, help="Separately captured native runtime identities.")
-    parser.add_argument("--confirmation-manifest", type=Path, action="append", required=True,
+    parser.add_argument("--confirmation-manifest", type=Path, action="append", default=[],
                         help="both models' confirmation state manifests; fixture states must not collide (ISO)")
     args = parser.parse_args()
-    if len(args.confirmation_manifest) != 2:
-        raise SystemExit("REFUSED: give both models' confirmation manifests for the ISO check")
+    if not args.check_inputs and (args.authorisation is None or args.output is None):
+        parser.error("native execution requires --authorisation and --output")
+    report, bound, document, coverage, forbidden = protocol_e_inputs(
+        args.stack, args.fixtures, args.confirmation_manifest, args.benchstudio_runtime
+    )
+    if args.check_inputs:
+        print(json.dumps(report, indent=2, sort_keys=True))
+        raise SystemExit(0 if report["ready_for_review"] else 2)
+    if not report["ready_for_review"]:
+        raise SystemExit("REFUSED: incomplete Protocol E inputs; run --check-inputs")
     # E-AUTH before any env construction (13 E7).
-    bound = {"fixtures": args.fixtures, "evaluator_validation.py": __file__}
-    if args.benchstudio_runtime is not None:
-        bound["benchstudio_runtime"] = args.benchstudio_runtime
-    release.check_authorisation(args.authorisation, PROTOCOL_E_DOCUMENT, bound,
-                                scope="PROTOCOL_E_" + args.stack.upper())
+    import release
+
+    release.check_authorisation(args.authorisation, PROTOCOL_E_DOCUMENT, bound, scope=report["scope"])
     root = args.fixtures.resolve().parent
-    document = json.loads(args.fixtures.read_text("utf-8"))
-    coverage = validate_fixtures(document, args.stack, root)
-    forbidden = set()
-    for path in args.confirmation_manifest:
-        forbidden |= {row["state_sha256"] for row in json.loads(path.read_text("utf-8"))["states"]}
     args.output.mkdir(parents=True, exist_ok=False)
     import os
     os.environ.setdefault("MUJOCO_GL", "osmesa")
@@ -430,7 +483,7 @@ def main():
     verdict = stack_verdict(results, coverage["missing_cases"], incident)
     record = {"stack": args.stack, "verdict": verdict, "coverage": coverage, "incident": incident,
               "results": results, "fixtures_sha256": file_sha(args.fixtures), "harness_sha256": file_sha(__file__),
-              "results_sha256": sha(results)}
+              "results_sha256": sha(results), "input_sha256": report["bound"]}
     atomic_write_json(args.output / "protocol_e_record.json", record)
     if args.benchstudio_runtime is not None:
         runtime = json.loads(args.benchstudio_runtime.read_text("utf-8"))

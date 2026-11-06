@@ -103,3 +103,28 @@ qualification bundle.
 
 This handoff uses JSON so the OpenPI Python 3.8 evaluator does not import
 BenchStudio. Native qualification remains UNVERIFIED.
+
+
+## Check Protocol E inputs before booking the native host
+
+Run the following separately for `pi05` and `smolvla`:
+
+```sh
+python experiments/tooling/cross_policy_v3/evaluator_validation.py \
+  --check-inputs --stack pi05 --fixtures PATH_TO_FIXTURES \
+  --confirmation-manifest PATH_TO_PI05_MANIFEST \
+  --confirmation-manifest PATH_TO_SMOLVLA_MANIFEST \
+  --benchstudio-runtime PATH_TO_CAPTURED_RUNTIME_JSON
+```
+
+This imports neither native stack, writes no authorization, and emits the
+missing cases/manifests plus exact file digests for review. Both confirmation
+manifests are required for ISO before native execution, but this command can
+report missing inputs without generating them. `--benchstudio-runtime` is
+optional unless a BenchStudio evaluator export is needed.
+
+Only after separate authorization, replace `--check-inputs` with
+`--authorisation APPROVAL_JSON --output NEW_DIRECTORY` on the matching
+pinned stack. The authorization must include the two ISO manifest hashes
+under `confirmation_manifest_pi05` and `confirmation_manifest_smolvla`.
+With the runtime argument, a qualifying run also emits `evaluator.json`.
