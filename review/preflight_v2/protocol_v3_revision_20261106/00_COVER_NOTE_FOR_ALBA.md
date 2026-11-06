@@ -26,7 +26,7 @@ The superseded requirements, including the t₃₉ interval, McNemar, the option
 
 ## Four questions your decisions leave open
 
-1. **π0.5 non-finite actions.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure. For π0.5 the written rule (v1 `stop_rule_pi05`) stops the phase instead. I have kept that as written, so the two models classify the same event differently. Do you want π0.5 to follow D7 too?
+1. **π0.5 non-finite actions and wrong chunk shapes.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure, and a broken SmolVLA action contract an instrument incident. For π0.5 the written rule (v1 `stop_rule_pi05`) stops the phase in both cases instead. I have kept that as written, so the two models classify the same event differently. Do you want π0.5 to follow D7 too?
 2. **R3 coverage check.** The grid, generative model, replicate count and seed in `02` B6.4 are my drafting choices (PROPOSED). Please confirm or replace them before the check is run. I expect that some low-discordance cells may fail, because tasks with no discordant pair contribute zero variance; the check is meant to detect exactly that.
 3. **Secondary interval reference distribution.** Student t at 160 degrees of freedom (PROPOSED, `02` B6.3).
 4. **Goal-reached fixtures for Protocol E.** Neither stack has one. Is a version-matched replay of a LIBERO demonstration acceptable as the source (`13` E3)?

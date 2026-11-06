@@ -59,7 +59,7 @@
 
 ## 5. Questions these decisions leave open (raised in `00`, not decided here)
 
-1. **Non-finite action, π0.5.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure. The written π0.5 rule (B5, v1 `stop_rule_pi05`) still treats a non-finite action as PROTOCOL_STOP. The two models therefore classify the same event differently. Kept as written until Alba says otherwise.
+1. **Non-finite action and broken action contract, π0.5.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure, and a broken SmolVLA action contract an instrument incident. The written π0.5 rule (B5, v1 `stop_rule_pi05`) still treats a non-finite action or a wrong chunk shape as PROTOCOL_STOP. The two models therefore classify the same event differently. Kept as written until Alba says otherwise.
 2. **R3 coverage-check grid and generative model.** D1 requires the check; its concrete grid points, generative model and replicate count are drafting choices (`02` B6.4, marked PROPOSED).
 3. **Secondary-interval reference distribution.** Student t with 160 degrees of freedom is a drafting choice (`02` B6.3, PROPOSED). The R3 check evaluates it as specified.
 4. **Source of goal-reached fixtures for Protocol E.** D3 permits saved actions or scripted fixtures. Neither exists yet for either stack (`13` E4).
