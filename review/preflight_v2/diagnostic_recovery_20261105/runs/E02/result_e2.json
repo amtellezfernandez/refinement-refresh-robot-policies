@@ -1,0 +1,223 @@
+{
+ "S0_sha": "06003c8790b26bf85eb969319e0cfd234a47f4168a4ac9ef4bdf89fdca00f8bc",
+ "F_max_abs_vs_first": [
+  0.0,
+  0.0,
+  0.0
+ ],
+ "H_fresh_after_set": {
+  "timestep": 0,
+  "done": false,
+  "horizon": 1000,
+  "ignore_done": false,
+  "goal_pos": [
+   -0.208465,
+   0.0,
+   1.173279
+  ],
+  "goal_ori": [
+   [
+    -0.000492,
+    0.998387,
+    -0.056777
+   ],
+   [
+    1.0,
+    0.000493,
+    0.0
+   ],
+   [
+    2.8e-05,
+    -0.056777,
+    -0.998387
+   ]
+  ],
+  "relative_ori": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "ori_ref": null
+ },
+ "H_dirty_after_set": {
+  "timestep": 30,
+  "done": false,
+  "horizon": 1000,
+  "ignore_done": false,
+  "goal_pos": [
+   -0.179554,
+   0.121568,
+   1.167044
+  ],
+  "goal_ori": [
+   [
+    -0.250183,
+    0.708996,
+    -0.659343
+   ],
+   [
+    0.841305,
+    0.496235,
+    0.214377
+   ],
+   [
+    0.479182,
+    -0.501075,
+    -0.720631
+   ]
+  ],
+  "relative_ori": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "ori_ref": null
+ },
+ "H_simstate_restored_exact": true,
+ "X_reused_resetgoal_vs_fresh": [
+  0.3069662647566065,
+  0.4743344728129857,
+  0.5424554870201836
+ ],
+ "X_reused_noreset_vs_fresh": [
+  0.5445590600652715,
+  0.6522267474784063
+ ],
+ "X_fresh_resetgoal_vs_fresh": 0.0,
+ "U": {
+  "zero": {
+   "eef_delta_5steps_m": [
+    -0.0,
+    -0.0,
+    0.0
+   ],
+   "axisangle_delta": [
+    0.0,
+    -0.0,
+    -0.0
+   ],
+   "gripper_qpos_delta": [
+    0.00033,
+    -0.00033
+   ]
+  },
+  "+x0.5": {
+   "eef_delta_5steps_m": [
+    0.02155,
+    0.0,
+    -0.00527
+   ],
+   "axisangle_delta": [
+    0.00068,
+    0.0,
+    0.02869
+   ],
+   "gripper_qpos_delta": [
+    0.00033,
+    -0.00033
+   ]
+  },
+  "-x0.5": {
+   "eef_delta_5steps_m": [
+    -0.02154,
+    0.0,
+    0.00498
+   ],
+   "axisangle_delta": [
+    -0.00095,
+    -0.0,
+    -0.02902
+   ],
+   "gripper_qpos_delta": [
+    0.00033,
+    -0.00033
+   ]
+  },
+  "+x1.0": {
+   "eef_delta_5steps_m": [
+    0.04405,
+    -0.0,
+    -0.00945
+   ],
+   "axisangle_delta": [
+    0.00102,
+    0.0,
+    0.05046
+   ],
+   "gripper_qpos_delta": [
+    0.00033,
+    -0.00033
+   ]
+  },
+  "+y0.5": {
+   "eef_delta_5steps_m": [
+    -0.00045,
+    0.02694,
+    -0.00011
+   ],
+   "axisangle_delta": [
+    0.002,
+    0.00502,
+    0.00061
+   ],
+   "gripper_qpos_delta": [
+    0.00042,
+    -0.00025
+   ]
+  },
+  "+z0.5": {
+   "eef_delta_5steps_m": [
+    -0.00178,
+    0.0,
+    0.02722
+   ],
+   "axisangle_delta": [
+    0.0002,
+    0.0,
+    0.00736
+   ],
+   "gripper_qpos_delta": [
+    0.00033,
+    -0.00033
+   ]
+  },
+  "+rz0.5": {
+   "eef_delta_5steps_m": [
+    8e-05,
+    0.00599,
+    8e-05
+   ],
+   "axisangle_delta": [
+    -0.0224,
+    0.32514,
+    6e-05
+   ],
+   "gripper_qpos_delta": [
+    0.00035,
+    -0.00033
+   ]
+  },
+  "grip+1": {
+   "eef_delta_5steps_m": [
+    -0.0,
+    0.0,
+    0.0
+   ],
+   "axisangle_delta": [
+    0.0,
+    -0.0,
+    -0.0
+   ],
+   "gripper_qpos_delta": [
+    -0.01343,
+    0.01343
+   ]
+  }
+ },
+ "P_render_repeat_max_abs": [
+  0,
+  0,
+  0
+ ],
+ "P_negative_control_agent_vs_wrist_max_abs": 224
+}

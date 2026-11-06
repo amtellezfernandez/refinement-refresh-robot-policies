@@ -1,0 +1,43 @@
+=== attempt 1 2026-11-05T23:06:49Z
+libero_source /home/warren/alba-cross-policy-20261101/src/openpi/third_party/libero
+driver_sha256 e0d3a1ff5f291abee8c8b8e4ec35d3b6c0a140ccb6e49c47d79588c1591a4cc7
+rc_osmesa=0
+[Warning]: datasets path /home/warren/alba-cross-policy-20261101/src/openpi/third_party/libero/libero/libero/../datasets does not exist!
+STATUS completed osmesa
+rc_egl=0
+[Warning]: datasets path /home/warren/alba-cross-policy-20261101/src/openpi/third_party/libero/libero/libero/../datasets does not exist!
+STATUS completed egl
+COMPARE {"S0": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}, "agentview": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}, "wrist": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}, "pin_image": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}, "pin_state": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}, "E3_final": {"equal": true, "max_abs": 0.0, "frac_diff": 0.0}}
+BEGIN_RESULT
+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
+END_RESULT
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/pdr-E01/attempts
+a1b69f3f0bedf825942afbd8cb6f5d9ec7fae104c045b98f6fb6f090e47abd8a  /home/warren/jobs/pdr-E01/cmd
+70f26c6ed8714f242a231fd2ffc568c9d67b70327d85aa8e71c7815b032ae271  /home/warren/jobs/pdr-E01/cmdpid
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/pdr-E01/cwd
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/pdr-E01/hb
+0dfca9696c897ad468d249c60d4cf2bd2fda7f4d78d8a0945088e715641be9bd  /home/warren/jobs/pdr-E01/libero_rev.txt
+893065cabda29bfe9b33427f3c8947a4501c65f25ae00046db6009d65a6ce4e2  /home/warren/jobs/pdr-E01/log
+b2a7aa146685aa661794217bcb42f639f39bd7943020189f9e9493e6a427a0a6  /home/warren/jobs/pdr-E01/out/E3_final_egl.npy
+b2a7aa146685aa661794217bcb42f639f39bd7943020189f9e9493e6a427a0a6  /home/warren/jobs/pdr-E01/out/E3_final_osmesa.npy
+36ebea18fa2d4586a8c0bfc7d24203bbf9d295029d9736c463a0016f5c696a7c  /home/warren/jobs/pdr-E01/out/S0_egl.npy
+36ebea18fa2d4586a8c0bfc7d24203bbf9d295029d9736c463a0016f5c696a7c  /home/warren/jobs/pdr-E01/out/S0_osmesa.npy
+d61522f23b65d8a1a61c85c54cfc1da96d34663eb8178a6977516f3395c37d8d  /home/warren/jobs/pdr-E01/out/agentview_egl.npy
+d61522f23b65d8a1a61c85c54cfc1da96d34663eb8178a6977516f3395c37d8d  /home/warren/jobs/pdr-E01/out/agentview_osmesa.npy
+7e8b0b6f24c4927e497aa32f670b536e7ebf49ffd2833a35c246795d28925ed1  /home/warren/jobs/pdr-E01/out/compare.json
+af2d99ab4b2be9d84232f96243ea7f3259647b486d4b6981b2c252cb0c262cde  /home/warren/jobs/pdr-E01/out/pin_image_egl.npy
+af2d99ab4b2be9d84232f96243ea7f3259647b486d4b6981b2c252cb0c262cde  /home/warren/jobs/pdr-E01/out/pin_image_osmesa.npy
+84fb2e1a2ceb0b5bc2dc0b80c85f80e233d74d0dba6cc86ac6f3f1dd9d5f80cc  /home/warren/jobs/pdr-E01/out/pin_state_egl.npy
+84fb2e1a2ceb0b5bc2dc0b80c85f80e233d74d0dba6cc86ac6f3f1dd9d5f80cc  /home/warren/jobs/pdr-E01/out/pin_state_osmesa.npy
+538d03eb5852c2319599d86b59b9870fc39be0cf2c836287c9b848a13d99f86a  /home/warren/jobs/pdr-E01/out/result_egl.json
+0bb7158e874a0a2d46d6891d58f330a04aaab29c9249132eb26b9c2ad204c265  /home/warren/jobs/pdr-E01/out/result_osmesa.json
+b94a3072f0a9c08b5f1ccb185a013354c22df0d5d9115cc7d84be2dd8667ff37  /home/warren/jobs/pdr-E01/out/wrist_egl.npy
+b94a3072f0a9c08b5f1ccb185a013354c22df0d5d9115cc7d84be2dd8667ff37  /home/warren/jobs/pdr-E01/out/wrist_osmesa.npy
+e0d3a1ff5f291abee8c8b8e4ec35d3b6c0a140ccb6e49c47d79588c1591a4cc7  /home/warren/jobs/pdr-E01/pdr_e_sim.py
+b8335a530f629a731b00b3690c36a8db43b016ab7fc5a3f2f8817dd00413ca26  /home/warren/jobs/pdr-E01/pid
+d2838e190ef43c81b9d4562600c66a25d891266935a8dde01ccc14e51aeb5b13  /home/warren/jobs/pdr-E01/python_egl.log
+c8145de9ba6d9129b4b98f7cc85d27e50ac7c5c7a32c207328e94104851d8e73  /home/warren/jobs/pdr-E01/python_osmesa.log
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/pdr-E01/retries
+db157252d7da09a71861d4fc41017006a1042bd8a667fb3d3049d7ec50d19cd6  /home/warren/jobs/pdr-E01/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/pdr-E01/status
+a541a85771c72707a1efa405af4473c6eb15ecc31f2cea318f2a4b28e00ee28e  /home/warren/jobs/pdr-E01/tag

@@ -1,0 +1,10 @@
+=== attempt 1 2026-11-05T23:13:22Z
+driver_sha256 c1793e2d87b9a191c78d8768ecd9637e0f7794a0b312ace12299661818c01611
+36ebea18fa2d4586a8c0bfc7d24203bbf9d295029d9736c463a0016f5c696a7c  /home/warren/jobs/pdr-E01/out/S0_osmesa.npy
+python_rc=0
+[Warning]: datasets path /home/warren/alba-cross-policy-20261101/src/openpi/third_party/libero/libero/libero/../datasets does not exist!
+[Warning]: datasets path /home/warren/alba-cross-policy-20261101/src/openpi/third_party/libero/libero/libero/../datasets does not exist!
+STATUS completed {"fresh_vs_fresh": 0.0, "none": [0.5754599749917942, 0.7945704932919251], "warm": [0.5754599749917942, 0.7945704932919251], "goal": [0.3069662647566065, 0.4743344728129857], "warm+goal": [0.3069662647566065, 0.4743344728129857], "warm+goal+ts": [0.3069662647566065, 0.474334472812985
+BEGIN_RESULT
+H4sICNMN7WoCA3Jlc3VsdF9lMy5qc29uAK2NywrCMBRE9/mK0G2LJDf30fFXREoXVRfaQiO6EP/dWEHcKu5mDpyZm/PVbh7yobvkbgnV2odVaAofp3EobeN8IWLCAhgD0cDULLQkscBIhAiS6Pz2aV77+fSbuZ/649tMQaFKyiaqQeVlsnFKzEZtJLRiH5/1H/T6nL9fcPcHe2/EPkkBAAA=
+END_RESULT

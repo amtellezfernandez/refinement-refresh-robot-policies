@@ -1,0 +1,3 @@
+rc_det1=0
+rc_det2=0
+rc_def=0

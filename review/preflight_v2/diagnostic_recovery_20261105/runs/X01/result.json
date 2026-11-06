@@ -1,0 +1,43 @@
+{
+ "example_sha": {
+  "observation/state": "064003f5802794cc7a1ce7b18925b41e526f4796ca75760b71437c12c2b4ebdf",
+  "observation/image": "c6fca23aa5619f9aaa7de275a021a323df72c93f8e266e0f7d685aede16e0137",
+  "observation/wrist_image": "465a78e90f688923f5154185fc8edc6c88ef402a05bc9f9d1706c514233419e0",
+  "prompt": "do something"
+ },
+ "eager_counts": {
+  "2": 2,
+  "5": 5,
+  "10": 10
+ },
+ "compiled_repeat_bitwise": {
+  "2": true,
+  "5": true,
+  "10": true
+ },
+ "eager_vs_compiled_max_abs": {
+  "2": 0.023432824218750037,
+  "5": 0.008636357666015615,
+  "10": 0.009700933593749905
+ },
+ "eager_vs_compiled_bitwise": {
+  "2": false,
+  "5": false,
+  "10": false
+ },
+ "compiled_between_d_max_abs": {
+  "2v5": 0.2831467451620697,
+  "5v10": 0.07414292285156243
+ },
+ "compiled_sha": {
+  "2": "9ab226de4c390e8b06f9619d5ee681cf646c59e0260806be57a26119ebd734fe",
+  "5": "684b7bb862ac64461708bafd17c23e6d4d73f13300246b45f59d5e4f9cb1614e",
+  "10": "ab6370d149ba2a3f78e3398555a754bb867cfeb7e7ef1212de4fe203a3a5af4c"
+ },
+ "eager_sha": {
+  "2": "a6461b29f059d87fce60a4159d254c66db6ae69f4e870d3d141eaebcbe364671",
+  "5": "29c3e5cc7c8080761268f713e72751a7899ecdaa20438c1ecc2ac97a886436d5",
+  "10": "81d020ab0c74b8223ed6c4740bb56af5d7da8b2b6f3aa82a74127be75f9fcedb"
+ },
+ "status": "completed"
+}

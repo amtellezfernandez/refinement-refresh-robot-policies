@@ -1,0 +1,27 @@
+=== attempt 1 2026-11-05T23:18:31Z
+driver_sha256 7502bdaa29880b58cec4bf5aea60d9c7a4613f6b41481f9b75eea7f1fe86edcc
+python_rc=0
+STATUS completed {"P": {"2": 2, "5": 5, "10": 10}, "M3": {"2": 2, "5": 5, "10": 10}, "M5": {"2": 4, "5": 10, "10": 20}, "M6": {"2": 1, "5": 1, "10": 1}}
+peak_line 23:19:32 memavail_gib=38 gpu_used_mib=9146
+BEGIN_RESULT
+H4sICAQP7WoCA3Jlc3VsdC5qc29uAJ1Ty27CMBC85ysinxHybvwKf9BDpf5BZBsHIlGCiEMrIf69toHGVFAJLtHMKjOTnWiPRUnct/7cbVwzeO3Dc63JoiRUMEqrliuKsmbWSg3WSQOqRm4YOI6iZbIWVksuBTUSWCUtoEXDnFm2ZBac36Cx/bj1Q3A8FmVJPi6gJBgQzhLkAfIzBBow0IBPcUDeq2cF/EbAJgHQTIGZQtwoIFPkEfH9IknIsht84/tmt9Hd9v5mdE4nn1+SnAJ7uN48dl5TgTz7ijlTChUgf2TCX4oWf1QcEKmkFeThYZyPLi6XWVaJ6fxXN7j/KvH70U3GE0uekT5qpdWbIVNm9I6Uv5opnslMPFs/rd1sXbdam37cNyu9u5aAh3OPGA5EhRNJTRJ+uP4QqVKTySYe4Bhvhdg+XqR3S1KcfgDbSu5CowMAAA==
+END_RESULT
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/pdr-F01/attempts
+7c77f466a63b82c84f12e14b95728abd2b76638c715f83ee5d657d2f1007c2ca  /home/warren/jobs/pdr-F01/cmd
+9b4297f2c3af932afa1ed413a1069deb5b9c54d59cb8927b49d4bdba0112e9b8  /home/warren/jobs/pdr-F01/cmdpid
+c065d32fe15860c01241249f23d655fcb12c1b29281c791d51dc2587a02f610e  /home/warren/jobs/pdr-F01/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/pdr-F01/cwd
+c413ad2a0000ba4dd5ec4a1ec866e53e2888746c72f8177c76987ddc31df459c  /home/warren/jobs/pdr-F01/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/pdr-F01/hb
+7285e6840a08f5929ff6164384aa7155dcf73631d26f4ddc2917780a840fe07f  /home/warren/jobs/pdr-F01/log
+613eebd0a6d14f3b5dba311641c62b74d740bd84356ea9bd3038da4a5ca74b9f  /home/warren/jobs/pdr-F01/openpi_rev.txt
+5879dd6aa0b219f7e7dc288159bb10c0b573e903f17b284cc061c41dfd5f75ba  /home/warren/jobs/pdr-F01/out/result.json
+7502bdaa29880b58cec4bf5aea60d9c7a4613f6b41481f9b75eea7f1fe86edcc  /home/warren/jobs/pdr-F01/pdr_f_falsify.py
+ab1abd683dd68b045d629244a31ce46d18bf540d1880d215712327d75ceafcc8  /home/warren/jobs/pdr-F01/pid
+9a8fda43973c449f5f76bf5db4fc0fbe52c852c6dfbc83d589a800e062337432  /home/warren/jobs/pdr-F01/python.log
+74095d0b4139b3eeaa8950251004a259e31905637ed5fe6343c3af2c3901f2e9  /home/warren/jobs/pdr-F01/rc.txt
+70ce37fe40d332ddf2b4241cab4bfb33eb82aeeff172f540a15a8e5185d85004  /home/warren/jobs/pdr-F01/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/pdr-F01/retries
+26c9084dddb4cb7efad9bfd5a922283457401eed080d0711a35b4a6ef4d8afac  /home/warren/jobs/pdr-F01/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/pdr-F01/status
+636d6aad94394ce88153f7a9eb1c468e159b8c6b0281d663324ff0ad55f2e911  /home/warren/jobs/pdr-F01/tag

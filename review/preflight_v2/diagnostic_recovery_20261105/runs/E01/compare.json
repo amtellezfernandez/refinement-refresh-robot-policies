@@ -1,0 +1,32 @@
+{
+ "S0": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ },
+ "agentview": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ },
+ "wrist": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ },
+ "pin_image": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ },
+ "pin_state": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ },
+ "E3_final": {
+  "equal": true,
+  "max_abs": 0.0,
+  "frac_diff": 0.0
+ }
+}

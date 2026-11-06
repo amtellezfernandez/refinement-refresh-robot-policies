@@ -1,0 +1,6 @@
+STATUS D_done True
+STATUS variant plain {'2': [0, 0], '5': [0, 0], '10': [0, 0]}
+STATUS variant cb {'2': [2, 2], '5': [5, 5], '10': [10, 10]}
+STATUS variant M1 {'2': [10, 10], '5': [10, 10], '10': [10, 10]}
+STATUS variant M2 {'2': [3, 3], '5': [6, 6], '10': [11, 11]}
+STATUS completed

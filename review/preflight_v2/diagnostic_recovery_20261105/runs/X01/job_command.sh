@@ -1,0 +1,18 @@
+set -o pipefail
+W=$HOME/alba-cross-policy-20261101; C=$W/code-078e166/experiments/tooling/cross_policy; JD=$HOME/jobs/pdr-X01; OUT=$JD/out; mkdir -p $JD $OUT
+exec 9>$HOME/local-science-programme-20261008/gpu.lock; flock -n 9 || { echo GPU_LOCK_HELD; exit 3; }
+( while sleep 2; do a=$(awk '/MemAvailable/{print int($2/1048576)}' /proc/meminfo); if [ "$a" -lt 6 ]; then echo "WATCHDOG_FIRED $a $(date -u +%T)" >> $JD/watchdog.txt; pkill -f pdr_x_eager_vs_compiled.py; fi; done ) & WD=$!
+( while sleep 3; do echo "$(date -u +%T) memavail_gib=$(awk '/MemAvailable/{print int($2/1048576)}' /proc/meminfo) gpu_used_mib=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits)" >> $JD/resources.txt; done ) & RS=$!
+export MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa LD_LIBRARY_PATH="$W/syslibs/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}" OMP_NUM_THREADS=3 MKL_NUM_THREADS=3 OPENBLAS_NUM_THREADS=3 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 CUBLAS_WORKSPACE_CONFIG=:4096:8 XLA_PYTHON_CLIENT_PREALLOCATE=false ALBA_GPU_RESERVATION=R018 PDR_RUN_ID=X01
+env | grep -E '^(XLA|JAX|CUDA|OMP|MKL|OPENBLAS|HF_|TRANSFORMERS|ALBA|LD_LIB|MUJOCO|PYOPENGL|CUBLAS|PDR)' | sort > $JD/env.txt
+sha256sum $C/server_openpi.py $C/common.py $C/launch_guard.py $C/provenance.py > $JD/code_sha256.txt; (cd $W/src/openpi && git rev-parse HEAD && git status --porcelain | wc -l) > $JD/openpi_rev.txt
+echo H4sICGIN7WoCA3Bkcl94X2VhZ2VyX3ZzX2NvbXBpbGVkLnB5AL1VUW/bOAx+96/geS/yzvWS9LIDAvSh13RDr0NStCluQFAIiqXEWhzJk+Q0wdD/fpQcJ2mRHfZ0AYxQFMmPH0nT7377UFvzYSbVB6HWUG1dodV5FMfx3fAevg5AsIUw5Pec5YUAI0rBrEhgbSHXq0qWgoNWMB5dgxWC48lulSuEkzlIVdUuxWsBldG5sDaD0Xh0djV+HE1uRp9heHP5eTR+mNxcZVF0pY0RubPAYK0lh9xoa892jgGMGWkRi1x2uh7/L/yrLSJyOZ8LI5SDWu2SWLGloKWcCaOp2LBVVYomHZtkUW2R0gAqbuiGBnp0bWlLJ6u2cDUeXtPhzT1c3d5NYPw4oX8/jEe+KJFcVdo4KJgtMH4K3zClFElbZJAG+9Q7wIXXZcws1tPuU3o49I4P50+Rlyvmikxi7saRDgZJWpRvbJOCqleYErOgKoB3oPR3NoDrPzq91gr91shBV0JV0hta/cZwbvQKmvus0qXMpbDZrjzhvIVdrFOFOxFrXrJNptSmdZsZyRciJKk2dHd67RfZgmFVSraacQao3ZUwQ32v/5GoKmM218rJRa2xRcawbaNsRJYkmdOzrROWoFiIDZcLYR1JjoD+PO9G6GOY4nqV+WEgvU7vY7fb6SdRy+fiFEuSRPd48yPenSmmFQ/gx3IABEWyTkDOEcaBtNgqx1QuyBp76UwCorQC0GKuDSxTWOOswS5OJp1YYcYvL1GpmZ9NnAydeZn4aUmipdi22lsv3oWGkMY6iT7d4p2fsozjIFgyjedyI/iZ0tKK+CmJ/OD6zPkAjsoVouJQ4ZtBuMwd2eWTAqWc0gvuhRCDoikqPt0myTRmuZNaWYwbyHDPhPRS6KfQ7SQvAaz3v6FpIxcIdpipbKJHo68ZpTkrS0qjKOJivttKUi2IFeU8hfcMn/fL52QQAf507TCIj/X2PlzjS5bNSp0vaY3DV1IjGN8SdDpc5xjf0LACsZVBbYSrjfKxMYmfJoi4++SisGpSXGWIY30NX1J8ohPMm7xxIC6/fBn/cz2kQzQnPG2g8yI4N3IINsUpJDx5aqYo6CgXTb1LraumPynsu5IXSesTwoTUptwHOOpqXrRGDXBlpHIkfphcTh4fGp84BZ6+ySLF9VDb4mJiapH8Z218T6L7adws4SZK7JNoRH/VrmVsSyWYozPpnsPg+xo0gAOYaV2GXeHTpuJ7zUriHZFRGj4dPZSSoyHzupcD8tH6pyu2oWxmXwPM8W10AWFmyb5YZ7ADSTL0Ir8I8MsMWpx0D3MK4BBXuGchFH1DIe6t+/EbBiFeb0+gvyeQQtxfdzsn7ft7+25n7/A6Bb8zX9Hym7NN/qfFOenVkj9yC6rgh+vX1Q2/AF4KJ3gc7bckuU/D547glxgpPcdITCp8I9xFN4lej/HB//Xc/gsMF2GoGQkAAA== | base64 -d | gunzip > $JD/pdr_x_eager_vs_compiled.py
+[ "$(sha256sum $JD/pdr_x_eager_vs_compiled.py | cut -c1-64)" = "42c78e2566516df78347931906009fae790bd55b17ad89ef141e624ce04fc9fc" ] || { echo DRIVER_HASH_MISMATCH; exit 7; }; echo "driver_sha256 42c78e2566516df78347931906009fae790bd55b17ad89ef141e624ce04fc9fc"
+taskset -c 0-2 timeout 2400 $W/envs/openpi/bin/python $JD/pdr_x_eager_vs_compiled.py $C $W/ckpt/checkpoints/pi05_libero $OUT/result.json  > $JD/python.log 2>&1
+rc=$?; echo "python_rc=$rc" > $JD/rc.txt; cat $JD/rc.txt
+kill $WD $RS 2>/dev/null
+grep -E "STATUS|MARK|RESOURCE_EXHAUSTED|Error" $JD/python.log | tail -40 | cut -c1-300
+sort -t= -k3 -n $JD/resources.txt | tail -1 | sed 's/^/peak_line /'
+echo BEGIN_RESULT; gzip -9c $OUT/result.json 2>/dev/null | base64 -w0; echo; echo END_RESULT
+find $JD -type f | sort | xargs sha256sum
+exit $rc

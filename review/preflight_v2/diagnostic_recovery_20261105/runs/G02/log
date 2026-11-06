@@ -1,0 +1,73 @@
+=== attempt 1 2026-11-05T23:44:23Z
+driver_sha256 e533a605a577f79677a33959ca99f2f23da4f1f4e138eeaefd1a816e5bfa8fff
+rc_det1=0
+rc_det2=0
+rc_def=0
+python_rc=0
+STATUS B W1 [False, False, False]
+STATUS completed GATE_OK=True
+STATUS A stock [True, True, True]
+STATUS A P [True, True, True]
+STATUS A M1 [False, False, True]
+STATUS A M2 [False, False, False]
+STATUS A M3 [False, False, True]
+STATUS A M5 [False, False, False]
+STATUS A M6 [False, False, False]
+STATUS A K [False, False, False]
+STATUS A W1 [False, False, False]
+STATUS B stock [True, True, True]
+STATUS B P [True, True, True]
+STATUS B M1 [False, False, True]
+STATUS B M2 [False, False, False]
+STATUS B M3 [False, False, True]
+STATUS B M5 [False, False, False]
+STATUS B M6 [False, False, False]
+STATUS B K [False, False, False]
+STATUS B W1 [False, False, False]
+STATUS completed GATE_OK=True
+STATUS A stock [True, True, True]
+STATUS A P [True, True, True]
+STATUS A M1 [False, False, True]
+STATUS A M2 [False, False, False]
+STATUS A M3 [False, False, True]
+STATUS A M5 [False, False, False]
+STATUS A M6 [False, False, False]
+STATUS A K [False, False, False]
+STATUS A W1 [False, False, False]
+STATUS B stock [True, True, True]
+STATUS B P [True, True, True]
+STATUS B M1 [False, False, True]
+STATUS B M2 [False, False, False]
+STATUS B M3 [False, False, True]
+STATUS B M5 [False, False, False]
+STATUS B M6 [False, False, False]
+STATUS B K [False, False, False]
+STATUS B W1 [False, False, False]
+STATUS completed GATE_OK=True
+peak_line 23:55:23 memavail_gib=38 gpu_used_mib=9150
+BEGIN_RESULT
+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
+END_RESULT
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  /home/warren/jobs/pdr-G02/attempts
+731ea62788249f0cb0ca9da2e42603ef9739763a7ab995c1de6cc8db91fc3d4d  /home/warren/jobs/pdr-G02/cmd
+664c21a0e04efb7dd8a2cf5ac636de370f7decfd04485b4dbf60d530a663b0da  /home/warren/jobs/pdr-G02/cmdpid
+c065d32fe15860c01241249f23d655fcb12c1b29281c791d51dc2587a02f610e  /home/warren/jobs/pdr-G02/code_sha256.txt
+8605b02d4377add726c4ad56ac40136c01a74bd1aa92a88ff408a83011a8e380  /home/warren/jobs/pdr-G02/cwd
+3d04fa43567286075014d00f031d6f718f37023d633fd2cb0648a3fe8746c079  /home/warren/jobs/pdr-G02/env.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  /home/warren/jobs/pdr-G02/hb
+17d42d697409a4beda02779f1c992eef76e40fbd13ae6c05854e7c0d37f502f7  /home/warren/jobs/pdr-G02/log
+613eebd0a6d14f3b5dba311641c62b74d740bd84356ea9bd3038da4a5ca74b9f  /home/warren/jobs/pdr-G02/openpi_rev.txt
+f82e98d4e419e97ce385b36eb725fa0e1855ad5fa1472d37489593f8abeefe1c  /home/warren/jobs/pdr-G02/out/r_def.json
+7fa07969740f58330ce51a33880eaa6ff24de2fe6fe0576c65bfb8050610f925  /home/warren/jobs/pdr-G02/out/r_det1.json
+7fa07969740f58330ce51a33880eaa6ff24de2fe6fe0576c65bfb8050610f925  /home/warren/jobs/pdr-G02/out/r_det2.json
+cb9febe4ed857468f8e3ddc0f05263a100b6684d0e5ab51e1d07b890c7b61801  /home/warren/jobs/pdr-G02/out/result.json
+e533a605a577f79677a33959ca99f2f23da4f1f4e138eeaefd1a816e5bfa8fff  /home/warren/jobs/pdr-G02/pdr_g2_gate.py
+49fec537d94640b7b1dc4dd76ede6b80b094c8cd354cf47de1f5edaad0772822  /home/warren/jobs/pdr-G02/pid
+2cfed353f7d0f305a1f1062a1063b49df61f559776ed9f5454955f61c2d728db  /home/warren/jobs/pdr-G02/python.log
+74095d0b4139b3eeaa8950251004a259e31905637ed5fe6343c3af2c3901f2e9  /home/warren/jobs/pdr-G02/rc.txt
+e5c21be0e37d65ed77b67449a582510cbbe9e0cc4adff8b3def69c28fe7b95ae  /home/warren/jobs/pdr-G02/rcs.txt
+77bf8eb155371951bc630d8eb675a9610920e1c852c8a65d2e366ea498fe70aa  /home/warren/jobs/pdr-G02/resources.txt
+9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  /home/warren/jobs/pdr-G02/retries
+288c3c368a6cbd7ade60d618f7f99ef3baf6272c843db7be8b0ec12b3b5940a0  /home/warren/jobs/pdr-G02/started
+a4ecc5c87d811bbff7a118c17ef8cf83318cb623a103c15b8549089aa2a7f0ac  /home/warren/jobs/pdr-G02/status
+d947d092cbec6fb0c73a5ad80f6e3e7f54cd1d4ee3c27c958bb3b6a7b2c17e8f  /home/warren/jobs/pdr-G02/tag

@@ -1,0 +1,19 @@
+=== attempt 1 2026-11-05T23:05:02Z
+c441ebb785b7a1008203b85a241e610bec0a0711
+2026-10-08 18:09:52 +0200
+0
+./src/lerobot/policies/pi05/configuration_pi05.py
+61:    num_inference_steps: int = 10
+92:    normalization_mapping: dict[str, NormalizationMode] = field(
+94:            "VISUAL": NormalizationMode.IDENTITY,
+95:            "STATE": NormalizationMode.QUANTILES,  # Pi0.5 uses quantiles for state
+96:            "ACTION": NormalizationMode.QUANTILES,  # Pi0.5 uses quantiles for action
+126:    prefix_mask = torch.arange(x_t.shape[1], device=x_t.device) < inference_delay
+141:    positions = torch.arange(action_horizon, device=device)
+945:        num_steps=None,
+949:        if num_steps is None:
+950:            num_steps = self.config.num_inference_steps
+1012:            num_steps,
+1434:        for _num_empty_cameras in range(len(missing_img_keys)):
+drwxr-xr-x    2 warren warren     4096 2026-10-08 .libero
+drwxr-xr-x   13 warren warren     4096 2026-10-08 lerobot

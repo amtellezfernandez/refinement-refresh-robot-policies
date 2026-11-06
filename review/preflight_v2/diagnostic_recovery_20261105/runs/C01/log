@@ -1,0 +1,16 @@
+=== attempt 1 2026-11-05T23:04:35Z
+zsh:1: no matches found: /home/warren/alba-cross-policy-20261101/envs/smolvla/lib/python3*/site-packages/lerobot
+ENV smolvla lerobot=
+ENV openpi lerobot=/home/warren/alba-cross-policy-20261101/envs/openpi/lib/python3.11/site-packages/lerobot
+{"url":"https://github.com/huggingface/lerobot","vcs_info":{"vcs":"git","commit_id":"0cf864870cf29f4738d3ade893e6fd13fbd7cdb5","requested_revision":"0cf864870cf29f4738d3ade893e6fd13fbd7cdb5"}}
+
+/home/warren/lerobot/tests/policies/pi0_pi05
+/home/warren/lerobot/tests/processor/test_pi05_processor.py
+/home/warren/lerobot/docs/source/pi05.mdx
+/home/warren/lerobot/docs/source/policy_pi05_README.md
+/home/warren/jobs/alba-v3-p6-pi05-profile-platform
+/home/warren/jobs/alba-v3-p1-pi05-profile
+/home/warren/jobs/alba-pf-collect-1/preflight-bb86691/pi05
+/home/warren/jobs/alba-v3-p2-pi05-profile-memfrac95
+/home/warren/jobs/alba-v3-pi05-cuda-probe
+/home/warren/jobs/alba-v2-run001-cpu-prov/ckpt_pi05.sha256
