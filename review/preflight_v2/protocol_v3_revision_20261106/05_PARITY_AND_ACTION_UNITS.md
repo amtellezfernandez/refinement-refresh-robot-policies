@@ -1,6 +1,6 @@
 # R9 action parity, action-unit specification, and R4 approval evidence
 
-**Status:** specification only. **No parity has been run under this specification.**
+**Status:** specification only. **No parity has been run under this specification.** Updated for Alba's decision D8 (`12_DECISION_REGISTER_20261106.md`): deterministic XLA flags for stock, candidate and Protocol B; same-host bitwise parity; matched noise; preprocessing comparison; clipping and frame checks against pinned source; stop and return a revised proposal if any of these is infeasible (P6).
 
 Prior diagnostic B01/B02 found stock = wrapper bitwise at d=10 on two **synthetic** inputs, in **one process**. That is not this check, and it is not cited as its result.
 
@@ -13,7 +13,8 @@ Prior diagnostic B01/B02 found stock = wrapper bitwise at d=10 on two **syntheti
 | Step count | stock default (`num_steps=10`, a Python constant baked into the trace; `pi05_libero` sets no `sample_kwargs`) | `num_steps=10` passed as a traced int |
 | Noise | the frozen array N, loaded from `.npy` and hash-checked | derived inside the wrapper from key K. **Precondition:** the wrapper's `noise_for(K)` must equal N bitwise, checked and recorded first |
 | Process | separate process, own interpreter (`envs/openpi`) | the serving process |
-| Flags | the A4 deterministic XLA flags | the same |
+| Flags | the deterministic XLA flags (D8): `--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level=0` | the same |
+| Host | the planned host (D4): RTX 5090, WSL | the same host, the same toolchain |
 | Inputs | DO1, DO2, DO3 (`06_DIAGNOSTIC_POPULATION.md`), loaded from frozen files by hash | the same files |
 | Written by | a script that does not import `server_openpi`, `client_openpi` or `common` | n/a |
 
@@ -34,6 +35,16 @@ For each of DO1, DO2 and DO3 at d=10:
 3. **Finite:** all 70 values finite in both outputs.
 4. **Bitwise identical:** the SHA-256 of the C-contiguous array with dtype and shape is equal (`client_openpi.digest`), and max |a − b| = 0 is reported alongside.
 5. **Dtype:** equal. The expected value is float64 at the `Policy.infer` output (B01). **Verified on two synthetic inputs only.**
+
+**Matched noise (D8).** The reference's frozen noise array N and the candidate's `noise_for(K)` must be bitwise equal, checked and recorded before either output is produced (P1 precondition). Parity on unmatched noise is not parity.
+
+## P2a. Preprocessing comparison (D8)
+
+From **identical raw environment observations** (the raw `obs` dicts of DO1–DO3, loaded from frozen files by hash), compute the model input twice:
+1. through the client adapter (`client_openpi.policy_input`); and
+2. through the stock preprocessing of `examples/libero/main.py` at OpenPI `215abfb` (180-degree image rotation, resize-with-pad to 224, uint8 conversion, state concatenation of eef position, axis-angle and gripper qpos), in a script that does not import the client.
+
+Pass: every field bitwise equal (`client_openpi.digest` per array; the prompt string equal). This replaces the earlier reliance on source reading alone (P5 item 3).
 
 **Native chunk use (h=5), the only use of h=5:** this is Protocol A's CHUNK check.
 - The DO1 d=10 chunk is saved by this parity step as a frozen array.
@@ -63,16 +74,18 @@ For each of DO1, DO2 and DO3 at d=10:
   - The R9 check records the dtype at each of these stages.
 - **Normalization (input):** quantile `Normalize` on the 8-dim state: eef position 3, axis-angle 3, gripper qpos 2. The state is then padded to the model width (`PadStatesAndActions`). Images are resized to 224 with padding, after a 180-degree rotation in the client.
 - **Unnormalization (output):** `(x + 1)/2 · (q99 − q01 + 1e-6) + q01`, quantile mode, **no clipping** in OpenPI (`transforms.py`, `04`). Loaded statistics equal `norm_stats.json` `b3a44bb2...` (probe_r0, same author).
-- **Clipping:** none in OpenPI. Clipping of controller input to [-1, 1] by robosuite's OSC `scale_action` is **asserted from robosuite design, not verified against the pinned robosuite 1.4.1 source in this revision**. Owed before release: a source read.
+- **Clipping:** none in OpenPI. Clipping of controller input to [-1, 1] by robosuite's OSC `scale_action` is **asserted from robosuite design, not yet verified against the pinned robosuite 1.4.1 source**. Required by D8 before qualification: the source read, recorded in the pi0.5 qualification record (item "Action normalization and clipping") with file path and sha256.
 - **Controller convention:** robosuite `OSC_POSE`, delta mode, input range [-1, 1], output range ±0.05 m and ±0.5 rad, kp 150, 20 Hz. The configuration was read from the live env in E01.
 - **Units:** env input is dimensionless in [-1, 1]. Commanded offsets are in metres and radians. The gripper is a dimensionless command.
-- **Note F (frames):** the reference frame of the delta (world/base versus end-effector) is **UNVERIFIED** in this revision. Owed: a source read of pinned robosuite `OperationalSpaceController` and its `control_delta` handling. E02 showed that +x commands move the eef along +x in the observation frame (+2.16 cm in 5 steps at 0.5), which is consistent with a base or world frame. That is not proof.
+- **Note F (frames):** the reference frame of the delta (world/base versus end-effector) is **UNVERIFIED**. Required by D8 before qualification: a source read of pinned robosuite 1.4.1 `OperationalSpaceController` and its delta handling, recorded in the qualification record (item "Controller mapping"), and consistent with the UNITS sign and axis check. E02 showed that +x commands move the eef along +x in the observation frame (+2.16 cm in 5 steps at 0.5), which is consistent with a base or world frame. That is not proof.
 
 **Commanded is not measured.** Translation ±0.05 m and rotation ±0.5 rad are **commanded goal offsets per step** at full-scale input. They are not physical displacements. The one measured response, E02 (fresh env, one state, 5 steps), was 4.41 cm at action 1.0, about 0.0088 m per step. It is a diagnostic observation of one configuration, and it is not a unit specification.
 
-## P4. If cross-host comparison becomes necessary (specified, not run)
+## P4. Cross-host comparison: not part of the plan (D4)
 
-Bitwise parity is required **on one host and toolchain**. If a comparison across hosts or toolchains is ever needed (for example, this WSL host against Alba's native Linux host), no tolerance may be chosen after seeing parity data. The procedure is:
+D4 fixes one host, the RTX 5090 WSL host, for both models and both protocols, and excludes the 4060 Ti NVIDIA EGL host. No cross-host comparison is planned. Parity is same-host and bitwise (D8).
+
+The procedure below is kept only as the rule that would apply if a host change were ever proposed. Using it would need a new decision by Alba first. If it is ever used, no tolerance may be chosen after seeing parity data:
 
 1. **Freeze first.** Fix the inputs (DO1–DO3, SC1, SC2), the d values, and the metric: per-dimension max |Δ| on the (10, 7) chunk, in env units.
 2. **Repeatability, per host, before any parity data.** On each host separately, measure within-host spread from R repeated fresh-process runs of the **same** program on the same inputs, with no cross-host comparison. R = 10 is PROPOSED. Record the per-dimension maximum.
@@ -90,9 +103,21 @@ None of these measurements is run here.
 |---|---|---|
 | 1 | Independent stock-native parity (P1, P2) on DO1–DO3 at d=10, bitwise | **not run** |
 | 2 | Frozen diagnostic observations used, hashes bound, isolation check passed (ISO) | **not generated** |
-| 3 | Verified input preprocessing. The client's `policy_input` output equals stock `examples/libero/main.py` preprocessing on the same raw env observation (image rotation, resize-with-pad, state concatenation, axis-angle), bitwise. B01 noted this rested **on source reading only** | **not run** |
+| 3 | Verified input preprocessing (P2a, D8). The client's `policy_input` output equals stock `examples/libero/main.py` preprocessing on the same raw env observation (image rotation, resize-with-pad, state concatenation, axis-angle), bitwise. B01 noted this rested **on source reading only** | **not run** |
 | 4 | Verified normalization. NORM check: file hash plus loaded-statistics equality, quantile mode | done once in probe_r0 (5 Nov, same author, not independent); to be repeated in the counted preflight |
 | 5 | Verified action mapping. P3 table checked against source, including the owed clipping and frame reads; UNITS sign and axis check | **partly** (E02 signs and axes; source reads owed) |
 | 6 | Counting (CNT) passes on the candidate path | prototype only (`09`) |
 
+| 7 | Per-request attestation (D5) verified on the served path; ATT drills refuse a mutant and a stripped attestation | **not run**; code in the implementation draft PR |
+
 The echo `received_num_steps` is not evidence for any of these.
+
+## P6. If D8 parity is infeasible: stop (D8)
+
+If any of the following cannot be carried out as specified, stop and send Alba a revised proposal **before collecting any new parity data**:
+- same-host bitwise action parity under the deterministic flags (P2);
+- matched noise (P2);
+- the preprocessing comparison (P2a);
+- the clipping and frame checks against pinned source (P3).
+
+"Infeasible" includes a toolchain that cannot run the stock reference under the flags, a stock program whose cross-process output is not bitwise repeatable under the flags on this host, and a pinned source that is unavailable for reading. No tolerance, substitute criterion or alternative host is adopted in the meantime. Parity data collected after the problem is known, and before the revised proposal is approved, is not used.

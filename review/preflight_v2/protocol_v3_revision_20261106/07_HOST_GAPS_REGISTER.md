@@ -6,6 +6,13 @@
 - NVIDIA GPU EGL, WSL OSMesa/llvmpipe and any other rendering environment are distinguished.
 - Facts not established from a primary record are marked **UNKNOWN**.
 
+**Decision D4 (6 Nov, `12_DECISION_REGISTER_20261106.md`):**
+- **Planned host: RTX 5090, WSL, OSMesa, for both models**, in Protocol A, Protocol E and Protocol B.
+- Each model keeps its own pinned native simulator and evaluator stack (H2). No simulator equivalence between the models is claimed.
+- Before qualification, the actual renderer string, the driver, the package locks and the asset hashes are bound in each model's qualification record (`01` A3a).
+- The same certified configuration is used for each model in Protocol A and Protocol B.
+- **The 4060 Ti NVIDIA EGL host is excluded.**
+
 **Sources:**
 - `preflight_cpu_evidence/*.lock.txt` and `gpu.txt` (1–2 Nov);
 - `rtx_recovery_20261105/evidence/p4b`, `p4c` and `rtx_recovery_20261105/REPORT.md` line 23 (5 Nov);
@@ -17,9 +24,9 @@ Every fact below is **carried** from those records and was not re-measured on 6 
 
 | Kind | Where it exists | GL vendor / renderer | Status |
 |---|---|---|---|
-| **NVIDIA GPU EGL** | Alba's reference host (RTX 4060 Ti, by her account); possibly a future native Linux host | NVIDIA, presumably | **UNKNOWN on every machine we have access to.** Not available on the RTX WSL host: no NVIDIA EGL vendor file, only `50_mesa.json` (P4) |
+| **NVIDIA GPU EGL** | Alba's 4060 Ti host, by her account | NVIDIA, presumably | **Excluded (D4).** Not used for any protocol. Not available on the RTX WSL host either: no NVIDIA EGL vendor file, only `50_mesa.json` (P4) |
 | **WSL Mesa llvmpipe, requested as `MUJOCO_GL=egl`** | RTX WSL host | `Mesa` / `llvmpipe (LLVM 20.1.2, 256 bits)` (P4b: client 3.2.3 and SmolVLA 3.8.1 stacks) | software rendering; **not GPU EGL** despite the name |
-| **WSL OSMesa / llvmpipe** | RTX WSL host (diagnostic runs used `MUJOCO_GL=osmesa`, `PYOPENGL_PLATFORM=osmesa`) | Mesa software. `libosmesa6_25.1.7-1ubuntu2~24.04.2_amd64.deb`, sha256 `9c23e599...` | the renderer string under OSMesa was **not logged** (E01 review finding) |
+| **WSL OSMesa / llvmpipe** | RTX WSL host (diagnostic runs used `MUJOCO_GL=osmesa`, `PYOPENGL_PLATFORM=osmesa`) | Mesa software. `libosmesa6_25.1.7-1ubuntu2~24.04.2_amd64.deb`, sha256 `9c23e599...` | **the planned renderer (D4).** The renderer string under OSMesa was **not logged** (E01 review finding); it must be bound before qualification (G3) |
 
 P4c rendered one 64×64 frame **byte-identically** under `egl` and `osmesa` in all three stacks (same hash `67d353d6...`). E01 found the same at 256 px. On this host, therefore, "EGL" and "OSMesa" are not two independent renderers. **A 1–2 Nov comparison of OSMesa against Alba's GPU EGL gave a non-zero SmolVLA first-action L2 of 0.011–0.019 on one state**, so GPU EGL and llvmpipe are not shown to be equivalent. That single confounded comparison suggests they may differ.
 
@@ -58,18 +65,18 @@ P4c rendered one 64×64 frame **byte-identically** under `egl` and `osmesa` in a
 
 | # | Gap | Affects | Status | Closes when |
 |---|---|---|---|---|
-| G1 | Which host and renderer each model's Protocol B runs on (Alba's ruling: each model in its own native environment; the concrete host is not yet named) | both | **UNKNOWN** | Alba names a host per model; this table is filled from that host |
-| G2 | Alba's GPU-EGL reference host: OS, kernel, driver, MuJoCo, Python, package locks | reference | **UNKNOWN** (not on our machines) | Alba supplies lock files |
-| G3 | Renderer string under `MUJOCO_GL=osmesa` on the RTX host | both | not logged | logged in PROV |
-| G4 | SmolVLA LIBERO asset path and hashes (`hf-libero`) | SmolVLA | **UNKNOWN** | manifest produced in PROV |
-| G5 | Single bound asset manifest for the client LIBERO tree | pi0.5 | per-file N2 result only | manifest hash in A3 |
-| G6 | LeRobot commit actually checked out in `envs/smolvla` (lock shows an editable path) | SmolVLA | v2 pins `b6ec0060...`; checkout state **not re-verified** | `git -C src/lerobot rev-parse HEAD` recorded in PROV |
+| G1 | Which host and renderer each model's Protocol B runs on | both | **RESOLVED by D4:** RTX 5090, WSL, OSMesa, for both | closed |
+| G2 | Alba's GPU-EGL reference host: OS, kernel, driver, MuJoCo, Python, package locks | reference | **CLOSED by D4:** the 4060 Ti EGL host is excluded, so its locks are not needed | closed |
+| G3 | Renderer string under `MUJOCO_GL=osmesa` on the RTX host | both | not logged; **required before qualification (D4)** | bound in the qualification record (host and renderer) |
+| G4 | SmolVLA LIBERO asset path and hashes (`hf-libero`) | SmolVLA | **UNKNOWN; required before qualification (D4)** | manifest bound in the qualification record (asset hashes) |
+| G5 | Single bound asset manifest for the client LIBERO tree | pi0.5 | per-file N2 result only; **required before qualification (D4)** | manifest bound in the qualification record (asset hashes) |
+| G6 | LeRobot commit actually checked out in `envs/smolvla` (lock shows an editable path) | SmolVLA | v2 pins `b6ec0060...`; checkout state **not re-verified**; **required before qualification (D4)** | `git -C src/lerobot rev-parse HEAD` bound in the qualification record (package locks) |
 | G7 | Whether the pi0.5 server process imports or initialises MuJoCo 2.3.7 or a GL context | pi0.5 | **UNKNOWN** | import trace in PROV |
-| G8 | Distribution and architecture recorded first-hand | both | inferred | `/etc/os-release`, `uname -m` in PROV |
-| G9 | WSL library file named `libnvidia-gpucomp.so.610.57.01`, while `nvidia-smi` reports driver 610.88 | both | **unresolved discrepancy** | record both; explain or accept as a WSL packaging artefact |
-| G10 | SmolVLA episode horizons per suite (`_max_episode_steps`) | SmolVLA | **UNKNOWN** | read from the pinned stack (`02` B4) |
-| G11 | `done` in the pinned LIBERO is exactly the BDDL goal check | pi0.5 | **UNVERIFIED** | source read (`02` B4) |
-| G12 | OSC clipping and delta frame in robosuite 1.4.1 | pi0.5 | **UNVERIFIED** | source read (`05` P3) |
+| G8 | Distribution and architecture recorded first-hand | both | inferred; **required before qualification (D4)** | `/etc/os-release`, `uname -m` in the qualification record |
+| G9 | WSL library file named `libnvidia-gpucomp.so.610.57.01`, while `nvidia-smi` reports driver 610.88 | both | **unresolved discrepancy**; the driver is a D4 binding | both recorded in the qualification record (driver); explained or accepted as a WSL packaging artefact by Alba |
+| G10 | SmolVLA episode horizons per suite (`_max_episode_steps`) | SmolVLA | **UNKNOWN**; D7 qualification item | Protocol E HORIZON fixtures plus source read (`13` E5.3) |
+| G11 | `done` in the pinned LIBERO is exactly the BDDL goal check | pi0.5 | **UNVERIFIED**; D3 requires it to be established | Protocol E plus pinned source read (`13` E5.5) |
+| G12 | OSC clipping and delta frame in robosuite 1.4.1 (and 1.4.0 for SmolVLA's action-mapping item) | both | **UNVERIFIED**; D8 (pi0.5) and D7 (SmolVLA) | pinned source read recorded in the qualification record (`05` P3; `01` S-QUAL 5) |
 | G13 | Cause of reused-env history dependence | both | bounded, not named (E03) | not required: fresh env per attempt |
 | G14 | Global `np.random.seed(7)` in stock `main.py`, absent from the client | pi0.5 | untested whether anything in the episode path draws from it | test, or declare as a deviation from stock |
 | G15 | The WSL kernel has not been restarted since the 2 Nov fault; disk 93% (5 Nov) | host | carried | host health check before any run |

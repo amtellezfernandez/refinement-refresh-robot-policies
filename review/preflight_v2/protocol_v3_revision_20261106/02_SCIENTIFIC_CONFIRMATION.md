@@ -1,16 +1,18 @@
 # Protocol B: cross_policy_confirmation_v2, scientific confirmation. DRAFT / NOT AUTHORISED
 
-> **NOT AUTHORISED FOR EXECUTION.** This protocol is scoped separately from the engineering preflight (Protocol A, `01_PREFLIGHT_V3_DRAFT_REV2.md`).
+> **NOT AUTHORISED FOR EXECUTION.** This protocol is scoped separately from the engineering preflight (Protocol A, `01_PREFLIGHT_V3_DRAFT_REV2.md`) and from the evaluator validation (Protocol E, `13_EVALUATOR_VALIDATION.md`).
 >
-> Execution needs all of the following:
-> 1. a PREFLIGHT_PASS under Protocol A for the model concerned;
-> 2. both confirmation state manifests generated and bound;
-> 3. the R3 coverage study (B6.4) completed with the primary outcomes unseen;
-> 4. a release from Alba bound to this document's sha256 and to each model's schedule hash.
+> Execution, for a model, needs all of the following:
+> 1. a PREFLIGHT_PASS under Protocol A for that model;
+> 2. EVALUATOR_QUALIFIED under Protocol E for that model's stack;
+> 3. every item of that model's qualification record (`01` A3a) marked PASSED by a separately authorised check;
+> 4. that model's confirmation state manifest generated and bound;
+> 5. the R3 coverage check (B6.4) **run** with the primary outcomes unseen, and its result recorded;
+> 6. a release from Alba bound to this document's sha256 and to that model's schedule hash.
 >
 > It replaces the design content of the frozen `cross_policy_confirmation_v1.json` (`9310639c...`), which stays unchanged on disk. It does not edit that file.
 >
-> Items marked **PROPOSED** are drafting choices for Alba's review. Everything else implements her 6 November decisions.
+> It implements Alba's decisions of 6 November (`12_DECISION_REGISTER_20261106.md`, D1–D8). Items marked **PROPOSED** are drafting choices that those decisions leave open.
 
 ## B1. Research question (unchanged hypothesis)
 
@@ -18,7 +20,7 @@ The question, for each model m in {SmolVLA, pi0.5} separately: in the LIBERO eva
 
 The question keeps v1's hypothesis: is SmolVLA's d=2 over d=5 result at h=2 specific to SmolVLA? v1's secondary h question is **removed**, along with h=5, R52 and R55.
 
-**Prediction:** NONE_RECORDED. The SmolVLA discovery direction (d=2 above d=5) is context, not a preregistered numerical prediction. If Alba wants a numerical prediction per model, she supplies it before release.
+**Prediction (D6):** NONE_RECORDED. The SmolVLA discovery direction (d=2 above d=5) is context only, not a preregistered prediction. **The analysis is two-sided for each model.**
 
 ## B2. Estimand
 
@@ -28,8 +30,8 @@ For each model m:
 
 - **R22** = (d=2, h=2). **R25** = (d=5, h=2).
 - h = the number of consecutive actions executed from the latest chunk before a new chunk is requested (v1 `h_definition`).
-- The **target population** is the 400 frozen identities of model m's own state population (B3), each attempted under both conditions.
-- Delta_m is a finite-population average treatment effect over those 400 identities, in model m's own environment (`07_HOST_GAPS_REGISTER.md`).
+- The **primary target** is the 400 frozen identities of model m's own state population (B3), each attempted under both conditions. On this target Delta_m is a finite-population quantity: the R22 − R25 success difference of this cohort, in model m's own environment (`07_HOST_GAPS_REGISTER.md`).
+- The **secondary target** (B6.3) is the expected R22 − R25 difference for fresh states on the same 40 tasks, with equal task weights.
 - **Never pooled across models.** Delta_SmolVLA and Delta_pi0.5 are reported side by side. Whether their signs agree is described, not tested.
 
 **There are no other conditions.** There is no NATIVE arm, no R52, no R55, no h=5 condition and no quality-preservation margin.
@@ -51,14 +53,10 @@ For each model m:
 
 Y = 1 if, and only if, the environment's success signal becomes true at any control step within the episode horizon. Otherwise Y = 0.
 
-When the episode ends differs by model:
-- **pi0.5:** the client breaks on `done` (`client_openpi.py:125`).
-- **SmolVLA:** the loop breaks only on `terminated` or `truncated` (`runner_smolvla.py:119`), while `success` accumulates by OR (line 118). Whether LeRobot `LiberoEnv` terminates on success is **UNVERIFIED** (register G10).
-
 | Model | Source in code | Horizon | Status |
 |---|---|---|---|
-| pi0.5 | `client_openpi.rollout`: `obs, _, done, _ = env.step(...)`; `success = bool(done)` (`client_openpi.py:124-127`). `done` comes from LIBERO `OffScreenRenderEnv.step` in the OpenPI LIBERO submodule | `MAX_STEPS[suite]` after 10 wait steps: 220 / 280 / 300 / 520 for spatial / object / goal / 10, matching stock `examples/libero/main.py` | **That `done` equals the BDDL goal-predicate check, with no other termination path, is UNVERIFIED in this revision.** Owed: a source read of pinned LIBERO `ControlEnv.step` / `_check_success` before release |
-| SmolVLA | `runner_smolvla.rollout`: `success = success or batch_one_success(info)` over `info["is_success"]` (`runner_smolvla.py:118`; `experiments/tooling/run_paired.py:95-107`, which fails closed if the field is missing) | `base._max_episode_steps` from LeRobot `LiberoEnv` | **Horizon values UNKNOWN** in this revision. Owed: read them from the pinned stack and record them per suite |
+| pi0.5 | `done` from LIBERO `OffScreenRenderEnv.step` in the OpenPI LIBERO submodule; the client breaks on `done` | `MAX_STEPS[suite]` after 10 wait steps: 220 / 280 / 300 / 520 for spatial / object / goal / 10, matching stock `examples/libero/main.py` | **That `done` equals the BDDL goal conjunction, with no other path, is UNVERIFIED.** It is established only by Protocol E (E5.5) plus the pinned source read (G11) |
+| SmolVLA | `info["is_success"]`, OR-accumulated (`runner_smolvla.py:118`; `run_paired.batch_one_success`, which fails closed if the field is missing) | `_max_episode_steps` from LeRobot `LiberoEnv` | **Horizon values per suite and whether success terminates the episode are UNKNOWN.** Both are D7 qualification items, recorded by Protocol E (E5.3, E5.4) |
 
 The two success sources are different code paths with possibly different horizons. That is acceptable only because no cross-model pooling or comparison of levels is made.
 
@@ -66,116 +64,130 @@ The two success sources are different code paths with possibly different horizon
 
 Every attempt record is append-only and is written ahead of the attempt. Each attempt ends in exactly one class:
 
-| Class | Condition | Y |
-|---|---|---|
-| **SCI_SUCCESS** | the success signal became true | 1 |
-| **SCI_FAILURE** | the horizon was reached, or the env terminated, without success. This includes any policy behaviour: dropping objects, collisions, stalls | 0 |
-| **INFRA_PRE** | failure **before the first policy query**: env build error, state restore error, settled or first-observation hash mismatch (`check_reset`), server unreachable | missing; retry allowed (B7) |
-| **INFRA_POST** | failure **after the first policy query**: process crash, OOM, websocket loss, host fault, a per-request count attestation mismatch (if adopted, see `09`), timeout | missing; **no retry** |
-| **PROTOCOL_STOP** | non-finite action, wrong chunk shape, or d unsupported (`unsupported_refinement_setting`, v1 `stop_rule_pi05`) | the model's phase **stops**; not a missing value |
+| Class | Condition | Y | Run continues? |
+|---|---|---|---|
+| **SCI_SUCCESS** | the success signal became true | 1 | yes |
+| **SCI_FAILURE** | the horizon was reached, or the env terminated, without success. Includes any policy behaviour: dropping objects, collisions, stalls. **For SmolVLA, also a non-finite policy action under valid inputs (D7):** the action is not applied and the episode ends at that tick | 0 | yes |
+| **INFRA_PRE** | failure **before the first policy query**: env build error, state restore error, settled or first-observation hash mismatch (`check_reset`), server unreachable | missing; one retry (B7) | yes |
+| **INFRA_POST** | failure **after the first policy query** that is not an instrument incident: process crash, OOM, websocket loss, host fault, watchdog timeout | missing; **no retry** | yes, up to the B9 halt |
+| **INSTRUMENT_INCIDENT** | **pi0.5 (D5):** a served chunk whose executed-step attestation is missing, unparseable, not bound to this request identifier and tick, or not equal to d. **Both models (D7):** a broken action contract (wrong shape, dtype or dimension count; chunk shorter than h) or unclear provenance (no request or chunk record behind an executed action; provenance hash mismatch); for SmolVLA, an input that fails validity at a policy query, or a generation whose counted denoise steps differ from d (the v2 count, checked per generation before the action is applied rather than once per episode). The action is **never applied**. An incident record is written for investigation | missing | **no: the model run stops for review** |
+| **PROTOCOL_STOP** | pi0.5 only: non-finite action, or d unsupported (`unsupported_refinement_setting`, v1 `stop_rule_pi05`) | not a missing value | **no: the model's phase stops** |
 
-Scientific failures are outcomes and are never excluded. An infrastructure failure is never recoded as a scientific failure, and a scientific failure is never recoded as an infrastructure failure.
+Scientific failures are outcomes and are never excluded. An infrastructure failure is never recoded as a scientific failure, and a scientific failure is never recoded as an infrastructure failure. An instrument incident is never recoded as either.
 
-The classifier is to be written as a function of these record fields:
-- `termination_reason`;
-- the exception class: `ResetStateMismatch`, transport error, `RESOURCE_EXHAUSTED`, `unsupported_refinement_setting`;
-- whether any query record exists.
+**Valid inputs (SmolVLA, D7).** At each policy query the batch passed to the policy has the expected keys and shapes, every numeric field is finite, and the attempt's reset hashes matched. A non-finite action with valid inputs is SCI_FAILURE. A non-finite action with invalid inputs is an INSTRUMENT_INCIDENT.
 
-It is fixed and hashed before release. **It is not written yet.**
+**π0.5 non-finite actions** stay PROTOCOL_STOP as written in v1. D7 does not cover π0.5, so the two models classify this event differently. This is open question 1 in `12` §5.
+
+**The classifier** is written as a function of record fields: `termination_reason`, the exception class (`ResetStateMismatch`, transport error, `RESOURCE_EXHAUSTED`, `unsupported_refinement_setting`, attestation failure, contract failure), and whether a first-query marker exists. It is fixed and hashed before release. It exists as code in the implementation draft PR (`cross_policy_v3/classify.py`) and has not been run on any real attempt.
 
 **Timeout.** "Timeout" means a wall-clock watchdog only, set at **at least 3×** the longest horizon's expected wall time from the owed per-rollout measurement (`04` T4). A long episode that reaches its step horizon is SCI_FAILURE, never a timeout.
 
-**Outcome-correlated missingness.** OOM or timeouts may concentrate on long `libero_10` episodes, so missingness may depend on outcomes. The worst-case bounds of B6.6 and the per-suite, per-condition missingness table are the safeguard.
+**Outcome-correlated missingness.** OOM or timeouts may concentrate on long `libero_10` episodes, so missingness may depend on outcomes. The worst-case bounds and the per-arm, per-suite missingness tables of B6.5 are the safeguard.
 
-**Conflict with the frozen loop.** `attempt_loop.py:7-9` stops the whole run at the first failed attempt and never retries. B5, B7 and B9 require continuing past missing attempts, plus one INFRA_PRE retry. The Protocol B runner must therefore be new code. The frozen loop is not modified.
+**Conflict with the frozen loop.** `attempt_loop.py:7-9` stops the whole run at the first failed attempt and never retries. B5, B7 and B9 require continuing past missing attempts, plus one INFRA_PRE retry. The Protocol B runner is therefore new code. The frozen loop is not modified.
 
-## B6. Analysis
+## B6. Analysis (D1, D2)
 
-### B6.1 Primary estimator (within-identity, paired)
+Every analysis is run per model, two-sided, and only after all 800 attempts of that model have a final class (B9).
 
-For identity i of model m: D_i = Y_i(R22) − Y_i(R25), which takes a value in {−1, 0, +1}.
+### B6.1 Paired outcomes
 
-The 2×2 table counts the complete pairs:
+For identity i of model m: D_i = Y_i(R22) − Y_i(R25), which takes a value in {−1, 0, +1}. A pair is **complete** when both of its attempts end in SCI_SUCCESS or SCI_FAILURE.
+
+The four paired outcome counts are over complete pairs:
 
 | | R25 = 1 | R25 = 0 |
 |---|---|---|
-| **R22 = 1** | n11 | **n10** |
-| **R22 = 0** | **n01** | n00 |
+| **R22 = 1** | n11 | n10 |
+| **R22 = 0** | n01 | n00 |
 
-The estimate is Delta_hat_m = (n10 − n01) / N_c, where N_c = n11 + n10 + n01 + n00 is the number of complete pairs. N_c = 400 if nothing is missing.
+N_c = n11 + n10 + n01 + n00. Always reported: all four counts, overall and per suite.
 
-### B6.2 Discordant pairs
+### B6.2 Primary result: the exact cohort contrast
 
-- The estimate depends only on the discordant counts n10 and n01. Concordant pairs enter only the denominator.
-- Always report all four cells, the discordance rate (n10 + n01)/N_c, and the per-suite tables.
-- Secondary: an exact two-sided McNemar test (binomial on n10 out of n10 + n01, p = 0.5). It is reported, not used for the verdict.
+- **With all 400 pairs complete**, the primary result is the **exact cohort contrast**:
 
-### B6.3 Paired uncertainty interval (PROPOSED: Alba to confirm)
+      Delta_m(cohort) = (n10 − n01) / 400
 
-Identities are not independent: the two seeds share a state, and the five slots share a task. The interval therefore respects the design.
+  It is the R22 − R25 success difference of these 400 identities, computed without sampling error, together with the four counts. No interval is attached to it, because it is not an estimate of this cohort's difference: it is that difference.
+- **With any pair incomplete**, the cohort contrast is not known exactly. The primary result is then the pair of worst-case bounds (B6.5). The **complete-pair estimate**, (n10 − n01) / N_c, is reported separately, labelled `complete_pair_estimate`, and is never presented as the cohort contrast.
 
-- **Primary (PROPOSED):** a 95% cluster-robust paired interval. The clusters are the 40 tasks. The interval is Delta_hat ± t_{0.975, 39} × SE.
-  - SE² = (40/39) Σ_t (S_t − Delta_hat · n_t)² / N_c².
-  - S_t is the sum of D_i over the complete pairs in task t, and n_t is the number of those pairs.
-  - Clustering at the outermost level nests both state and seed.
-- **Sensitivity (reported, not used for the verdict):**
-  - the Tango score interval for a paired difference at identity level, which ignores clustering;
-  - the state-level paired bootstrap of v1 (20,000 draws, seed 20261102), kept only for continuity with the frozen v1 record.
+### B6.3 Secondary inference: fresh states on the same 40 tasks
 
-### B6.4 R3 calibration requirement
+This answers a different question from B6.2: what difference would fresh states, drawn by the same generator on the same 40 tasks, show on average?
 
-R3 found that v1's percentile bootstrap undercovered. **Before release, and with the outcomes unseen**, a synthetic coverage study must run.
+- **Reported only if** all 400 pairs are complete **and** the R3 coverage check (B6.4) passed. Otherwise it is recorded as not reported, with the reason, and nothing replaces it.
+- **Estimator.** For task t and state slot s, average the two seeds: Ď_ts = (D_ts,810001 + D_ts,810002) / 2. Task mean m_t = (1/5) Σ_s Ď_ts. Estimate = (1/40) Σ_t m_t, with equal task weights. With complete data it equals the exact cohort contrast.
+- **Within-task variance.** s_t² = (1/4) Σ_s (Ď_ts − m_t)². SE² = (1/40²) Σ_t s_t² / 5.
+- **Interval (95%).** Estimate ± c × SE, with **c = t₀.₉₇₅ at 160 degrees of freedom** (= Σ_t (5 − 1)); c ≈ 1.9746. **PROPOSED**: D1 does not name a reference distribution, and the R3 check evaluates this interval exactly as specified here.
+- Tasks are fixed, not sampled. The interval says nothing about other tasks, suites or benchmarks.
 
-- **Design:** simulate paired binary outcomes with task, state and seed random effects across a grid of baseline success (0.2–0.95), discordance (0.02–0.30), Delta (−0.15 to +0.15) and intra-task correlation (0–0.5).
-- **Criterion:** the primary interval's empirical coverage must be ≥ 0.93 in every grid cell. If it is not, Alba picks the replacement procedure **before release**, from the study's output.
-- **Freeze:** the grid, the replicate count (PROPOSED: 2,000 per cell, Monte Carlo SE about 0.005 at 0.95) and the criterion are frozen with this document.
-- **Infeasible cells:** combinations that cannot exist, for example baseline 0.95 with discordance 0.30 and a large Delta, are excluded by a stated feasibility rule. The marginal success probabilities must lie in [0, 1].
-- This is a CPU computation on simulated data, and it is **not run here**.
+### B6.4 R3 coverage check (preregistered; required for B6.3)
 
-### B6.5 Per-model verdict (PROPOSED wording)
+R3 found that v1's percentile bootstrap undercovered. The B6.3 interval is reported only if a synthetic coverage check, run **before release with the outcomes unseen**, passes.
+
+- **Generative model (PROPOSED).** Each pair's joint outcome is one of {11, 10, 01, 00}, with base probabilities from baseline success b = P(R25 = 1), Delta Δ and discordance q = P(R22 ≠ R25): π10 = (q + Δ)/2, π01 = (q − Δ)/2, π11 = b − π01, π00 = 1 − π11 − π10 − π01. Task-level heterogeneity: π_t ~ Dirichlet(κ π) with κ = (1 − ρ)/ρ (none when ρ = 0). State-level heterogeneity inside a task: π_ts ~ Dirichlet(κ π_t), with the same ρ. The two seeds of a state are independent draws from π_ts. The 40 × 5 × 2 layout matches B3.
+- **Target in each replicate:** the fresh-state difference on that replicate's 40 tasks, (1/40) Σ_t (π_t,10 − π_t,01). The check measures coverage of the B6.3 question, conditional on the tasks.
+- **Grid (PROPOSED):** b ∈ {0.20, 0.50, 0.80, 0.95}; q ∈ {0.02, 0.10, 0.30}; Δ ∈ {−0.15, −0.05, 0, +0.05, +0.15}; ρ ∈ {0, 0.25, 0.5}.
+- **Feasibility rule:** a cell is evaluated only if q ≥ |Δ| and all four π lie in [0, 1]. Infeasible cells are listed, not evaluated.
+- **Replicates:** 2,000 per feasible cell (Monte Carlo SE about 0.005 at 0.95). Seed 20261107. **PROPOSED**.
+- **Criterion:** empirical coverage ≥ 0.93 in **every** feasible cell. Otherwise the check fails, and B6.3 is not reported. Any replacement interval would need a new decision by Alba before release, made from synthetic output only.
+- **Binding:** the check's result record names the sha256 of the analysis code and of the grid. The analysis refuses an R3 record whose hashes differ.
+- **Disclosed expectation, not a prediction about outcomes.** At low discordance (q = 0.02) many tasks will have no discordant pair in a replicate, so s_t² = 0 for those tasks and the interval can be very short. Cells of this kind may fail the criterion. The check is designed to detect exactly this, and its result is reported whichever way it goes.
+- This is a CPU computation on simulated data. It exists as code in the implementation draft PR and **has not been run**.
+
+### B6.5 Missingness, bounds and the per-model verdict (D2)
+
+**Always reported**, per model:
+- missing attempts by arm (R22, R25) and by suite, after permitted retries;
+- INFRA_PRE retries, INFRA_POST attempts, instrument incidents and incomplete pairs, by arm and by suite.
+
+**Worst-case bounds**, always over all 400 identities (denominator 400, never N_c):
+- Lower bound L: each missing R22 outcome set to 0 and each missing R25 outcome set to 1, then Σ D_i / 400.
+- Upper bound U: each missing R22 outcome set to 1 and each missing R25 outcome set to 0, then Σ D_i / 400.
+- With no missing outcome, L = U = the exact cohort contrast.
+
+**Thresholds (D2).** The model's result is UNINTERPRETABLE if either holds:
+- more than 20 of the 400 pairs are incomplete;
+- |missing R22 attempts − missing R25 attempts| > 10, counted after permitted retries.
+
+**Direction.** Below both thresholds, a direction is claimed **only if the bounds exclude zero**: L > 0 gives DELTA_POSITIVE (R22 above R25), U < 0 gives DELTA_NEGATIVE. Otherwise the result is DELTA_INCONCLUSIVE.
 
 | Verdict | Condition |
 |---|---|
-| DELTA_POSITIVE | the primary interval lies entirely above 0 |
-| DELTA_NEGATIVE | the primary interval lies entirely below 0 |
-| DELTA_INCONCLUSIVE | the primary interval contains 0 |
-| UNINTERPRETABLE | a missingness threshold (B6.6) is breached, a pre-run gate failed, or a frozen hash changed |
-| UNSUPPORTED_REFINEMENT_SETTING | PROTOCOL_STOP fired |
+| DELTA_POSITIVE | no stop, no incident, thresholds not breached, L > 0 |
+| DELTA_NEGATIVE | no stop, no incident, thresholds not breached, U < 0 |
+| DELTA_INCONCLUSIVE | no stop, no incident, thresholds not breached, L ≤ 0 ≤ U |
+| UNINTERPRETABLE | a missingness threshold is breached, an instrument incident stopped the run, a pre-run gate failed, or a frozen hash changed |
+| UNSUPPORTED_REFINEMENT_SETTING | PROTOCOL_STOP fired (pi0.5) |
 
-DELTA_INCONCLUSIVE is not evidence of no effect. It is reported as "no difference established at this N in this environment".
+DELTA_INCONCLUSIVE is not evidence of no effect. With complete data and n10 = n01 it means the cohort's R22 and R25 success counts were equal.
 
 ```verdict-table
-dim: interval=above0|below0|contains0|none
-dim: missingness=ok|breached
 dim: stop=no|yes
-rule: stop=yes, interval=*, missingness=* -> UNSUPPORTED_REFINEMENT_SETTING
-rule: stop=no, missingness=breached, interval=* -> UNINTERPRETABLE
-rule: stop=no, missingness=ok, interval=none -> UNINTERPRETABLE
-rule: stop=no, missingness=ok, interval=above0 -> DELTA_POSITIVE
-rule: stop=no, missingness=ok, interval=below0 -> DELTA_NEGATIVE
-rule: stop=no, missingness=ok, interval=contains0 -> DELTA_INCONCLUSIVE
+dim: incident=no|yes
+dim: missingness=ok|breached
+dim: bounds=above0|below0|contains0
+rule: stop=yes, incident=*, missingness=*, bounds=* -> UNSUPPORTED_REFINEMENT_SETTING
+rule: stop=no, incident=yes, missingness=*, bounds=* -> UNINTERPRETABLE
+rule: stop=no, incident=no, missingness=breached, bounds=* -> UNINTERPRETABLE
+rule: stop=no, incident=no, missingness=ok, bounds=above0 -> DELTA_POSITIVE
+rule: stop=no, incident=no, missingness=ok, bounds=below0 -> DELTA_NEGATIVE
+rule: stop=no, incident=no, missingness=ok, bounds=contains0 -> DELTA_INCONCLUSIVE
 ```
 
-### B6.6 Missingness (prespecified)
-
-- **Primary analysis:** complete pairs only. A pair is complete when both of its attempts end in SCI_SUCCESS or SCI_FAILURE.
-- **Always reported:** the counts of INFRA_PRE retries, INFRA_POST attempts, and incomplete pairs, by condition and by suite.
-- **Always reported, worst-case bounds:** recompute Delta_hat with every missing outcome imputed adversarially.
-  - Lower bound: missing R22 → 0 and missing R25 → 1.
-  - Upper bound: the reverse.
-- **Thresholds (PROPOSED authored values):** the model's verdict is UNINTERPRETABLE if either of the following holds:
-  - more than 20 of 400 identities (5%) have incomplete pairs;
-  - missing attempts differ between R22 and R25 by more than 10.
-- Missing outcomes are never treated as failures in the primary analysis, never treated as successes, and never imputed.
+Missing outcomes are never treated as failures or successes in any reported estimate. They are imputed only inside the worst-case bounds, in the adversarial directions defined above.
 
 ## B7. Retry rules
 
-- **INFRA_PRE:** at most **one** retry, in a fresh process and a fresh env. Both records are kept. If the retry also fails, the attempt is INFRA_PRE_FINAL, which is missing. No outcome information exists before the first policy query, so the retry selects nothing.
+- **INFRA_PRE:** at most **one** retry, in a fresh process and a fresh env. Both records are kept. If the retry also fails, the attempt is missing. No outcome information exists before the first policy query, so the retry selects nothing.
 - **INFRA_POST:** **no retry.** The attempt is missing, permanently.
+- **INSTRUMENT_INCIDENT:** **no retry.** The model run stops.
 - **SCI_FAILURE:** never retried.
 - **Partial execution:** an attempt is never replaced after any of its output has been read. A second execution of a counted attempt is recorded, and it invalidates that attempt (it becomes missing). It never chooses between the two.
 
-## B8. Randomisation and order controls
+## B8. Randomisation, order and determinism
 
 - **Identity order:** a keyed permutation of the 400 identities per model. The key is sha256("cross_policy_confirmation_v2", model, "order"), and it is fixed in the schedule file before release.
 - **Condition order within an identity:** balanced and keyed. Within each task, the 10 identities are sorted by sha256(model, identity, "cond"). The first 5 run R22 first and the other 5 run R25 first. Each suite therefore has exactly 50 R22-first and 50 R25-first identities.
@@ -183,16 +195,19 @@ rule: stop=no, missingness=ok, interval=contains0 -> DELTA_INCONCLUSIVE
 - **Common random numbers:** both conditions draw the same noise per (identity, tick).
   - pi0.5 noise has shape (chunk, action_dim), independent of d, so the noise arrays are equal.
   - SmolVLA uses `make_noise(policy, ident, tick)`.
-- **Determinism:** pi0.5 runs with the deterministic XLA flags only if CNT-T has been recorded and Alba accepts their cost. SmolVLA runs with the `run_paired.py` settings.
-- **Stage:** schedule generation is new tooling. `make_primary_schedule.py` derives the pairs from the frozen 2,000-row five-condition schedule, which this design removes. The new generator emits the 800 rows directly and is hashed into the release.
+- **Determinism (D8):** pi0.5 runs with `XLA_FLAGS="--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level=0"`, exactly as certified in Protocol A. SmolVLA runs with the `run_paired.py` settings, exactly as certified in Protocol A.
+- **Host (D4):** both models run on the RTX 5090 WSL host under OSMesa, each in its own pinned stack, in the configuration bound in its qualification record.
+- **Schedule generation** is new tooling (implementation draft PR, `cross_policy_v3/make_schedule_v2.py`). It reads the model's state manifest and emits the 800 rows directly. `make_primary_schedule.py` derives pairs from the frozen 2,000-row five-condition schedule, which this design removes, so it is not used.
 
 ## B9. Stopping and exclusion rules
 
 - **No interim analysis.** There is no early stop for efficacy or futility. Outcomes are not read until all 800 attempts of a model have a final class.
 - **Stops:**
   - PROTOCOL_STOP (the model's phase ends);
-  - any frozen-hash change, gate failure, or reservation loss (the run halts and is UNINTERPRETABLE unless resumed under a recorded amendment approved by Alba before outcomes are read);
-  - INFRA_POST attempts exceeding 20 (the run halts for diagnosis before more outcomes are produced). This counts **attempts** and is an operational halt. The B6.6 threshold counts **incomplete identities** and is an analysis verdict. They are deliberately separate, and either can fire alone.
+  - an INSTRUMENT_INCIDENT (the model run stops for review, and the incident is investigated before anything is changed);
+  - any frozen-hash change, gate failure, or reservation loss.
+  - After any of the last three stops, the result is UNINTERPRETABLE unless the run resumes under a recorded amendment that Alba approves before any outcome is read.
+  - INFRA_POST attempts exceeding 20: the run halts for diagnosis before more outcomes are produced. This counts **attempts** and is an operational halt. The B6.5 threshold counts **incomplete pairs** and is an analysis verdict. They are deliberately separate, and either can fire alone.
 - **Exclusions:** only before the manifest is frozen (B3 validation). After the freeze, no identity is excluded. Reset-hash mismatches are INFRA_PRE, not exclusions.
 - **Archived cohorts:** the invalid 160-attempt LeRobot pi0.5 campaign stays permanently excluded. The SmolVLA discovery and confirmation identities, and the stale-observation diagnostic, are disjoint by construction and checked by hash.
 
@@ -200,11 +215,12 @@ rule: stop=no, missingness=ok, interval=contains0 -> DELTA_INCONCLUSIVE
 
 ```selection-and-gates
 counted_run: per model, the first execution of the Protocol B runner under Alba's release whose start is recorded in the scheduler-independent `started` file and whose schedule sha256 matches the release
-rerun_policy: INFRA_PRE once per attempt, fresh process and env, both records kept; INFRA_POST and SCI outcomes never
-post_data_free: NONE; estimator, interval, missingness thresholds, verdict table and reporting fixed here; the R3 replacement, if needed, is chosen before release from synthetic data only
-gate: G0-B | Alba's release bound to this document and both schedule hashes | enforced_at: launch_guard.py successor (NOT WRITTEN) | before: any confirmation attempt | qualified_on: matching release -> pass; mismatched schedule hash -> fail (fire drill owed)
-gate: PRE | Protocol A PREFLIGHT_PASS recorded for this model | enforced_at: Protocol B runner (NOT WRITTEN) | before: any confirmation attempt | qualified_on: PASS record -> pass; FAILED or absent -> fail
-gate: RESET | pair partner settled and first-observation hashes equal | enforced_at: experiments/tooling/cross_policy/attempt_loop.py:24 | before: first policy query of each attempt (called at client_openpi.py:87 and runner_smolvla.py:83) | qualified_on: matching reference -> pass; wrong reference -> raise ResetStateMismatch (real-simulator qualification owed in Protocol A RESET; never run)
+rerun_policy: INFRA_PRE once per attempt, fresh process and env, both records kept; INFRA_POST, INSTRUMENT_INCIDENT and SCI outcomes never
+post_data_free: NONE; estimator, bounds, thresholds, secondary interval, R3 criterion and verdict table fixed here; the R3 check runs before release on synthetic data only
+gate: G0-B | Alba's release bound to this document and the model's schedule hash | enforced_at: experiments/tooling/cross_policy_v3/runner_v2.py check_release (implementation PR; never run) | before: any confirmation attempt | qualified_on: matching release -> pass; mismatched schedule hash -> fail (fire drill owed)
+gate: PRE | Protocol A PREFLIGHT_PASS, Protocol E EVALUATOR_QUALIFIED and every qualification item PASSED for this model | enforced_at: experiments/tooling/cross_policy_v3/qualification.py require_qualified (implementation PR; never run) | before: any confirmation attempt | qualified_on: all PASSED -> pass; any UNVERIFIED -> fail (unit-tested on synthetic records only)
+gate: ATT | pi0.5 per-request executed-step attestation equals d and is bound to this request and tick | enforced_at: experiments/tooling/cross_policy_v3/attestation.py verify (implementation PR; never run) | before: application of each served chunk's first action | qualified_on: correct attestation -> pass; missing, wrong count, wrong request or tick -> fail (unit-tested on synthetic attestations only)
+gate: RESET | pair partner settled and first-observation hashes equal | enforced_at: experiments/tooling/cross_policy/attempt_loop.py:24 | before: first policy query of each attempt | qualified_on: matching reference -> pass; wrong reference -> raise ResetStateMismatch (real-simulator qualification owed in Protocol A RESET; never run)
 selection_risk: material
 selection_anchor: per-model schedule sha256 and runner command hash sent to Alba before launch; the earliest `started` record after that message counts
 multiple_executions: a second started execution of any planned attempt makes that attempt missing; a second started run of the whole schedule makes the model's result NO VALID RESULT
@@ -215,13 +231,14 @@ review_rounds_max: 2
 
 ## B11. Strongest claims under each outcome
 
-- **DELTA_POSITIVE or DELTA_NEGATIVE for model m:** "In [model m's native environment, host, renderer], on 400 frozen model-native identities, success at d=2, h=2 minus success at d=5, h=2 was X (95% CI [a, b], task-clustered)."
-- **DELTA_INCONCLUSIVE:** "No difference was established for model m at this N in this environment (estimate X, CI [a, b])."
+- **DELTA_POSITIVE or DELTA_NEGATIVE for model m, complete data:** "On 400 frozen model-native identities, in [model m's native stack] on the RTX 5090 WSL host under OSMesa, success at d=2, h=2 minus success at d=5, h=2 was exactly X (n11, n10, n01, n00 = …)." If B6.3 is reported: "For fresh states on the same 40 tasks, the 95% interval was [a, b]."
+- **DELTA_POSITIVE or DELTA_NEGATIVE with missing pairs:** "Over all 400 identities, the difference lies in [L, U] under worst-case imputation of k missing outcomes; the complete-pair estimate on N_c pairs was X."
+- **DELTA_INCONCLUSIVE:** "No direction was established for model m on this cohort in this environment (bounds [L, U])."
 - **Never claimed:**
   - a pooled or cross-model effect;
-  - renderer-controlled comparability between models;
+  - simulator or renderer equivalence between models;
   - identical physical states across models;
   - anything about h=5, R52 or R55;
   - quality preservation;
-  - generality beyond LIBERO, these checkpoints, or these hosts;
+  - generality beyond LIBERO, these 40 tasks, these checkpoints, or this host;
   - SmolVLA instrument validity for the historical 1,120 attempts.

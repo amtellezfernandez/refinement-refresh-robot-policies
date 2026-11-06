@@ -1,42 +1,43 @@
-# Cover note for Alba: protocol v3, revision 2 (DRAFT, NOT RELEASED, UNSENT)
+# Cover note for Alba: protocol v3, revision 2, with your 6 November decisions (DRAFT, NOT RELEASED, UNSENT)
 
 Alba,
 
-This revision implements your 6 November decisions on R6, R9, R4, N1, CNT and the scientific design. It is documentation only:
-- no preflight, parity, confirmation or state generation was run;
+This revision implements your decisions on R6, R9, R4, N1, CNT and the scientific design, and now also your eight answers of 6 November to the questions in the first version of this note (D1–D8, `12_DECISION_REGISTER_20261106.md`). It is documentation only:
+- no preflight, parity, evaluator validation, confirmation, state generation or coverage check was run;
 - no reserved identity was touched;
 - no frozen file was changed (v2 27/27 and diagnostic package 126/126 checksums verified on this branch).
 
-## What changed
+A separate draft PR contains the implementation (runner, gates, evaluator harness, schedule generator, analysis, qualification records). None of that code has been run on a simulator, a model or a GPU, and every qualification item in it is UNVERIFIED.
 
-- **Two protocols.**
-  - **A** is an engineering preflight (`01`): synthetic fixed actions, fresh envs, five diagnostic inputs, no outcome values.
-  - **B** is the scientific confirmation (`02`): separately scoped, not authorised.
-- **Estimand.** Delta_m = success(d=2, h=2) − success(d=5, h=2) per model. 400 model-native identities × 2 = 800 per model, 1,600 total (`04`).
-  - R52, R55, NATIVE, h=5 outcomes and the five-arm 2,000-per-model design are removed (`03`).
-- **R9.** A stock OpenPI `Policy.infer` reference in a separate process, with no wrapper. DO1–DO3 at d=10. Bitwise equality is required. h=5 is used only for the chunk-use check. Full action table, with commanded ±0.05 m / ±0.5 rad kept distinct from measured motion (`05`).
-- **R4.** `KeyedPolicy` is a candidate. Six approval items are listed; none is complete (`05` P5).
-- **R6.** Per-model environment register. GPU EGL and WSL llvmpipe/OSMesa are distinguished, and 15 host gaps are listed (`07`).
-- **N1.** Separate state populations, generated in each model's own stack. Pairs only within a model (`02` B3).
-- **CNT.** G02 exists only as a prototype (`pdr_g2_gate.py`). The production gate and entry point are absent from the repository and the MacBook; the RTX workspace was not searched. The requirements are listed (`09`).
+## Your eight decisions and where they are
 
-## Decisions I need from you
+| # | Decision | Where |
+|---|---|---|
+| D1 | Primary: exact cohort contrast and four paired counts over the 400 identities. Secondary: 95% interval for fresh states on the same 40 tasks, reported only with complete data and a passed R3 check. No t₃₉ interval | `02` B6.1–B6.4 |
+| D2 | UNINTERPRETABLE above 20 incomplete pairs or an arm-missingness difference above 10; bounds over 400; direction only if the bounds exclude zero | `02` B6.5 |
+| D3 | Model-free evaluator check for both stacks, independent BDDL inspection, π0.5 `done` semantics | `13` (Protocol E) |
+| D4 | RTX 5090 WSL OSMesa for both; bindings before qualification; 4060 Ti EGL excluded | `07`; `01` A3a |
+| D5 | Per-request executed-step attestation for π0.5, bound to request and tick; failure stops the run | `09` C4; `02` B5 |
+| D6 | NONE_RECORDED; two-sided | `02` B1 |
+| D7 | SmolVLA qualification items; non-finite under valid inputs = scientific failure; broken contract = instrument incident | `01` A5 S-QUAL; `02` B5 |
+| D8 | Deterministic flags; same-host bitwise parity; matched noise; preprocessing comparison; clipping and frame checks; stop if infeasible | `05` P1–P3, P6 |
 
-1. **Primary interval (PROPOSED):** task-clustered paired interval (40 clusters, t₃₉), with a coverage study before release. Accept it, or name another method.
-2. **Missingness thresholds (PROPOSED):** UNINTERPRETABLE if more than 20/400 pairs are incomplete, or if missing attempts differ by condition by more than 10.
-3. **Episode-level evaluator parity:** v2's 4 × 10 × 10 native-parity episodes are removed from the preflight because they read success rates. Do you still want an evaluator-level check as a separate protocol?
-4. **Hosts:** which host and renderer each model's Protocol B runs on (G1). Your reference stack's lock files (G2).
-5. **Per-request count attestation:** adopt it or not (`09`).
-6. **Numerical prediction per model:** optional. It is currently NONE_RECORDED.
-7. **SmolVLA preflight scope:** Protocol A tests SmolVLA only for count, provenance, isolation, fresh-env determinism, the reset check and a source read of its success signal. Normalization, units and evaluator parity are not tested, as in v2. Is that sufficient to release SmolVLA into Protocol B?
-8. **Deterministic XLA flags:** Protocol B must run in exactly the configuration Protocol A certified. If you decline the flags after the timing check, R9's cross-process bitwise criterion is not expected to hold under default flags (about 5e-3 drift). How should parity be judged then?
+The superseded requirements, including the t₃₉ interval, McNemar, the optional attestation and the cross-host plan, are listed in `12` §3 and removed from the current text.
+
+## Four questions your decisions leave open
+
+1. **π0.5 non-finite actions.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure. For π0.5 the written rule (v1 `stop_rule_pi05`) stops the phase instead. I have kept that as written, so the two models classify the same event differently. Do you want π0.5 to follow D7 too?
+2. **R3 coverage check.** The grid, generative model, replicate count and seed in `02` B6.4 are my drafting choices (PROPOSED). Please confirm or replace them before the check is run. I expect that some low-discordance cells may fail, because tasks with no discordant pair contribute zero variance; the check is meant to detect exactly that.
+3. **Secondary interval reference distribution.** Student t at 160 degrees of freedom (PROPOSED, `02` B6.3).
+4. **Goal-reached fixtures for Protocol E.** Neither stack has one. Is a version-matched replay of a LIBERO demonstration acceptable as the source (`13` E3)?
 
 ## Not claimed
 
-- No parity result.
-- No renderer equivalence.
+- No parity, evaluator or count result.
+- No renderer or simulator equivalence between the two models.
 - No cross-model physical-state equivalence.
 - No defect or root cause in the earlier pi0.5 campaign, only an unverified instrument and missing records (`08`).
 - No SmolVLA instrument validity.
+- No qualification of any kind: the implementation existing is not evidence that it passes.
 
 Warren

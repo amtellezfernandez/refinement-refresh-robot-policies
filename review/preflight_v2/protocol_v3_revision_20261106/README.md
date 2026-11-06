@@ -1,6 +1,6 @@
-# Protocol v3 revision 2 (6 Nov 2026): DRAFT / NOT RELEASED / UNSENT
+# Protocol v3 revision 2 (6 Nov 2026), with Alba's decisions D1–D8: DRAFT / NOT RELEASED / UNSENT
 
-Documentation and design only. No experiment ran. Branch `warren/pi05-protocol-v3-rev2-review-20261106`, based on the published `ba14f26`, for review as a draft PR.
+Documentation and design only. No experiment ran. Alba's eight decisions of 6 November are recorded in `12` and implemented across `00`–`09` and `13`. Branch `warren/pi05-protocol-v3-rev2-review-20261106`, based on the published `ba14f26`, for review as a draft PR.
 
 | File | Deliverable |
 |---|---|
@@ -15,9 +15,12 @@ Documentation and design only. No experiment ran. Branch `warren/pi05-protocol-v
 | `08_EARLIER_CAMPAIGN_REVISED.md` | 8, Part 9 |
 | `09_CNT_G02_REVIEW.md` | Part 7 |
 | `10_CONTRADICTIONS_FOUND.md` | contradictions between existing documents |
-| `11_DOCUMENT_REVIEW.md` | independent document-level review and dispositions |
+| `11_DOCUMENT_REVIEW.md` | independent document-level review and dispositions (of the first published revision, before D1–D8) |
+| `12_DECISION_REGISTER_20261106.md` | Alba's eight decisions of 6 November, where each is implemented, and the superseded requirements removed |
+| `13_EVALUATOR_VALIDATION.md` | Protocol E: model-free evaluator validation for both stacks (D3) |
 
-**Disclosed lint findings** (`prereg_lint.py`):
-- `01`: GATE_POINTER × 4, for tools not written.
-- `02`: GATE_POINTER × 2, for tools not written, and GATE_UNQUALIFIED for RESET, which has never run on the real simulator.
-- The verdict table is total.
+**Disclosed lint findings** (`prereg_lint.py`, after D1–D8):
+- `01`: GATE_POINTER × 5: four for tools not written, one (ATT-START) for code that exists only on the implementation draft branch and has never run.
+- `02`: GATE_POINTER × 3 for code on the implementation draft branch (never run), and GATE_UNQUALIFIED for RESET, which has never run on the real simulator.
+- `13`: GATE_POINTER × 1 for code on the implementation draft branch (never run).
+- All three verdict tables (`02`, `13`, and `01`'s verdict list) are total.

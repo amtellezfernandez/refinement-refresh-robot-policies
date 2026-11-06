@@ -2,6 +2,8 @@
 
 **Not approved. Not run.** Only Alba can accept compiled-path counting in place of v2's eager count.
 
+**Decision D5 (6 Nov, `12_DECISION_REGISTER_20261106.md`):** for π0.5, executed denoising steps are attested on **every served chunk**, bound to the request identifier and the execution tick. The startup G02 gate, independent count verification, an action-output preservation check and an overhead measurement are all required. A missing or incorrect count prevents action application, stops the model run, and is recorded as an instrument investigation. C4 below specifies this. The implementation draft PR contains code for it (`experiments/tooling/cross_policy_v3/server_openpi_v3.py`, `attestation.py`); that code **has never been run**, on any host.
+
 ## C1. Exact implementation status (read-only inspection, 6 Nov)
 
 | Artefact | Status | Evidence |
@@ -77,11 +79,9 @@ A second count from a **different instrument on a different program**: the v2 ea
 - Record host wall time per call, peak device memory, and first-call compile time.
 - **No pass threshold.** The numbers inform Alba's choice. Which of the two flags matters is not separated (D01) and is not required.
 
-### Per-request attestation (optional; Alba's choice)
+### Per-request attestation (required, D5)
 
-- Each served chunk carries its CNT-1 count. The client refuses a chunk whose count is not d, and the refusal is classed INFRA_POST under Protocol B.
-- It closes probe-input specificity (W4).
-- Timing cost: unmeasured. It would be measured under CNT-T if adopted.
+Specified in C4. It closes probe-input specificity (W4): the count is taken on every real request, not only on SC1 and SC2. Its timing cost is measured under CNT-T.
 
 ### Independent review requirements
 
@@ -94,4 +94,42 @@ A second count from a **different instrument on a different program**: the v2 ea
 - Model-code bugs shared between stock and reference are invisible.
 - Bitwise equality is fragile to JAX, XLA or driver changes. The gate then fails closed, which is the safe direction.
 - One host and toolchain.
-- Synthetic inputs, unless attestation is adopted.
+- The startup gate (CNT-1, CNT-2, CNT-NC, CNT-REP) runs on synthetic inputs only. Per-request attestation (C4) covers every real request for the **count** and the **time grid**, but not for CNT-2's bitwise reference comparison, which runs at startup only.
+
+## C4. Per-request executed-step attestation (D5)
+
+**Request.** Every client request carries, besides the observation, `__d__` and `__noise_key__`:
+- `__request_id__`: sha256 of the canonical JSON of `[planned_run_id, attempt_number, tick]`;
+- `__tick__`: the integer control tick at which the chunk is requested.
+
+**Served program.** The served sampler is a single `module_jit` of the stock `sample_actions`, compiled with two data-dependent `jax.debug.callback`s, installed before the gate runs:
+- one on the output of `action_out_proj` (the G02 counting site; signature-unique, asserted fail-closed), which counts executed action-head evaluations;
+- one on the time operand of `embed_suffix`, which records the time value visited at each Euler step.
+
+The object that passes the startup gate is the object that serves. It is never re-jitted after the gate.
+
+**Per request, inside the server, under one lock:**
+1. Reset the per-request counters.
+2. Call the frozen `KeyedPolicy.infer` path with `__d__` and `__noise_key__`.
+3. `jax.effects_barrier()`, then read the head-evaluation count and the visited time values.
+4. Return the actions together with an `attestation` object: `schema`, `request_id`, `tick`, `d_requested`, `executed_head_evaluations`, `time_values` (float32, as hexadecimal strings), `sequence_number` (strictly increasing per server process), `startup_gate_sha256` (the sha256 of the startup gate record) and `xla_flags`, plus `attestation_sha256` over its canonical JSON.
+
+The server never writes an attestation from the request: every count field comes from the callbacks. If the callbacks did not fire, the count is 0 and the client refuses the chunk.
+
+**Client verification, before the first action of the chunk is applied.** All must hold, or the attempt is an INSTRUMENT_INCIDENT (`02` B5), no action from the chunk is applied, and the model run stops:
+1. an attestation is present and has the expected schema;
+2. `request_id` and `tick` equal the values sent with this request;
+3. `d_requested` = d of the schedule row;
+4. `executed_head_evaluations` = d;
+5. the multiset of `time_values` equals the host-side float32 recurrence t₀ = 1, t_{k+1} = t_k + (−1/d), for k = 0..d−1, computed in NumPy outside JAX. **The recurrence is read from the G02 prototype's faithful sampler P, which was bitwise equal to stock; it has not been re-read from pinned `pi0.py` in this revision.**
+6. `startup_gate_sha256` equals the value the client recorded at start from the server's startup record;
+7. `sequence_number` is greater than the previous one this client saw;
+8. `attestation_sha256` matches the attestation's canonical JSON.
+
+**Independent count verification.** At startup, CNT-IND (C2) counts `action_out_proj` calls in the uncompiled program under `disable_jit` at d = 2, 5, 10 on SC1. Per request, check 5 (the time grid, from a different call site) is a second channel alongside check 4 (the head count). Both channels sit in the same compiled program, so a shared-body defect stays invisible to both (C3).
+
+**Action-output preservation.** At startup, for SC1 and SC2 at d = 2, 5, 10, the served (instrumented) output must be bitwise equal to a separate uninstrumented compile of the same sampler (CNT-1, PRES).
+
+**Overhead measurement.** CNT-T records, under the deterministic flags, per-call host time with the attestation callbacks and without them, 100 warm-up + 100 measured calls per d, in separate processes. Recorded, not gated.
+
+**Failure record.** An attestation failure writes an incident file (attempt, tick, request identifier, the raw attestation, the failed check) before the run stops. The incident is investigated before anything is changed; the attempt is not retried.
