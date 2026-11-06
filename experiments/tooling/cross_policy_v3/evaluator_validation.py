@@ -17,6 +17,7 @@ import their stack lazily.
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -161,12 +162,17 @@ def validate_fixtures(document, stack, root=Path(".")):
                 raise FixtureError("HORIZON fixtures run no-ops to the stack's horizon")
             if fixture["expected_case"] == "GOAL_UNMET" and steps != GOAL_UNMET_STEPS:
                 raise FixtureError("GOAL_UNMET fixtures run {} no-op steps".format(GOAL_UNMET_STEPS))
-        elif kind == "saved":
+        elif kind in ("saved", "scripted_actions"):
             path = (Path(root) / source.get("path", "")).resolve()
-            if not path.is_file() or file_sha(path) != source.get("sha256"):
+            if Path(root).resolve() not in path.parents or not path.is_file() or file_sha(path) != source.get("sha256"):
                 raise FixtureError("saved actions missing or hash mismatch for {}".format(fixture["fixture_id"]))
             if not source.get("version_matched_to"):
-                raise FixtureError("saved actions must name the stack version they were recorded in (D3)")
+                raise FixtureError("action fixtures must name the native stack version (D3)")
+            if kind == "scripted_actions":
+                script = (Path(root) / source.get("script_path", "")).resolve()
+                if (Path(root).resolve() not in script.parents or not script.is_file()
+                        or file_sha(script) != source.get("script_sha256")):
+                    raise FixtureError("scripted actions require a frozen script source")
         else:
             raise FixtureError("unknown action source {!r}".format(kind))
         coverage[(fixture["suite"], fixture["expected_case"])] += 1
@@ -224,7 +230,61 @@ def actions_for(fixture, horizon, root):
     if source["kind"] == "scripted_noop":
         steps = horizon if source["steps"] == "horizon" else source["steps"]
         return [list(NOOP) for _ in range(steps)]
-    return np.load(str(Path(root) / source["path"])).tolist()
+    actions = np.load(str(Path(root) / source["path"]), allow_pickle=False)
+    if actions.ndim != 2 or actions.shape[1] != 7 or actions.dtype.kind != "f" or not np.isfinite(actions).all():
+        raise FixtureError("fixture actions must be finite floating-point vectors of width 7")
+    return actions.tolist()
+
+
+def evaluator_sample(problem, atoms, step, native_success, stop_reason=None):
+    import numpy as np
+
+    goal, per_atom = independent_goal(problem, atoms)
+    state = np.asarray(problem.sim.get_state().flatten())
+    return {"step": step, "state_sha256": hashlib.sha256(state.tobytes()).hexdigest(),
+            "goal_met": bool(goal), "native_success": bool(native_success),
+            "stop_reason": stop_reason, "per_atom": per_atom}
+
+
+def benchstudio_report(stack, runtime, results, verdict, checker_sha256):
+    """Translate qualified Protocol E rows into the BenchStudio launch-gate schema."""
+    required = {"runner", "checkpoint", "simulator_stack", "renderer", "assets", "normalization"}
+    if (
+        stack not in STACKS or not isinstance(runtime, dict) or not required.issubset(runtime)
+        or not all(isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value)
+                   for value in runtime.values())
+        or not isinstance(checker_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", checker_sha256)
+    ):
+        raise FixtureError("BenchStudio export requires the native runtime hash mapping")
+    if verdict != "EVALUATOR_QUALIFIED" or not results or any(
+        row.get("agrees") is not True for row in results
+    ):
+        raise FixtureError("cannot export unqualified Protocol E evidence")
+    kinds = {"GOAL_UNMET": "goal_unmet", "HORIZON": "horizon_timeout", "GOAL_REACHED": "goal_reached"}
+    cases, seen = [], set()
+    for row in results:
+        key = row["suite"], kinds[row["expected_case"]]
+        if key in seen:
+            raise FixtureError("BenchStudio export requires exactly one fixture per suite and case")
+        seen.add(key)
+        samples = row["benchstudio_samples"]
+        if not samples or samples[0]["goal_met"] or samples[0]["native_success"]:
+            raise FixtureError("BenchStudio export needs a goal-unmet reset")
+        if key[1] == "goal_unmet":
+            samples, outcome = samples[:1], None
+        else:
+            if samples[-1]["stop_reason"] is None:
+                raise FixtureError("BenchStudio export needs a terminal trace or the full horizon")
+            outcome = any(sample["native_success"] for sample in samples)
+        cases.append({"suite": key[0], "kind": key[1], "task_id": str(row["task_id"]),
+                      "horizon": row["horizon"], "goal_spec_sha256": row["bddl_sha256"],
+                      "samples": samples, "recorded_success": outcome})
+    if seen != {(suite, kind) for suite in SUITES for kind in kinds.values()}:
+        raise FixtureError("BenchStudio export requires complete suite coverage")
+    return {"schema": "benchstudio.evaluator_qualification.v1",
+            "model": "pi0.5" if stack == "pi05" else "smolvla", "runtime": runtime,
+            "goal_checker_sha256": checker_sha256, "cases": cases, "passed": True,
+            "protocol_e_results_sha256": sha(results)}
 
 
 def run_fixture_pi05(fixture, root, forbidden_hashes):
@@ -250,18 +310,25 @@ def run_fixture_pi05(fixture, root, forbidden_hashes):
         for _ in range(co.WAIT_STEPS):
             env.step(co.DUMMY_ACTION)
         horizon = co.MAX_STEPS[fixture["suite"]]
+        samples = [evaluator_sample(problem, atoms, 0, env.check_success())]
         trace = []
         # The client loop: at most MAX_STEPS steps after settling, stop on done (client_openpi.rollout).
         for step, action in enumerate(actions_for(fixture, horizon, root)[:horizon]):
             _, _, done, _ = env.step(list(action))
-            goal, per_atom = independent_goal(problem, atoms)
-            trace.append({"step": step, "recorded_success": bool(done), "independent_goal": goal,
-                          "per_atom": per_atom, "episode_ended": bool(done)})
+            sample = evaluator_sample(problem, atoms, step + 1, done)
+            sample["stop_reason"] = (
+                ("goal" if sample["goal_met"] else "other") if done
+                else "horizon" if step + 1 == horizon else None
+            )
+            samples.append(sample)
+            trace.append({"step": step, "recorded_success": bool(done),
+                          "independent_goal": sample["goal_met"], "per_atom": sample["per_atom"],
+                          "episode_ended": bool(done)})
             if done:
                 break
     finally:
         env.close()
-    return trace, horizon, {"bddl_sha256": bddl_sha, "goal_atoms": atoms}
+    return trace, horizon, {"bddl_sha256": bddl_sha, "goal_atoms": atoms, "benchstudio_samples": samples}
 
 
 def run_fixture_smolvla(fixture, root, forbidden_hashes):
@@ -292,22 +359,31 @@ def run_fixture_smolvla(fixture, root, forbidden_hashes):
         if not same_atoms(atoms, problem.parsed_problem["goal_state"]):
             raise EvaluatorIncident("own BDDL parse differs from the env's goal_state")
         horizon = int(base._max_episode_steps)
+        samples = [evaluator_sample(problem, atoms, 0, base._env.check_success())]
         trace = []
         # Step the single underlying env, not the vector wrapper: a vector env may autoreset on termination,
         # and the goal must be read from the state the step produced.
         single = env.envs[0]
         for step, action in enumerate(actions_for(fixture, horizon, root)[:horizon]):
             _, _, terminated, truncated, info = single.step(np.asarray(action, dtype=np.float32))
-            goal, per_atom = independent_goal(problem, atoms)
+            recorded = rp.batch_one_success(info)
             ended = bool(terminated) or bool(truncated)
-            trace.append({"step": step, "recorded_success": rp.batch_one_success(info), "independent_goal": goal,
-                          "per_atom": per_atom, "episode_ended": ended, "terminated": bool(terminated),
+            sample = evaluator_sample(problem, atoms, step + 1, recorded)
+            sample["stop_reason"] = (
+                "goal" if terminated and sample["goal_met"]
+                else "horizon" if step + 1 == horizon and not terminated
+                else "other" if ended else None
+            )
+            samples.append(sample)
+            trace.append({"step": step, "recorded_success": recorded,
+                          "independent_goal": sample["goal_met"], "per_atom": sample["per_atom"],
+                          "episode_ended": ended, "terminated": bool(terminated),
                           "truncated": bool(truncated)})
             if ended:
                 break
     finally:
         env.close()
-    return trace, horizon, {"bddl_sha256": bddl_sha, "goal_atoms": atoms}
+    return trace, horizon, {"bddl_sha256": bddl_sha, "goal_atoms": atoms, "benchstudio_samples": samples}
 
 
 def main():
@@ -317,14 +393,17 @@ def main():
     parser.add_argument("--fixtures", type=Path, required=True)
     parser.add_argument("--authorisation", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--benchstudio-runtime", type=Path, help="Separately captured native runtime identities.")
     parser.add_argument("--confirmation-manifest", type=Path, action="append", required=True,
                         help="both models' confirmation state manifests; fixture states must not collide (ISO)")
     args = parser.parse_args()
     if len(args.confirmation_manifest) != 2:
         raise SystemExit("REFUSED: give both models' confirmation manifests for the ISO check")
     # E-AUTH before any env construction (13 E7).
-    release.check_authorisation(args.authorisation, PROTOCOL_E_DOCUMENT,
-                                {"fixtures": args.fixtures, "evaluator_validation.py": __file__},
+    bound = {"fixtures": args.fixtures, "evaluator_validation.py": __file__}
+    if args.benchstudio_runtime is not None:
+        bound["benchstudio_runtime"] = args.benchstudio_runtime
+    release.check_authorisation(args.authorisation, PROTOCOL_E_DOCUMENT, bound,
                                 scope="PROTOCOL_E_" + args.stack.upper())
     root = args.fixtures.resolve().parent
     document = json.loads(args.fixtures.read_text("utf-8"))
@@ -344,7 +423,8 @@ def main():
             incident = {"fixture_id": fixture["fixture_id"], "error": repr(error)}
             break
         result = dict(compare(trace, fixture["expected_case"], horizon), fixture_id=fixture["fixture_id"],
-                      suite=fixture["suite"], expected_case=fixture["expected_case"], **meta)
+                      suite=fixture["suite"], task_id=fixture["task_id"],
+                      expected_case=fixture["expected_case"], **meta)
         atomic_write_json(args.output / "{}.trace.json".format(fixture["fixture_id"]), trace)
         results.append(result)
     verdict = stack_verdict(results, coverage["missing_cases"], incident)
@@ -352,6 +432,10 @@ def main():
               "results": results, "fixtures_sha256": file_sha(args.fixtures), "harness_sha256": file_sha(__file__),
               "results_sha256": sha(results)}
     atomic_write_json(args.output / "protocol_e_record.json", record)
+    if args.benchstudio_runtime is not None:
+        runtime = json.loads(args.benchstudio_runtime.read_text("utf-8"))
+        evidence = benchstudio_report(args.stack, runtime, results, verdict, file_sha(__file__))
+        atomic_write_json(args.output / "evaluator.json", evidence)
     print(json.dumps({"stack": args.stack, "verdict": verdict}))
 
 

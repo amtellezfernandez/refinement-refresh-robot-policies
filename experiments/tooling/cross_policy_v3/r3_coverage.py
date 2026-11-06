@@ -7,8 +7,8 @@ model, replicate count and seed are the PROPOSED values of 02 B6.4.
 
 Generative model (02 B6.4): per pair, a joint outcome in {11, 10, 01, 00} with
     pi10 = (q + delta)/2, pi01 = (q - delta)/2, pi11 = b - pi01, pi00 = 1 - pi11 - pi10 - pi01.
-Task level: pi_t ~ Dirichlet(kappa * pi), state level: pi_ts ~ Dirichlet(kappa * pi_t), kappa = (1 - rho)/rho
-(no heterogeneity when rho = 0). The two seeds of a state are independent draws from pi_ts.
+Task and state Dirichlet concentrations are varied independently. At either level,
+kappa = (1 - rho)/rho, with no additional heterogeneity when that level has rho = 0. The two seeds of a state are independent draws from pi_ts.
 Target per replicate: (1/T) * sum_t (pi_t10 - pi_t01), the fresh-state difference on that replicate's tasks.
 Criterion: empirical coverage >= 0.93 in every feasible cell.
 """
@@ -25,7 +25,8 @@ from v3common import PROTOCOL_B_DOCUMENT, atomic_write_json, file_sha, sha  # no
 
 SCHEMA = "r3_coverage_record_v1"
 GRID = {"baseline": [0.20, 0.50, 0.80, 0.95], "discordance": [0.02, 0.10, 0.30],
-        "delta": [-0.15, -0.05, 0.0, 0.05, 0.15], "rho": [0.0, 0.25, 0.5]}
+        "delta": [-0.15, -0.05, 0.0, 0.05, 0.15], "rho_task": [0.0, 0.25, 0.5],
+        "rho_state": [0.0, 0.25, 0.5]}
 LAYOUT = {"tasks": 40, "states_per_task": 5, "seeds_per_state": 2}
 REPLICATES = 2000
 SEED = 20261107
@@ -55,9 +56,11 @@ def cells():
     for b in GRID["baseline"]:
         for q in GRID["discordance"]:
             for delta in GRID["delta"]:
-                for rho in GRID["rho"]:
-                    out.append({"baseline": b, "discordance": q, "delta": delta, "rho": rho,
-                                "feasible": feasible(b, q, delta)})
+                for rho_task in GRID["rho_task"]:
+                    for rho_state in GRID["rho_state"]:
+                        out.append({"baseline": b, "discordance": q, "delta": delta,
+                                    "rho_task": rho_task, "rho_state": rho_state,
+                                    "feasible": feasible(b, q, delta)})
     return out
 
 
@@ -79,15 +82,16 @@ def draw_category(rng, probabilities):
     return CATEGORIES[-1]
 
 
-def replicate(rng, pi, rho):
-    kappa = None if rho == 0 else (1.0 - rho) / rho
+def replicate(rng, pi, rho_task, rho_state):
+    kappa_task = None if rho_task == 0 else (1.0 - rho_task) / rho_task
+    kappa_state = None if rho_state == 0 else (1.0 - rho_state) / rho_state
     task_means, variances, targets = [], [], []
     for _ in range(LAYOUT["tasks"]):
-        pi_t = dirichlet(rng, pi, kappa)
+        pi_t = dirichlet(rng, pi, kappa_task)
         targets.append(pi_t["10"] - pi_t["01"])
         state_values = []
         for _ in range(LAYOUT["states_per_task"]):
-            pi_ts = dirichlet(rng, pi_t, kappa)
+            pi_ts = dirichlet(rng, pi_t, kappa_state)
             total = 0.0
             for _ in range(LAYOUT["seeds_per_state"]):
                 category = draw_category(rng, pi_ts)
@@ -102,12 +106,12 @@ def replicate(rng, pi, rho):
 
 
 def run_cell(cell, replicates=REPLICATES):
-    seed = int(hashlib.sha256(json.dumps([SEED, cell["baseline"], cell["discordance"], cell["delta"], cell["rho"]])
+    seed = int(hashlib.sha256(json.dumps([SEED, cell["baseline"], cell["discordance"], cell["delta"], cell["rho_task"], cell["rho_state"]])
                               .encode("utf-8")).hexdigest()[:16], 16)
     rng = random.Random(seed)
     pi = base_probabilities(cell["baseline"], cell["discordance"], cell["delta"])
     pi = {k: max(0.0, v) for k, v in pi.items()}
-    covered = sum(1 for _ in range(replicates) if replicate(rng, pi, cell["rho"]))
+    covered = sum(1 for _ in range(replicates) if replicate(rng, pi, cell["rho_task"], cell["rho_state"]))
     return covered / float(replicates)
 
 

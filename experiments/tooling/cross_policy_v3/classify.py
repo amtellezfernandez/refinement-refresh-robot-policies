@@ -44,7 +44,7 @@ class InfraPost(ClassifiedFailure):
 
 
 class InstrumentIncident(ClassifiedFailure):
-    """pi0.5 attestation failure (D5); SmolVLA broken contract, unclear provenance, invalid input, count (D7).
+    """Attestation failure, broken action contract, invalid input, or unclear provenance.
 
     The action concerned has not been applied. The model run stops for review.
     """
@@ -52,7 +52,7 @@ class InstrumentIncident(ClassifiedFailure):
 
 
 class ProtocolStop(ClassifiedFailure):
-    """pi0.5 v1 stop_rule_pi05: unsupported refinement setting, non-finite action, wrong chunk shape."""
+    """Unsupported pi0.5 refinement setting."""
     attempt_class = PROTOCOL_STOP
 
 

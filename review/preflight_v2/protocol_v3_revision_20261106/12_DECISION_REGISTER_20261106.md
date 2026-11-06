@@ -57,9 +57,11 @@
 - The π0.5 PROTOCOL_STOP rule of v1 (`stop_rule_pi05`) for an unsupported refinement setting.
 - All frozen files and checksums.
 
-## 5. Questions these decisions leave open (raised in `00`, not decided here)
+## 5. Decisions on the four implementation questions
 
-1. **Non-finite action and broken action contract, π0.5.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure, and a broken SmolVLA action contract an instrument incident. The written π0.5 rule (B5, v1 `stop_rule_pi05`) still treats a non-finite action or a wrong chunk shape as PROTOCOL_STOP. The two models therefore classify the same event differently. Kept as written until Alba says otherwise.
-2. **R3 coverage-check grid and generative model.** D1 requires the check; its concrete grid points, generative model and replicate count are drafting choices (`02` B6.4, marked PROPOSED).
-3. **Secondary-interval reference distribution.** Student t with 160 degrees of freedom is a drafting choice (`02` B6.3, PROPOSED). The R3 check evaluates it as specified.
-4. **Source of goal-reached fixtures for Protocol E.** D3 permits saved actions or scripted fixtures. Neither exists yet for either stack (`13` E4).
+1. **π0.5 outcomes.** Apply the same rule as SmolVLA. An attested chunk of the expected floating-point shape that contains a non-finite action is a scientific failure only if valid inputs and a non-finite raw model output are verified for that request. A malformed chunk, failed attestation, or unclear attribution stops the run as an instrument incident before applying the action. Keep PROTOCOL_STOP for unsupported refinement settings.
+2. **R3.** Freeze the existing baseline, discordance, and Delta grid. Vary task heterogeneity and within-state seed dependence independently over {0, 0.25, 0.5} at each level. Use 2,000 replicates per feasible cell, seed 20261107, and minimum empirical coverage 0.93. Freeze the grid and code before a separately authorised synthetic check.
+3. **Secondary interval.** Use Student t with 160 degrees of freedom as the prespecified candidate. Report it only for complete data if R3 passes. The exact cohort contrast remains primary.
+4. **Protocol E fixtures.** Prefer version-matched saved actions. Alternatively use a scripted trajectory frozen as an action file, with its script source and hashes recorded, on each pinned native stack. Use diagnostic states disjoint from confirmation. Validate success and termination through the evaluator with an independent BDDL goal check. A goal teleport alone does not qualify the rollout path.
+
+The proposed release fields `v3_code_sha256` and `qualification_sha256_by_model` are accepted for review. Authorization still binds the exact protocol and schedule and requires independent approval before execution.

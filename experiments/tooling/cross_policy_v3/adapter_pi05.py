@@ -5,7 +5,7 @@ MUJOCO_GL=osmesa on the RTX 5090 WSL host (D4). Environment, settling, image han
 frozen `client_openpi.py` helpers unchanged. Differences from the frozen rollout:
 - every request carries `__request_id__` and `__tick__`, and every served chunk's executed-step attestation is
   verified BEFORE its first action is applied (D5); a failure raises InstrumentIncident;
-- the v1 stop rule (server echo, shape, finiteness, chunk length) raises ProtocolStop, as in v1;
+- unsupported refinement settings stop the phase, and malformed chunks stop for instrument review;
 - a first-query marker is written before the first request;
 - each executed action records the request and attestation it came from.
 """
@@ -23,6 +23,28 @@ from classify import InfraPre, InstrumentIncident, ProtocolStop  # noqa: E402
 from v3common import V2, file_sha, sha  # noqa: E402
 
 CERTIFIED_XLA_FLAGS = "--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level=0"  # D8
+
+
+def checked_chunk(np, response, request_id, tick, h):
+    """Return an attested action chunk, or None for a verified model failure."""
+    try:
+        chunk = np.asarray(response["actions"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise InstrumentIncident("broken action chunk contract at tick {}".format(tick)) from exc
+    if chunk.ndim != 2 or chunk.shape[1] != 7 or len(chunk) < h or chunk.dtype.kind != "f":
+        raise InstrumentIncident("broken action chunk contract at tick {}".format(tick))
+    evidence = response.get("action_diagnostics")
+    if (
+        not isinstance(evidence, dict) or evidence.get("request_id") != request_id
+        or type(evidence.get("tick")) is not int or evidence["tick"] != tick
+        or evidence.get("transformed_inputs_finite") is not True
+    ):
+        raise InstrumentIncident("invalid or unverified transformed inputs at tick {}".format(tick))
+    if not np.isfinite(chunk).all():
+        if evidence.get("raw_actions_finite") is not False:
+            raise InstrumentIncident("non-finite action has unclear attribution at tick {}".format(tick))
+        return None
+    return chunk
 
 
 class Pi05ClientAdapter(object):
@@ -101,6 +123,7 @@ class Pi05ClientAdapter(object):
         co.check_reset((settled, first_observation), context.expected_reset)  # before any policy query
         plan, provenance, actions, done = collections.deque(), [], [], False
         started = time.perf_counter()
+        nonfinite = False
         for tick in range(co.MAX_STEPS[ident["suite"]]):
             current = co.policy_input(obs, prompt)
             if not plan:
@@ -112,16 +135,15 @@ class Pi05ClientAdapter(object):
                 response = self.client.infer(request)
                 # D5 first: no action from this chunk is applied unless its attestation verifies.
                 digest = self.verifier.verify(response.get("attestation"), rid, tick, d)
-                # v1 stop_rule_pi05, unchanged (02 B5).
                 if response.get("server_configured_num_steps") != d:
                     raise ProtocolStop("unsupported_refinement_setting: server did not attest configured d={}".format(d))
-                chunk = np.asarray(response["actions"])
-                if chunk.ndim != 2 or chunk.shape[1] != 7 or len(chunk) < h or not np.isfinite(chunk).all():
-                    raise ProtocolStop("unsupported_refinement_setting: chunk {} finite={}".format(
-                        chunk.shape, bool(np.isfinite(chunk).all())))
                 if response.get("received_num_steps") != d:
                     raise ProtocolStop("unsupported_refinement_setting: sampler received {}".format(
                         response.get("received_num_steps")))
+                chunk = checked_chunk(np, response, rid, tick, h)
+                if chunk is None:
+                    nonfinite = True
+                    break
                 chunk_record = {"request_id": rid, "tick": tick, "attestation_sha256": digest,
                                 "chunk_sha256": co.digest(chunk), "shape": list(chunk.shape)}
                 plan.extend((chunk_record, index, chunk[index]) for index in range(h))
@@ -140,7 +162,8 @@ class Pi05ClientAdapter(object):
         array_path = context.arrays_dir / "{}.attempt{:02d}.npy".format(row["planned_run_id"], context.attempt_number)
         np.save(str(array_path), np.asarray(actions))
         return {"outcome": {"success": bool(done), "episode_length": len(actions),
-                            "termination_reason": "success" if done else "task_horizon",
+                            "termination_reason": ("success" if done else "nonfinite_action_valid_inputs"
+                                                   if nonfinite else "task_horizon"),
                             "success_source": "LIBERO done (OffScreenRenderEnv.step)"},
                 "settled_state_sha256": settled, "first_observation_sha256": first_observation,
                 "action_provenance": provenance, "action_array": array_path.name,

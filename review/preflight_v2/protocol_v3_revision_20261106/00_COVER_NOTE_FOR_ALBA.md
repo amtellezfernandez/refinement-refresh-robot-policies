@@ -24,12 +24,12 @@ A separate draft PR contains the implementation (runner, gates, evaluator harnes
 
 The superseded requirements, including the t₃₉ interval, McNemar, the optional attestation and the cross-host plan, are listed in `12` §3 and removed from the current text.
 
-## Four questions your decisions leave open
+## Decisions on the four implementation questions
 
-1. **π0.5 non-finite actions and wrong chunk shapes.** D7 makes a non-finite SmolVLA action under valid inputs a scientific failure, and a broken SmolVLA action contract an instrument incident. For π0.5 the written rule (v1 `stop_rule_pi05`) stops the phase in both cases instead. I have kept that as written, so the two models classify the same event differently. Do you want π0.5 to follow D7 too?
-2. **R3 coverage check.** The grid, generative model, replicate count and seed in `02` B6.4 are my drafting choices (PROPOSED). Please confirm or replace them before the check is run. I expect that some low-discordance cells may fail, because tasks with no discordant pair contribute zero variance; the check is meant to detect exactly that.
-3. **Secondary interval reference distribution.** Student t at 160 degrees of freedom (PROPOSED, `02` B6.3).
-4. **Goal-reached fixtures for Protocol E.** Neither stack has one. Is a version-matched replay of a LIBERO demonstration acceptable as the source (`13` E3)?
+1. **π0.5 outcomes.** Apply the same rule as SmolVLA. An attested chunk of the expected floating-point shape that contains a non-finite action is a scientific failure only if valid inputs and a non-finite raw model output are verified for that request. A malformed chunk, failed attestation, or unclear attribution stops the run as an instrument incident before applying the action. Keep PROTOCOL_STOP for unsupported refinement settings.
+2. **R3.** Freeze the existing baseline, discordance, and Delta grid. Vary task heterogeneity and within-state seed dependence independently over {0, 0.25, 0.5} at each level. Use 2,000 replicates per feasible cell, seed 20261107, and minimum empirical coverage 0.93. Freeze the grid and code before a separately authorised synthetic check.
+3. **Secondary interval.** Use Student t with 160 degrees of freedom as the prespecified candidate. Report it only for complete data if R3 passes. The exact cohort contrast remains primary.
+4. **Protocol E fixtures.** Prefer version-matched saved actions. Alternatively use a scripted trajectory frozen as an action file, with its script source and hashes recorded, on each pinned native stack. Use diagnostic states disjoint from confirmation. Validate success and termination through the evaluator with an independent BDDL goal check. A goal teleport alone does not qualify the rollout path.
 
 ## Not claimed
 

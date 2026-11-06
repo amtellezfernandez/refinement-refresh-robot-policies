@@ -243,7 +243,7 @@ def check_r3_record(path):
     # Recompute the pass from the cells; never trust the record's own status alone.
     expected = r3_coverage.cells()
     cells = record.get("cells", [])
-    if [{k: c.get(k) for k in ("baseline", "discordance", "delta", "rho", "feasible")} for c in cells] != expected:
+    if [{k: c.get(k) for k in ("baseline", "discordance", "delta", "rho_task", "rho_state", "feasible")} for c in cells] != expected:
         return False, "R3 record cells differ from the preregistered grid"
     for cell in cells:
         if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and cell["coverage"] >= r3_coverage.CRITERION):

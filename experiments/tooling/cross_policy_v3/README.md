@@ -87,3 +87,19 @@ Implementation of protocol v3 revision 2 with Alba's decisions D1–D8 (`review/
 - the preallocate binding nothing asked for was removed (16).
 
 Not addressed, and listed as limits above: 12 (whole-schedule rerun detection), 15 (attestation minor points) and 17 (checks not written).
+
+
+## BenchStudio evidence handoff
+
+Protocol E can optionally emit the BenchStudio `evaluator.json` consumed by
+the v3 launch gate. Pass `--benchstudio-runtime` with a separately captured
+native runtime identity mapping. Bind that file to the Protocol E authorization
+as `benchstudio_runtime`. The exporter retains the native samples and the
+Protocol E result digest, and refuses incomplete or unqualified fixture sets.
+Supply one fixture per case and suite. Goal-reached traces must end normally
+or continue to the declared horizon. Keep the Protocol E record and fixture
+evidence for independent review before adding the exported file to a BenchStudio
+qualification bundle.
+
+This handoff uses JSON so the OpenPI Python 3.8 evaluator does not import
+BenchStudio. Native qualification remains UNVERIFIED.

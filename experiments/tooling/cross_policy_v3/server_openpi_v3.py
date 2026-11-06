@@ -255,8 +255,34 @@ class AttestingPolicy(object):
     def __init__(self, keyed, startup_gate_sha256):
         self._keyed, self._lock, self._sequence = keyed, threading.Lock(), 0
         self._gate = startup_gate_sha256
+        self._action_diagnostics = {}
+        self._install_action_diagnostics(keyed._policy)
         self.metadata = dict(keyed.metadata or {}, startup_gate_sha256=startup_gate_sha256,
                              xla_flags=os.environ.get("XLA_FLAGS"), server_code_sha256=file_sha(__file__))
+
+    def _install_action_diagnostics(self, policy):
+        # Pinned OpenPI Policy.infer calls these immediately before and after the model.
+        import jax
+        import numpy as np
+
+        original_input, original_output = policy._input_transform, policy._output_transform
+
+        def checked_input(data):
+            transformed = original_input(data)
+            leaves = jax.tree.leaves(transformed)
+            self._action_diagnostics["transformed_inputs_finite"] = bool(
+                leaves and all(np.isfinite(np.asarray(value)).all() for value in leaves)
+            )
+            return transformed
+
+        def checked_output(data):
+            self._action_diagnostics["raw_actions_finite"] = bool(
+                np.isfinite(np.asarray(data["actions"])).all()
+            )
+            return original_output(data)
+
+        policy._input_transform = checked_input
+        policy._output_transform = checked_output
 
     def infer(self, obs):
         import jax
@@ -266,7 +292,9 @@ class AttestingPolicy(object):
         with self._lock:
             TRACE["on"] = True
             COUNTS["head"], COUNTS["times"] = 0, []
+            self._action_diagnostics = {"request_id": request_id, "tick": tick}
             result = self._keyed.infer(obs)
+            result["action_diagnostics"] = dict(self._action_diagnostics)
             jax.effects_barrier()
             self._sequence += 1
             # Counts come only from the compiled callbacks. A missing request id or tick is passed through

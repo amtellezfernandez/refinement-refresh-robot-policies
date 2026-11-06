@@ -442,5 +442,21 @@ class Evaluator(unittest.TestCase):
             EV.validate_fixtures(generated, "pi05")
 
 
+class ReviewDecisions(unittest.TestCase):
+    def test_r3_independent_parameters(self):
+        import r3_coverage as R3
+
+        combinations = {(row["rho_task"], row["rho_state"]) for row in R3.cells()}
+        self.assertEqual(combinations, {(a, b) for a in (0, .25, .5) for b in (0, .25, .5)})
+
+    def test_benchstudio_export_refuses_unqualified_evidence(self):
+        runtime = dict.fromkeys(
+            ("runner", "checkpoint", "simulator_stack", "renderer", "assets", "normalization"),
+            "a" * 64,
+        )
+        with self.assertRaisesRegex(EV.FixtureError, "unqualified"):
+            EV.benchstudio_report("pi05", runtime, [], "EVALUATOR_NOT_QUALIFIED", "b" * 64)
+
+
 if __name__ == "__main__":
     unittest.main()
