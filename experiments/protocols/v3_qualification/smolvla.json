@@ -1,0 +1,140 @@
+{
+  "excluded_hosts": [
+    "RTX 4060 Ti, NVIDIA EGL (D4)"
+  ],
+  "items": {
+    "action_normalization_clipping": {
+      "bindings": {
+        "evaluator_boundary_mapping": null,
+        "loaded_equals_file": null,
+        "normalization_mode": null,
+        "postprocessor_stats_sha256": null,
+        "preprocessor_stats_sha256": null,
+        "robosuite_scale_action_clipping": null
+      },
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "Normalization file hashes, loaded-statistics equality and mode; where any clipping happens, from pinned source",
+      "status": "UNVERIFIED"
+    },
+    "asset_hashes": {
+      "bindings": {
+        "asset_root": null,
+        "bddl_manifest_sha256": null,
+        "libero_asset_manifest_sha256": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "One bound manifest sha256 over this stack's LIBERO assets and BDDL files (G4/G5)",
+      "status": "UNVERIFIED"
+    },
+    "controller_mapping": {
+      "bindings": {
+        "controller_source_sha256": null,
+        "controller_type": null,
+        "delta_frame": null,
+        "input_range": null,
+        "output_range": null,
+        "robosuite_version": "1.4.0"
+      },
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "OSC controller type, input/output ranges and delta frame, read from pinned robosuite source (path + sha256) and from the live env (G12)",
+      "status": "UNVERIFIED"
+    },
+    "count_gate": {
+      "bindings": {
+        "adapter_code_sha256": null,
+        "scnt_record_sha256": null
+      },
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "v2 count (denoise steps = generations x d) checked per generation before the action is applied",
+      "status": "UNVERIFIED"
+    },
+    "determinism_config": {
+      "bindings": {
+        "allow_tf32": false,
+        "cublas_workspace_config": ":4096:8",
+        "cudnn_benchmark": false,
+        "torch_use_deterministic_algorithms": true
+      },
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "Exact determinism configuration certified in Protocol A and used unchanged in Protocol B",
+      "status": "UNVERIFIED"
+    },
+    "driver_package_locks": {
+      "bindings": {
+        "cuda_umd": null,
+        "lerobot_commit": null,
+        "lock_file_sha256": null,
+        "native_stack": "LeRobot LiberoEnv, hf-libero 0.1.4, robosuite 1.4.0, MuJoCo 3.8.1, torch 2.7.1+cu128, Python 3.12",
+        "nvidia_smi_driver": null,
+        "wsl_driver_library": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "Driver, CUDA UMD, WSL driver library version (G9) and this stack's package lock file sha256 (G6)",
+      "status": "UNVERIFIED"
+    },
+    "evaluator": {
+      "bindings": {
+        "protocol_e_record_sha256": null,
+        "verdict": null
+      },
+      "decision": "D3",
+      "evidence": null,
+      "requirement": "Protocol E verdict EVALUATOR_QUALIFIED for this stack (13)",
+      "status": "UNVERIFIED"
+    },
+    "host_renderer": {
+      "bindings": {
+        "gl_renderer": null,
+        "gl_vendor": null,
+        "gl_version": null,
+        "gpu_uuid": null,
+        "hostname": null,
+        "kernel": null,
+        "mujoco_gl": "osmesa",
+        "os_release": null,
+        "planned_host": "RTX 5090, WSL, OSMesa",
+        "uname_m": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "Actual renderer strings under MUJOCO_GL=osmesa on the planned host, recorded first-hand (G3, G8)",
+      "status": "UNVERIFIED"
+    },
+    "parity": {
+      "bindings": {},
+      "decision": "D8",
+      "evidence": null,
+      "requirement": "R9 same-host bitwise parity, stock vs candidate, matched noise, DO1-DO3 at d=10; P2a preprocessing comparison",
+      "status": "NOT_APPLICABLE"
+    },
+    "protocol_a_preflight": {
+      "bindings": {
+        "preflight_record_sha256": null,
+        "verdict": null
+      },
+      "decision": "Protocol A",
+      "evidence": null,
+      "requirement": "Protocol A PREFLIGHT_PASS for this model on the planned host",
+      "status": "UNVERIFIED"
+    },
+    "smolvla_horizons_termination": {
+      "bindings": {
+        "horizon_by_suite": null,
+        "success_terminates_by_suite": null
+      },
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "Per-suite _max_episode_steps and whether success terminates the episode, from Protocol E fixtures and source (G10)",
+      "status": "UNVERIFIED"
+    }
+  },
+  "model": "smolvla",
+  "schema": "cross_policy_v3_qualification_v1",
+  "status_note": "Every item is UNVERIFIED. Implementation existing is not evidence that any check passed. No check has been run."
+}
