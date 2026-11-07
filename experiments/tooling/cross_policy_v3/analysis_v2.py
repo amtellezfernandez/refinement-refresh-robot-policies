@@ -19,7 +19,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import classify as C  # noqa: E402
-from v3common import CONDITIONS, CONFIRMATION_POPULATION, atomic_write_json, file_sha, sha  # noqa: E402
+from v3common import (CONDITIONS, CONFIRMATION_POPULATION, MODELS, PROTOCOL_B,
+                      atomic_write_json, file_sha, identity_id, sha, state_key)  # noqa: E402
 
 MAX_INCOMPLETE_PAIRS = 20          # D2
 MAX_ARM_MISSING_DIFFERENCE = 10    # D2, after permitted retries
@@ -101,6 +102,24 @@ def pair_table(schedule, finals, population=CONFIRMATION_POPULATION):
     expected_rows = 2 * population.identity_count()
     if len(rows) != expected_rows:
         raise ValueError("schedule must have {} rows".format(expected_rows))
+    from make_schedule_v2 import validate_schedule
+
+    model = schedule.get("model")
+    if model not in MODELS or schedule.get("protocol") != PROTOCOL_B or schedule.get("cohort") != population.cohort:
+        raise ValueError("schedule model, protocol or cohort mismatch")
+    validate_schedule(rows, population, model)
+    # A matching row hash does not bind redundant identity labels to their fields.
+    # Check these before reading any final classes or grouping outcomes.
+    for row in rows:
+        ident = row["episode_identity"]
+        expected_id = identity_id(ident)
+        if row["identity_id"] != expected_id or row["cohort"] != population.cohort:
+            raise ValueError("schedule row identity or cohort mismatch")
+        if row["state_key"] != state_key(ident["suite"], ident["task_id"], ident["state_slot"]):
+            raise ValueError("schedule row state key mismatch")
+        expected_planned = "{}.{}.{}.{}".format(population.cohort, model, expected_id, row["condition_id"])
+        if row["planned_run_id"] != expected_planned:
+            raise ValueError("schedule planned_run_id does not bind its identity and condition")
     pairs = {}
     for row in rows:
         planned = row["planned_run_id"]

@@ -320,6 +320,26 @@ class Analysis(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "halt condition: HALTED_GATE_OR_HASH"):
                 AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
 
+    def test_analysis_rejects_rehashed_semantic_schedule_mutations(self):
+        finals = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)["final_classes"]
+        for mutation in ("identity", "denoising", "planned_id", "state_key", "cohort"):
+            schedule = json.loads(json.dumps(self.schedule))
+            rows = schedule["schedule"]
+            if mutation == "identity":
+                for row in rows[:2]:
+                    row["episode_identity"] = dict(rows[2]["episode_identity"])
+            elif mutation == "denoising":
+                rows[0]["d"] = 10
+            elif mutation == "planned_id":
+                rows[1]["planned_run_id"] = rows[0]["planned_run_id"]
+            elif mutation == "state_key":
+                rows[0]["state_key"] = "wrong-state"
+            else:
+                rows[0]["cohort"] = "wrong-cohort"
+            schedule["schedule_sha256"] = sha(rows)
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                AN.pair_table(schedule, finals, TEST_POP)
+
     def test_exact_contrast_and_counts(self):
         # R22 succeeds on task 0 of every suite only; R25 always fails.
         def outcome(row):
