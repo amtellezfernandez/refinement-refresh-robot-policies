@@ -284,10 +284,14 @@ def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPU
         return report
     finals = summary["final_classes"]
     if journal is not None:
-        from runner_v2 import classes_by_row
+        from runner_v2 import classes_by_row, stop_state
 
+        classes = classes_by_row(journal)
+        halted = stop_state(classes, Path(journal.root).parent)
+        if halted is not None:
+            raise ValueError("COMPLETED summary contradicts journal halt condition: {}".format(halted))
         journal_finals = {planned: C.final_class(classes)
-                          for planned, classes in classes_by_row(journal).items()}
+                          for planned, classes in classes.items()}
         if finals != journal_finals:
             raise ValueError("runner summary final classes do not match the attempt journal")
     pairs = pair_table(schedule, finals, population)
