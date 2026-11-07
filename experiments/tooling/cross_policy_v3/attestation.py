@@ -40,8 +40,9 @@ def expected_time_values(d):
     """The time operand visited at each Euler step: t0 = 1, t(k+1) = t(k) + (-1/d), in float32, k = 0..d-1.
 
     Each float32 sum is exact in double and then rounded once, so this equals float32 arithmetic. -1/d is
-    rounded once from the double quotient. The recurrence follows the G02 faithful sampler P (bitwise equal to
-    stock); it has not been re-read from pinned pi0.py (09 C4, check 5).
+    rounded once from the double quotient. The recurrence matches the pinned stock Pi0.sample_actions source at OpenPI
+    215abfb (see STOCK_SAMPLER_SOURCE_AUDIT.md). Float32 execution and compiled
+    callback/count behavior remain unverified on the native stack.
     """
     if not isinstance(d, int) or d < 1:
         raise ValueError("d must be a positive int")
