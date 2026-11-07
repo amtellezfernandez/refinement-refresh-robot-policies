@@ -69,9 +69,9 @@ def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
     # Reject an occupied service port before spending a model run.
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', port))
-    def model_round(model):
+    def model_round(model, required_service=None):
         try:
-            command(model + '-campaign').run(logs)
+            command(model + '-campaign').run(logs, required_service=required_service)
         except bs.ProcessFailure:
             # A stopped native run may have an accounting-only summary. Its
             # existing analysis decides whether any outcomes can be read.
@@ -88,8 +88,8 @@ def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
         with socket.socket() as probe:
             probe.settimeout(0.2)
             return probe.connect_ex(('127.0.0.1', port)) == 0
-    with command('pi05-server').service(logs, ready=ready, startup_timeout=startup_timeout):
-        model_round('pi05')
+    with command('pi05-server').service(logs, ready=ready, startup_timeout=startup_timeout) as server:
+        model_round('pi05', required_service=server)
     print('Both model runs and their separate offline analyses completed. See ' + str(workspace))
 
 

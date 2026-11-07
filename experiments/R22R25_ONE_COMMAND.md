@@ -50,3 +50,10 @@ those missing scientific checks, issue their permissions, execute E0, qualify a
 stack, generate states, or release a campaign. Before real use, freeze/check the
 frontend and native code hashes in the eventual release. Merging code is not a
 campaign release. The native hash list includes this frontend and its verifier.
+
+The pi05 client command monitors the owned server process after readiness.
+A server exit while the client remains active stops the client, retains the
+failure receipt, and prevents reporting normal campaign completion. Any existing
+native stopped-run summary still goes through the same accounting-only rules;
+no automatic native retry is introduced. This requires the updated
+`ProcessCommand.run(required_service=...)` from BenchStudio PR #26.

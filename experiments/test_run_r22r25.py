@@ -54,6 +54,30 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
             with self.assertRaisesRegex(ValueError, 'Existing output'):
                 runner.execute(plan, workspace, port=port, root=root)
 
+    def test_server_death_after_readiness_stops_client_and_analysis(self):
+        import benchstudio as bs
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            tools = root / 'experiments/tooling/cross_policy_v3'
+            server = tools / 'server_openpi_v3.py'
+            source = server.read_text().replace("time.sleep(60)",
+                "\nwhile not Path('client-running').exists(): time.sleep(0.01)\n")
+            server.write_text(source)
+            client = tools / 'launch_v3.py'
+            client.write_text(client.read_text() +
+                "\nimport sys,time\nif 'pi05' in sys.argv:\n"
+                "    Path('client-running').touch()\n    time.sleep(1)\n"
+                "    Path('client-incorrectly-completed').touch()\n")
+            with socket.socket() as probe:
+                probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
+            commands = runner.plan(workspace, sys.executable, sys.executable, port=port, root=root)
+            with self.assertRaisesRegex(bs.ProcessFailure, 'required service'):
+                runner.execute(commands, workspace, port=port, startup_timeout=10, root=root)
+            self.assertFalse((root / 'client-incorrectly-completed').exists())
+            self.assertFalse((workspace / 'pi05/analysis.json').exists())
+            receipt = json.loads(next((workspace / 'operator-logs').glob('launch-*/pi05-campaign.receipt.json')).read_text())
+            self.assertEqual(receipt['reason'], 'ProcessFailure')
+
     def test_stopped_native_run_is_analyzed_without_starting_other_model(self):
         import benchstudio as bs
         with tempfile.TemporaryDirectory() as directory:
