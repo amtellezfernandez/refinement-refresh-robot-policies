@@ -305,6 +305,14 @@ def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPU
     if journal is not None:
         from runner_v2 import classes_by_row, stop_state
 
+        # Journal checksums bind bytes, not their experimental meaning. Every
+        # attempt (including retries) must bind the exact planned row, rather
+        # than only its planned_run_id, before any final outcomes are used.
+        planned_rows = {row["planned_run_id"]: row for row in schedule["schedule"]}
+        for record in journal.records():
+            expected = planned_rows.get(record.get("planned_run_id"))
+            if expected is None or sha(record.get("schedule_row")) != sha(expected):
+                raise ValueError("journal schedule row does not match the analysis schedule")
         classes = classes_by_row(journal)
         halted = stop_state(classes, Path(journal.root).parent)
         if halted is not None:

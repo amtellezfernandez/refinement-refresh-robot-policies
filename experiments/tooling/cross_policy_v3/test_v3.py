@@ -307,6 +307,27 @@ class Analysis(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "final classes do not match"):
                 AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
 
+    def test_journal_rows_must_match_schedule_even_with_current_checksums(self):
+        # Fabricate an internally consistent journal whose planned ID is right
+        # but whose executed settings/state differ from the analysis schedule.
+        for field, wrong in (("d", 10), ("state_sha256", h("other-state")),
+                             ("condition_id", "R25"),
+                             ("episode_identity", {"synthetic": "different"})):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                journal = AttemptJournal(Path(directory) / "attempts")
+                for index, row in enumerate(self.schedule["schedule"]):
+                    recorded = json.loads(json.dumps(row))
+                    if index == 0:
+                        recorded[field] = ("R22" if row[field] == "R25" else "R25") if field == "condition_id" else wrong
+                    path = journal.begin(recorded, "synthetic", ["test"])
+                    journal.update(path, "running")
+                    journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+                summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+                summary["journal_checksums"] = journal.checksums()
+                with self.assertRaisesRegex(ValueError, "journal schedule row"):
+                    AN.analyze(self.schedule, summary, population=TEST_POP,
+                               journal_dir=journal.root)
+
     def test_completed_summary_cannot_override_persisted_halt(self):
         with tempfile.TemporaryDirectory() as directory:
             journal = AttemptJournal(Path(directory) / "attempts")
