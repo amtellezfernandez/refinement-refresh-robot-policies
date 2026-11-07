@@ -60,7 +60,7 @@ Implementation of protocol v3 revision 2 with Alba's decisions D1–D8 (`review/
 - **Callback ordering.** The time-grid check compares multisets, so it does not depend on callback order. The count check does not depend on it either.
 - **Time recurrence.** The expected time grid copies the G02 faithful sampler's arithmetic. It has not been re-read from pinned `pi0.py`.
 - **LeRobot and LIBERO internals.** Attributes such as `base._env.env`, `parsed_problem`, `object_states_dict` and `_max_episode_steps` were read from a local hf-libero 0.1.4 copy. That copy is not the planned host's stack, and the OpenPI submodule's copy was not read.
-- **Fresh-process retry.** It needs a launcher that relaunches on exit code 75. No launcher is written.
+- **Fresh-process retry.** `launch_v3.py` relaunches `runner_v2.py` with identical arguments on exit code 75 (cap 800 relaunches; other exit codes pass through). It is in `release.RUNTIME_FILES`, so a release binds it. Not run natively.
 - **B904 style.** `ruff` flags re-raises without `from`, matching the house style of the frozen modules.
 - **Second whole-schedule run.** It is not detected across output directories. `launches.jsonl` records relaunches in one directory and is not read by the analysis.
 - **Attestation digest.** It detects corruption, not forgery: the server computes it. Gaps in sequence numbers are allowed. The order of time values is not checked.

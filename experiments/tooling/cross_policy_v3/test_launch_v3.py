@@ -55,5 +55,14 @@ if __name__ == "__main__":
         self.check_launch("75,75,75", 3, 3)
 
 
+class ReleaseBindsLauncher(unittest.TestCase):
+    def test_release_code_hashes_cover_the_launcher(self):
+        import release
+        from v3common import file_sha
+        here = Path(__file__).resolve().parent
+        self.assertIn("launch_v3.py", release.RUNTIME_FILES)
+        self.assertEqual(release.code_hashes()["launch_v3.py"], file_sha(here / "launch_v3.py"))
+
+
 if __name__ == "__main__":
     unittest.main()
