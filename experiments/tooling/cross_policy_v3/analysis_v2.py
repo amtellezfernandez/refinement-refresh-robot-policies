@@ -256,14 +256,17 @@ def check_r3_record(path):
 def check_journal(summary, journal_dir):
     """The summary's journal checksums must match the journal on disk (finding: summary not trusted alone)."""
     from journal import AttemptJournal
-    if AttemptJournal(journal_dir).checksums() != summary.get("journal_checksums"):
+    if not Path(journal_dir).is_dir():
+        raise ValueError("attempt journal directory does not exist")
+    journal = AttemptJournal(journal_dir)
+    if journal.checksums() != summary.get("journal_checksums"):
         raise ValueError("runner summary does not match the attempt journal on disk")
+    return journal
 
 
 def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPULATION, journal_dir=None):
     model = schedule["model"]
-    if journal_dir is not None:
-        check_journal(summary, journal_dir)
+    journal = check_journal(summary, journal_dir) if journal_dir is not None else None
     if summary.get("model") != model or summary.get("schedule_sha256") != schedule["schedule_sha256"]:
         raise ValueError("runner summary is for a different model or schedule")
     status = summary.get("run_status")
@@ -277,7 +280,15 @@ def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPU
         report["accounting"] = summary.get("accounting")
         report["outcomes_read"] = False
         return report
-    pairs = pair_table(schedule, summary["final_classes"], population)
+    finals = summary["final_classes"]
+    if journal is not None:
+        from runner_v2 import classes_by_row
+
+        journal_finals = {planned: C.final_class(classes)
+                          for planned, classes in classes_by_row(journal).items()}
+        if finals != journal_finals:
+            raise ValueError("runner summary final classes do not match the attempt journal")
+    pairs = pair_table(schedule, finals, population)
     miss = missingness(pairs, population)
     overall, by_suite = paired_counts(pairs, population)
     n_complete = sum(overall.values())
