@@ -140,6 +140,25 @@ class Attestation(unittest.TestCase):
         with self.assertRaises(C.InstrumentIncident):  # digest no longer matches
             A.Verifier("g" * 64, "F").verify(tampered, rid, 4, 5)
 
+    def test_malformed_attestation_is_always_instrument_incident(self):
+        rid, valid = self.good()
+        mutations = [
+            {"time_values": [None] + valid["time_values"][1:]},
+            {"time_values": [{}] + valid["time_values"][1:]},
+            {"tick": float(valid["tick"])},
+            {"d_requested": float(valid["d_requested"])},
+            {"executed_head_evaluations": float(valid["executed_head_evaluations"])},
+            {"sequence_number": True},
+        ]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                bad = dict(valid, **mutation)
+                bad["attestation_sha256"] = A.attestation_digest(bad)
+                verifier = A.Verifier("g" * 64, "F")
+                with self.assertRaises(C.InstrumentIncident):
+                    verifier.verify(bad, rid, 4, 5)
+                self.assertIsNone(verifier.last_sequence)
+
     def test_sequence_must_increase(self):
         verifier = A.Verifier("g" * 64, "F")
         rid, att = self.good(seq=3)
@@ -196,6 +215,23 @@ class Runner(unittest.TestCase):
             if code != R.EXIT_FRESH_PROCESS_RETRY:
                 return status, code, journal
         raise AssertionError("did not finish")
+
+    def test_malformed_counter_proof_stops_at_first_attempt(self):
+        class BadAdapter(FakeAdapter):
+            def run_attempt(self, context):
+                self.calls.append(context.row["planned_run_id"])
+                context.mark_first_query()
+                rid = A.request_id(context.row["planned_run_id"], context.attempt_number, 4)
+                bad = A.build(rid, 4, 5, 5, A.expected_time_values(5), 1, "g" * 64, "F")
+                bad["time_values"][0] = None
+                bad["attestation_sha256"] = A.attestation_digest(bad)
+                A.Verifier("g" * 64, "F").verify(bad, rid, 4, 5)
+        adapter = BadAdapter({})
+        status, code, journal = self.run_until_done(adapter)
+        self.assertEqual(status, "STOPPED_INSTRUMENT_INCIDENT")
+        self.assertEqual(code, R.EXIT_STOPPED)
+        self.assertEqual(len(adapter.calls), 1)
+        self.assertEqual(list(R.classes_by_row(journal).values()), [[C.INSTRUMENT_INCIDENT]])
 
     def test_completes_and_classifies(self):
         script = {(self.rows[1]["planned_run_id"], 0): "failure"}
