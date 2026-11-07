@@ -14,9 +14,9 @@ spec.loader.exec_module(runner)
 
 class Operator(unittest.TestCase):
     def fixture(self, root):
-        tools = root / 'repo/experiments/tooling/cross_policy_v3'
+        tools = root / 'repo with spaces/experiments/tooling/cross_policy_v3'
         tools.mkdir(parents=True)
-        workspace = root / 'workspace with spaces'
+        workspace = runner.canonical_workspace(tools.parents[2])
         for model in ('smolvla', 'pi05'):
             (workspace / model / 'checkpoint').mkdir(parents=True)
         (tools / 'verify_campaign.py').write_text('print("fake qualification checked")')
@@ -38,6 +38,24 @@ Path(a.output).mkdir(); (Path(a.output)/'startup_gate.json').write_text('{}')
 s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
 ''')
         return tools.parents[2], workspace
+
+    def test_default_preview_uses_existing_release_gate_directory(self):
+        import subprocess
+        script = Path(__file__).with_name('run_r22r25.py')
+        result = subprocess.run([sys.executable, str(script),
+            '--smolvla-python', '/fake/smol/python', '--pi05-python', '/fake/pi05/python'],
+            capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        expected = script.resolve().parents[1] / 'experiments/runs/cross_policy_confirmation_v2'
+        self.assertIn(str(expected / 'smolvla/schedule.json'), result.stdout)
+        self.assertIn(str(expected / 'pi05/schedule.json'), result.stdout)
+
+    def test_wrong_workspace_is_rejected_as_layout_not_authorization(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, 'released schedule directory'):
+                runner.plan(root / 'arbitrary-workspace', sys.executable, sys.executable, root=root)
+            self.assertEqual(list(root.iterdir()), [])
 
     def test_complete_fake_round_and_service_cleanup(self):
         with tempfile.TemporaryDirectory() as directory:

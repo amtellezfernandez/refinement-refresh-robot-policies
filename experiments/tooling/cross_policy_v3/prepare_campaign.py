@@ -12,7 +12,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import qualification as Q
-from v3common import MODELS, file_sha
+from v3common import MODELS, PROTOCOL_B, REPO_ROOT, file_sha
 
 SCHEMA = "refinement_campaign_preparation_v1"
 
@@ -37,6 +37,10 @@ def prepare(workspace, model, python=sys.executable):
     except (OSError, ValueError) as error:
         statuses = {}
         issue("native_qualification", str(error), "Repair the qualification record and its evidence references.")
+    expected_workspace = (REPO_ROOT / "experiments/runs" / PROTOCOL_B).resolve()
+    if Path(workspace).resolve() != expected_workspace:
+        issue("layout", "Workspace is outside the existing released schedule directory",
+              "Use " + str(expected_workspace) + "; this is a path constraint, not a missing approval.")
     documents = {}
     for name in ("manifest", "schedule", "states", "fixtures"):
         path = paths[name]
@@ -127,7 +131,7 @@ def prepare(workspace, model, python=sys.executable):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--workspace", type=Path, required=True)
+    parser.add_argument("--workspace", type=Path, default=REPO_ROOT / "experiments/runs" / PROTOCOL_B)
     parser.add_argument("--model", choices=MODELS, required=True)
     args = parser.parse_args()
     print(json.dumps(prepare(args.workspace, args.model), indent=2, sort_keys=True))
@@ -135,3 +139,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

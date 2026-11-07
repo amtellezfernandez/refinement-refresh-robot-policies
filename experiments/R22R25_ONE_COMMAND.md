@@ -5,6 +5,12 @@ provides `bs.ProcessCommand` for the reusable process/log/service mechanisms.
 Use a reviewed BenchStudio version that includes that API in the frontend's
 Python >=3.10 environment; keep each native environment pinned and separate.
 
+The workspace defaults to this checkout's
+`experiments/runs/cross_policy_confirmation_v2/`, as required by the existing
+release gate. Omit `--workspace` in normal use; a custom path must resolve to
+that same location. An arbitrary external workspace would be rejected even
+with a valid release. This directory is outside the frozen evidence packages.
+
 Place existing files in `WORKSPACE/smolvla/` and `WORKSPACE/pi05/`:
 `manifest.json`, `schedule.json`, `initial_states.npz`, and pinned `checkpoint/`.
 Keep these outside frozen evidence. An existing `r3_record.json` is forwarded
@@ -14,14 +20,14 @@ secondary interval. No R3 check or identity generation is performed here.
 Preview (read-only, no subprocesses):
 
 ```sh
-python experiments/run_r22r25.py --workspace /path/to/workspace --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python
+python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python
 ```
 
 After both native qualifications and the separate campaign release exist, the
 same command with `--execute` orchestrates the released round:
 
 ```sh
-python experiments/run_r22r25.py --workspace /path/to/workspace --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python --execute
+python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python --execute
 ```
 
 The native verification stage checks existing qualification and release records,

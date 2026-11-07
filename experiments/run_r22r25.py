@@ -15,8 +15,15 @@ TOOLS = ROOT / 'experiments/tooling/cross_policy_v3'
 XLA_FLAGS = '--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level=0'
 
 
+def canonical_workspace(root=ROOT):
+    # Existing launch_guard.verify_released_schedule requires this directory.
+    return Path(root).resolve() / 'experiments/runs/cross_policy_confirmation_v2'
+
+
 def plan(workspace, smolvla_python, pi05_python, *, port=8000, root=ROOT):
     workspace, root = Path(workspace).resolve(), Path(root).resolve()
+    if workspace != canonical_workspace(root).resolve():
+        raise ValueError('Use the existing released schedule directory: ' + str(canonical_workspace(root)))
     tools = root / 'experiments/tooling/cross_policy_v3'
     commands = []
     interpreters = {'smolvla': str(smolvla_python), 'pi05': str(pi05_python)}
@@ -95,7 +102,8 @@ def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--workspace', type=Path, required=True)
+    parser.add_argument('--workspace', type=Path, default=canonical_workspace(),
+                        help='Existing release-gate directory; normally omit this argument.')
     parser.add_argument('--smolvla-python', required=True)
     parser.add_argument('--pi05-python', required=True)
     parser.add_argument('--port', type=int, default=8000)
