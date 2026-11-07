@@ -232,6 +232,8 @@ def check_r3_record(path):
         return False, "unexpected R3 record schema"
     if record.get("analysis_sha256") != file_sha(__file__):
         return False, "R3 record was produced for different analysis code"
+    if record.get("r3_code_sha256") != file_sha(r3_coverage.__file__):
+        return False, "R3 record was produced for different coverage code"
     if record.get("grid_sha256") != r3_coverage.grid_sha256():
         return False, "R3 record grid differs from the preregistered grid"
     if record.get("criterion") != r3_coverage.CRITERION or record.get("replicates") != r3_coverage.REPLICATES:
@@ -246,8 +248,8 @@ def check_r3_record(path):
     if [{k: c.get(k) for k in ("baseline", "discordance", "delta", "rho_task", "rho_state", "feasible")} for c in cells] != expected:
         return False, "R3 record cells differ from the preregistered grid"
     for cell in cells:
-        if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and cell["coverage"] >= r3_coverage.CRITERION):
-            return False, "R3 record has a feasible cell below the criterion"
+        if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and r3_coverage.CRITERION <= cell["coverage"] <= 1.0):
+            return False, "R3 record has a feasible cell outside the passing coverage range"
     return True, "R3 coverage check passed"
 
 
