@@ -397,7 +397,7 @@ class R3Record(unittest.TestCase):
         cells = [dict(c, coverage=(coverage if c["feasible"] else None)) for c in R3.cells()]
         return {"schema": R3.SCHEMA, "status": "PASS", "criterion": R3.CRITERION, "replicates": R3.REPLICATES,
                 "grid_sha256": R3.grid_sha256(), "analysis_sha256": Q.file_sha(AN.__file__),
-                "authorisation_sha256": "a" * 64, "cells": cells}
+                "r3_code_sha256": Q.file_sha(R3.__file__), "authorisation_sha256": "a" * 64, "cells": cells}
 
     def check(self, record):
         path = Path(tempfile.mkdtemp()) / "r3.json"
@@ -407,6 +407,10 @@ class R3Record(unittest.TestCase):
     def test_recomputed_from_cells(self):
         self.assertTrue(self.check(self.record(0.95)))
         self.assertFalse(self.check(self.record(0.92)))  # self-declared PASS with failing cells is refused
+        self.assertFalse(self.check(self.record(1.01)))
+        stale_code = self.record(0.95)
+        stale_code["r3_code_sha256"] = "0" * 64
+        self.assertFalse(self.check(stale_code))
         unbound = self.record(0.95)
         del unbound["authorisation_sha256"]
         self.assertFalse(self.check(unbound))
