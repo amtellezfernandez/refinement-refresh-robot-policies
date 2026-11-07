@@ -270,6 +270,27 @@ class Analysis(unittest.TestCase):
     def setUp(self):
         self.schedule = MS.build_schedule(manifest(), "pi05", TEST_POP)
 
+    def test_completed_summary_cannot_override_journal_halt(self):
+        # The last 22 missing attempts occupy 11 pairs: D2 limits alone
+        # permit interpretation, but B9 halts after >20 INFRA_POST events.
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(Path(directory) / "attempts")
+            rows = self.schedule["schedule"]
+            for index, row in enumerate(rows):
+                value = (C.INFRA_POST if index >= len(rows) - 22 else
+                         C.SCI_SUCCESS if row["condition_id"] == "R22" else C.SCI_FAILURE)
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "failed" if value == C.INFRA_POST else "completed",
+                               attempt_class=value)
+            summary = R.summarize(rows, journal, directory, self.schedule["schedule_sha256"],
+                                  "pi05", "HALTED_INFRA_POST")
+            report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
+            self.assertFalse(report["outcomes_read"])
+            summary["run_status"] = "COMPLETED"
+            with self.assertRaisesRegex(ValueError, "halt condition"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
+
     def test_summary_final_classes_must_match_journal(self):
         summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
         with tempfile.TemporaryDirectory() as directory:
@@ -285,6 +306,19 @@ class Analysis(unittest.TestCase):
             summary["final_classes"][planned] = C.SCI_SUCCESS
             with self.assertRaisesRegex(ValueError, "final classes do not match"):
                 AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
+
+    def test_completed_summary_cannot_override_persisted_halt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(Path(directory) / "attempts")
+            for row in self.schedule["schedule"]:
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+            summary = R.summarize(self.schedule["schedule"], journal, directory,
+                                  self.schedule["schedule_sha256"], "pi05", "COMPLETED")
+            R.write_halt(directory, "HALTED_GATE_OR_HASH", "synthetic gate fault")
+            with self.assertRaisesRegex(ValueError, "halt condition: HALTED_GATE_OR_HASH"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
 
     def test_exact_contrast_and_counts(self):
         # R22 succeeds on task 0 of every suite only; R25 always fails.
