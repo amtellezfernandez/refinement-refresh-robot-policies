@@ -287,6 +287,7 @@ class Analysis(unittest.TestCase):
                                   "pi05", "HALTED_INFRA_POST")
             report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
             self.assertFalse(report["outcomes_read"])
+            self.assertTrue(report["journal_checked"])
             summary["run_status"] = "COMPLETED"
             with self.assertRaisesRegex(ValueError, "halt condition"):
                 AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
@@ -340,12 +341,19 @@ class Analysis(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 AN.pair_table(schedule, finals, TEST_POP)
 
+    def test_analyze_requires_the_journal(self):
+        summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+        with self.assertRaisesRegex(ValueError, "journal_dir is required"):
+            AN.analyze(self.schedule, summary, population=TEST_POP)
+        report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
+        self.assertFalse(report["journal_checked"])
+
     def test_exact_contrast_and_counts(self):
         # R22 succeeds on task 0 of every suite only; R25 always fails.
         def outcome(row):
             ok = row["condition_id"] == "R22" and row["episode_identity"]["task_id"] == 0
             return C.SCI_SUCCESS if ok else C.SCI_FAILURE
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["paired_counts"], {"n11": 0, "n10": 40, "n01": 0, "n00": 360})
         self.assertAlmostEqual(report["exact_cohort_contrast"], 0.1)
         self.assertEqual(report["worst_case_bounds"]["lower"], report["worst_case_bounds"]["upper"])
@@ -362,7 +370,7 @@ class Analysis(unittest.TestCase):
             if row["planned_run_id"] in missing:
                 return C.MISSING
             return C.SCI_SUCCESS if row["condition_id"] == "R22" and row["episode_identity"]["task_id"] < 2 else C.SCI_FAILURE
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertIsNone(report["exact_cohort_contrast"])
         self.assertEqual(report["missingness"]["overall"]["R25_missing"], 5)
         self.assertEqual(report["worst_case_bounds"]["denominator"], 400)
@@ -371,17 +379,17 @@ class Analysis(unittest.TestCase):
         many = set(r["planned_run_id"] for r in self.schedule["schedule"] if r["condition_id"] == "R25")
         many = set(sorted(many)[:11])
         report = AN.analyze(self.schedule, fake_summary(
-            self.schedule, lambda r: C.MISSING if r["planned_run_id"] in many else C.SCI_FAILURE), population=TEST_POP)
+            self.schedule, lambda r: C.MISSING if r["planned_run_id"] in many else C.SCI_FAILURE), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["verdict"], "UNINTERPRETABLE")  # arm difference 11 > 10
 
     def test_bounds_containing_zero_is_inconclusive(self):
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, lambda r: C.SCI_FAILURE), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, lambda r: C.SCI_FAILURE), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["verdict"], "DELTA_INCONCLUSIVE")
 
     def test_stopped_run_reads_no_outcomes(self):
         summary = fake_summary(self.schedule, lambda r: C.SCI_SUCCESS)
         summary["run_status"] = "STOPPED_INSTRUMENT_INCIDENT"
-        report = AN.analyze(self.schedule, summary, population=TEST_POP)
+        report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertFalse(report["outcomes_read"])
         self.assertEqual(report["verdict"], "UNINTERPRETABLE")
 
@@ -389,7 +397,7 @@ class Analysis(unittest.TestCase):
         summary = fake_summary(self.schedule, lambda r: C.SCI_SUCCESS)
         del summary["final_classes"][self.schedule["schedule"][0]["planned_run_id"]]
         with self.assertRaises(ValueError):
-            AN.analyze(self.schedule, summary, population=TEST_POP)
+            AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
 
     def test_t_quantile(self):
         self.assertAlmostEqual(AN.t_quantile(0.975, 160), 1.974902, places=5)  # scipy t.ppf: 1.9749015600

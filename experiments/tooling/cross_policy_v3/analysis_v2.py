@@ -285,16 +285,22 @@ def check_journal(summary, journal_dir):
     return journal
 
 
+# Explicit opt-out for offline tests that build synthetic summaries without a journal. Never a CLI option.
+SKIP_JOURNAL_CHECK = object()
+
+
 def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPULATION, journal_dir=None):
     model = schedule["model"]
-    journal = check_journal(summary, journal_dir) if journal_dir is not None else None
+    if journal_dir is None:
+        raise ValueError("journal_dir is required: the summary is not trusted without the attempt journal")
+    journal = None if journal_dir is SKIP_JOURNAL_CHECK else check_journal(summary, journal_dir)
     if summary.get("model") != model or summary.get("schedule_sha256") != schedule["schedule_sha256"]:
         raise ValueError("runner summary is for a different model or schedule")
     status = summary.get("run_status")
     if status not in RUN_STATUSES:
         raise ValueError("unknown run_status {!r}".format(status))
     report = {"model": model, "schedule_sha256": schedule["schedule_sha256"], "run_status": status,
-              "two_sided": True, "prediction": "NONE_RECORDED"}
+              "two_sided": True, "prediction": "NONE_RECORDED", "journal_checked": journal is not None}
     if status != "COMPLETED":
         # 02 B9: outcomes of a stopped run are not read. Accounting only.
         report["verdict"] = "UNSUPPORTED_REFINEMENT_SETTING" if status == "STOPPED_PROTOCOL" else "UNINTERPRETABLE"
