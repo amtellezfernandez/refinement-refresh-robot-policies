@@ -452,20 +452,54 @@ class Qualification(unittest.TestCase):
 
     def test_passed_needs_alba_authorisation_and_verdict(self):
         root = Path(tempfile.mkdtemp())
-        (root / "auth.json").write_text(json.dumps({"approved_by": "Alba"}))
-        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_DISAGREES"}))
+        (root / "auth.json").write_text(json.dumps({"approved_by": "Alba", "scope": "PROTOCOL_E_PI05"}))
+        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_DISAGREES", "stack": "pi05"}))
         record = json.loads(Q.record_path("pi05").read_text())
         item = record["items"]["evaluator"]
         item["status"] = "PASSED"
-        item["bindings"] = {"protocol_e_record_sha256": "x", "verdict": "EVALUATOR_QUALIFIED"}
+        item["bindings"] = {"protocol_e_record_sha256": Q.file_sha(root / "ev.json"), "verdict": "EVALUATOR_QUALIFIED"}
         item["evidence"] = {"run_id": "r", "authorisation_path": "auth.json",
                             "authorisation_sha256": Q.file_sha(root / "auth.json"),
                             "evidence_path": "ev.json", "evidence_sha256": Q.file_sha(root / "ev.json")}
         with self.assertRaises(Q.RecordError):  # evidence says DISAGREES
             Q.validate(record, "pi05", root=root)
-        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_QUALIFIED"}))
+        (root / "ev.json").write_text(json.dumps({"verdict": "EVALUATOR_QUALIFIED", "stack": "pi05"}))
         item["evidence"]["evidence_sha256"] = Q.file_sha(root / "ev.json")
+        item["bindings"]["protocol_e_record_sha256"] = Q.file_sha(root / "ev.json")
         Q.validate(record, "pi05", root=root)  # well-formed; still a synthetic record, not a qualification
+
+    def test_protocol_e_pass_binds_counted_scope_stack_and_record_hash(self):
+        for model in ("pi05", "smolvla"):
+            for mutation in ("E0_scope", "other_model_scope", "other_stack", "record_hash"):
+                with self.subTest(model=model, mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    auth = {"approved_by": "Alba", "scope": "PROTOCOL_E_" + model.upper()}
+                    ev = {"verdict": "EVALUATOR_QUALIFIED", "stack": model}
+                    record = json.loads(Q.record_path(model).read_text())
+                    item = record["items"]["evaluator"]
+                    item["status"] = "PASSED"
+                    def write_inputs():
+                        (root / "auth.json").write_text(json.dumps(auth))
+                        (root / "ev.json").write_text(json.dumps(ev))
+                        item["bindings"] = {"protocol_e_record_sha256": Q.file_sha(root / "ev.json"),
+                                            "verdict": "EVALUATOR_QUALIFIED"}
+                        item["evidence"] = {"run_id": "synthetic", "authorisation_path": "auth.json",
+                            "authorisation_sha256": Q.file_sha(root / "auth.json"),
+                            "evidence_path": "ev.json", "evidence_sha256": Q.file_sha(root / "ev.json")}
+                    write_inputs()
+                    Q.validate(record, model, root=root)  # positive structural control only
+                    other = "smolvla" if model == "pi05" else "pi05"
+                    if mutation == "E0_scope":
+                        auth["scope"] = "PROTOCOL_E0_PI05"
+                    elif mutation == "other_model_scope":
+                        auth["scope"] = "PROTOCOL_E_" + other.upper()
+                    elif mutation == "other_stack":
+                        ev["stack"] = other
+                    write_inputs()  # recomputed file hashes must not hide semantic mismatches
+                    if mutation == "record_hash":
+                        item["bindings"]["protocol_e_record_sha256"] = "0" * 64
+                    with self.assertRaises(Q.RecordError):
+                        Q.validate(record, model, root=root)
 
     def test_passed_without_evidence_rejected(self):
         record = json.loads(Q.record_path("pi05").read_text())
