@@ -21,7 +21,7 @@ class Refused(SystemExit):
 # Every file whose behaviour decides an attempt's class or the analysis (01: certified = executed; 02 B5).
 RUNTIME_FILES = ("v3common.py", "classify.py", "runner_v2.py", "attestation.py", "adapter_pi05.py",
                  "adapter_smolvla.py", "server_openpi_v3.py", "release.py", "qualification.py", "analysis_v2.py",
-                 "r3_coverage.py", "make_schedule_v2.py", "launch_v3.py")
+                 "r3_coverage.py", "make_schedule_v2.py", "launch_v3.py", "verify_campaign.py", "../../run_r22r25.py")
 
 
 def code_hashes():
