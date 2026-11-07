@@ -270,6 +270,22 @@ class Analysis(unittest.TestCase):
     def setUp(self):
         self.schedule = MS.build_schedule(manifest(), "pi05", TEST_POP)
 
+    def test_summary_final_classes_must_match_journal(self):
+        summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(directory)
+            for row in self.schedule["schedule"]:
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+            summary["journal_checksums"] = journal.checksums()
+            report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
+            self.assertEqual(report["paired_counts"]["n00"], 400)
+            planned = self.schedule["schedule"][0]["planned_run_id"]
+            summary["final_classes"][planned] = C.SCI_SUCCESS
+            with self.assertRaisesRegex(ValueError, "final classes do not match"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
+
     def test_exact_contrast_and_counts(self):
         # R22 succeeds on task 0 of every suite only; R25 always fails.
         def outcome(row):
