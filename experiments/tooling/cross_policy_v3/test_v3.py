@@ -270,12 +270,111 @@ class Analysis(unittest.TestCase):
     def setUp(self):
         self.schedule = MS.build_schedule(manifest(), "pi05", TEST_POP)
 
+    def test_completed_summary_cannot_override_journal_halt(self):
+        # The last 22 missing attempts occupy 11 pairs: D2 limits alone
+        # permit interpretation, but B9 halts after >20 INFRA_POST events.
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(Path(directory) / "attempts")
+            rows = self.schedule["schedule"]
+            for index, row in enumerate(rows):
+                value = (C.INFRA_POST if index >= len(rows) - 22 else
+                         C.SCI_SUCCESS if row["condition_id"] == "R22" else C.SCI_FAILURE)
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "failed" if value == C.INFRA_POST else "completed",
+                               attempt_class=value)
+            summary = R.summarize(rows, journal, directory, self.schedule["schedule_sha256"],
+                                  "pi05", "HALTED_INFRA_POST")
+            report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
+            self.assertFalse(report["outcomes_read"])
+            self.assertTrue(report["journal_checked"])
+            summary["run_status"] = "COMPLETED"
+            with self.assertRaisesRegex(ValueError, "halt condition"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
+
+    def test_summary_final_classes_must_match_journal(self):
+        summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(directory)
+            for row in self.schedule["schedule"]:
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+            summary["journal_checksums"] = journal.checksums()
+            report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
+            self.assertEqual(report["paired_counts"]["n00"], 400)
+            planned = self.schedule["schedule"][0]["planned_run_id"]
+            summary["final_classes"][planned] = C.SCI_SUCCESS
+            with self.assertRaisesRegex(ValueError, "final classes do not match"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=directory)
+
+    def test_journal_rows_must_match_schedule_even_with_current_checksums(self):
+        # Fabricate an internally consistent journal whose planned ID is right
+        # but whose executed settings/state differ from the analysis schedule.
+        for field, wrong in (("d", 10), ("state_sha256", h("other-state")),
+                             ("condition_id", "R25"),
+                             ("episode_identity", {"synthetic": "different"})):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as directory:
+                journal = AttemptJournal(Path(directory) / "attempts")
+                for index, row in enumerate(self.schedule["schedule"]):
+                    recorded = json.loads(json.dumps(row))
+                    if index == 0:
+                        recorded[field] = ("R22" if row[field] == "R25" else "R25") if field == "condition_id" else wrong
+                    path = journal.begin(recorded, "synthetic", ["test"])
+                    journal.update(path, "running")
+                    journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+                summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+                summary["journal_checksums"] = journal.checksums()
+                with self.assertRaisesRegex(ValueError, "journal schedule row"):
+                    AN.analyze(self.schedule, summary, population=TEST_POP,
+                               journal_dir=journal.root)
+
+    def test_completed_summary_cannot_override_persisted_halt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            journal = AttemptJournal(Path(directory) / "attempts")
+            for row in self.schedule["schedule"]:
+                path = journal.begin(row, "synthetic", ["test"])
+                journal.update(path, "running")
+                journal.update(path, "completed", attempt_class=C.SCI_FAILURE)
+            summary = R.summarize(self.schedule["schedule"], journal, directory,
+                                  self.schedule["schedule_sha256"], "pi05", "COMPLETED")
+            R.write_halt(directory, "HALTED_GATE_OR_HASH", "synthetic gate fault")
+            with self.assertRaisesRegex(ValueError, "halt condition: HALTED_GATE_OR_HASH"):
+                AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=journal.root)
+
+    def test_analysis_rejects_rehashed_semantic_schedule_mutations(self):
+        finals = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)["final_classes"]
+        for mutation in ("identity", "denoising", "planned_id", "state_key", "cohort"):
+            schedule = json.loads(json.dumps(self.schedule))
+            rows = schedule["schedule"]
+            if mutation == "identity":
+                for row in rows[:2]:
+                    row["episode_identity"] = dict(rows[2]["episode_identity"])
+            elif mutation == "denoising":
+                rows[0]["d"] = 10
+            elif mutation == "planned_id":
+                rows[1]["planned_run_id"] = rows[0]["planned_run_id"]
+            elif mutation == "state_key":
+                rows[0]["state_key"] = "wrong-state"
+            else:
+                rows[0]["cohort"] = "wrong-cohort"
+            schedule["schedule_sha256"] = sha(rows)
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                AN.pair_table(schedule, finals, TEST_POP)
+
+    def test_analyze_requires_the_journal(self):
+        summary = fake_summary(self.schedule, lambda row: C.SCI_FAILURE)
+        with self.assertRaisesRegex(ValueError, "journal_dir is required"):
+            AN.analyze(self.schedule, summary, population=TEST_POP)
+        report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
+        self.assertFalse(report["journal_checked"])
+
     def test_exact_contrast_and_counts(self):
         # R22 succeeds on task 0 of every suite only; R25 always fails.
         def outcome(row):
             ok = row["condition_id"] == "R22" and row["episode_identity"]["task_id"] == 0
             return C.SCI_SUCCESS if ok else C.SCI_FAILURE
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["paired_counts"], {"n11": 0, "n10": 40, "n01": 0, "n00": 360})
         self.assertAlmostEqual(report["exact_cohort_contrast"], 0.1)
         self.assertEqual(report["worst_case_bounds"]["lower"], report["worst_case_bounds"]["upper"])
@@ -292,7 +391,7 @@ class Analysis(unittest.TestCase):
             if row["planned_run_id"] in missing:
                 return C.MISSING
             return C.SCI_SUCCESS if row["condition_id"] == "R22" and row["episode_identity"]["task_id"] < 2 else C.SCI_FAILURE
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, outcome), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertIsNone(report["exact_cohort_contrast"])
         self.assertEqual(report["missingness"]["overall"]["R25_missing"], 5)
         self.assertEqual(report["worst_case_bounds"]["denominator"], 400)
@@ -301,17 +400,17 @@ class Analysis(unittest.TestCase):
         many = set(r["planned_run_id"] for r in self.schedule["schedule"] if r["condition_id"] == "R25")
         many = set(sorted(many)[:11])
         report = AN.analyze(self.schedule, fake_summary(
-            self.schedule, lambda r: C.MISSING if r["planned_run_id"] in many else C.SCI_FAILURE), population=TEST_POP)
+            self.schedule, lambda r: C.MISSING if r["planned_run_id"] in many else C.SCI_FAILURE), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["verdict"], "UNINTERPRETABLE")  # arm difference 11 > 10
 
     def test_bounds_containing_zero_is_inconclusive(self):
-        report = AN.analyze(self.schedule, fake_summary(self.schedule, lambda r: C.SCI_FAILURE), population=TEST_POP)
+        report = AN.analyze(self.schedule, fake_summary(self.schedule, lambda r: C.SCI_FAILURE), population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertEqual(report["verdict"], "DELTA_INCONCLUSIVE")
 
     def test_stopped_run_reads_no_outcomes(self):
         summary = fake_summary(self.schedule, lambda r: C.SCI_SUCCESS)
         summary["run_status"] = "STOPPED_INSTRUMENT_INCIDENT"
-        report = AN.analyze(self.schedule, summary, population=TEST_POP)
+        report = AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
         self.assertFalse(report["outcomes_read"])
         self.assertEqual(report["verdict"], "UNINTERPRETABLE")
 
@@ -319,7 +418,7 @@ class Analysis(unittest.TestCase):
         summary = fake_summary(self.schedule, lambda r: C.SCI_SUCCESS)
         del summary["final_classes"][self.schedule["schedule"][0]["planned_run_id"]]
         with self.assertRaises(ValueError):
-            AN.analyze(self.schedule, summary, population=TEST_POP)
+            AN.analyze(self.schedule, summary, population=TEST_POP, journal_dir=AN.SKIP_JOURNAL_CHECK)
 
     def test_t_quantile(self):
         self.assertAlmostEqual(AN.t_quantile(0.975, 160), 1.974902, places=5)  # scipy t.ppf: 1.9749015600
@@ -381,7 +480,7 @@ class R3Record(unittest.TestCase):
         cells = [dict(c, coverage=(coverage if c["feasible"] else None)) for c in R3.cells()]
         return {"schema": R3.SCHEMA, "status": "PASS", "criterion": R3.CRITERION, "replicates": R3.REPLICATES,
                 "grid_sha256": R3.grid_sha256(), "analysis_sha256": Q.file_sha(AN.__file__),
-                "authorisation_sha256": "a" * 64, "cells": cells}
+                "r3_code_sha256": Q.file_sha(R3.__file__), "authorisation_sha256": "a" * 64, "cells": cells}
 
     def check(self, record):
         path = Path(tempfile.mkdtemp()) / "r3.json"
@@ -391,6 +490,10 @@ class R3Record(unittest.TestCase):
     def test_recomputed_from_cells(self):
         self.assertTrue(self.check(self.record(0.95)))
         self.assertFalse(self.check(self.record(0.92)))  # self-declared PASS with failing cells is refused
+        self.assertFalse(self.check(self.record(1.01)))
+        stale_code = self.record(0.95)
+        stale_code["r3_code_sha256"] = "0" * 64
+        self.assertFalse(self.check(stale_code))
         unbound = self.record(0.95)
         del unbound["authorisation_sha256"]
         self.assertFalse(self.check(unbound))

@@ -19,7 +19,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import classify as C  # noqa: E402
-from v3common import CONDITIONS, CONFIRMATION_POPULATION, atomic_write_json, file_sha, sha  # noqa: E402
+from v3common import (CONDITIONS, CONFIRMATION_POPULATION, MODELS, PROTOCOL_B,
+                      atomic_write_json, file_sha, identity_id, sha, state_key)  # noqa: E402
 
 MAX_INCOMPLETE_PAIRS = 20          # D2
 MAX_ARM_MISSING_DIFFERENCE = 10    # D2, after permitted retries
@@ -101,6 +102,24 @@ def pair_table(schedule, finals, population=CONFIRMATION_POPULATION):
     expected_rows = 2 * population.identity_count()
     if len(rows) != expected_rows:
         raise ValueError("schedule must have {} rows".format(expected_rows))
+    from make_schedule_v2 import validate_schedule
+
+    model = schedule.get("model")
+    if model not in MODELS or schedule.get("protocol") != PROTOCOL_B or schedule.get("cohort") != population.cohort:
+        raise ValueError("schedule model, protocol or cohort mismatch")
+    validate_schedule(rows, population, model)
+    # A matching row hash does not bind redundant identity labels to their fields.
+    # Check these before reading any final classes or grouping outcomes.
+    for row in rows:
+        ident = row["episode_identity"]
+        expected_id = identity_id(ident)
+        if row["identity_id"] != expected_id or row["cohort"] != population.cohort:
+            raise ValueError("schedule row identity or cohort mismatch")
+        if row["state_key"] != state_key(ident["suite"], ident["task_id"], ident["state_slot"]):
+            raise ValueError("schedule row state key mismatch")
+        expected_planned = "{}.{}.{}.{}".format(population.cohort, model, expected_id, row["condition_id"])
+        if row["planned_run_id"] != expected_planned:
+            raise ValueError("schedule planned_run_id does not bind its identity and condition")
     pairs = {}
     for row in rows:
         planned = row["planned_run_id"]
@@ -232,6 +251,8 @@ def check_r3_record(path):
         return False, "unexpected R3 record schema"
     if record.get("analysis_sha256") != file_sha(__file__):
         return False, "R3 record was produced for different analysis code"
+    if record.get("r3_code_sha256") != file_sha(r3_coverage.__file__):
+        return False, "R3 record was produced for different coverage code"
     if record.get("grid_sha256") != r3_coverage.grid_sha256():
         return False, "R3 record grid differs from the preregistered grid"
     if record.get("criterion") != r3_coverage.CRITERION or record.get("replicates") != r3_coverage.REPLICATES:
@@ -246,8 +267,8 @@ def check_r3_record(path):
     if [{k: c.get(k) for k in ("baseline", "discordance", "delta", "rho_task", "rho_state", "feasible")} for c in cells] != expected:
         return False, "R3 record cells differ from the preregistered grid"
     for cell in cells:
-        if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and cell["coverage"] >= r3_coverage.CRITERION):
-            return False, "R3 record has a feasible cell below the criterion"
+        if cell["feasible"] and not (isinstance(cell.get("coverage"), float) and r3_coverage.CRITERION <= cell["coverage"] <= 1.0):
+            return False, "R3 record has a feasible cell outside the passing coverage range"
     return True, "R3 coverage check passed"
 
 
@@ -256,28 +277,57 @@ def check_r3_record(path):
 def check_journal(summary, journal_dir):
     """The summary's journal checksums must match the journal on disk (finding: summary not trusted alone)."""
     from journal import AttemptJournal
-    if AttemptJournal(journal_dir).checksums() != summary.get("journal_checksums"):
+    if not Path(journal_dir).is_dir():
+        raise ValueError("attempt journal directory does not exist")
+    journal = AttemptJournal(journal_dir)
+    if journal.checksums() != summary.get("journal_checksums"):
         raise ValueError("runner summary does not match the attempt journal on disk")
+    return journal
+
+
+# Explicit opt-out for offline tests that build synthetic summaries without a journal. Never a CLI option.
+SKIP_JOURNAL_CHECK = object()
 
 
 def analyze(schedule, summary, r3_record_path=None, population=CONFIRMATION_POPULATION, journal_dir=None):
     model = schedule["model"]
-    if journal_dir is not None:
-        check_journal(summary, journal_dir)
+    if journal_dir is None:
+        raise ValueError("journal_dir is required: the summary is not trusted without the attempt journal")
+    journal = None if journal_dir is SKIP_JOURNAL_CHECK else check_journal(summary, journal_dir)
     if summary.get("model") != model or summary.get("schedule_sha256") != schedule["schedule_sha256"]:
         raise ValueError("runner summary is for a different model or schedule")
     status = summary.get("run_status")
     if status not in RUN_STATUSES:
         raise ValueError("unknown run_status {!r}".format(status))
     report = {"model": model, "schedule_sha256": schedule["schedule_sha256"], "run_status": status,
-              "two_sided": True, "prediction": "NONE_RECORDED"}
+              "two_sided": True, "prediction": "NONE_RECORDED", "journal_checked": journal is not None}
     if status != "COMPLETED":
         # 02 B9: outcomes of a stopped run are not read. Accounting only.
         report["verdict"] = "UNSUPPORTED_REFINEMENT_SETTING" if status == "STOPPED_PROTOCOL" else "UNINTERPRETABLE"
         report["accounting"] = summary.get("accounting")
         report["outcomes_read"] = False
         return report
-    pairs = pair_table(schedule, summary["final_classes"], population)
+    finals = summary["final_classes"]
+    if journal is not None:
+        from runner_v2 import classes_by_row, stop_state
+
+        # Journal checksums bind bytes, not their experimental meaning. Every
+        # attempt (including retries) must bind the exact planned row, rather
+        # than only its planned_run_id, before any final outcomes are used.
+        planned_rows = {row["planned_run_id"]: row for row in schedule["schedule"]}
+        for record in journal.records():
+            expected = planned_rows.get(record.get("planned_run_id"))
+            if expected is None or sha(record.get("schedule_row")) != sha(expected):
+                raise ValueError("journal schedule row does not match the analysis schedule")
+        classes = classes_by_row(journal)
+        halted = stop_state(classes, Path(journal.root).parent)
+        if halted is not None:
+            raise ValueError("COMPLETED summary contradicts journal halt condition: {}".format(halted))
+        journal_finals = {planned: C.final_class(classes)
+                          for planned, classes in classes.items()}
+        if finals != journal_finals:
+            raise ValueError("runner summary final classes do not match the attempt journal")
+    pairs = pair_table(schedule, finals, population)
     miss = missingness(pairs, population)
     overall, by_suite = paired_counts(pairs, population)
     n_complete = sum(overall.values())
