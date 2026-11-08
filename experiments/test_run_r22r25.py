@@ -86,7 +86,7 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
                 runner.execute(plan, workspace, port=port, root=root)
 
     def test_server_death_after_readiness_stops_client_and_analysis(self):
-        import benchstudio as bs
+        from benchstudio.processes import ProcessFailure
         with tempfile.TemporaryDirectory() as directory:
             root, workspace = self.fixture(Path(directory))
             tools = root / 'experiments/tooling/cross_policy_v3'
@@ -102,7 +102,7 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
             with socket.socket() as probe:
                 probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
             commands = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, port=port, root=root)
-            with self.assertRaisesRegex(bs.ProcessFailure, 'required service'):
+            with self.assertRaisesRegex(ProcessFailure, 'required service'):
                 runner.execute(commands, workspace, port=port, startup_timeout=10, root=root)
             self.assertFalse((root / 'client-incorrectly-completed').exists())
             self.assertFalse((workspace / 'pi05/analysis.json').exists())
@@ -110,7 +110,7 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
             self.assertEqual(receipt['reason'], 'ProcessFailure')
 
     def test_stopped_native_run_is_analyzed_without_starting_other_model(self):
-        import benchstudio as bs
+        from benchstudio.processes import ProcessFailure
         with tempfile.TemporaryDirectory() as directory:
             root, workspace = self.fixture(Path(directory))
             script = root / 'experiments/tooling/cross_policy_v3/launch_v3.py'
@@ -119,32 +119,32 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
                 "Path(a.output).mkdir(); (Path(a.output)/'run_summary.json').write_text('{}')\n"
                 "raise SystemExit(3)\n")
             plan = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, root=root)
-            with self.assertRaises(bs.ProcessFailure, msg='must preserve the native stop'):
+            with self.assertRaises(ProcessFailure, msg='must preserve the native stop'):
                 runner.execute(plan, workspace, root=root)
             self.assertTrue((workspace / 'smolvla/analysis.json').exists())
             self.assertFalse((workspace / 'pi05/server').exists())
 
     def test_server_interpreter_precheck_fails_before_any_model_starts(self):
-        import benchstudio as bs
+        from benchstudio.processes import ProcessFailure
         with tempfile.TemporaryDirectory() as directory:
             root, workspace = self.fixture(Path(directory))
             script = root / 'experiments/tooling/cross_policy_v3/verify_campaign.py'
             script.write_text('import sys; raise SystemExit(2 if "--role" in sys.argv else 0)')
             commands = runner.plan(workspace, sys.executable, sys.executable,
                 pi05_server_python=sys.executable, root=root)
-            with self.assertRaisesRegex(bs.ProcessFailure, 'pi05-server-verify'):
+            with self.assertRaisesRegex(ProcessFailure, 'pi05-server-verify'):
                 runner.execute(commands, workspace, root=root)
             self.assertFalse((workspace / 'smolvla/run').exists())
             self.assertFalse((workspace / 'pi05/server').exists())
 
     def test_failed_second_precheck_prevents_all_native_jobs(self):
-        import benchstudio as bs
+        from benchstudio.processes import ProcessFailure
         with tempfile.TemporaryDirectory() as directory:
             root, workspace = self.fixture(Path(directory))
             script = root / 'experiments/tooling/cross_policy_v3/verify_campaign.py'
             script.write_text('import sys; raise SystemExit(2 if "pi05" in sys.argv else 0)')
             plan = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, root=root)
-            with self.assertRaises(bs.ProcessFailure):
+            with self.assertRaises(ProcessFailure):
                 runner.execute(plan, workspace, root=root)
             self.assertFalse((workspace / 'smolvla/run').exists())
             self.assertFalse((workspace / 'pi05/server').exists())
@@ -152,3 +152,4 @@ s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
 
 if __name__ == '__main__':
     unittest.main()
+

@@ -10,7 +10,8 @@ import tempfile
 from types import MappingProxyType
 from typing import Mapping
 
-import benchstudio as bs
+from benchstudio.processes import ProcessCommand
+from benchstudio.refinement import RefinementWorkspace
 
 
 @dataclass(frozen=True)
@@ -56,13 +57,13 @@ class NativeRecipe:
     def check(self):
         """Offline inventory only. No native qualification or identity generation."""
         self._verify_checkout()
-        return bs.RefinementWorkspace(self.repository).prepare()
+        return RefinementWorkspace(self.repository).prepare()
 
     def run(self):
         # The helper reads retained evidence; the existing native runner independently
         # checks releases, interpreter roles, manifest hashes and qualification again.
         report = self.check()
-        if not report.technical_ready or not report.execution_authorized:
+        if not report.configuration_valid or not report.execution_authorized:
             raise RuntimeError("native campaign is not ready/authorized:\n" + report.summary())
         workspace = self.repository / "experiments/runs/cross_policy_confirmation_v2"
         logs_root = workspace / "operator-logs"
@@ -72,7 +73,7 @@ class NativeRecipe:
                 "--smolvla-python", self.smolvla_python,
                 "--pi05-client-python", self.pi05_client_python,
                 "--pi05-server-python", self.pi05_server_python, "--execute")
-        bs.ProcessCommand("refinement-refresh", argv, self.repository).run(logs)
+        ProcessCommand("refinement-refresh", argv, self.repository).execute(logs)
         analyses, digests = {}, {}
         for model in ("smolvla", "pi05"):
             path = workspace / model / "analysis.json"
@@ -118,3 +119,4 @@ class RecipeFactory:
 
 
 recipe = RecipeFactory()
+

@@ -54,7 +54,7 @@ def plan(workspace, smolvla_python, pi05_python, *, pi05_server_python, port=800
 
 
 def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
-    import benchstudio as bs
+    from benchstudio.processes import ProcessCommand, ProcessFailure
     workspace = Path(workspace).resolve()
     # Refuse a second launch, rather than overwrite scientific outputs/logs.
     # This is an output-preservation check, not a global single-campaign registry.
@@ -71,24 +71,24 @@ def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
     print('Operator logs: ' + str(logs), flush=True)
     env = {'MUJOCO_GL': 'osmesa', 'XLA_FLAGS': XLA_FLAGS}
     def command(name):
-        return bs.ProcessCommand(name, tuple(by_name[name]), root, env=env)
+        return ProcessCommand(name, tuple(by_name[name]), root, env=env)
     # Both native stacks must pass before the first model/server is started.
     for model in ('smolvla', 'pi05'):
-        command(model + '-verify').run(logs)
-    command('pi05-server-verify').run(logs)
+        command(model + '-verify').execute(logs)
+    command('pi05-server-verify').execute(logs)
     # Reject an occupied service port before spending a model run.
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', port))
     def model_round(model, required_service=None):
         try:
-            command(model + '-campaign').run(logs, required_service=required_service)
-        except bs.ProcessFailure:
+            command(model + '-campaign').execute(logs, required_service=required_service)
+        except ProcessFailure:
             # A stopped native run may have an accounting-only summary. Its
             # existing analysis decides whether any outcomes can be read.
             if (workspace / model / 'run/run_summary.json').is_file():
-                command(model + '-analysis').run(logs)
+                command(model + '-analysis').execute(logs)
             raise
-        command(model + '-analysis').run(logs)
+        command(model + '-analysis').execute(logs)
     model_round('smolvla')
     gate = workspace / 'pi05/server/startup_gate.json'
     def ready():
@@ -129,3 +129,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

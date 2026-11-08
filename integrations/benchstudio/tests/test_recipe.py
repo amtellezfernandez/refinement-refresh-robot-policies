@@ -7,6 +7,8 @@ from unittest.mock import patch
 
 import pytest
 import benchstudio as bs
+from benchstudio.processes import ProcessCommand, ProcessFailure
+from benchstudio.refinement import RefinementWorkspace, RefinementPreparation
 from refinement_refresh_benchstudio import create_pipeline
 
 
@@ -26,7 +28,7 @@ def recipe(tmp_path, script=None):
 
 
 def preparation(technical=False, authorized=False):
-    return bs.RefinementPreparation({model: {"issues": [] if technical else [{
+    return RefinementPreparation({model: {"issues": [] if technical else [{
         "message": "native evidence missing", "next_action": "retain evidence"}],
         "offline_inputs_complete": technical, "execution_authorized": authorized,
         "commands": {}} for model in ("smolvla", "pi05")})
@@ -35,8 +37,8 @@ def preparation(technical=False, authorized=False):
 @pytest.mark.parametrize("technical,authorized", [(False, False), (True, False), (False, True)])
 def test_readiness_and_permission_are_independent_and_never_launch(tmp_path, technical, authorized):
     pipeline = recipe(tmp_path)
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation(technical, authorized)), \
-            patch.object(bs.ProcessCommand, "run") as run:
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation(technical, authorized)), \
+            patch.object(ProcessCommand, "execute") as run:
         with pytest.raises(RuntimeError, match="not ready/authorized"):
             pipeline.run()
         run.assert_not_called()
@@ -47,9 +49,9 @@ def test_discovery_construction_and_check_do_not_execute_campaign(tmp_path, monk
     monkeypatch.setattr("benchstudio.backend_loading.metadata.entry_points", lambda **kw: [
         SimpleNamespace(load=lambda: lambda **kw: backend)])
     pipeline = bs.pipeline("refinement-refresh")
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation()), \
-            patch.object(bs.ProcessCommand, "run") as run:
-        assert not pipeline.check().technical_ready
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation()), \
+            patch.object(ProcessCommand, "execute") as run:
+        assert not pipeline.check().configuration_valid
         run.assert_not_called()
 
 
@@ -64,7 +66,7 @@ for model in ("smolvla", "pi05"):
     (folder / "analysis.json").write_text(json.dumps({"model": model, "verdict": "SYNTHETIC_ONLY"}))
 '''
     pipeline = recipe(tmp_path, script)
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation(True, True)):
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation(True, True)):
         result = pipeline.run()
     args = json.loads((pipeline.repository / "received.json").read_text())
     assert args == ["--smolvla-python", "/smol/python", "--pi05-client-python", "/client/python",
@@ -77,7 +79,7 @@ for model in ("smolvla", "pi05"):
 def test_checkout_mismatch_refuses_before_preparation(tmp_path):
     pipeline = recipe(tmp_path)
     object.__setattr__(pipeline, "revision", "0" * 40)
-    with patch.object(bs.RefinementWorkspace, "prepare") as prepare:
+    with patch.object(RefinementWorkspace, "prepare") as prepare:
         with pytest.raises(ValueError, match="revision"):
             pipeline.check()
         prepare.assert_not_called()
@@ -85,8 +87,8 @@ def test_checkout_mismatch_refuses_before_preparation(tmp_path):
 
 def test_existing_runner_failure_propagates_without_fake_results(tmp_path):
     pipeline = recipe(tmp_path)
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation(True, True)):
-        with pytest.raises(bs.ProcessFailure, match="exited 7"):
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation(True, True)):
+        with pytest.raises(ProcessFailure, match="exited 7"):
             pipeline.run()
     assert not (pipeline.repository / "experiments/runs/cross_policy_confirmation_v2/pi05/analysis.json").exists()
 
@@ -100,8 +102,8 @@ def test_cli_preparation_uses_same_installed_recipe_and_never_launches(tmp_path,
     args = ["evaluate", "--recipe", "refinement-refresh", "--repository", str(pipeline.repository),
             "--revision", pipeline.revision, "--smolvla-python", "/smol/python",
             "--pi05-client-python", "/client/python", "--pi05-server-python", "/server/python", "--check"]
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation()), \
-            patch.object(bs.ProcessCommand, "run") as run:
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation()), \
+            patch.object(ProcessCommand, "execute") as run:
         assert main(args) == 1
         run.assert_not_called()
 
@@ -118,8 +120,8 @@ def test_runtime_drift_refuses_before_preparation_and_launch(tmp_path, kind):
         source.write_text(source.read_text() + "\n# local change")
         if kind == "staged":
             subprocess.run(["git", "-C", str(pipeline.repository), "add", "."], check=True)
-    with patch.object(bs.RefinementWorkspace, "prepare") as prepare, \
-            patch.object(bs.ProcessCommand, "run") as run:
+    with patch.object(RefinementWorkspace, "prepare") as prepare, \
+            patch.object(ProcessCommand, "execute") as run:
         with pytest.raises(ValueError, match="runtime sources differ"):
             pipeline.run()
         prepare.assert_not_called()
@@ -130,6 +132,7 @@ def test_retained_json_and_documentation_do_not_invalidate_runtime_pin(tmp_path)
     pipeline = recipe(tmp_path)
     (pipeline.repository / "retained.json").write_text('{"fixture": true}')
     (pipeline.repository / "notes.md").write_text("operator notes")
-    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation()) as prepare:
-        assert not pipeline.check().technical_ready
+    with patch.object(RefinementWorkspace, "prepare", return_value=preparation()) as prepare:
+        assert not pipeline.check().configuration_valid
         prepare.assert_called_once()
+
