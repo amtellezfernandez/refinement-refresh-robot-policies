@@ -77,6 +77,9 @@ def prepare(workspace, model, python=sys.executable):
                 raise ValueError("schedule names a different model")
             if "manifest" in artifacts and doc.get("state_manifest_file_sha256") != artifacts["manifest"]["sha256"]:
                 raise ValueError("schedule is not bound to this manifest file")
+            if "manifest" in documents:
+                from make_schedule_v2 import validate_manifest_binding
+                validate_manifest_binding(doc, documents["manifest"], model)
         except (ValueError, KeyError, TypeError) as error:
             issue("inputs", "Schedule: " + str(error), "Correct the existing schedule binding and 400-pair/800-attempt accounting.")
     if not (HERE / "launch_v3.py").is_file():
@@ -144,4 +147,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

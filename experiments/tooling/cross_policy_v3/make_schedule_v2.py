@@ -96,6 +96,44 @@ def validate_manifest(document, model, population=CONFIRMATION_POPULATION):
     return by_key
 
 
+def validate_manifest_binding(schedule, document, model, population=CONFIRMATION_POPULATION):
+    """Check that every scheduled state's bytes/task/provenance match its native manifest.
+
+    Schedule population, pairing and ordering remain the separate schedule validator's
+    responsibility. A file digest reference alone cannot validate redundant row data.
+    """
+    by_key = validate_manifest(document, model, population)
+    if schedule.get("model") != model or schedule.get("state_binding") != "BOUND":
+        fail("schedule model or state binding mismatch")
+    for scheduled, native in (
+        ("state_manifest_states_sha256", "states_sha256"),
+        ("initial_states_npz_sha256", "initial_states_npz_sha256"),
+        ("state_generator_sha256", "generator_sha256"),
+    ):
+        if schedule.get(scheduled) != document[native]:
+            fail("schedule {} differs from the native manifest".format(scheduled))
+    rows = schedule.get("schedule")
+    if not isinstance(rows, list) or not rows:
+        fail("schedule rows missing from manifest binding check")
+    for row in rows:
+        if not isinstance(row, dict):
+            fail("schedule row is not an object")
+        state = by_key.get(row.get("state_key"))
+        if state is None:
+            fail("scheduled state key is absent from the native manifest")
+        ident = row.get("episode_identity")
+        if not isinstance(ident, dict) or any(
+                ident.get(key) != state[key] for key in ("suite", "task_id", "state_slot")):
+            fail("schedule identity differs from the native manifest")
+        for field in ("state_sha256", "task_bddl_sha256", "task_language"):
+            if row.get(field) != state[field]:
+                fail("schedule {} differs from the native manifest".format(field))
+        expected = {key: state[key] for key in ("draw", "seed", "state_length")}
+        if row.get("state_provenance") != expected:
+            fail("schedule state provenance differs from the native manifest")
+    return by_key
+
+
 def check_disjoint(by_key, other_documents):
     """No state hash may appear in another population (the other model's, or the diagnostic population)."""
     ours = {row["state_sha256"] for row in by_key.values()}
@@ -228,3 +266,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

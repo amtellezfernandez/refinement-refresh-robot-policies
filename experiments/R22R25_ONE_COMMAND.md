@@ -43,7 +43,10 @@ python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --
 ```
 
 The native verification stage checks existing qualification and release records,
-manifest/schedule pairing and state archive hashes for BOTH models, plus server-interpreter compatibility, before any
+manifest/schedule pairing and state archive hashes for BOTH models. It also checks
+that every scheduled state's digest, BDDL, task language and provenance match the
+native manifest, including its archive and generator bindings. Server-interpreter
+compatibility is checked before any
 model process starts. GPU reservation/environment variables required by the
 existing native guards must already be present. Then it runs SmolVLA and its
 offline analysis, starts the pi05 attesting server with deterministic XLA flags
@@ -79,4 +82,5 @@ The installed recipe checks `configuration_valid` and `execution_authorized`
 separately; neither the package import nor this frontend qualifies a native stack.
 These code updates apply to a subsequent reviewed campaign release, not the
 independently pinned E0 staging package.
+
 
