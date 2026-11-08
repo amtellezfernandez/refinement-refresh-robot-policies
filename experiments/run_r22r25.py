@@ -20,7 +20,7 @@ def canonical_workspace(root=ROOT):
     return Path(root).resolve() / 'experiments/runs/cross_policy_confirmation_v2'
 
 
-def plan(workspace, smolvla_python, pi05_python, *, port=8000, root=ROOT):
+def plan(workspace, smolvla_python, pi05_python, *, pi05_server_python, port=8000, root=ROOT):
     workspace, root = Path(workspace).resolve(), Path(root).resolve()
     if workspace != canonical_workspace(root).resolve():
         raise ValueError('Use the existing released schedule directory: ' + str(canonical_workspace(root)))
@@ -30,10 +30,12 @@ def plan(workspace, smolvla_python, pi05_python, *, port=8000, root=ROOT):
     for model, python in interpreters.items():
         commands.append((model + '-verify', [python, str(tools / 'verify_campaign.py'),
                                            '--workspace', str(workspace), '--model', model]))
+    commands.append(('pi05-server-verify', [str(pi05_server_python), str(tools / 'verify_campaign.py'),
+        '--workspace', str(workspace), '--model', 'pi05', '--role', 'server']))
     for model, python in interpreters.items():
         folder = workspace / model
         if model == 'pi05':
-            commands.append(('pi05-server', [python, str(tools / 'server_openpi_v3.py'), 'serve',
+            commands.append(('pi05-server', [str(pi05_server_python), str(tools / 'server_openpi_v3.py'), 'serve',
                 '--checkpoint', str(folder / 'checkpoint'), '--output', str(folder / 'server'),
                 '--schedule', str(folder / 'schedule.json'), '--port', str(port)]))
         command = [python, str(tools / 'launch_v3.py'), '--model', model,
@@ -73,6 +75,7 @@ def execute(commands, workspace, *, port=8000, startup_timeout=1800, root=ROOT):
     # Both native stacks must pass before the first model/server is started.
     for model in ('smolvla', 'pi05'):
         command(model + '-verify').run(logs)
+    command('pi05-server-verify').run(logs)
     # Reject an occupied service port before spending a model run.
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', port))
@@ -105,14 +108,18 @@ def main():
     parser.add_argument('--workspace', type=Path, default=canonical_workspace(),
                         help='Existing release-gate directory; normally omit this argument.')
     parser.add_argument('--smolvla-python', required=True)
-    parser.add_argument('--pi05-python', required=True)
+    parser.add_argument('--pi05-client-python', '--pi05-python', dest='pi05_client_python', required=True,
+                        help='Pinned LIBERO client interpreter (Python 3.8); old flag remains an alias.')
+    parser.add_argument('--pi05-server-python', required=True,
+                        help='Independent pinned OpenPI/JAX interpreter (Python >=3.11).')
     parser.add_argument('--port', type=int, default=8000)
     parser.add_argument('--startup-timeout', type=float, default=1800)
     parser.add_argument('--execute', action='store_true', help='Invoke existing release-gated native entry points.')
     args = parser.parse_args()
     if not 1 <= args.port <= 65535 or args.startup_timeout <= 0:
         parser.error('port/timeout outside valid range')
-    commands = plan(args.workspace, args.smolvla_python, args.pi05_python, port=args.port)
+    commands = plan(args.workspace, args.smolvla_python, args.pi05_client_python,
+                    pi05_server_python=args.pi05_server_python, port=args.port)
     if not args.execute:
         for name, argv in commands:
             print(name + ': ' + shlex.join(argv))

@@ -5,6 +5,17 @@ provides `bs.ProcessCommand` for the reusable process/log/service mechanisms.
 Use a reviewed BenchStudio version that includes that API in the frontend's
 Python >=3.10 environment; keep each native environment pinned and separate.
 
+The pi05 LIBERO client and OpenPI/JAX server are distinct environments. OpenPI
+at the pinned commit 215abfb217dbac7d5f1273282331b9b1866c0479 declares Python
+>=3.11 in its [pyproject.toml](https://github.com/Physical-Intelligence/openpi/blob/215abfb217dbac7d5f1273282331b9b1866c0479/pyproject.toml).
+Its server cannot be launched with the prepared Python 3.8 LIBERO client.
+Select both explicitly; `--pi05-python` remains an alias for CLIENT only.
+The server's stdlib precheck runs before the first SmolVLA attempt and rejects
+Python <3.11 before reading artifacts or importing a native framework. Each
+role logs its actual interpreter/version. Minimum-version compatibility is not
+proof that package locks, checkpoints, CUDA/JAX or native qualification match;
+those still require pinned environments and retained native evidence.
+
 The workspace defaults to this checkout's
 `experiments/runs/cross_policy_confirmation_v2/`, as required by the existing
 release gate. Omit `--workspace` in normal use; a custom path must resolve to
@@ -20,18 +31,18 @@ secondary interval. No R3 check or identity generation is performed here.
 Preview (read-only, no subprocesses):
 
 ```sh
-python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python
+python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-client-python /path/to/libero-client/bin/python --pi05-server-python /path/to/openpi-server/bin/python
 ```
 
 After both native qualifications and the separate campaign release exist, the
 same command with `--execute` orchestrates the released round:
 
 ```sh
-python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-python /path/to/openpi/bin/python --execute
+python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --pi05-client-python /path/to/libero-client/bin/python --pi05-server-python /path/to/openpi-server/bin/python --execute
 ```
 
 The native verification stage checks existing qualification and release records,
-manifest/schedule pairing and state archive hashes for BOTH models before any
+manifest/schedule pairing and state archive hashes for BOTH models, plus server-interpreter compatibility, before any
 model process starts. GPU reservation/environment variables required by the
 existing native guards must already be present. Then it runs SmolVLA and its
 offline analysis, starts the pi05 attesting server with deterministic XLA flags

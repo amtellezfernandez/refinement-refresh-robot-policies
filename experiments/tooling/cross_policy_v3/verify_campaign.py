@@ -1,6 +1,7 @@
 """Read-only campaign input checks in the selected native interpreter. No native imports."""
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from v3common import file_sha
@@ -11,7 +12,14 @@ from analysis_v2 import pair_table
 from classify import MISSING
 
 
-def verify(workspace, model):
+def check_runtime_role(role, version=None):
+    version = sys.version_info if version is None else version
+    if role == "server" and tuple(version[:2]) < (3, 11):
+        raise ValueError("Pinned OpenPI server requires Python >=3.11; select its server environment, not the LIBERO client")
+
+
+def verify(workspace, model, role="client"):
+    check_runtime_role(role)
     root = Path(workspace).resolve() / model
     schedule = root / "schedule.json"
     manifest_path = root / "manifest.json"
@@ -31,8 +39,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--model", choices=("pi05", "smolvla"), required=True)
+    parser.add_argument("--role", choices=("client", "server"), default="client")
     args = parser.parse_args()
-    verify(args.workspace, args.model)
+    if args.role == "server" and args.model != "pi05":
+        parser.error("server role applies only to pi05")
+    verify(args.workspace, args.model, args.role)
+    print("Interpreter: {} {} (role {})".format(sys.executable, sys.version.split()[0], args.role))
     print("{}: existing release, qualification, schedule and state hashes validated".format(args.model))
 
 
