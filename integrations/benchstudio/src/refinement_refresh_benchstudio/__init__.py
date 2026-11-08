@@ -36,6 +36,19 @@ class NativeRecipe:
                                 text=True, capture_output=True, check=True)
         if result.stdout.strip() != self.revision:
             raise ValueError("paper checkout differs from the requested recipe revision")
+        # HEAD alone does not identify the code that Python will execute.
+        # Inspect staged, unstaged and untracked Python/configuration changes;
+        # retained run data and evidence JSON are intentionally outside this guard.
+        paths = ("*.py", "pyproject.toml", "integrations/benchstudio/pyproject.toml")
+        changed = subprocess.run(
+            ["git", "diff", "--name-only", self.revision, "--", *paths],
+            cwd=self.repository, text=True, capture_output=True, check=True)
+        untracked = subprocess.run(
+            ["git", "ls-files", "--others", "--exclude-standard", "--", *paths],
+            cwd=self.repository, text=True, capture_output=True, check=True)
+        if changed.stdout.strip() or untracked.stdout.strip():
+            raise ValueError("paper runtime sources differ from the requested recipe revision; "
+                             "use a clean pinned checkout")
         script = self.repository / "experiments/run_r22r25.py"
         if not script.is_file() or "--pi05-server-python" not in script.read_text("utf-8"):
             raise ValueError("integrate the reviewed three-interpreter frontend (paper PR #14) first")

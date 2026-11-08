@@ -37,7 +37,12 @@ Replace the illustrative revision and paths with the actual pinned checkout and
 native interpreters. They cannot be inferred safely from another host's logs. No
 source filename, launcher, result converter or manually constructed workspace is
 required from the operator. The recipe derives the existing canonical workspace.
-The full checkout revision is checked before invoking its preparation helper.
+The full checkout revision is checked before invoking its preparation helper. Staged,
+unstaged and untracked Python source or package-configuration changes are refused
+before preparation or launch, even when HEAD still names that revision. Retained
+JSON evidence and operator notes do not invalidate this source check. This is a
+local reproducibility guard, not a tamper-proof checkout or cross-host execution
+lock; native qualification and release hash checks remain mandatory.
 
 Only for a separately authorized and natively qualified campaign:
 
