@@ -3,6 +3,9 @@
 Shared by the attesting server (which builds attestations from callback counters) and the client (which
 verifies each one before the first action of a chunk is applied). Verification raises InstrumentIncident;
 nothing here ever produces a passing attestation from a request's own fields.
+Malformed JSON field types are instrument incidents, not generic infrastructure
+exceptions: the runner must stop before any further action/attempt. Integer
+fields exclude booleans and float lookalikes; sequence state changes only on pass.
 """
 import hashlib
 import json
@@ -37,8 +40,9 @@ def expected_time_values(d):
     """The time operand visited at each Euler step: t0 = 1, t(k+1) = t(k) + (-1/d), in float32, k = 0..d-1.
 
     Each float32 sum is exact in double and then rounded once, so this equals float32 arithmetic. -1/d is
-    rounded once from the double quotient. The recurrence follows the G02 faithful sampler P (bitwise equal to
-    stock); it has not been re-read from pinned pi0.py (09 C4, check 5).
+    rounded once from the double quotient. The recurrence matches the pinned stock Pi0.sample_actions source at OpenPI
+    215abfb (see STOCK_SAMPLER_SOURCE_AUDIT.md). Float32 execution and compiled
+    callback/count behavior remain unverified on the native stack.
     """
     if not isinstance(d, int) or d < 1:
         raise ValueError("d must be a positive int")
@@ -83,6 +87,9 @@ class Verifier(object):
             incident(1, "missing")
         if attestation.get("schema") != SCHEMA or any(k not in attestation for k in FIELDS + ("attestation_sha256",)):
             incident(1, "unexpected schema or missing field")
+        for name, check in (("tick", 2), ("d_requested", 3), ("executed_head_evaluations", 4)):
+            if type(attestation[name]) is not int:
+                incident(check, "{} must be a JSON integer".format(name))
         if attestation["request_id"] != sent_request_id or attestation["tick"] != sent_tick:
             incident(2, "bound to request {} tick {}, sent {} tick {}".format(
                 attestation["request_id"], attestation["tick"], sent_request_id, sent_tick))
@@ -91,14 +98,16 @@ class Verifier(object):
         if attestation["executed_head_evaluations"] != d:
             incident(4, "executed {} head evaluations, expected {}".format(attestation["executed_head_evaluations"], d))
         expected = sorted(f32_hex(v) for v in expected_time_values(d))
-        if not isinstance(attestation["time_values"], list) or sorted(attestation["time_values"]) != expected:
+        if (not isinstance(attestation["time_values"], list)
+                or any(type(value) is not str for value in attestation["time_values"])
+                or sorted(attestation["time_values"]) != expected):
             incident(5, "visited time values differ from the float32 grid for d={}".format(d))
         if attestation["startup_gate_sha256"] != self.startup_gate_sha256:
             incident(6, "startup gate record differs from the one recorded at client start")
         if attestation["xla_flags"] != self.xla_flags:
             incident(6, "XLA flags differ from the certified configuration")
         sequence = attestation["sequence_number"]
-        if not isinstance(sequence, int) or (self.last_sequence is not None and sequence <= self.last_sequence):
+        if type(sequence) is not int or (self.last_sequence is not None and sequence <= self.last_sequence):
             incident(7, "sequence number {} not after {}".format(sequence, self.last_sequence))
         if attestation["attestation_sha256"] != attestation_digest(attestation):
             incident(8, "digest mismatch")
@@ -108,3 +117,4 @@ class Verifier(object):
 
 def to_json(attestation):
     return json.dumps(attestation, sort_keys=True)
+
