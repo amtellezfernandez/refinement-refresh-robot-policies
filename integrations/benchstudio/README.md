@@ -6,7 +6,8 @@ conversion, state generation or permission file. Construction and check() never
 run a native campaign. The native runner remains the authority for experimental
 identities, 400 pairs/800 attempts per model, gates and analysis.
 
-Install the reviewed BenchStudio version supporting installed pipelines in a
+Tested against BenchStudio commit `081e12a8d0e92fbfd40a92147fcc23eab415c19f`.
+Install that reviewed version in a
 separate controlling Python >=3.10 environment. Install this integration there:
 
 ```sh
@@ -53,7 +54,7 @@ print(results.summary())
 
 run() refuses unless the existing preparation reports for both models say the
 technical inputs are complete and execution is authorized. It then invokes
-experiments/run_r22r25.py through bs.ProcessCommand. The existing frontend checks
+experiments/run_r22r25.py through `benchstudio.processes.ProcessCommand.execute`. The existing frontend checks
 both native stacks again before either model, manages the pi0.5 server/client,
 and invokes each model's existing analysis. The package does not bypass those
 checks, add retries or generate identities. A native failure propagates, retaining
@@ -61,8 +62,15 @@ its logs. Missing or malformed analysis files do not yield fabricated results.
 
 results.analyses retains the two native reports separately; analysis_sha256 binds
 their actual files. They are not pooled, converted into one success trial or
-claimed to be a comparable cross-model treatment effect. Technical readiness and
+claimed to be a comparable cross-model treatment effect. Offline input completeness (`configuration_valid`) and
 execution authorization are exposed separately on the preparation report.
+
+Preparation requires an existing pinned checkpoint directory for both models.
+The pi0.5 count qualification remains mandatory in its qualification record.
+The separate run-specific `server/startup_gate.json` is produced by the owned
+server after its startup checks; it is not an artifact to create or copy into
+place before preparation. The frontend refuses existing server output and the
+native client still verifies the gate and per-request count before actions.
 
 ## Current limitation
 
@@ -105,3 +113,4 @@ This preparation command never invokes the campaign. Only after the separately
 required native qualification, inputs and authorization exist can the operator
 remove --check to invoke the same release-gated native recipe. E0 is not a step
 in this command and its single-use permission cannot authorize this campaign.
+

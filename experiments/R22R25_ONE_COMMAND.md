@@ -1,8 +1,9 @@
 # One command after qualification and release
 
 The frontend lives here because R22/R25 is a scientific recipe. BenchStudio
-provides `bs.ProcessCommand` for the reusable process/log/service mechanisms.
-Use a reviewed BenchStudio version that includes that API in the frontend's
+provides `ProcessCommand` from `benchstudio.processes` for reusable process,
+log and service mechanisms. This frontend is tested against BenchStudio commit
+`081e12a8d0e92fbfd40a92147fcc23eab415c19f` in its
 Python >=3.10 environment; keep each native environment pinned and separate.
 
 The pi05 LIBERO client and OpenPI/JAX server are distinct environments. OpenPI
@@ -42,7 +43,10 @@ python experiments/run_r22r25.py --smolvla-python /path/to/smolvla/bin/python --
 ```
 
 The native verification stage checks existing qualification and release records,
-manifest/schedule pairing and state archive hashes for BOTH models, plus server-interpreter compatibility, before any
+manifest/schedule pairing and state archive hashes for BOTH models. It also checks
+that every scheduled state's digest, BDDL, task language and provenance match the
+native manifest, including its archive and generator bindings. Server-interpreter
+compatibility is checked before any
 model process starts. GPU reservation/environment variables required by the
 existing native guards must already be present. Then it runs SmolVLA and its
 offline analysis, starts the pi05 attesting server with deterministic XLA flags
@@ -73,4 +77,10 @@ A server exit while the client remains active stops the client, retains the
 failure receipt, and prevents reporting normal campaign completion. Any existing
 native stopped-run summary still goes through the same accounting-only rules;
 no automatic native retry is introduced. This requires the updated
-`ProcessCommand.run(required_service=...)` from BenchStudio PR #26.
+`ProcessCommand.execute(required_service=...)` from `benchstudio.processes`.
+The installed recipe checks `configuration_valid` and `execution_authorized`
+separately; neither the package import nor this frontend qualifies a native stack.
+These code updates apply to a subsequent reviewed campaign release, not the
+independently pinned E0 staging package.
+
+

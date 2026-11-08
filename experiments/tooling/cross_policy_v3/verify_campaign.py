@@ -7,7 +7,7 @@ from pathlib import Path
 from v3common import file_sha
 import qualification
 import release
-from make_schedule_v2 import validate_manifest
+from make_schedule_v2 import validate_manifest, validate_manifest_binding
 from analysis_v2 import pair_table
 from classify import MISSING
 
@@ -31,6 +31,7 @@ def verify(workspace, model, role="client"):
     pair_table(doc, {r["planned_run_id"]: MISSING for r in doc["schedule"]})
     if doc["model"] != model or doc.get("state_manifest_file_sha256") != file_sha(manifest_path):
         raise ValueError("schedule is not bound to this model's manifest")
+    validate_manifest_binding(doc, manifest, model)
     qualification.require_qualified(model)
     release.check_release(schedule, model)
 
@@ -50,3 +51,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
