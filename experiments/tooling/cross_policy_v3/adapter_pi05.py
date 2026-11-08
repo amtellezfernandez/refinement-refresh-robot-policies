@@ -133,6 +133,8 @@ class Pi05ClientAdapter(object):
                 if not context.first_query_started():
                     context.mark_first_query()
                 response = self.client.infer(request)
+                if not isinstance(response, dict):
+                    raise InstrumentIncident("broken decoded response contract at tick {}".format(tick))
                 # D5 first: no action from this chunk is applied unless its attestation verifies.
                 digest = self.verifier.verify(response.get("attestation"), rid, tick, d)
                 if response.get("server_configured_num_steps") != d:
