@@ -233,7 +233,8 @@ def validate(record, model, root=REPO_ROOT):
         authorisation = _checked_file(root, evidence["authorisation_path"], evidence["authorisation_sha256"],
                                       "authorisation", name)
         try:
-            approved = json.loads(authorisation.read_text("utf-8")).get("approved_by")
+            authorisation_record = json.loads(authorisation.read_text("utf-8"))
+            approved = authorisation_record.get("approved_by") if isinstance(authorisation_record, dict) else None
         except ValueError:
             approved = None
         if approved != "Alba":
@@ -241,12 +242,23 @@ def validate(record, model, root=REPO_ROOT):
         evidence_file = _checked_file(root, evidence["evidence_path"], evidence["evidence_sha256"], "evidence", name)
         if status == "PASSED" and name in REQUIRED_VERDICTS:
             try:
-                claimed = json.loads(evidence_file.read_text("utf-8")).get("verdict")
+                evidence_record = json.loads(evidence_file.read_text("utf-8"))
+                claimed = evidence_record.get("verdict") if isinstance(evidence_record, dict) else None
             except ValueError:
                 claimed = None
             if item["bindings"].get("verdict") != REQUIRED_VERDICTS[name] or claimed != REQUIRED_VERDICTS[name]:
                 raise RecordError("{}: PASSED needs verdict {} in the binding and in the evidence".format(
                     name, REQUIRED_VERDICTS[name]))
+            if name == "evaluator":
+                # E0 is non-counting and cannot qualify Protocol E. Recheck the
+                # native harness's existing stack/scope and direct record hash,
+                # rather than accepting any Alba-labelled file or either stack.
+                if authorisation_record.get("scope") != "PROTOCOL_E_" + model.upper():
+                    raise RecordError("evaluator: authorisation is not counted Protocol E for this model")
+                if evidence_record.get("stack") != model:
+                    raise RecordError("evaluator: evidence is for a different native stack")
+                if item["bindings"]["protocol_e_record_sha256"] != file_sha(evidence_file):
+                    raise RecordError("evaluator: bound Protocol E record hash differs from the evidence file")
     return record
 
 
@@ -286,3 +298,4 @@ def summary(model, directory=RECORD_DIR, root=REPO_ROOT):
 if __name__ == "__main__":
     for name in MODELS:
         print(name, json.dumps(summary(name), sort_keys=True))
+
