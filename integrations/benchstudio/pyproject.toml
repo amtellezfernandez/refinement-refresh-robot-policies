@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "refinement-refresh-benchstudio"
+version = "0.1.0"
+description = "Native scientific recipe integration for Refinement versus Refresh"
+requires-python = ">=3.10"
+
+[project.entry-points."benchstudio.pipelines"]
+refinement-refresh = "refinement_refresh_benchstudio:recipe"
+
+[tool.setuptools.packages.find]
+where = ["src"]
