@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from prepare_campaign import prepare
 
@@ -40,6 +41,46 @@ class Preparation(unittest.TestCase):
             self.assertTrue(any("malformed JSON" in i["next_action"] for i in report["issues"]))
             self.assertEqual(before, {p.name: p.read_bytes() for p in root.iterdir()})
             json.dumps(report, allow_nan=False)
+
+    def test_checkpoint_directory_is_required_for_both_models(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for model in ("pi05", "smolvla"):
+                report = prepare(directory, model)
+                self.assertTrue(any(i["message"] == "Missing checkpoint directory"
+                                    for i in report["issues"]))
+
+    def test_pi05_startup_gate_belongs_to_the_future_owned_server(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "pi05"
+            (root / "checkpoint").mkdir(parents=True)
+            before = sorted(str(p.relative_to(root)) for p in root.rglob("*"))
+            with patch("prepare_campaign.Q.summary", return_value={"count_gate": "UNVERIFIED"}):
+                report = prepare(directory, "pi05")
+            command = report["commands"]["confirmation_after_separate_release"]
+            self.assertEqual(command[command.index("--startup-gate") + 1],
+                             str(root / "server/startup_gate.json"))
+            self.assertFalse(any("Missing " + str(root / "server") in i["message"]
+                                 for i in report["issues"]))
+            self.assertTrue(any(i["message"] == "count_gate: UNVERIFIED"
+                                for i in report["issues"]))
+            self.assertFalse(report["offline_inputs_complete"])
+            self.assertEqual(before, sorted(str(p.relative_to(root)) for p in root.rglob("*")))
+
+    def test_nonobject_json_is_reported_without_reading_native_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "pi05"
+            root.mkdir()
+            for value in ([], None, True, 3, "not an object"):
+                with self.subTest(value=value):
+                    for name in ("manifest.json", "schedule.json", "fixtures.json"):
+                        (root / name).write_text(json.dumps(value), encoding="utf-8")
+                    before = {p.name: p.read_bytes() for p in root.iterdir()}
+                    report = prepare(directory, "pi05")
+                    self.assertEqual(sum("artifact must be a JSON object" in i["message"]
+                                         for i in report["issues"]), 3)
+                    self.assertFalse(report["offline_inputs_complete"])
+                    self.assertEqual(before, {p.name: p.read_bytes() for p in root.iterdir()})
+
 
     def test_python38_syntax(self):
         source = Path(__file__).with_name("prepare_campaign.py").read_text()

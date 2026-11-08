@@ -65,6 +65,13 @@ their actual files. They are not pooled, converted into one success trial or
 claimed to be a comparable cross-model treatment effect. Offline input completeness (`configuration_valid`) and
 execution authorization are exposed separately on the preparation report.
 
+Preparation requires an existing pinned checkpoint directory for both models.
+The pi0.5 count qualification remains mandatory in its qualification record.
+The separate run-specific `server/startup_gate.json` is produced by the owned
+server after its startup checks; it is not an artifact to create or copy into
+place before preparation. The frontend refuses existing server output and the
+native client still verifies the gate and per-request count before actions.
+
 ## Current limitation
 
 The published native evidence still does not qualify either model. Required

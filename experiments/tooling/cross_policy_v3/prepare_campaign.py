@@ -24,7 +24,7 @@ def prepare(workspace, model, python=sys.executable):
     paths = {name: root / filename for name, filename in (
         ("manifest", "manifest.json"), ("schedule", "schedule.json"),
         ("states", "initial_states.npz"), ("fixtures", "fixtures.json"),
-        ("startup_gate", "startup_gate.json"))}
+        ("startup_gate", "server/startup_gate.json"))}
     issues, artifacts = [], {}
     def issue(stage, message, action):
         issues.append({"stage": stage, "message": message, "next_action": action})
@@ -50,7 +50,10 @@ def prepare(workspace, model, python=sys.executable):
         artifacts[name] = {"path": str(path), "sha256": file_sha(path)}
         if path.suffix == ".json":
             try:
-                documents[name] = json.loads(path.read_text("utf-8"))
+                document = json.loads(path.read_text("utf-8"))
+                if not isinstance(document, dict):
+                    raise ValueError("artifact must be a JSON object")
+                documents[name] = document
             except ValueError as error:
                 issue("inputs", name + ": " + str(error), "Repair the malformed JSON artifact.")
     # Reuse the scientific harness's validators, rather than another definition
@@ -80,13 +83,15 @@ def prepare(workspace, model, python=sys.executable):
         issue("integration", "launch_v3.py is absent", "Integrate the reviewed launcher from draft PR #6/#8.")
     native_args = []
     if model == "pi05":
-        if not paths["startup_gate"].is_file():
-            issue("native_qualification", "Missing " + str(paths["startup_gate"]), "Retain the attesting server startup gate after its authorized native validation.")
+        # The owned server creates this run-specific gate during launch. Its
+        # prior qualification is still required by Q.summary above; an old gate
+        # is neither a preparation input nor evidence for a new served object.
         native_args = ["--startup-gate", str(paths["startup_gate"])]
     else:
         native_args = ["--checkpoint", str(root / "checkpoint")]
-        if not (root / "checkpoint").is_dir():
-            issue("inputs", "Missing checkpoint directory", "Place the pinned SmolVLA checkpoint at " + str(root / "checkpoint"))
+    if not (root / "checkpoint").is_dir():
+        issue("inputs", "Missing checkpoint directory",
+              "Place the pinned " + model + " checkpoint at " + str(root / "checkpoint"))
     manifests = [Path(workspace).resolve() / name / "manifest.json" for name in MODELS]
     if "fixtures" in documents and all(path.is_file() for path in manifests):
         try:
