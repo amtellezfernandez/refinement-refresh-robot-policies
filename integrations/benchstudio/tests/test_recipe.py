@@ -104,3 +104,32 @@ def test_cli_preparation_uses_same_installed_recipe_and_never_launches(tmp_path,
             patch.object(bs.ProcessCommand, "run") as run:
         assert main(args) == 1
         run.assert_not_called()
+
+
+@pytest.mark.parametrize("kind", ["unstaged", "staged", "untracked", "deleted"])
+def test_runtime_drift_refuses_before_preparation_and_launch(tmp_path, kind):
+    pipeline = recipe(tmp_path)
+    source = pipeline.repository / "experiments/run_r22r25.py"
+    if kind == "deleted":
+        source.unlink()
+    elif kind == "untracked":
+        (source.parent / "shadow.py").write_text("raise RuntimeError('unreviewed')")
+    else:
+        source.write_text(source.read_text() + "\n# local change")
+        if kind == "staged":
+            subprocess.run(["git", "-C", str(pipeline.repository), "add", "."], check=True)
+    with patch.object(bs.RefinementWorkspace, "prepare") as prepare, \
+            patch.object(bs.ProcessCommand, "run") as run:
+        with pytest.raises(ValueError, match="runtime sources differ"):
+            pipeline.run()
+        prepare.assert_not_called()
+        run.assert_not_called()
+
+
+def test_retained_json_and_documentation_do_not_invalidate_runtime_pin(tmp_path):
+    pipeline = recipe(tmp_path)
+    (pipeline.repository / "retained.json").write_text('{"fixture": true}')
+    (pipeline.repository / "notes.md").write_text("operator notes")
+    with patch.object(bs.RefinementWorkspace, "prepare", return_value=preparation()) as prepare:
+        assert not pipeline.check().technical_ready
+        prepare.assert_called_once()
