@@ -74,7 +74,7 @@
 \draw[card] (10,242) rectangle (411,478);
 \fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,458) {Result 1: Fewer Denoising Steps Improve Success};
+  at (25,458) {Case result 1: Less Refinement Improved Success};
 
 \begin{scope}[shift={(65,0)}]
 \draw[line width=1.7pt] (72,278)--(72,414);
@@ -93,7 +93,8 @@
 \node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (128,270) {$d=2$};
 \node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (206,270) {$d=5$};
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (185,420) {$+10.6$ percentage points};
+  align=center,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (185,418)
+  {$d=2$: $+10.6$ pp success\\$5.9\%$ less arithmetic / step};
 \draw[thinflow,bend left=25] (153,393) to (203,387);
 \end{scope}
 
@@ -101,7 +102,7 @@
 \draw[card] (430,242) rectangle (831,478);
 \fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (444,458) {Result 2: Less Frequent Refresh Is Much Cheaper};
+  at (444,458) {Case result 2: Longer Prefix Used Much Less Arithmetic};
 
 \begin{scope}[shift={(65,0)}]
 \draw[line width=1.7pt] (492,278)--(492,414);
@@ -120,7 +121,8 @@
 \node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (548,270) {$h=2$};
 \node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (626,270) {$h=5$};
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (605,420) {$+0.6$ percentage points};
+  align=center,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (605,418)
+  {$h=5$: $-0.6$ pp observed\\$60.7\%$ less arithmetic / attempt};
 \draw[thinflow,bend left=25] (573,393) to (623,390);
 \end{scope}
 
@@ -136,7 +138,7 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (450,157)
   {Interpretation and limits};
 \node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (450,143) {SmolVLA provides the case study, not a universal allocation rule. The framework transfers to other policies, but each policy requires within-model confirmation; arithmetic is not deployment latency, and equivalent quality is not established.};
+  at (450,143) {SmolVLA provides the case study, not a universal allocation rule. The procedure can be applied to other policies, but each requires within-model confirmation; arithmetic is not deployment latency, and equivalent quality is not established.};
 
 \end{scope}
 \end{tikzpicture}
