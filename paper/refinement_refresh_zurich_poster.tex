@@ -43,104 +43,11 @@
 \fill[softgray] (278,982)--(329,1028)--(278,1028)--cycle;
 \node[anchor=west,heading] at (30,1004) {Chunked Closed-Loop Policy};
 
-% Refresh loop and label
-\node[draw=ink,fill=white,line width=1.8pt,rounded corners=6mm,
-  font=\rmfamily\fontsize{28}{34}\selectfont,inner xsep=12mm,inner ysep=5mm]
-  (refresh) at (462,955) {\textbf{Replan / Refresh}\; (new observation + new chunk)};
+% Supplied closed-loop execution diagram
+\node[anchor=center] at (420.5,850)
+  {\includegraphics[width=780mm]{figures/closed_loop_policy_diagram.png}};
 
-% Robot arm
-\begin{scope}[shift={(70,830)}]
-  \draw[line width=2.8pt,rounded corners=2mm] (-25,-30) rectangle (10,-18);
-  \draw[line width=3.2pt] (-18,-18)--(-13,18)--(13,48)--(36,30)--(36,9);
-  \draw[line width=3.2pt] (36,9)--(28,9) (36,9)--(44,9) (32,9)--(32,-1) (40,9)--(40,-1);
-  \draw[line width=2.6pt,rounded corners=2mm] (24,-18) rectangle (49,1);
-  \foreach \x/\y in {-13/18,13/48,36/30}{
-    \fill[white] (\x,\y) circle (7mm); \draw[line width=2.2pt] (\x,\y) circle (7mm);
-    \fill[ink] (\x,\y) circle (2.5mm);
-  }
-\end{scope}
-
-% First observation
-\begin{scope}[shift={(145,825)}]
-  \draw[fill=panelgray,line width=1.6pt,rounded corners=7mm] (-30,-38) rectangle (30,38);
-  \fill[midgray!45] (-18,-8) rectangle (2,12);
-  \fill[midgray!70] (-2,-1) rectangle (18,20);
-  \fill[darkgray!55] (10,10) rectangle (27,29);
-  \node[font=\rmfamily\itshape\bfseries\fontsize{25}{30}\selectfont] at (0,-27) {$o_t$};
-\end{scope}
-\draw[flow] (103,825)--(112,825);
-\draw[flow] (176,825)--(193,825);
-
-% Generate action chunk
-\draw[fill=panelgray,line width=1.8pt,rounded corners=7mm] (195,770) rectangle (390,891);
-\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{27}{31}\selectfont]
-  at (292.5,882) {Generate action chunk\\(refinement: $d$ steps)};
-\begin{scope}[shift={(229,811)}]
-  \foreach \x/\y in {0/3,5/18,8/7,12/25,15/12,18/31,21/5,23/20,27/14,30/28,33/9,36/23,39/4,42/17,45/30,48/12,50/25,54/7,57/19,59/29}{
-    \fill[darkgray] (\x,\y) circle (1.3mm);
-  }
-  \draw[line width=1pt] (0,3)--(18,31)--(36,23)--(57,19);
-  \draw[line width=1pt] (8,7)--(30,28)--(48,12);
-\end{scope}
-\draw[flow] (294,826)--(318,826);
-\node[font=\rmfamily\bfseries\fontsize{35}{38}\selectfont] at (307,826) {$\cdots$};
-\draw[line width=2.2pt] (333,799)--(367,835);
-\fill[white] (333,799) circle (4mm); \draw[line width=1.8pt] (333,799) circle (4mm);
-\fill[midgray] (367,835) circle (4mm); \draw[line width=1.8pt] (367,835) circle (4mm);
-\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.6pt]
-  (195,761)--(390,761);
-\node[anchor=north,font=\rmfamily\fontsize{25}{30}\selectfont] at (292.5,746)
-  {$K$ actions (predicted)};
-
-% Execute/discard action chunk
-\draw[flow] (391,825)--(413,825);
-\node[draw=ink,fill=panelgray,line width=1.4pt,rounded corners=5mm,
-  align=center,font=\rmfamily\bfseries\fontsize{27}{31}\selectfont]
-  at (517,884) {Execute $h$ actions\\(refresh after $h$)};
-\draw[thinflow] (517,862)--(500,844);
-\draw[fill=white,line width=1.5pt,rounded corners=5mm] (416,795) rectangle (682,847);
-\fill[softgray] (548,795) rectangle (682,847);
-\draw[line width=1.3pt] (548,795)--(548,847);
-\node[font=\rmfamily\itshape\fontsize{26}{31}\selectfont] at (482,822)
-  {$a_t\;\cdots\;a_{t+h-1}$};
-\node[font=\rmfamily\itshape\fontsize{26}{31}\selectfont,text=midgray] at (615,822)
-  {$a_{t+h}\;\cdots\;a_{t+K-1}$};
-\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.4pt]
-  (416,787)--(548,787);
-\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.4pt]
-  (548,787)--(682,787);
-\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont]
-  at (482,772) {execute\\($h$ actions)};
-\node[anchor=north,align=center,font=\rmfamily\fontsize{26}{31}\selectfont,text=darkgray]
-  at (615,772) {discard\\($K-h$ actions)};
-
-% New observation and loop
-\draw[flow] (683,825)--(706,825);
-\begin{scope}[shift={(738,825)}]
-  \draw[fill=panelgray,line width=1.6pt,rounded corners=7mm] (-30,-38) rectangle (30,38);
-  \fill[midgray!45] (-18,-8) rectangle (2,12);
-  \fill[midgray!70] (-2,-1) rectangle (18,20);
-  \fill[darkgray!55] (10,10) rectangle (27,29);
-  \node[font=\rmfamily\itshape\bfseries\fontsize{25}{30}\selectfont] at (0,-27) {$o_{t+h}$};
-\end{scope}
-\draw[flow] (769,825)--(798,825);
-\node[font=\rmfamily\bfseries\fontsize{34}{38}\selectfont] at (813,825) {$\cdots$};
-\draw[dashed,line width=2.1pt,-Latex,rounded corners=8mm]
-  (738,864)--(738,955)--(603,955);
-\draw[dashed,line width=2.1pt,-Latex,rounded corners=8mm]
-  (321,955)--(216,955)--(216,892);
-
-% Variable key and experimental setup
-\fill[softgray,rounded corners=8mm] (28,611) rectangle (476,699);
-\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (50,657) {$K$: \textbf{chunk length}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(total predicted actions)}};
-\draw[line width=1.2pt] (180,624)--(180,686);
-\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (202,657) {$d$: \textbf{refinement}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(denoising steps)}};
-\draw[line width=1.2pt] (335,624)--(335,686);
-\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (356,657) {$h$: \textbf{refresh}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(actions before replanning)}};
-
+% Experimental setup
 \draw[line width=1.5pt] (492,610)--(492,701);
 \fill[panelgray,rounded corners=8mm] (503,611) rectangle (814,699);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (520,677) {Setup (held-out)};
