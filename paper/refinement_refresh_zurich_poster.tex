@@ -225,14 +225,16 @@
 \node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
   at (704,378) {At $d=2$, $h=5$ gives 138/160 successes versus 139/160 for $h=2$, with \textbf{60.7\% less} arithmetic per attempt. Equivalent quality is not established.};
 
-% Bottom cards
+% Bottom cards: interpretation and the practical decision
 \draw[card] (10,34) rectangle (337,218);
-\node[draw=ink,circle,line width=2.2pt,minimum size=30mm,font=\sffamily\bfseries\fontsize{30}{34}\selectfont]
-  at (48,184) {$\nearrow$};
+\draw[line width=2.2pt] (36,184) circle (13mm);
+\draw[line width=2.2pt] (36,184) circle (7mm);
+\fill[ink] (36,184) circle (2.5mm);
+\draw[-Latex,line width=2.2pt] (25,173)--(47,195);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (74,184) {Why This Matters};
 \draw[line width=1.4pt] (48,62)--(48,153);
 \node[anchor=west,align=left,text width=250mm,font=\rmfamily\fontsize{28}{36}\selectfont]
-  at (65,105) {Treat inference compute as a control decision. For this checkpoint, fewer denoising steps improved success. Executing more of each predicted chunk cut arithmetic sharply with similar observed success.};
+  at (65,105) {Closed-loop inference has two levers: refine the current chunk or refresh from a new observation. The primary comparison favors less refinement, while the prefix comparison identifies a much cheaper candidate. Together, they turn compute allocation into a control decision.};
 
 \draw[card] (349,34) rectangle (831,218);
 \draw[line width=2.2pt,rounded corners=2mm] (369,167)--(386,202)--(403,167)--cycle;
@@ -241,15 +243,15 @@
 \node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=192mm,align=left] at (365,150) {Takeaways};
 \node[anchor=north west,align=left,text width=205mm,font=\sffamily\fontsize{24}{31}\selectfont]
-  at (367,115) {$\blacksquare$\; Fewer denoising steps improved success at $h=2$.\\[3mm]
-  $\blacksquare$\; At $d=2$, longer execution was far cheaper with similar observed success.};
+  at (367,115) {$\blacksquare$\; Primary: less refinement improved success at fixed $h=2$.\\[3mm]
+  $\blacksquare$\; Secondary: $h=5$ is much cheaper at $d=2$, but remains a descriptive candidate.};
 \draw[line width=1.3pt] (589,56)--(589,150);
 \node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=206mm,align=left] at (606,150) {Limitations};
 \node[anchor=north west,align=left,text width=207mm,font=\sffamily\fontsize{24}{31}\selectfont]
-  at (608,115) {$\blacksquare$\; One SmolVLA checkpoint; synchronous simulation.\\[3mm]
-  $\blacksquare$\; Prefix comparison is descriptive; equivalence is not established.\\[3mm]
-  $\blacksquare$\; Arithmetic does not establish physical-robot latency.};
+  at (608,115) {$\blacksquare$\; One frozen SmolVLA checkpoint in synchronous LIBERO.\\[3mm]
+  $\blacksquare$\; Changing $h$ changes refresh timing and action positions together.\\[3mm]
+  $\blacksquare$\; Similar success is not an equivalence claim; arithmetic is not latency.};
 
 \end{scope}
 \end{tikzpicture}
