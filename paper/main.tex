@@ -128,8 +128,13 @@ hardware, and measurement boundaries.
 
 \subsection{Compute rate and episode expenditure}
 
-Let $d$ be the denoising count and $h$ the number of successive predicted
-actions executed before replanning. Let $F_{\mathrm{gen}}(d)$ denote reference-calibrated neural arithmetic for a full
+Let $K$ be the predicted action-chunk length and $h<K$ the execution prefix.
+At each policy query, the policy predicts $K$ actions, executes only the first
+$h$, discards the remaining $K-h$, and then generates a new chunk from a new
+observation. Thus $h$ controls replanning frequency without changing the
+predicted chunk length. In all experiments, $K=50$. We reserve $T_e$ for the
+number of actions actually executed in attempt $e$. Let $d$ be the denoising
+count and $F_{\mathrm{gen}}(d)$ the reference-calibrated neural arithmetic for a full
 action-chunk generation at denoising setting $d$. For complete execution prefixes, the nominal
 compute rate per simulated control step is
 \[
@@ -204,7 +209,7 @@ closed-loop control.
 \subsection{Discovery and confirmation protocol}
 
 We evaluate the public \texttt{HuggingFaceVLA/smolvla\_libero} checkpoint on LIBERO
-\cite{libero}. Predicted chunk length remains 50 actions; native execution uses
+\cite{libero}. The predicted chunk length remains fixed at $K=50$; native execution uses
 $(h,d)=(1,10)$. We hold weights, sensors, preprocessing, action normalization,
 control period, and task-specific episode horizons fixed.
 
@@ -311,7 +316,8 @@ We first report the frozen denoising tests, then the amended prefix comparisons.
 \begin{table}[htbp]
 \centering\small
 \caption{Confirmation overview: 160 attempts per configuration on eight tasks.
-$h$ is the executed prefix and $d$ the denoising count.
+$K=50$ is the fixed predicted chunk length, $h$ is the executed prefix, and $d$
+is the denoising count.
 Nominal rate/native is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
 All-attempt arithmetic uses the length-20 reference calibration and charges
 every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
