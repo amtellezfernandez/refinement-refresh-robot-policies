@@ -434,19 +434,9 @@ a paired difference of $+0.6$ percentage points $[-6.3,+6.9]$. Yet $(5,2)$ uses
 arithmetic per attempt: 16.1 versus 41.1 TFLOPs. The interval permits meaningful
 differences in either direction; similar counts do not certify equivalent
 quality or justify a non-inferiority claim.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/task_level_effects.pdf}
-\caption{Task-level differences beneath the two aggregate comparisons. Each
-row contains 20 attempts per setting. The refinement panel reports $(2,2)-(2,5)$;
-the refresh panel reports $(5,2)-(2,2)$, matching the arrows in
-Figure~\ref{fig:success-compute}. The primary refinement advantage is positive
-on seven tasks and tied on one, while the near-equal aggregate refresh counts
-contain mixed task-level changes. Rows are descriptive marginal counts; no
-task-level confidence intervals are inferred from them.}
-\label{fig:task-level-effects}
-\end{figure}
+At task level, the $(5,2)-(2,2)$ difference is positive on three tasks,
+negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}). Thus
+the near-equal aggregate counts contain mixed descriptive task-level changes.
 
 Refreshing every action with $(1,2)$ instead of every two actions gives two
 fewer successes, a difference of $-1.3$ points $[-7.5,+5.0]$, at 83.3 versus
@@ -606,16 +596,6 @@ $d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/arithmetic_host_time.pdf}
-\caption{Fixed-input generation arithmetic and host elapsed time, each
-normalized to its own $d=10$ value. At $d=5$, counted arithmetic is 8.9\% lower
-while mean host generation time is 40.5\% lower. These calibration timings do
-not measure asynchronous execution or physical-robot responsiveness.}
-\label{fig:arithmetic-host-time}
-\end{figure}
 
 The calibration stores full-generation intervals and global operator arithmetic
 counts, not separate vision, language-prefill, or action-expert timings and

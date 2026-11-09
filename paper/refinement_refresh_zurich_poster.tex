@@ -58,11 +58,13 @@
 \draw[line width=1.3pt] (514,637) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
 \draw[line width=1pt] (514,643) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
 \node[anchor=west,body] at (534,644) {\textbf{SmolVLA} (frozen)};
-\node[anchor=west,body] at (665,644) {$K=50,\ d\in\{2,5\}$};
+\node[anchor=west,align=left,smallbody] at (665,644)
+  {50 predicted actions\\2 or 5 denoising steps};
 \draw[line width=1.4pt,rounded corners=1mm] (513,613) rectangle (527,624);
 \draw[line width=1.4pt] (520,613)--(520,608) (515,608)--(525,608);
 \node[anchor=west,body] at (534,618) {\textbf{LIBERO} (simulation)};
-\node[anchor=west,body] at (665,618) {$h\in\{2,5\}$ \quad 8 tasks, 1,120 attempts};
+\node[anchor=west,align=left,smallbody] at (665,618)
+  {Refresh after 2 or 5 actions\\8 tasks, 1,120 attempts};
 
 % Central research question
 \fill[softgray] (36,527) circle (25mm);
@@ -88,21 +90,19 @@
 \node[anchor=center] at (630.5,340)
   {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff.pdf}};
 
-% Task-level evidence and general lesson
+% Compact interpretation
 \draw[card] (10,24) rectangle (831,220);
-\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,202)
-  {What the Aggregate Results Hide};
-\node[anchor=center] at (235,105)
-  {\includegraphics[width=410mm]{paper/generated/task_level_effects.pdf}};
-\draw[line width=1.4pt] (485,45)--(485,177);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (505,169)
-  {General lesson};
-\node[anchor=north west,align=left,text width=300mm,font=\rmfamily\fontsize{23}{29}\selectfont]
-  at (505,154) {Use a within-model protocol: define refinement and refresh, measure complete generation cost, freeze the primary comparisons, then evaluate held-out success, expenditure, and task variation together.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (505,88)
-  {Limits};
-\node[anchor=north west,align=left,text width=300mm,font=\rmfamily\fontsize{23}{29}\selectfont]
-  at (505,73) {One frozen checkpoint in synchronous simulation. Arithmetic is not deployment latency, and similar observed success does not establish equivalence.};
+\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,190)
+  {A Recipe for Closed-Loop Compute Studies};
+\draw[line width=1.4pt] (420.5,48)--(420.5,164);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,154)
+  {Evaluate allocations within each model};
+\node[anchor=north west,align=left,text width=360mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (30,139) {1. Define refinement and refresh controls.\\2. Measure the complete cost of a fresh prediction.\\3. Freeze primary comparisons before held-out evaluation.\\4. Report success and expenditure together.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,154)
+  {Interpretation boundary};
+\node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (445,139) {SmolVLA is the worked example, not a universal allocation rule. Arithmetic is not deployment latency, and similar observed success does not establish equivalent quality.};
 
 \end{scope}
 \end{tikzpicture}

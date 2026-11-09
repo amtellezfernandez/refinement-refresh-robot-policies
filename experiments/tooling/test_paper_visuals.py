@@ -104,7 +104,7 @@ class PaperVisualTests(unittest.TestCase):
                     segment[:, 1], 100 * np.array(row["descriptive_95_interval"])
                 )
         self.assertEqual(axis.get_ylim(), (0, 100))
-        self.assertIn("Rule-selected", rule.get_ylabel())
+        self.assertEqual(rule.get_ylabel(), "Actions before refresh")
         np.testing.assert_equal(rule.lines[0].get_ydata(), [0, 1, 2])
         np.testing.assert_equal(rule.lines[1].get_ydata(), [1, 2, 2])
 
@@ -185,43 +185,12 @@ class PaperVisualTests(unittest.TestCase):
             [-0.625],
         )
         text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("+10.6 [+4.4, +16.9]", text)
-        self.assertIn("-0.6 [-6.9, +6.3]", text)
-        self.assertIn("41.1 → 16.1 TFLOPs", text)
-        self.assertIn("Equivalence is not established", text)
-
-    def test_task_figure_uses_reported_counts_without_invented_intervals(self):
-        import numpy as np
-        from matplotlib.text import Text
-
-        visuals.style()
-        with patch.object(visuals, "save_figure") as save:
-            visuals.task_level_figure(self.data, Path("unused.pdf"))
-        figure = save.call_args.args[0]
-        refinement = figure.axes[0].collections[0].get_offsets()[:, 0]
-        refresh = figure.axes[1].collections[0].get_offsets()[:, 0]
-        np.testing.assert_equal(refinement, [10, 15, 5, 20, 0, 15, 15, 5])
-        np.testing.assert_equal(refresh, [10, 5, -5, 0, 0, -10, -15, 10])
-        text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("7 positive · 1 tie", text)
-        self.assertIn("3 positive · 3 negative · 2 ties", text)
-        self.assertIn("24 wins / 7 losses", text)
-        self.assertIn("no task-level intervals", text)
-
-    def test_timing_figure_normalizes_each_coordinate_to_native(self):
-        import numpy as np
-
-        visuals.style()
-        with patch.object(visuals, "save_figure") as save:
-            visuals.arithmetic_timing_figure(self.data, Path("unused.pdf"))
-        axis = save.call_args.args[0].axes[0]
-        arithmetic, timing = axis.lines[:2]
-        self.assertEqual(arithmetic.get_xdata().tolist(), [2, 3, 5, 8, 10, 20])
-        self.assertEqual(timing.get_xdata().tolist(), [2, 3, 5, 8, 10, 20])
-        self.assertAlmostEqual(arithmetic.get_ydata()[4], 1.0)
-        self.assertAlmostEqual(timing.get_ydata()[4], 1.0)
-        self.assertAlmostEqual(1 - arithmetic.get_ydata()[2], 0.0893, places=3)
-        self.assertAlmostEqual(1 - timing.get_ydata()[2], 0.4055, places=3)
+        self.assertIn("+10.6 pp", text)
+        self.assertIn("+4.4 to +16.9", text)
+        self.assertIn("-0.6 pp", text)
+        self.assertIn("-6.9 to +6.3", text)
+        self.assertIn("41.1 to 16.1 TFLOPs", text)
+        self.assertIn("No equivalence claim", text)
 
     def test_study_design_figure_keeps_selection_and_confirmation_separate(self):
         from matplotlib.text import Text

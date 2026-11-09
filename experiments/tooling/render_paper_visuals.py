@@ -401,10 +401,10 @@ def discovery_figure(data, path):
             capsize=2,
             elinewidth=0.9,
             markersize=4.5,
-            label=f"$h={h}$",
+            label=f"Refresh after {h} action{'s' if h != 1 else ''}",
         )
     ax.set(
-        xlabel="Denoising steps, $d$",
+        xlabel="Denoising steps",
         ylabel="Success (%)",
         ylim=(0, 100),
         xlim=(-0.42, 3.42),
@@ -442,7 +442,7 @@ def discovery_figure(data, path):
         )
     rule.set(
         xlabel="Ceiling / native",
-        ylabel="Rule-selected prefix, $h$",
+        ylabel="Actions before refresh",
         xlim=(-0.4, 2.4),
         ylim=(-0.4, 2.4),
         xticks=range(3),
@@ -471,8 +471,8 @@ def discovery_figure(data, path):
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.12))
-    ax = fig.add_axes([0.32, 0.22, 0.37, 0.66])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.72))
+    ax = fig.add_axes([0.36, 0.22, 0.32, 0.66])
     ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
     ax.set(xlim=(-10, 20), ylim=(-0.1, 8.5), xticks=[-10, 0, 10, 20], yticks=[])
     ax.spines[["left", "top", "right"]].set_visible(False)
@@ -498,10 +498,18 @@ def confirmation_figure(data, path):
             elinewidth=1.1,
             zorder=3,
         )
-        a, b = c["a"], c["b"]
-        label = f"({a[0]},{a[1]}) - ({b[0]},{b[1]})"
+        labels = (
+            "Refresh 5: refine 2 vs 5",
+            "Refresh 2: refine 2 vs 5",
+            "Refresh 1: refine 2 vs 5",
+            "Refresh 2, refine 2 vs\nrefresh 1, refine 10",
+            "Refine 2: refresh 2 vs 5",
+            "Refine 2: refresh 1 vs 2",
+            "Refresh 1: refine 2 vs 10",
+        )
+        label = labels[i]
         ax.text(
-            -0.12,
+            -0.06,
             y,
             label,
             transform=transform,
@@ -510,24 +518,24 @@ def confirmation_figure(data, path):
             fontweight="bold" if primary else "normal",
         )
         ax.text(
-            1.09,
+            1.43,
             y,
-            f"{number(effect, True)} [{number(lo, True)}, {number(hi, True)}]",
+            f"{number(effect, True)} pp; {number(lo, True)} to {number(hi, True)}",
             transform=transform,
-            ha="left",
+            ha="center",
             va="center",
             fontweight="bold" if primary else "normal",
         )
     for y, title in (
-        (8.42, "Frozen denoising tests (fixed h)"),
+        (8.42, "Frozen refinement tests at fixed refresh frequency"),
         (4.43, "Amended descriptive comparisons"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
-        0.5, 0.025, "Paired success difference, A - B (percentage points)", ha="center"
+        0.5, 0.025, "Paired change in success rate (percentage points)", ha="center"
     )
-    fig.text(0.278, 0.97, "Configuration A - B", ha="right", va="top")
-    fig.text(0.87, 0.97, "Effect [95% interval]", ha="center", va="top")
+    fig.text(0.33, 0.97, "Comparison", ha="right", va="top")
+    fig.text(0.87, 0.97, "Change and 95% interval", ha="center", va="top")
     save_figure(fig, path)
     plt.close(fig)
 
@@ -600,7 +608,7 @@ def cost_decomposition_figure(data, path):
            label="Denoising-dependent")
     ax.set(
         ylabel="Dense arithmetic\n/ generation (GFLOPs)",
-        xlabel="Denoising steps, $d$",
+        xlabel="Denoising steps",
         xticks=x,
         xticklabels=settings,
         ylim=(0, 850),
@@ -611,7 +619,7 @@ def cost_decomposition_figure(data, path):
     ax.text(
         2,
         base * 0.48,
-        f"{number(native_share)}% of native\nis independent of $d$",
+        f"{number(native_share)}% of native\nis independent of refinement",
         ha="center",
         va="center",
         fontweight="bold",
@@ -625,9 +633,28 @@ def cost_decomposition_figure(data, path):
     ax.set_axisbelow(True)
     ax.grid(axis="y", color=".91", lw=0.55)
     ax.spines[["top", "right"]].set_visible(False)
-    fig.text(0.83, 0.55, r"$\dfrac{F_{\mathrm{gen}}(d)}{h}$", ha="center", va="center", fontsize=16)
-    fig.text(0.83, 0.36, "Arithmetic per\ncontrol step", ha="center", va="center", fontweight="bold")
-    fig.text(0.83, 0.16, "Reduce $d$: shrink the blue segment\nIncrease $h$: amortize a generation", ha="center", va="center")
+    fig.text(
+        0.83,
+        0.56,
+        "Two ways to lower\nper-step arithmetic",
+        ha="center",
+        va="center",
+        fontweight="bold",
+    )
+    fig.text(
+        0.83,
+        0.34,
+        "Less refinement\nshrinks the blue segment",
+        ha="center",
+        va="center",
+    )
+    fig.text(
+        0.83,
+        0.14,
+        "Longer executed prefixes\nspread one prediction\nacross more actions",
+        ha="center",
+        va="center",
+    )
     save_figure(fig, path)
     plt.close(fig)
 
@@ -643,7 +670,12 @@ def success_compute_figure(data, path):
     )
     fig.subplots_adjust(left=0.095, right=0.985, bottom=0.36, top=0.88, wspace=0.48)
     highlighted = {(2, 5), (2, 2), (5, 2)}
-    offsets = {(2, 5): (4, -12), (2, 2): (5, 6), (5, 2): (5, 6)}
+    offsets = {(2, 5): (5, 5), (2, 2): (5, 7), (5, 2): (4, -17)}
+    point_labels = {
+        (2, 5): "More refinement",
+        (2, 2): "Reference",
+        (5, 2): "Less frequent refresh",
+    }
     for cell, row in resources.items():
         x = row["nominal_fraction_native"]
         y = 100 * row["success_rate"]
@@ -660,14 +692,14 @@ def success_compute_figure(data, path):
         )
         if prominent:
             tradeoff.annotate(
-                f"({cell[0]},{cell[1]})",
+                point_labels[cell],
                 (x, y),
                 xytext=offsets[cell],
                 textcoords="offset points",
                 fontweight="bold",
             )
     tradeoff.annotate(
-        "refinement",
+        "",
         xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
         xytext=(resources[(2, 5)]["nominal_fraction_native"], 100 * resources[(2, 5)]["success_rate"]),
         arrowprops={"arrowstyle": "->", "color": ACCENT, "lw": 1.2, "connectionstyle": "arc3,rad=-0.18"},
@@ -676,7 +708,7 @@ def success_compute_figure(data, path):
         color=ACCENT,
     )
     tradeoff.annotate(
-        "refresh",
+        "",
         xy=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
         xytext=(0.38, 85.2),
         arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
@@ -698,8 +730,8 @@ def success_compute_figure(data, path):
     primary = data["confirmation"]["comparisons"][1]
     refresh = data["confirmation"]["comparisons"][4]
     rows = (
-        (2.2, 100 * primary["mean_difference"][0], [100 * v for v in primary["interval95"][0]], ACCENT, "Refinement"),
-        (1.25, -100 * refresh["mean_difference"][0], [-100 * refresh["interval95"][0][1], -100 * refresh["interval95"][0][0]], INK, "Refresh"),
+        (2.2, 100 * primary["mean_difference"][0], [100 * v for v in primary["interval95"][0]], ACCENT, "Less refinement"),
+        (1.25, -100 * refresh["mean_difference"][0], [-100 * refresh["interval95"][0][1], -100 * refresh["interval95"][0][0]], INK, "Refresh less often"),
     )
     effects.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8)
     for y, effect, bounds, color, label in rows:
@@ -707,101 +739,39 @@ def success_compute_figure(data, path):
             effect,
             y,
             xerr=[[effect - bounds[0]], [bounds[1] - effect]],
-            fmt="D" if label == "Refinement" else "o",
+            fmt="D" if label == "Less refinement" else "o",
             color=color,
-            mfc=color if label == "Refinement" else "white",
+            mfc=color if label == "Less refinement" else "white",
             capsize=2.5,
             ms=5,
         )
-        effects.text(effect, y + 0.28, f"{number(effect, True)} [{number(bounds[0], True)}, {number(bounds[1], True)}]", ha="center", va="bottom", fontweight="bold" if label == "Refinement" else "normal")
+        effects.text(
+            effect,
+            y + 0.28,
+            f"{number(effect, True)} pp\n{number(bounds[0], True)} to {number(bounds[1], True)}",
+            ha="center",
+            va="bottom",
+            fontweight="bold" if label == "Less refinement" else "normal",
+        )
     effects.set(
-        title="Paired uncertainty",
-        xlabel="Success difference (pp)\nin arrow direction",
+        xlabel="Change in success rate\n(percentage points)",
         xlim=(-10, 20),
         ylim=(-0.2, 2.8),
         xticks=[-10, 0, 10, 20],
         yticks=[1.25, 2.2],
-        yticklabels=["Refresh", "Refinement"],
+        yticklabels=["Refresh less often", "Less refinement"],
     )
     effects.spines[["top", "right", "left"]].set_visible(False)
     effects.tick_params(axis="y", length=0)
     effects.text(
         5,
         0.28,
-        "Episode cost (per attempt)\n41.1 → 16.1 TFLOPs (−60.7%)\nEquivalence is not established.",
+        "Episode cost: 60.7% lower\n41.1 to 16.1 TFLOPs\nNo equivalence claim",
         ha="center",
         va="center",
         color=MID,
         bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.5},
     )
-    save_figure(fig, path)
-    plt.close(fig)
-
-
-def task_level_figure(data, path):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    tasks = data["confirmation"]["per_task"]
-    labels = [t["suite"].replace("libero_", "").title() + f" {t['task']}" for t in tasks]
-    refinement = [5 * (t["successes"]["(2, 2)"] - t["successes"]["(2, 5)"]) for t in tasks]
-    refresh = [5 * (t["successes"]["(5, 2)"] - t["successes"]["(2, 2)"]) for t in tasks]
-    y = np.arange(len(tasks))[::-1]
-    fig, (left, right) = plt.subplots(1, 2, figsize=(FIGURE_WIDTH, 2.10), sharey=True)
-    fig.subplots_adjust(left=0.18, right=0.985, bottom=0.34, top=0.80, wspace=0.28)
-    for axis, values, title, color in (
-        (left, refinement, "Less refinement\n7 positive · 1 tie", ACCENT),
-        (right, refresh, "Less frequent refresh\n3 positive · 3 negative · 2 ties", INK),
-    ):
-        axis.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8)
-        axis.scatter(values, y, s=28, color=color, zorder=3)
-        axis.hlines(y, 0, values, color=color, lw=1.0)
-        axis.set(
-            title=title,
-            xlabel="Task success difference (pp)",
-            xlim=(-20, 25),
-            xticks=[-20, -10, 0, 10, 20],
-            ylim=(-0.6, 7.6),
-        )
-        axis.set_axisbelow(True)
-        axis.grid(axis="x", color=".91", lw=0.55)
-        axis.spines[["top", "right", "left"]].set_visible(False)
-        axis.tick_params(axis="y", length=0)
-    left.set_yticks(y, labels)
-    right.tick_params(labelleft=False)
-    fig.text(0.5, 0.035, "Primary refinement pairs: 24 wins / 7 losses. Task rows are descriptive; no task-level intervals are inferred.", ha="center", va="bottom", color=MID)
-    save_figure(fig, path)
-    plt.close(fig)
-
-
-def arithmetic_timing_figure(data, path):
-    import matplotlib.pyplot as plt
-
-    settings = (2, 3, 5, 8, 10, 20)
-    arithmetic = [data["calibration"]["generation_flops"][str(d)] for d in settings]
-    timing = [sum(r["host_s"] for r in data["calibration"]["timings"][str(d)]) / len(data["calibration"]["timings"][str(d)]) for d in settings]
-    native_arithmetic = arithmetic[settings.index(10)]
-    native_timing = timing[settings.index(10)]
-    arithmetic = [v / native_arithmetic for v in arithmetic]
-    timing = [v / native_timing for v in timing]
-    fig, ax = plt.subplots(figsize=(FIGURE_WIDTH, 1.75))
-    fig.subplots_adjust(left=0.105, right=0.985, bottom=0.27, top=0.86)
-    ax.plot(settings, arithmetic, marker="o", color=ACCENT, label="Dense arithmetic")
-    ax.plot(settings, timing, marker="s", color=INK, label="Host generation time")
-    ax.axhline(1, color=".65", ls=(0, (3, 3)), lw=0.7)
-    ax.set(
-        xlabel="Denoising steps, $d$",
-        ylabel="Relative to $d=10$",
-        xticks=settings,
-        ylim=(0.25, 1.95),
-        yticks=[0.5, 1.0, 1.5],
-    )
-    ax.annotate("−8.9%", (5, arithmetic[2]), xytext=(-13, 10), textcoords="offset points", color=ACCENT, fontweight="bold")
-    ax.annotate("−40.5%", (5, timing[2]), xytext=(7, -12), textcoords="offset points", color=INK, fontweight="bold")
-    ax.legend(frameon=False, ncol=2, loc="upper left")
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color=".91", lw=0.55)
-    ax.spines[["top", "right"]].set_visible(False)
     save_figure(fig, path)
     plt.close(fig)
 
@@ -825,8 +795,6 @@ def render(destination):
     study_design_figure(data, destination / "study_design.pdf")
     cost_decomposition_figure(data, destination / "cost_decomposition.pdf")
     success_compute_figure(data, destination / "success_compute_tradeoff.pdf")
-    task_level_figure(data, destination / "task_level_effects.pdf")
-    arithmetic_timing_figure(data, destination / "arithmetic_host_time.pdf")
     names = [
         *contents,
         "discovery_allocation.pdf",
@@ -834,8 +802,6 @@ def render(destination):
         "study_design.pdf",
         "cost_decomposition.pdf",
         "success_compute_tradeoff.pdf",
-        "task_level_effects.pdf",
-        "arithmetic_host_time.pdf",
     ]
     manifest = {
         "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
