@@ -38,7 +38,7 @@
   at (420.5,1057) {Alba Mar\'ia T\'ellez Fern\'andez, MAAT Institute (alba.tellez@maatinstitute.com)};
 
 % Closed-loop policy panel
-\draw[card] (12,586) rectangle (829,1028);
+\draw[card] (12,675) rectangle (829,1028);
 \fill[softgray,rounded corners=8mm] (12,982) rectangle (286,1028);
 \fill[softgray] (278,982)--(329,1028)--(278,1028)--cycle;
 \node[anchor=west,heading] at (30,1004) {Chunked Closed-Loop Policy};
@@ -47,62 +47,43 @@
 \node[anchor=center] at (420.5,850)
   {\includegraphics[width=780mm]{paper/figures/closed_loop_policy_diagram.png}};
 
-% Experimental setup
-\draw[line width=1.5pt] (492,610)--(492,701);
-\node[anchor=center] at (255,655)
-  {\includegraphics[width=445mm]{paper/generated/study_design.pdf}};
-\fill[panelgray,rounded corners=8mm] (503,611) rectangle (814,699);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (520,677) {Setup (held-out)};
-\draw[line width=1.3pt] (520,650) ellipse (6mm and 2.5mm);
-\draw[line width=1.3pt] (514,650)--(514,637) (526,650)--(526,637);
-\draw[line width=1.3pt] (514,637) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
-\draw[line width=1pt] (514,643) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
-\node[anchor=west,body] at (534,644) {\textbf{SmolVLA} (frozen)};
-\node[anchor=west,align=left,smallbody] at (665,644)
-  {50 predicted actions\\2 or 5 denoising steps};
-\draw[line width=1.4pt,rounded corners=1mm] (513,613) rectangle (527,624);
-\draw[line width=1.4pt] (520,613)--(520,608) (515,608)--(525,608);
-\node[anchor=west,body] at (534,618) {\textbf{LIBERO} (simulation)};
-\node[anchor=west,align=left,smallbody] at (665,618)
-  {Refresh after 2 or 5 actions\\8 tasks, 1,120 attempts};
-
 % Central research question
-\fill[softgray] (36,527) circle (25mm);
-\node[font=\rmfamily\bfseries\fontsize{52}{56}\selectfont] at (36,527) {?};
-\draw[line width=1.5pt] (76,492)--(76,561);
+\fill[softgray] (36,596) circle (25mm);
+\node[font=\rmfamily\bfseries\fontsize{52}{56}\selectfont] at (36,596) {?};
+\draw[line width=1.5pt] (76,561)--(76,630);
 \node[anchor=west,align=left,text width=720mm,font=\rmfamily\fontsize{31}{39}\selectfont]
-  at (96,527) {Under a fixed inference budget, should we allocate compute to additional denoising steps
+  at (96,596) {Under a fixed inference budget, should we allocate compute to additional denoising steps
   (\textbf{refinement}) or to more frequent observation-conditioned replanning (\textbf{refresh})?};
 
 % Result card 1
-\draw[card] (10,242) rectangle (411,478);
-\fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
+\draw[card] (10,297) rectangle (411,533);
+\fill[softgray,rounded corners=8mm] (10,495) rectangle (411,533);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,458) {Why the Trade-Off Exists};
-\node[anchor=center] at (210.5,340)
+  at (25,513) {Why the Trade-Off Exists};
+\node[anchor=center] at (210.5,395)
   {\includegraphics[width=390mm]{paper/generated/cost_decomposition.pdf}};
 
 % Result card 2
-\draw[card] (430,242) rectangle (831,478);
-\fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
+\draw[card] (430,297) rectangle (831,533);
+\fill[softgray,rounded corners=8mm] (430,495) rectangle (831,533);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (444,458) {Held-Out Success and Compute};
-\node[anchor=center] at (630.5,340)
+  at (444,513) {Held-Out Success and Compute};
+\node[anchor=center] at (630.5,395)
   {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff.pdf}};
 
 % Compact interpretation
-\draw[card] (10,24) rectangle (831,220);
-\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,190)
+\draw[card] (10,24) rectangle (831,275);
+\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,245)
   {A Recipe for Closed-Loop Compute Studies};
-\draw[line width=1.4pt] (420.5,48)--(420.5,164);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,154)
+\draw[line width=1.4pt] (420.5,48)--(420.5,219);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,209)
   {Evaluate allocations within each model};
 \node[anchor=north west,align=left,text width=360mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,139) {1. Define refinement and refresh controls.\\2. Measure the complete cost of a fresh prediction.\\3. Freeze primary comparisons before held-out evaluation.\\4. Report success and expenditure together.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,154)
+  at (30,194) {1. Define refinement and refresh controls.\\2. Measure the complete cost of a fresh prediction.\\3. Freeze primary comparisons before held-out evaluation.\\4. Report success and expenditure together.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,209)
   {Interpretation boundary};
 \node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (445,139) {SmolVLA is the worked example, not a universal allocation rule. Arithmetic is not deployment latency, and similar observed success does not establish equivalent quality.};
+  at (445,194) {SmolVLA is the worked example, not a universal allocation rule. Arithmetic is not deployment latency, and similar observed success does not establish equivalent quality.};
 
 \end{scope}
 \end{tikzpicture}
