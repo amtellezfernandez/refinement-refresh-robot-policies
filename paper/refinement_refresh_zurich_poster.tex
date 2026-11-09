@@ -225,11 +225,11 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,157)
   {Takeaway};
 \node[anchor=north west,align=left,text width=370mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,143) {Less refinement can improve closed-loop success at lower arithmetic. Longer execution prefixes can be dramatically cheaper, but this comparison remains descriptive.};
+  at (30,143) {At fixed $h=2$, reducing denoising from 5 to 2 steps raises success by $10.6$ percentage points and uses $5.9\%$ less arithmetic per control step. At $d=2$, executing $h=5$ rather than $h=2$ uses $60.7\%$ less arithmetic per attempt.};
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (450,157)
   {Interpretation and limits};
 \node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (450,143) {Together, the results motivate joint refinement-refresh evaluation. They do not establish equivalence, a universal allocation, physical latency, or transfer beyond this checkpoint.};
+  at (450,143) {The $h=5$ comparison gives 138/160 versus 139/160 successes, so similar quality is descriptive rather than established. Results are from one frozen checkpoint in synchronous LIBERO; arithmetic is not deployment latency, and transfer remains untested.};
 
 \end{scope}
 \end{tikzpicture}
