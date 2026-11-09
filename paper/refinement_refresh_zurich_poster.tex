@@ -169,6 +169,7 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
   at (25,458) {Result 1: Fewer Denoising Steps Improve Success};
 
+\begin{scope}[shift={(65,0)}]
 \draw[line width=1.7pt] (72,278)--(72,414);
 \draw[line width=1.7pt] (72,278)--(260,278);
 \foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
@@ -187,12 +188,7 @@
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
   font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (185,420) {$+10.6$ percentage points};
 \draw[thinflow,bend left=25] (153,393) to (203,387);
-
-\draw[line width=1.3pt] (270,264)--(270,422);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
-  minimum width=116mm,align=left] at (281,414) {Takeaway};
-\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
-  at (284,378) {At $h=2$, reducing denoising from 5 to 2 steps raises success by \textbf{10.6 pp} and uses \textbf{5.9\% less} arithmetic per control step.};
+\end{scope}
 
 % Result card 2
 \draw[card] (430,242) rectangle (831,478);
@@ -200,6 +196,7 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
   at (444,458) {Result 2: Less Frequent Refresh Is Much Cheaper};
 
+\begin{scope}[shift={(65,0)}]
 \draw[line width=1.7pt] (492,278)--(492,414);
 \draw[line width=1.7pt] (492,278)--(680,278);
 \foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
@@ -218,31 +215,21 @@
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
   font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (605,420) {$+0.6$ percentage points};
 \draw[thinflow,bend left=25] (573,393) to (623,390);
-
-\draw[line width=1.3pt] (690,264)--(690,422);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
-  minimum width=116mm,align=left] at (701,414) {Takeaway};
-\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
-  at (704,378) {At $d=2$, $h=5$ gives 138/160 successes versus 139/160 for $h=2$, with \textbf{60.7\% less} arithmetic per attempt. Equivalent quality is not established.};
+\end{scope}
 
 % Compact interpretation band
 \draw[card] (10,34) rectangle (831,218);
 \node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,190)
   {What the results mean};
-\draw[line width=1.4pt] (280,55)--(280,170);
-\draw[line width=1.4pt] (560,55)--(560,170);
+\draw[line width=1.4pt] (430,55)--(430,170);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,157)
-  {Why it matters};
-\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,143) {Closed-loop inference has two levers: refine the current chunk or refresh from a new observation. This study makes that allocation visible in both success and arithmetic.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (300,157)
-  {What we can claim};
-\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (300,143) {At fixed $h=2$, less refinement improved success and lowered arithmetic. At $d=2$, $h=5$ is much cheaper with similar observed success, but remains a descriptive candidate.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (580,157)
-  {Limits};
-\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (580,143) {One frozen checkpoint in synchronous LIBERO. Changing $h$ changes refresh timing and action positions together. Similar success is not equivalence; arithmetic is not latency.};
+  {Takeaway};
+\node[anchor=north west,align=left,text width=370mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (30,143) {Less refinement can improve closed-loop success at lower arithmetic. Longer execution prefixes can be dramatically cheaper, but this comparison remains descriptive.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (450,157)
+  {Interpretation and limits};
+\node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (450,143) {Together, the results motivate joint refinement-refresh evaluation. They do not establish equivalence, a universal allocation, physical latency, or transfer beyond this checkpoint.};
 
 \end{scope}
 \end{tikzpicture}
