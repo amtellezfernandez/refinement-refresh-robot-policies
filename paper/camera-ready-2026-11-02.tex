@@ -416,31 +416,27 @@ established on transfer. The task populations differ, so this comparison
 does not identify a causal task effect. The cost model explains feasibility,
 but does not determine the quality ranking on new tasks.
 
-\clearpage
 \section{Discussion and Conclusion}
 
-This study provides a worked methodology for evaluating how a chunked robot
-policy allocates inference compute between refinement and observation-conditioned
-refresh. The procedure separates configuration discovery from confirmation,
-holds the checkpoint and predicted chunk length fixed, measures full-generation
-arithmetic, and evaluates success and expenditure together under explicit compute
-ceilings. SmolVLA serves as the case study: at a fixed two-action execution
-prefix, reducing denoising from five to two steps raises success from 122/160 to
-139/160 while reducing reference-calibrated arithmetic per control step by
-5.9\%. This primary comparison follows a 480-attempt discovery study and is part
-of a 1,120-attempt campaign across seven frozen configurations on eight Goal and
-Object tasks excluded from configuration selection.
+This study develops a procedure for evaluating how chunked robot policies
+allocate inference compute between refining an action prediction and refreshing
+it from a new observation. The procedure measures the complete cost of a policy
+call, separates configuration discovery from held-out confirmation, freezes the
+comparisons before evaluation, and reports closed-loop success together with
+episode expenditure. This prevents a cheap configuration from being treated as
+useful without behavioral evidence, or a successful configuration from being
+discussed without its compute cost.
 
-Full-generation accounting also shows why reducing refinement alone yields
-limited savings: 82.1\% of native generation arithmetic is independent of
-denoising. At two denoising steps, executing five rather than two actions before
-replanning yields 138/160 versus 139/160 successes with 60.7\% less arithmetic
-per attempt, but equivalent quality is not established. A simple cost-aware rule
-matches the fitted response model's choices at three compute budgets, so fitting
-has no demonstrated decision-making advantage. These checkpoint-specific
-results illustrate the value of evaluating refinement and replanning jointly
-through closed-loop success and explicit compute constraints; they do not
-identify a universal allocation.
+The SmolVLA case study demonstrates why this joint evaluation is necessary.
+Additional refinement did not consistently produce better closed-loop behavior,
+and reducing refinement alone delivered limited savings because most generation
+work was independent of denoising. Changing the execution prefix affected cost
+more strongly, but similar observed success was insufficient to establish
+equivalent quality. The fitted response model also did not improve configuration
+choices over a simple cost-aware rule. The conclusion is methodological:
+refinement and refresh should be evaluated together within each model, under
+explicit counting boundaries and prespecified comparisons. The case study does
+not establish a universal allocation.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction

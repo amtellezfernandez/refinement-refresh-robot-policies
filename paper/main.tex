@@ -409,21 +409,27 @@ established on transfer. The task populations differ, so this comparison
 does not identify a causal task effect. The cost model explains feasibility,
 but does not determine the quality ranking on new tasks.
 
-\clearpage
 \section{Discussion and Conclusion}
 
-This study provides a worked methodology for evaluating how a chunked robot
-policy allocates inference compute between refinement and observation-conditioned
-refresh. The procedure separates configuration discovery from confirmation,
-holds the checkpoint and predicted chunk length fixed, measures full-generation
-arithmetic, and evaluates success and expenditure together under explicit compute
-ceilings. Applied to SmolVLA, it shows that full-generation cost determines which
-refresh schedules are feasible, while closed-loop outcomes determine which
-feasible expenditure is useful. The checkpoint-specific results favor less
-denoising at a two-action prefix and identify a much cheaper five-action candidate
-whose quality difference remains unresolved. They illustrate the value of the
-evaluation procedure rather than establishing a universal setting. The fitted
-selector adds no demonstrated advantage over the simple rule.
+This study develops a procedure for evaluating how chunked robot policies
+allocate inference compute between refining an action prediction and refreshing
+it from a new observation. The procedure measures the complete cost of a policy
+call, separates configuration discovery from held-out confirmation, freezes the
+comparisons before evaluation, and reports closed-loop success together with
+episode expenditure. This prevents a cheap configuration from being treated as
+useful without behavioral evidence, or a successful configuration from being
+discussed without its compute cost.
+
+The SmolVLA case study demonstrates why this joint evaluation is necessary.
+Additional refinement did not consistently produce better closed-loop behavior,
+and reducing refinement alone delivered limited savings because most generation
+work was independent of denoising. Changing the execution prefix affected cost
+more strongly, but similar observed success was insufficient to establish
+equivalent quality. The fitted response model also did not improve configuration
+choices over a simple cost-aware rule. The conclusion is methodological:
+refinement and refresh should be evaluated together within each model, under
+explicit counting boundaries and prespecified comparisons. The case study does
+not establish a universal allocation.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
