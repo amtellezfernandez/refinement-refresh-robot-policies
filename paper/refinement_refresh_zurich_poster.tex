@@ -21,16 +21,16 @@
 \newcommand{\metric}[3]{\begin{minipage}[t]{0.31\textwidth}\centering{\fontsize{96}{100}\selectfont\bfseries\color{#3}#1}\par\vspace{5mm}{\fontsize{33}{41}\selectfont\bfseries #2}\end{minipage}}
 \newcommand{\tagline}[1]{{\fontsize{34}{41}\selectfont\bfseries\color{blue}\MakeUppercase{#1}}}
 \begin{document}
-\noindent\colorbox{white}{\begin{minipage}[t][220mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
-\vspace*{25mm}
+\noindent\colorbox{white}{\begin{minipage}[t][165mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
+\vspace*{20mm}
 \hspace*{46mm}\begin{minipage}{749mm}
 {\fontsize{112}{114}\selectfont\bfseries\color{black} REFINEMENT vs. REFRESH}\par
 \vspace{7mm}
 {\fontsize{46}{56}\selectfont\color{black} Compute allocation for closed-loop robot policies}\par
-\vspace{13mm}
+\vspace{10mm}
 {\fontsize{32}{40}\selectfont\color{black}\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\hfill
 {\fontsize{30}{38}\selectfont\color{black} MAAT Institute \quad\textbullet\quad Z\"urich, 10 Nov 2026}\par
-\vspace{22mm}
+\vspace{8mm}
 {\fontsize{55}{66}\selectfont\bfseries\color{black} INFERENCE COMPUTE IS A CONTROL DECISION.}\par
 \end{minipage}
 \end{minipage}}\par
@@ -38,21 +38,28 @@
 \vspace{20mm}
 \begin{center}
 \begin{minipage}{748mm}
-{\fontsize{47}{57}\selectfont\bfseries A RECIPE FOR CLOSED-LOOP INFERENCE}\par
+{\fontsize{47}{57}\selectfont\bfseries WHAT THE EXECUTION PREFIX $h$ MEANS}\par
 \vspace{7mm}
-{\fontsize{39}{49}\selectfont\color{muted} Choose how long to refine, how long to execute, and when to observe again.}
+{\fontsize{39}{49}\selectfont\color{muted} The policy predicts $K=50$ actions, executes only the first $h<K$, discards the remaining $K-h$, and replans from a new observation.}
 \end{minipage}
 \vspace{12mm}
 \begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{39}{48}\selectfont\bfseries},note/.style={align=center,font=\fontsize{36}{44}\selectfont,text=muted}]
   \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {01\\OBSERVE};
-  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {02\\PREDICT};
+  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {02\\PREDICT\\$K=50$};
   \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {03\\REFINE\\$d$ steps};
-  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {04\\EXECUTE\\$h$ actions};
+  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {04\\EXECUTE\\first $h$};
   \draw[flow,navy] (observe) -- (policy);
   \draw[flow,orange] (policy) -- (refine);
   \draw[flow,blue] (refine) -- (act);
-  \draw[flow,blue] (act.south) -- ++(0,-60mm) -| (observe.south);
-  \node[note] at (0,-105mm) {\textbf{05 REPEAT:} obtain a new observation-conditioned prediction};
+  \node[font=\fontsize{31}{38}\selectfont\bfseries,anchor=south] at (8mm,-69mm) {ONE PREDICTED CHUNK OF $K$ ACTIONS};
+  \fill[black,rounded corners=2mm] (-170mm,-106mm) rectangle (-62mm,-76mm);
+  \draw[black,line width=2pt,rounded corners=2mm] (-170mm,-106mm) rectangle (186mm,-76mm);
+  \fill[black!14] (-62mm,-106mm) rectangle (186mm,-76mm);
+  \draw[black,line width=2pt] (-62mm,-106mm)--(-62mm,-76mm);
+  \node[text=white,font=\fontsize{29}{36}\selectfont\bfseries] at (-116mm,-91mm) {EXECUTE $h$};
+  \node[text=black,font=\fontsize{29}{36}\selectfont\bfseries] at (62mm,-91mm) {DISCARD $K-h$};
+  \draw[flow,blue] (act.south) -- ++(0,-148mm) -| (observe.south);
+  \node[note,fill=white,inner xsep=8mm] at (0,-149mm) {\textbf{05 REPLAN:} new observation $\rightarrow$ new $K$-action chunk};
   \node[draw=black,fill=white,text=black,line width=3pt,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {CHOOSE $d$ AND $h$ UNDER THE AVAILABLE COMPUTE BUDGET};
 \end{tikzpicture}
 \end{center}
@@ -77,7 +84,7 @@
 \end{tikzpicture}
 \end{minipage}
 \end{center}
-\vspace{18mm}
+\vspace{10mm}
 \begin{center}
 \begin{minipage}{748mm}
 \metric{$-5.9\%$}{arithmetic per control step\\with 2 instead of 5 denoising steps}{blue}\hfill
@@ -85,7 +92,7 @@
 \metric{$-60.7\%$}{arithmetic per attempt for\\$h=5$ versus $h=2$, at $d=2$}{blue}
 \end{minipage}
 \end{center}
-\vspace{18mm}
+\vspace{10mm}
 \begin{center}
 \begin{minipage}{748mm}
 \begin{tikzpicture}
@@ -99,7 +106,7 @@
 \end{tikzpicture}
 \end{minipage}
 \end{center}
-\vspace{18mm}
+\vspace{10mm}
 \begin{center}
 \begin{minipage}{748mm}
 \begin{minipage}[t]{482mm}
