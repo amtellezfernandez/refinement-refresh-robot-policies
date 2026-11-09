@@ -49,6 +49,8 @@
 
 % Experimental setup
 \draw[line width=1.5pt] (492,610)--(492,701);
+\node[anchor=center] at (255,655)
+  {\includegraphics[width=445mm]{paper/generated/study_design.pdf}};
 \fill[panelgray,rounded corners=8mm] (503,611) rectangle (814,699);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (520,677) {Setup (held-out)};
 \draw[line width=1.3pt] (520,650) ellipse (6mm and 2.5mm);
@@ -74,31 +76,33 @@
 \draw[card] (10,242) rectangle (411,478);
 \fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,458) {Case study 1: Refinement at fixed $h=2$};
+  at (25,458) {Why the Trade-Off Exists};
 \node[anchor=center] at (210.5,340)
-  {\includegraphics[width=380mm]{paper/generated/refinement_comparison.pdf}};
+  {\includegraphics[width=390mm]{paper/generated/cost_decomposition.pdf}};
 
 % Result card 2
 \draw[card] (430,242) rectangle (831,478);
 \fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (444,458) {Case study 2: Refresh at fixed $d=2$};
+  at (444,458) {Held-Out Success and Compute};
 \node[anchor=center] at (630.5,340)
-  {\includegraphics[width=380mm]{paper/generated/refresh_comparison.pdf}};
+  {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff.pdf}};
 
-% Compact interpretation band
-\draw[card] (10,34) rectangle (831,218);
-\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,190)
-  {What the results mean};
-\draw[line width=1.4pt] (430,55)--(430,170);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,157)
-  {Takeaway};
-\node[anchor=north west,align=left,text width=370mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,143) {RoboPAD is a worked example of how to study closed-loop inference allocation: define refinement and refresh controls, measure complete inference cost, freeze comparisons, and evaluate success and expenditure together.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (450,157)
-  {Interpretation and limits};
-\node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (450,143) {SmolVLA provides the case study, not a universal allocation rule. The procedure can be applied to other policies, but each requires within-model confirmation; arithmetic is not deployment latency, and equivalent quality is not established.};
+% Task-level evidence and general lesson
+\draw[card] (10,24) rectangle (831,220);
+\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,202)
+  {What the Aggregate Results Hide};
+\node[anchor=center] at (235,105)
+  {\includegraphics[width=410mm]{paper/generated/task_level_effects.pdf}};
+\draw[line width=1.4pt] (485,45)--(485,177);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (505,169)
+  {General lesson};
+\node[anchor=north west,align=left,text width=300mm,font=\rmfamily\fontsize{23}{29}\selectfont]
+  at (505,154) {Use a within-model protocol: define refinement and refresh, measure complete generation cost, freeze the primary comparisons, then evaluate held-out success, expenditure, and task variation together.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (505,88)
+  {Limits};
+\node[anchor=north west,align=left,text width=300mm,font=\rmfamily\fontsize{23}{29}\selectfont]
+  at (505,73) {One frozen checkpoint in synchronous simulation. Arithmetic is not deployment latency, and similar observed success does not establish equivalence.};
 
 \end{scope}
 \end{tikzpicture}

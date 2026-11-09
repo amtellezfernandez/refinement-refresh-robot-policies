@@ -132,53 +132,110 @@ class PaperVisualTests(unittest.TestCase):
                 "D" if i == 1 else ("o" if i < 3 else "s"),
             )
 
-    def test_shared_refinement_figure_uses_retained_success_and_step_costs(self):
+    def test_shared_cost_figure_uses_the_retained_affine_decomposition(self):
         import numpy as np
         from matplotlib.text import Text
 
         visuals.style()
         with patch.object(visuals, "save_figure") as save:
-            visuals.refinement_comparison_figure(self.data, Path("unused.pdf"))
+            visuals.cost_decomposition_figure(self.data, Path("unused.pdf"))
         figure = save.call_args.args[0]
-        success_axis, compute_axis = figure.axes
+        axis = figure.axes[0]
+        base = self.data["calibration"]["affine"]["base"] / 1e9
         np.testing.assert_allclose(
-            [bar.get_height() for bar in success_axis.patches], [86.875, 76.25]
+            [bar.get_height() for bar in axis.patches[:4]], [base] * 4
         )
+        settings = (2, 5, 10, 20)
+        totals = [
+            self.data["calibration"]["generation_flops"][str(d)] / 1e9
+            for d in settings
+        ]
         np.testing.assert_allclose(
-            [bar.get_height() for bar in compute_axis.patches],
+            [bar.get_height() for bar in axis.patches[4:]],
+            np.asarray(totals) - base,
+        )
+        text = " ".join(item.get_text() for item in figure.findobj(Text))
+        self.assertIn("82.1% of native", text)
+        self.assertIn("756.2", text)
+
+    def test_shared_tradeoff_figure_keeps_all_settings_and_paired_intervals(self):
+        import numpy as np
+        from matplotlib.text import Text
+
+        visuals.style()
+        with patch.object(visuals, "save_figure") as save:
+            visuals.success_compute_figure(self.data, Path("unused.pdf"))
+        figure = save.call_args.args[0]
+        tradeoff, effects = figure.axes
+        points = np.vstack([collection.get_offsets()[0] for collection in tradeoff.collections])
+        expected = np.array(
             [
-                self.data["calibration"]["generation_flops"]["2"] / 2e9,
-                self.data["calibration"]["generation_flops"]["5"] / 2e9,
-            ],
+                [r["nominal_fraction_native"], 100 * r["success_rate"]]
+                for r in self.data["confirmation"]["resources"]
+            ]
+        )
+        np.testing.assert_allclose(points, expected)
+        self.assertEqual(len(effects.containers), 2)
+        np.testing.assert_allclose(
+            np.asarray(effects.containers[0].lines[0].get_xdata(), dtype=float),
+            [10.625],
+        )
+        np.testing.assert_allclose(
+            np.asarray(effects.containers[1].lines[0].get_xdata(), dtype=float),
+            [-0.625],
         )
         text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("139/160", text)
-        self.assertIn("122/160", text)
-        self.assertIn("+10.6 pp [+4.4, +16.9]", text)
-        self.assertIn("5.9% lower", text)
+        self.assertIn("+10.6 [+4.4, +16.9]", text)
+        self.assertIn("-0.6 [-6.9, +6.3]", text)
+        self.assertIn("41.1 → 16.1 TFLOPs", text)
+        self.assertIn("Equivalence is not established", text)
 
-    def test_shared_refresh_figure_preserves_uncertainty_and_non_equivalence(self):
+    def test_task_figure_uses_reported_counts_without_invented_intervals(self):
         import numpy as np
         from matplotlib.text import Text
 
         visuals.style()
         with patch.object(visuals, "save_figure") as save:
-            visuals.refresh_comparison_figure(self.data, Path("unused.pdf"))
+            visuals.task_level_figure(self.data, Path("unused.pdf"))
         figure = save.call_args.args[0]
-        success_axis, compute_axis = figure.axes
-        np.testing.assert_allclose(
-            [bar.get_height() for bar in success_axis.patches], [86.875, 86.25]
-        )
-        np.testing.assert_allclose(
-            [bar.get_height() for bar in compute_axis.patches],
-            [41.1, 16.1],
-            rtol=0,
-            atol=0.05,
-        )
+        refinement = figure.axes[0].collections[0].get_offsets()[:, 0]
+        refresh = figure.axes[1].collections[0].get_offsets()[:, 0]
+        np.testing.assert_equal(refinement, [10, 15, 5, 20, 0, 15, 15, 5])
+        np.testing.assert_equal(refresh, [10, 5, -5, 0, 0, -10, -15, 10])
         text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("+0.6 pp [-6.3, +6.9]", text)
-        self.assertIn("60.7% lower", text)
-        self.assertIn("equivalence is not established", text)
+        self.assertIn("7 positive · 1 tie", text)
+        self.assertIn("3 positive · 3 negative · 2 ties", text)
+        self.assertIn("24 wins / 7 losses", text)
+        self.assertIn("no task-level intervals", text)
+
+    def test_timing_figure_normalizes_each_coordinate_to_native(self):
+        import numpy as np
+
+        visuals.style()
+        with patch.object(visuals, "save_figure") as save:
+            visuals.arithmetic_timing_figure(self.data, Path("unused.pdf"))
+        axis = save.call_args.args[0].axes[0]
+        arithmetic, timing = axis.lines[:2]
+        self.assertEqual(arithmetic.get_xdata().tolist(), [2, 3, 5, 8, 10, 20])
+        self.assertEqual(timing.get_xdata().tolist(), [2, 3, 5, 8, 10, 20])
+        self.assertAlmostEqual(arithmetic.get_ydata()[4], 1.0)
+        self.assertAlmostEqual(timing.get_ydata()[4], 1.0)
+        self.assertAlmostEqual(1 - arithmetic.get_ydata()[2], 0.0893, places=3)
+        self.assertAlmostEqual(1 - timing.get_ydata()[2], 0.4055, places=3)
+
+    def test_study_design_figure_keeps_selection_and_confirmation_separate(self):
+        from matplotlib.text import Text
+
+        visuals.style()
+        with patch.object(visuals, "save_figure") as save:
+            visuals.study_design_figure(self.data, Path("unused.pdf"))
+        text = " ".join(
+            item.get_text() for item in save.call_args.args[0].findobj(Text)
+        )
+        self.assertIn("480 attempts · 12 settings", text)
+        self.assertIn("3 denoising comparisons", text)
+        self.assertIn("1,120 attempts · 7 settings", text)
+        self.assertIn("later-amended descriptive analyses", text)
 
     def test_undersized_figure_text_is_rejected(self):
         import matplotlib.pyplot as plt

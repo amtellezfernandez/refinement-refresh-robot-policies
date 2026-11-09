@@ -155,10 +155,14 @@ frequently the policy receives a new observation.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
+\vspace{2pt}
+\includegraphics[width=\linewidth]{../paper/generated/study_design.pdf}
 \caption{Synchronous chunked closed-loop execution. A policy call predicts
 $K$ actions after $d$ denoising steps; only the first $h$ actions are executed,
 with the remaining $K-h$ actions discarded before the next observation and
-replanning step. In the experiments, $K=50$.}
+replanning step. In the experiments, $K=50$. The study-design strip separates
+configuration discovery from held-out confirmation; prefix contrasts were
+added later as descriptive analyses.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
@@ -197,6 +201,18 @@ ten to five saves 8.9\% of counted generation work; reducing it to two saves
  \frac{b(h,d)}{b_{\mathrm{native}}}
  \simeq \frac{0.821+0.179(d/10)}{h}.
 \]
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/cost_decomposition.pdf}
+\caption{Why refinement and refresh must be considered together. Each complete
+generation contains the same denoising-independent arithmetic plus a component
+that grows with $d$. At native $d=10$, 82.1\% of the counted arithmetic is
+independent of denoising. Increasing $h$ amortizes the complete generation over
+more executed actions. This is a dense-arithmetic decomposition under the
+declared counting boundary, not a component-level timing attribution.}
+\label{fig:cost-decomposition}
+\end{figure}
 
 We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
 Eligibility uses measured per-$d$ values, not the rounded affine expression.
@@ -336,6 +352,19 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \label{tab:confirmation-grid}
 \input{../paper/generated/confirmation_resources.tex}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}
+\caption{Held-out success and compute for all seven confirmation settings.
+The horizontal coordinate is nominal reference arithmetic per control step,
+relative to native deployment. Arrows isolate refinement at fixed $h=2$ and
+refresh at fixed $d=2$; the right panel reports paired, task-conditional
+descriptive 95\% intervals in each arrow's direction. The refresh episode-cost
+annotation uses mean arithmetic per attempted episode, a separate coordinate.
+The refresh interval does not establish equivalent success.}
+\label{fig:success-compute}
+\end{figure}
 \FloatBarrier
 
 \begin{samepage}
@@ -349,17 +378,6 @@ per control step: 275.0 versus 292.2 GFLOPs. Thus reducing refinement improves
 observed success while reducing counted work at this fixed prefix.
 \par\end{samepage}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/refinement_comparison.pdf}
-\caption{Primary refinement comparison at fixed $h=2$ (160 paired attempts
-per setting). Success counts and the paired, task-conditional descriptive 95\%
-interval come from the retained confirmation report. The compute panel reports
-nominal reference-calibrated arithmetic per control step, keeping its counting
-boundary separate from episode expenditure and deployment latency.}
-\label{fig:refinement-comparison}
-\end{figure}
-
 Mean reference arithmetic per attempt falls from 48.7 to 41.1 TFLOPs
 (15.6\%). This larger reduction includes changed trajectories and termination:
 mean episode length is 149.0 versus 166.3 control steps. All failures reach
@@ -368,8 +386,9 @@ The primary direction is positive on seven tasks and tied on one, with
 24 paired wins and seven losses. Appendix~\ref{app:primary-costs} gives
 task sensitivity and expenditure intervals. These measurements do not establish
 a controlled physical-latency improvement.
-Figure~\ref{fig:confirmation-effects} places the primary effect alongside all
-other frozen and amended comparisons.
+Figure~\ref{fig:success-compute} places the primary setting in the joint
+success--compute coordinate; Figure~\ref{fig:confirmation-effects} places its
+effect alongside all other frozen and amended comparisons.
 
 \begin{figure}[htbp]
 \centering
@@ -411,14 +430,15 @@ quality or justify a non-inferiority claim.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{../paper/generated/refresh_comparison.pdf}
-\caption{Descriptive refresh comparison at fixed $d=2$ (160 paired attempts
-per setting). The success contrast is $(h=2)-(h=5)$ with its paired,
-task-conditional descriptive 95\% interval. The compute panel reports mean
-reference-calibrated arithmetic per attempted episode, including failures and
-partly consumed final prefixes. Similar observed success does not establish
-equivalence or non-inferiority.}
-\label{fig:refresh-comparison}
+\includegraphics[width=\linewidth]{../paper/generated/task_level_effects.pdf}
+\caption{Task-level differences beneath the two aggregate comparisons. Each
+row contains 20 attempts per setting. The refinement panel reports $(2,2)-(2,5)$;
+the refresh panel reports $(5,2)-(2,2)$, matching the arrows in
+Figure~\ref{fig:success-compute}. The primary refinement advantage is positive
+on seven tasks and tied on one, while the near-equal aggregate refresh counts
+contain mixed task-level changes. Rows are descriptive marginal counts; no
+task-level confidence intervals are inferred from them.}
+\label{fig:task-level-effects}
 \end{figure}
 
 Refreshing every action with $(1,2)$ instead of every two actions gives two
@@ -581,6 +601,16 @@ $d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/arithmetic_host_time.pdf}
+\caption{Fixed-input generation arithmetic and host elapsed time, each
+normalized to its own $d=10$ value. At $d=5$, counted arithmetic is 8.9\% lower
+while mean host generation time is 40.5\% lower. These calibration timings do
+not measure asynchronous execution or physical-robot responsiveness.}
+\label{fig:arithmetic-host-time}
+\end{figure}
 
 The calibration stores full-generation intervals and global operator arithmetic
 counts, not separate vision, language-prefill, or action-expert timings and
