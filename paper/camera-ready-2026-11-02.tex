@@ -23,22 +23,23 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Chunked robot policies allocate inference compute between refining a predicted
-action chunk and replanning from a fresh observation. We present a procedure for
-studying this trade-off: calibrate full-generation cost, separate configuration
-discovery from confirmation, and evaluate success and expenditure under explicit
-compute constraints. We apply it to one frozen SmolVLA checkpoint in synchronous
-LIBERO using 480 discovery attempts and 1,120 confirmation attempts on held-out
-tasks. At a fixed two-action prefix, reducing denoising from five to two steps
-increases success from 122/160 to 139/160 (+10.6 percentage points; descriptive
-task-conditional 95\% interval: 4.4--16.9) while reducing arithmetic per control
-step by 5.9\%. At two denoising steps, a five-action prefix records 138/160
-successes with 60.7\% less arithmetic per attempt than a two-action prefix,
-although equivalent quality is not established. Because 82.1\% of native
-generation arithmetic is denoising-independent, refinement and refresh should be
-evaluated jointly. This case study illustrates a reproducible way to analyze
-closed-loop inference allocation; its configuration findings remain
-checkpoint-specific.
+How should a chunked robot policy spend inference compute: refine its current
+action chunk, or replan from a newer observation? We present a case-study
+protocol for answering this question within a frozen policy. The protocol treats
+denoising depth and executed prefix as separate controls, calibrates complete
+generation cost, separates configuration discovery from held-out confirmation,
+and evaluates closed-loop success together with realized episode expenditure.
+Applied to SmolVLA in synchronous LIBERO, the study shows why both controls must
+be considered jointly. At a fixed refresh schedule, fewer denoising steps
+improved success while reducing arithmetic. At low denoising, a longer execution
+prefix substantially reduced expenditure while producing similar observed
+success, although equivalence was not established. Most generation arithmetic
+was independent of denoising, so reducing refinement alone could not deliver
+proportional savings. A fitted response model offered no demonstrated selection
+advantage over a simple cost-aware rule. These findings are checkpoint-specific.
+The broader contribution is a reproducible procedure for testing
+refinement--refresh allocations without treating arithmetic efficiency, latency,
+or apparent quality preservation as interchangeable.
 \end{abstract}
 
 \section{Introduction}
