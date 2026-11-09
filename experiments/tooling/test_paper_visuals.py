@@ -132,6 +132,54 @@ class PaperVisualTests(unittest.TestCase):
                 "D" if i == 1 else ("o" if i < 3 else "s"),
             )
 
+    def test_shared_refinement_figure_uses_retained_success_and_step_costs(self):
+        import numpy as np
+        from matplotlib.text import Text
+
+        visuals.style()
+        with patch.object(visuals, "save_figure") as save:
+            visuals.refinement_comparison_figure(self.data, Path("unused.pdf"))
+        figure = save.call_args.args[0]
+        success_axis, compute_axis = figure.axes
+        np.testing.assert_allclose(
+            [bar.get_height() for bar in success_axis.patches], [86.875, 76.25]
+        )
+        np.testing.assert_allclose(
+            [bar.get_height() for bar in compute_axis.patches],
+            [
+                self.data["calibration"]["generation_flops"]["2"] / 2e9,
+                self.data["calibration"]["generation_flops"]["5"] / 2e9,
+            ],
+        )
+        text = " ".join(item.get_text() for item in figure.findobj(Text))
+        self.assertIn("139/160", text)
+        self.assertIn("122/160", text)
+        self.assertIn("+10.6 pp [+4.4, +16.9]", text)
+        self.assertIn("5.9% lower", text)
+
+    def test_shared_refresh_figure_preserves_uncertainty_and_non_equivalence(self):
+        import numpy as np
+        from matplotlib.text import Text
+
+        visuals.style()
+        with patch.object(visuals, "save_figure") as save:
+            visuals.refresh_comparison_figure(self.data, Path("unused.pdf"))
+        figure = save.call_args.args[0]
+        success_axis, compute_axis = figure.axes
+        np.testing.assert_allclose(
+            [bar.get_height() for bar in success_axis.patches], [86.875, 86.25]
+        )
+        np.testing.assert_allclose(
+            [bar.get_height() for bar in compute_axis.patches],
+            [41.1, 16.1],
+            rtol=0,
+            atol=0.05,
+        )
+        text = " ".join(item.get_text() for item in figure.findobj(Text))
+        self.assertIn("+0.6 pp [-6.3, +6.9]", text)
+        self.assertIn("60.7% lower", text)
+        self.assertIn("equivalence is not established", text)
+
     def test_undersized_figure_text_is_rejected(self):
         import matplotlib.pyplot as plt
 

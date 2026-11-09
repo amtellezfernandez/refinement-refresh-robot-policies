@@ -532,6 +532,148 @@ def confirmation_figure(data, path):
     plt.close(fig)
 
 
+def comparison_figure(
+    *,
+    success_rates,
+    successes,
+    condition_labels,
+    effect_text,
+    compute_values,
+    compute_title,
+    compute_labels,
+    compute_note,
+    path,
+    caveat=None,
+):
+    """Render one retained success contrast beside its declared cost boundary."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig, (success_ax, compute_ax) = plt.subplots(
+        1,
+        2,
+        figsize=(FIGURE_WIDTH, 2.08),
+        gridspec_kw={"width_ratios": [1.08, 1]},
+    )
+    fig.subplots_adjust(left=0.09, right=0.985, bottom=0.24, top=0.74, wspace=0.38)
+    colors = (ACCENT, LIGHT)
+    x = np.arange(2)
+
+    success_ax.bar(x, success_rates, width=0.58, color=colors, edgecolor=INK, linewidth=0.65)
+    success_ax.set(
+        title="Observed success",
+        ylabel="Success (%)",
+        ylim=(0, 100),
+        yticks=[0, 25, 50, 75, 100],
+        xticks=x,
+        xticklabels=condition_labels,
+    )
+    for i, (rate, count) in enumerate(zip(success_rates, successes)):
+        success_ax.text(
+            i,
+            rate + 3.0,
+            f"{number(rate)}%",
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+        )
+        success_ax.text(
+            i,
+            max(10, rate * 0.46),
+            f"{count}/160",
+            ha="center",
+            va="center",
+            color="white" if i == 0 else INK,
+            fontweight="bold",
+        )
+
+    compute_ax.bar(x, compute_values, width=0.58, color=colors, edgecolor=INK, linewidth=0.65)
+    compute_ax.set(
+        title=compute_title,
+        ylim=(0, max(compute_values) * 1.22),
+        yticks=[],
+        xticks=x,
+        xticklabels=condition_labels,
+    )
+    for i, (value, label) in enumerate(zip(compute_values, compute_labels)):
+        compute_ax.text(
+            i,
+            value + max(compute_values) * 0.045,
+            label,
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+        )
+
+    fig.text(0.255, 0.94, effect_text, ha="center", va="top", fontweight="bold")
+    fig.text(0.77, 0.94, compute_note, ha="center", va="top", fontweight="bold")
+    if caveat:
+        fig.text(0.5, 0.035, caveat, ha="center", va="bottom", color=MID)
+    for axis in (success_ax, compute_ax):
+        axis.set_axisbelow(True)
+        axis.grid(axis="y", color=".90", lw=0.55)
+        axis.spines[["top", "right"]].set_visible(False)
+    save_figure(fig, path)
+    plt.close(fig)
+
+
+def refinement_comparison_figure(data, path):
+    resources = {
+        (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
+    }
+    selected, comparator = resources[(2, 2)], resources[(2, 5)]
+    primary = data["confirmation"]["comparisons"][1]
+    check(primary["a"] == [2, 2] and primary["b"] == [2, 5], "Primary pair changed")
+    generation = data["calibration"]["generation_flops"]
+    rates = [generation["2"] / 2 / 1e9, generation["5"] / 2 / 1e9]
+    saving = 100 * (1 - rates[0] / rates[1])
+    lo, hi = [100 * v for v in primary["interval95"][0]]
+    comparison_figure(
+        success_rates=[100 * selected["success_rate"], 100 * comparator["success_rate"]],
+        successes=[selected["successes"], comparator["successes"]],
+        condition_labels=[r"$d=2$", r"$d=5$"],
+        effect_text=(
+            f"$d=2$ minus $d=5$: {number(100 * primary['mean_difference'][0], True)} pp "
+            f"[{number(lo, True)}, {number(hi, True)}]"
+        ),
+        compute_values=rates,
+        compute_title="Nominal arithmetic / control step",
+        compute_labels=[f"{number(v)} GFLOPs" for v in rates],
+        compute_note=f"$d=2$: {number(saving)}% lower",
+        path=path,
+    )
+
+
+def refresh_comparison_figure(data, path):
+    resources = {
+        (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
+    }
+    frequent, longer = resources[(2, 2)], resources[(5, 2)]
+    comparison = data["confirmation"]["comparisons"][4]
+    check(
+        comparison["a"] == [2, 2] and comparison["b"] == [5, 2],
+        "Refresh pair changed",
+    )
+    costs = [frequent["mean_reference_tflops"], longer["mean_reference_tflops"]]
+    saving = 100 * (1 - costs[1] / costs[0])
+    lo, hi = [100 * v for v in comparison["interval95"][0]]
+    comparison_figure(
+        success_rates=[100 * frequent["success_rate"], 100 * longer["success_rate"]],
+        successes=[frequent["successes"], longer["successes"]],
+        condition_labels=[r"$h=2$", r"$h=5$"],
+        effect_text=(
+            f"$h=2$ minus $h=5$: {number(100 * comparison['mean_difference'][0], True)} pp "
+            f"[{number(lo, True)}, {number(hi, True)}]"
+        ),
+        compute_values=costs,
+        compute_title="Mean arithmetic / attempt",
+        compute_labels=[f"{number(v)} TFLOPs" for v in costs],
+        compute_note=f"$h=5$: {number(saving)}% lower",
+        path=path,
+        caveat="Observed success is similar; equivalence is not established.",
+    )
+
+
 def render(destination):
     import matplotlib
     import numpy
@@ -548,7 +690,15 @@ def render(destination):
     style()
     discovery_figure(data, destination / "discovery_allocation.pdf")
     confirmation_figure(data, destination / "confirmation_effects.pdf")
-    names = [*contents, "discovery_allocation.pdf", "confirmation_effects.pdf"]
+    refinement_comparison_figure(data, destination / "refinement_comparison.pdf")
+    refresh_comparison_figure(data, destination / "refresh_comparison.pdf")
+    names = [
+        *contents,
+        "discovery_allocation.pdf",
+        "confirmation_effects.pdf",
+        "refinement_comparison.pdf",
+        "refresh_comparison.pdf",
+    ]
     manifest = {
         "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
         "script_sha256": digest(Path(__file__)),

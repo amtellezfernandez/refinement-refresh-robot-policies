@@ -74,57 +74,17 @@
 \draw[card] (10,242) rectangle (411,478);
 \fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,458) {Case result 1: Less Refinement Improved Success};
-
-\begin{scope}[shift={(65,0)}]
-\draw[line width=1.7pt] (72,278)--(72,414);
-\draw[line width=1.7pt] (72,278)--(260,278);
-\foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
-  \draw[line width=1pt] (66,\yy)--(72,\yy);
-  \node[anchor=east,font=\sffamily\fontsize{22}{26}\selectfont] at (63,\yy) {\lab};
-}
-\node[rotate=90,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (30,346) {Success rate};
-\fill[darkgray] (98,278) rectangle (158,378);
-\fill[midgray] (176,278) rectangle (236,349);
-\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (128,382) {86.9\%};
-\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (206,353) {76.3\%};
-\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (128,312) {139 /\\160};
-\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (206,312) {122 /\\160};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (128,270) {$d=2$};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (206,270) {$d=5$};
-\node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  align=center,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (185,418)
-  {$d=2$: $+10.6$ pp success\\$5.9\%$ less arithmetic / step};
-\draw[thinflow,bend left=25] (153,393) to (203,387);
-\end{scope}
+  at (25,458) {Case study 1: Refinement at fixed $h=2$};
+\node[anchor=center] at (210.5,340)
+  {\includegraphics[width=380mm]{paper/generated/refinement_comparison.pdf}};
 
 % Result card 2
 \draw[card] (430,242) rectangle (831,478);
 \fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (444,458) {Case result 2: Longer Prefix Used Much Less Arithmetic};
-
-\begin{scope}[shift={(65,0)}]
-\draw[line width=1.7pt] (492,278)--(492,414);
-\draw[line width=1.7pt] (492,278)--(680,278);
-\foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
-  \draw[line width=1pt] (486,\yy)--(492,\yy);
-  \node[anchor=east,font=\sffamily\fontsize{22}{26}\selectfont] at (483,\yy) {\lab};
-}
-\node[rotate=90,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (450,346) {Success rate};
-\fill[darkgray] (518,278) rectangle (578,378);
-\fill[midgray] (596,278) rectangle (656,376);
-\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (548,382) {86.9\%};
-\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (626,380) {86.3\%};
-\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (548,312) {139 /\\160};
-\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (626,312) {138 /\\160};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (548,270) {$h=2$};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (626,270) {$h=5$};
-\node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  align=center,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (605,418)
-  {$h=5$: $-0.6$ pp observed\\$60.7\%$ less arithmetic / attempt};
-\draw[thinflow,bend left=25] (573,393) to (623,390);
-\end{scope}
+  at (444,458) {Case study 2: Refresh at fixed $d=2$};
+\node[anchor=center] at (630.5,340)
+  {\includegraphics[width=380mm]{paper/generated/refresh_comparison.pdf}};
 
 % Compact interpretation band
 \draw[card] (10,34) rectangle (831,218);

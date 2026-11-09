@@ -356,6 +356,17 @@ per control step: 275.0 versus 292.2 GFLOPs. Thus reducing refinement improves
 observed success while reducing counted work at this fixed prefix.
 \par\end{samepage}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/refinement_comparison.pdf}
+\caption{Primary refinement comparison at fixed $h=2$ (160 paired attempts
+per setting). Success counts and the paired, task-conditional descriptive 95\%
+interval come from the retained confirmation report. The compute panel reports
+nominal reference-calibrated arithmetic per control step, keeping its counting
+boundary separate from episode expenditure and deployment latency.}
+\label{fig:refinement-comparison}
+\end{figure}
+
 Mean reference arithmetic per attempt falls from 48.7 to 41.1 TFLOPs
 (15.6\%). This larger reduction includes changed trajectories and termination:
 mean episode length is 149.0 versus 166.3 control steps. All failures reach
@@ -404,6 +415,18 @@ a paired difference of $+0.6$ percentage points $[-6.3,+6.9]$. Yet $(5,2)$ uses
 arithmetic per attempt: 16.1 versus 41.1 TFLOPs. The interval permits meaningful
 differences in either direction; similar counts do not certify equivalent
 quality or justify a non-inferiority claim.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/refresh_comparison.pdf}
+\caption{Descriptive refresh comparison at fixed $d=2$ (160 paired attempts
+per setting). The success contrast is $(h=2)-(h=5)$ with its paired,
+task-conditional descriptive 95\% interval. The compute panel reports mean
+reference-calibrated arithmetic per attempted episode, including failures and
+partly consumed final prefixes. Similar observed success does not establish
+equivalence or non-inferiority.}
+\label{fig:refresh-comparison}
+\end{figure}
 
 Refreshing every action with $(1,2)$ instead of every two actions gives two
 fewer successes, a difference of $-1.3$ points $[-7.5,+5.0]$, at 83.3 versus
