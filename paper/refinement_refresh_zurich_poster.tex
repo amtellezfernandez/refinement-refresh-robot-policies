@@ -2,126 +2,255 @@
 \usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern,microtype,amsmath,booktabs,tikz,graphicx}
-\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
-\usepackage[hidelinks]{hyperref}
+\usepackage{lmodern,microtype,amsmath,amssymb,tikz,xcolor}
+\usetikzlibrary{arrows.meta,calc,decorations.pathreplacing,positioning,shapes.geometric}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
-\definecolor{navy}{gray}{0.00}
-\definecolor{blue}{gray}{0.00}
-\definecolor{cyan}{gray}{0.88}
-\definecolor{orange}{gray}{0.00}
-\definecolor{peach}{gray}{0.93}
-\definecolor{cream}{gray}{1.00}
-\definecolor{ink}{gray}{0.00}
-\definecolor{muted}{gray}{0.28}
-\definecolor{white}{HTML}{FFFFFF}
-\pagecolor{cream}
+\definecolor{ink}{gray}{0.03}
+\definecolor{darkgray}{gray}{0.24}
+\definecolor{midgray}{gray}{0.56}
+\definecolor{softgray}{gray}{0.92}
+\definecolor{panelgray}{gray}{0.965}
+\definecolor{white}{gray}{1.00}
+\pagecolor{white}
 \color{ink}
-\newcommand{\metric}[3]{\begin{minipage}[t]{0.31\textwidth}\centering{\fontsize{96}{100}\selectfont\bfseries\color{#3}#1}\par\vspace{5mm}{\fontsize{33}{41}\selectfont\bfseries #2}\end{minipage}}
-\newcommand{\tagline}[1]{{\fontsize{34}{41}\selectfont\bfseries\color{blue}\MakeUppercase{#1}}}
+
 \begin{document}
-\noindent\colorbox{white}{\begin{minipage}[t][165mm][t]{\dimexpr\paperwidth-2\fboxsep\relax}
-\vspace*{20mm}
-\hspace*{46mm}\begin{minipage}{749mm}
-{\fontsize{112}{114}\selectfont\bfseries\color{black} REFINEMENT vs. REFRESH}\par
-\vspace{7mm}
-{\fontsize{46}{56}\selectfont\color{black} Compute allocation for closed-loop robot policies}\par
-\vspace{10mm}
-{\fontsize{32}{40}\selectfont\color{black}\bfseries Alba Mar\'ia T\'ellez Fern\'andez}\hfill
-{\fontsize{30}{38}\selectfont\color{black} MAAT Institute \quad\textbullet\quad Z\"urich, 10 Nov 2026}\par
-\vspace{8mm}
-{\fontsize{55}{66}\selectfont\bfseries\color{black} INFERENCE COMPUTE IS A CONTROL DECISION.}\par
-\end{minipage}
-\end{minipage}}\par
-\noindent\rule{\paperwidth}{3mm}\par
-\vspace{20mm}
-\begin{center}
-\begin{minipage}{748mm}
-{\fontsize{47}{57}\selectfont\bfseries WHAT THE EXECUTION PREFIX $h$ MEANS}\par
-\vspace{7mm}
-{\fontsize{39}{49}\selectfont\color{muted} The policy predicts $K=50$ actions, executes only the first $h<K$, discards the remaining $K-h$, and replans from a new observation.}
-\end{minipage}
-\vspace{12mm}
-\begin{tikzpicture}[>=Latex,flow/.style={line width=5pt,->,rounded corners=12mm},stage/.style={circle,minimum size=124mm,align=center,line width=4pt,font=\fontsize{39}{48}\selectfont\bfseries},note/.style={align=center,font=\fontsize{36}{44}\selectfont,text=muted}]
-  \node[stage,draw=navy,fill=white] (observe) at (-255mm,0) {01\\OBSERVE};
-  \node[stage,draw=navy,fill=white] (policy) at (-86mm,0) {02\\PREDICT\\$K=50$};
-  \node[stage,draw=orange,fill=peach,text=navy] (refine) at (83mm,0) {03\\REFINE\\$d$ steps};
-  \node[stage,draw=blue,fill=cyan,text=navy] (act) at (252mm,0) {04\\EXECUTE\\first $h$};
-  \draw[flow,navy] (observe) -- (policy);
-  \draw[flow,orange] (policy) -- (refine);
-  \draw[flow,blue] (refine) -- (act);
-  \node[font=\fontsize{31}{38}\selectfont\bfseries,anchor=south] at (8mm,-69mm) {ONE PREDICTED CHUNK OF $K$ ACTIONS};
-  \fill[black,rounded corners=2mm] (-170mm,-106mm) rectangle (-62mm,-76mm);
-  \draw[black,line width=2pt,rounded corners=2mm] (-170mm,-106mm) rectangle (186mm,-76mm);
-  \fill[black!14] (-62mm,-106mm) rectangle (186mm,-76mm);
-  \draw[black,line width=2pt] (-62mm,-106mm)--(-62mm,-76mm);
-  \node[text=white,font=\fontsize{29}{36}\selectfont\bfseries] at (-116mm,-91mm) {EXECUTE $h$};
-  \node[text=black,font=\fontsize{29}{36}\selectfont\bfseries] at (62mm,-91mm) {DISCARD $K-h$};
-  \draw[flow,blue] (act.south) -- ++(0,-148mm) -| (observe.south);
-  \node[note,fill=white,inner xsep=8mm] at (0,-149mm) {\textbf{05 REPLAN:} new observation $\rightarrow$ new $K$-action chunk};
-  \node[draw=black,fill=white,text=black,line width=3pt,rounded corners=7mm,inner xsep=18mm,inner ysep=12mm,font=\fontsize{36}{44}\selectfont\bfseries] at (0,105mm) {CHOOSE $d$ AND $h$ UNDER THE AVAILABLE COMPUTE BUDGET};
+\begin{tikzpicture}[remember picture,overlay,x=1mm,y=1mm,
+  >={Latex[length=6mm,width=4mm]},
+  flow/.style={-Latex,line width=2.4pt,draw=ink},
+  thinflow/.style={-Latex,line width=1.8pt,draw=ink},
+  card/.style={draw=ink,fill=white,line width=1.8pt,rounded corners=8mm},
+  labelbox/.style={fill=softgray,rounded corners=4mm},
+  body/.style={font=\sffamily\fontsize{26}{33}\selectfont,text=ink},
+  smallbody/.style={font=\sffamily\fontsize{22}{28}\selectfont,text=ink},
+  heading/.style={font=\rmfamily\bfseries\fontsize{38}{43}\selectfont,text=ink}]
+\begin{scope}[shift={(current page.south west)}]
+
+% Title
+\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{86}{90}\selectfont]
+  at (420.5,1176) {Refinement vs. Refresh};
+\node[anchor=north,align=center,font=\rmfamily\fontsize{48}{54}\selectfont]
+  at (420.5,1099) {Compute Allocation for Closed-Loop Robot Policies};
+\draw[line width=1.6pt] (32,1057)--(168,1057);
+\draw[line width=1.6pt] (673,1057)--(809,1057);
+\node[anchor=center,align=center,font=\sffamily\fontsize{25}{31}\selectfont]
+  at (420.5,1057) {Alba Mar\'ia T\'ellez Fern\'andez, MAAT Institute (alba.tellez@maatinstitute.com)};
+
+% Closed-loop policy panel
+\draw[card] (12,586) rectangle (829,1028);
+\fill[softgray,rounded corners=8mm] (12,982) rectangle (286,1028);
+\fill[softgray] (278,982)--(329,1028)--(278,1028)--cycle;
+\node[anchor=west,heading] at (30,1004) {Chunked Closed-Loop Policy};
+
+% Refresh loop and label
+\node[draw=ink,fill=white,line width=1.8pt,rounded corners=6mm,
+  font=\rmfamily\fontsize{28}{34}\selectfont,inner xsep=12mm,inner ysep=5mm]
+  (refresh) at (462,955) {\textbf{Replan / Refresh}\; (new observation + new chunk)};
+
+% Robot arm
+\begin{scope}[shift={(70,830)}]
+  \draw[line width=2.8pt,rounded corners=2mm] (-25,-30) rectangle (10,-18);
+  \draw[line width=3.2pt] (-18,-18)--(-13,18)--(13,48)--(36,30)--(36,9);
+  \draw[line width=3.2pt] (36,9)--(28,9) (36,9)--(44,9) (32,9)--(32,-1) (40,9)--(40,-1);
+  \draw[line width=2.6pt,rounded corners=2mm] (24,-18) rectangle (49,1);
+  \foreach \x/\y in {-13/18,13/48,36/30}{
+    \fill[white] (\x,\y) circle (7mm); \draw[line width=2.2pt] (\x,\y) circle (7mm);
+    \fill[ink] (\x,\y) circle (2.5mm);
+  }
+\end{scope}
+
+% First observation
+\begin{scope}[shift={(145,825)}]
+  \draw[fill=panelgray,line width=1.6pt,rounded corners=7mm] (-30,-38) rectangle (30,38);
+  \fill[midgray!45] (-18,-8) rectangle (2,12);
+  \fill[midgray!70] (-2,-1) rectangle (18,20);
+  \fill[darkgray!55] (10,10) rectangle (27,29);
+  \node[font=\rmfamily\itshape\bfseries\fontsize{25}{30}\selectfont] at (0,-27) {$o_t$};
+\end{scope}
+\draw[flow] (103,825)--(112,825);
+\draw[flow] (176,825)--(193,825);
+
+% Generate action chunk
+\draw[fill=panelgray,line width=1.8pt,rounded corners=7mm] (195,770) rectangle (390,891);
+\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{27}{31}\selectfont]
+  at (292.5,882) {Generate action chunk\\(refinement: $d$ steps)};
+\begin{scope}[shift={(229,811)}]
+  \foreach \x/\y in {0/3,5/18,8/7,12/25,15/12,18/31,21/5,23/20,27/14,30/28,33/9,36/23,39/4,42/17,45/30,48/12,50/25,54/7,57/19,59/29}{
+    \fill[darkgray] (\x,\y) circle (1.3mm);
+  }
+  \draw[line width=1pt] (0,3)--(18,31)--(36,23)--(57,19);
+  \draw[line width=1pt] (8,7)--(30,28)--(48,12);
+\end{scope}
+\draw[flow] (294,826)--(318,826);
+\node[font=\rmfamily\bfseries\fontsize{35}{38}\selectfont] at (307,826) {$\cdots$};
+\draw[line width=2.2pt] (333,799)--(367,835);
+\fill[white] (333,799) circle (4mm); \draw[line width=1.8pt] (333,799) circle (4mm);
+\fill[midgray] (367,835) circle (4mm); \draw[line width=1.8pt] (367,835) circle (4mm);
+\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.6pt]
+  (195,761)--(390,761);
+\node[anchor=north,font=\rmfamily\fontsize{25}{30}\selectfont] at (292.5,746)
+  {$K$ actions (predicted)};
+
+% Execute/discard action chunk
+\draw[flow] (391,825)--(413,825);
+\node[draw=ink,fill=panelgray,line width=1.4pt,rounded corners=5mm,
+  align=center,font=\rmfamily\bfseries\fontsize{27}{31}\selectfont]
+  at (517,884) {Execute $h$ actions\\(refresh after $h$)};
+\draw[thinflow] (517,862)--(500,844);
+\draw[fill=white,line width=1.5pt,rounded corners=5mm] (416,795) rectangle (682,847);
+\fill[softgray] (548,795) rectangle (682,847);
+\draw[line width=1.3pt] (548,795)--(548,847);
+\node[font=\rmfamily\itshape\fontsize{26}{31}\selectfont] at (482,822)
+  {$a_t\;\cdots\;a_{t+h-1}$};
+\node[font=\rmfamily\itshape\fontsize{26}{31}\selectfont,text=midgray] at (615,822)
+  {$a_{t+h}\;\cdots\;a_{t+K-1}$};
+\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.4pt]
+  (416,787)--(548,787);
+\draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.4pt]
+  (548,787)--(682,787);
+\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{23}{28}\selectfont]
+  at (482,772) {execute\\($h$ actions)};
+\node[anchor=north,align=center,font=\rmfamily\fontsize{23}{28}\selectfont,text=darkgray]
+  at (615,772) {discard\\($K-h$ actions)};
+
+% New observation and loop
+\draw[flow] (683,825)--(706,825);
+\begin{scope}[shift={(738,825)}]
+  \draw[fill=panelgray,line width=1.6pt,rounded corners=7mm] (-30,-38) rectangle (30,38);
+  \fill[midgray!45] (-18,-8) rectangle (2,12);
+  \fill[midgray!70] (-2,-1) rectangle (18,20);
+  \fill[darkgray!55] (10,10) rectangle (27,29);
+  \node[font=\rmfamily\itshape\bfseries\fontsize{25}{30}\selectfont] at (0,-27) {$o_{t+h}$};
+\end{scope}
+\draw[flow] (769,825)--(798,825);
+\node[font=\rmfamily\bfseries\fontsize{34}{38}\selectfont] at (813,825) {$\cdots$};
+\draw[dashed,line width=2.1pt,-Latex,rounded corners=8mm]
+  (738,864)--(738,955)--(603,955);
+\draw[dashed,line width=2.1pt,-Latex,rounded corners=8mm]
+  (321,955)--(216,955)--(216,892);
+
+% Variable key and experimental setup
+\fill[softgray,rounded corners=8mm] (28,611) rectangle (476,699);
+\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
+  at (50,657) {$K$: \textbf{chunk length}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(total predicted actions)}};
+\draw[line width=1.2pt] (180,624)--(180,686);
+\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
+  at (202,657) {$d$: \textbf{refinement}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(denoising steps)}};
+\draw[line width=1.2pt] (335,624)--(335,686);
+\node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
+  at (356,657) {$h$: \textbf{refresh}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(actions before replanning)}};
+
+\draw[line width=1.5pt] (492,610)--(492,701);
+\fill[panelgray,rounded corners=8mm] (503,611) rectangle (814,699);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont] at (520,677) {Setup (held-out)};
+\draw[line width=1.3pt] (520,650) ellipse (6mm and 2.5mm);
+\draw[line width=1.3pt] (514,650)--(514,637) (526,650)--(526,637);
+\draw[line width=1.3pt] (514,637) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
+\draw[line width=1pt] (514,643) arc[start angle=180,end angle=360,x radius=6mm,y radius=2.5mm];
+\node[anchor=west,body] at (534,644) {\textbf{SmolVLA} (frozen)};
+\node[anchor=west,body] at (665,644) {$K=50,\ d\in\{2,5\}$};
+\draw[line width=1.4pt,rounded corners=1mm] (513,613) rectangle (527,624);
+\draw[line width=1.4pt] (520,613)--(520,608) (515,608)--(525,608);
+\node[anchor=west,body] at (534,618) {\textbf{LIBERO} (simulation)};
+\node[anchor=west,body] at (665,618) {$h\in\{2,5\}$ \quad 8 tasks, 1,120 attempts};
+
+% Central research question
+\fill[softgray] (36,527) circle (25mm);
+\node[font=\rmfamily\bfseries\fontsize{52}{56}\selectfont] at (36,527) {?};
+\draw[line width=1.5pt] (76,492)--(76,561);
+\node[anchor=west,align=left,text width=720mm,font=\rmfamily\fontsize{31}{39}\selectfont]
+  at (96,527) {Under a fixed inference budget, should we allocate compute to additional denoising steps
+  (\textbf{refinement}) or to more frequent observation-conditioned replanning (\textbf{refresh})?};
+
+% Result card 1
+\draw[card] (10,242) rectangle (411,478);
+\fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont]
+  at (25,458) {Result 1: Fewer Denoising Steps Improve Success};
+
+\draw[line width=1.7pt] (72,278)--(72,414);
+\draw[line width=1.7pt] (72,278)--(260,278);
+\foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
+  \draw[line width=1pt] (66,\yy)--(72,\yy);
+  \node[anchor=east,font=\sffamily\fontsize{16}{19}\selectfont] at (63,\yy) {\lab};
+}
+\node[rotate=90,font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (30,346) {Success rate};
+\fill[darkgray] (98,278) rectangle (158,378);
+\fill[midgray] (176,278) rectangle (236,349);
+\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (128,382) {86.9\%};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (206,353) {76.3\%};
+\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (128,312) {139 /\\160};
+\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (206,312) {122 /\\160};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (128,270) {$d=2$};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (206,270) {$d=5$};
+\node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
+  font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (185,420) {$+10.6$ percentage points};
+\draw[thinflow,bend left=25] (153,393) to (203,387);
+
+\draw[line width=1.3pt] (270,264)--(270,422);
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+  minimum width=116mm,align=left] at (281,414) {Takeaway};
+\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{21}{27}\selectfont]
+  at (284,382) {Reducing denoising from 5 to 2 steps improves success by \textbf{10.6 pp} while using \textbf{5.9\% less} arithmetic per control step.};
+
+% Result card 2
+\draw[card] (430,242) rectangle (831,478);
+\fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{27}{33}\selectfont]
+  at (444,458) {Result 2: Less Frequent Refresh Is Much Cheaper};
+
+\draw[line width=1.7pt] (492,278)--(492,414);
+\draw[line width=1.7pt] (492,278)--(680,278);
+\foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
+  \draw[line width=1pt] (486,\yy)--(492,\yy);
+  \node[anchor=east,font=\sffamily\fontsize{16}{19}\selectfont] at (483,\yy) {\lab};
+}
+\node[rotate=90,font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (450,346) {Success rate};
+\fill[darkgray] (518,278) rectangle (578,378);
+\fill[midgray] (596,278) rectangle (656,376);
+\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (548,382) {86.9\%};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (626,380) {86.3\%};
+\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (548,312) {139 /\\160};
+\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (626,312) {138 /\\160};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (548,270) {$h=2$};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (626,270) {$h=5$};
+\node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
+  font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (605,420) {$+0.6$ percentage points};
+\draw[thinflow,bend left=25] (573,393) to (623,390);
+
+\draw[line width=1.3pt] (690,264)--(690,422);
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+  minimum width=116mm,align=left] at (701,414) {Takeaway};
+\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{20}{26}\selectfont]
+  at (704,382) {At $d=2$, executing 5 actions rather than 2 before replanning gives similar observed success (138/160 vs. 139/160) with \textbf{60.7\% less} arithmetic per attempt.};
+
+% Bottom cards
+\draw[card] (10,34) rectangle (337,218);
+\node[draw=ink,circle,line width=2.2pt,minimum size=30mm,font=\sffamily\bfseries\fontsize{30}{34}\selectfont]
+  at (48,184) {$\nearrow$};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (74,184) {Why This Matters};
+\draw[line width=1.4pt] (48,62)--(48,153);
+\node[anchor=west,align=left,text width=250mm,font=\rmfamily\fontsize{25}{33}\selectfont]
+  at (65,105) {Inference compute is a control decision. For this checkpoint, fewer denoising steps improved success; executing more of each predicted chunk cut arithmetic sharply with similar observed success.};
+
+\draw[card] (349,34) rectangle (831,218);
+\draw[line width=2.2pt,rounded corners=2mm] (369,167)--(386,202)--(403,167)--cycle;
+\node[font=\sffamily\bfseries\fontsize{27}{31}\selectfont] at (386,178) {!};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (416,184) {Interpretation \& Limitations};
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+  minimum width=192mm,align=left] at (365,150) {Takeaways};
+\node[anchor=north west,align=left,text width=205mm,font=\sffamily\fontsize{20}{27}\selectfont]
+  at (367,119) {$\blacksquare$\; Fewer denoising steps improved success at $h=2$.\\[3mm]
+  $\blacksquare$\; At $d=2$, longer execution was far cheaper with similar observed success.};
+\draw[line width=1.3pt] (589,56)--(589,150);
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+  minimum width=206mm,align=left] at (606,150) {Limitations};
+\node[anchor=north west,align=left,text width=207mm,font=\sffamily\fontsize{19}{26}\selectfont]
+  at (608,119) {$\blacksquare$\; One SmolVLA checkpoint; synchronous simulation.\\[3mm]
+  $\blacksquare$\; Prefix comparison is descriptive; equivalence is not established.\\[3mm]
+  $\blacksquare$\; Arithmetic does not establish physical-robot latency.};
+
+\end{scope}
 \end{tikzpicture}
-\end{center}
-\vspace{8mm}
-\begin{center}
-\begin{minipage}{748mm}
-\tagline{The held-out result}\par\vspace{6mm}
-{\fontsize{56}{66}\selectfont\bfseries FEWER DENOISING STEPS. MORE SUCCESS.}\par
-\vspace{9mm}
-{\fontsize{34}{43}\selectfont\color{muted} Same two-action execution prefix; eight Goal and Object tasks excluded from configuration selection.}\par
-\vspace{14mm}
-\begin{tikzpicture}
-  \fill[white,draw=black,line width=2pt,rounded corners=8mm] (1mm,0) rectangle (747mm,210mm);
-  \node[anchor=west,font=\fontsize{36}{44}\selectfont\bfseries,text=navy] at (22mm,169mm) {2 denoising steps};
-  \fill[black,rounded corners=5mm] (22mm,112mm) rectangle (485mm,154mm);
-  \node[anchor=west,font=\fontsize{38}{46}\selectfont\bfseries,text=white] at (40mm,133mm) {139 / 160 successes};
-  \node[anchor=west,font=\fontsize{36}{44}\selectfont\bfseries,text=navy] at (22mm,83mm) {5 denoising steps};
-  \fill[black!38,rounded corners=5mm] (22mm,26mm) rectangle (428mm,68mm);
-  \node[anchor=west,font=\fontsize{38}{46}\selectfont\bfseries,text=white] at (40mm,47mm) {122 / 160 successes};
-  \node[anchor=center,align=center,text=black,font=\fontsize{76}{80}\selectfont\bfseries] at (617mm,132mm) {+10.6\\pp};
-  \node[anchor=center,align=center,text=muted,font=\fontsize{34}{42}\selectfont] at (617mm,46mm) {descriptive 95\% interval\\+4.4 to +16.9 pp};
-\end{tikzpicture}
-\end{minipage}
-\end{center}
-\vspace{10mm}
-\begin{center}
-\begin{minipage}{748mm}
-\metric{$-5.9\%$}{arithmetic per control step\\with 2 instead of 5 denoising steps}{blue}\hfill
-\metric{$82.1\%$}{of generation arithmetic is\\independent of denoising count}{orange}\hfill
-\metric{$-60.7\%$}{arithmetic per attempt for\\$h=5$ versus $h=2$, at $d=2$}{blue}
-\end{minipage}
-\end{center}
-\vspace{10mm}
-\begin{center}
-\begin{minipage}{748mm}
-\begin{tikzpicture}
-  \fill[white,draw=black,line width=2pt,rounded corners=8mm] (1mm,0) rectangle (747mm,145mm);
-  \node[anchor=west,text=black,font=\fontsize{36}{44}\selectfont\bfseries] at (22mm,112mm) {HOW WE TESTED IT};
-  \node[anchor=west,text=black,align=left,text width=220mm,font=\fontsize{34}{43}\selectfont] at (22mm,57mm) {12 configurations\\4 Spatial tasks\\480 discovery attempts};
-  \draw[black,line width=2pt] (264mm,18mm)--(264mm,125mm);
-  \node[anchor=west,text=black,align=left,text width=215mm,font=\fontsize{34}{43}\selectfont] at (292mm,57mm) {7 frozen configurations\\8 held-out tasks\\1,120 confirmation attempts};
-  \draw[black,line width=2pt] (533mm,18mm)--(533mm,125mm);
-  \node[anchor=west,text=black,align=left,text width=185mm,font=\fontsize{32}{40}\selectfont\bfseries] at (558mm,63mm) {Frozen SmolVLA\\Synchronous LIBERO\\Paired evaluation};
-\end{tikzpicture}
-\end{minipage}
-\end{center}
-\vspace{10mm}
-\begin{center}
-\begin{minipage}{748mm}
-\begin{minipage}[t]{482mm}
-{\fontsize{36}{44}\selectfont\bfseries\color{orange}\MakeUppercase{The idea to remember}}\par\vspace{6mm}
-{\fontsize{48}{58}\selectfont\bfseries Better robot inference is not only about refining longer. It is also about deciding when to look again.}\par\vspace{7mm}
-{\fontsize{34}{43}\selectfont Evaluate refinement and replanning jointly through closed-loop success and compute.}
-\end{minipage}\hfill
-\begin{minipage}[t]{235mm}
-{\fontsize{32}{40}\selectfont\bfseries\color{blue} INTERPRET WITH CARE}\par\vspace{5mm}
-{\fontsize{29}{37}\selectfont Similar observed success for $h=2$ and $h=5$ does not establish equivalent quality. Results cover one checkpoint and synchronous simulation.}\par
-\vspace{9mm}
-{\fontsize{27}{34}\selectfont\bfseries\color{navy}\href{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}{github.com/amtellezfernandez/\\refinement-refresh-robot-policies}}
-\end{minipage}
-\end{minipage}
-\end{center}
-\vfill
-\noindent\rule{\paperwidth}{3mm}
 \end{document}
