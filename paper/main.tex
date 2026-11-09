@@ -21,33 +21,22 @@ Compute Allocation for Closed-Loop Robot Policies}
 \maketitle
 
 \begin{abstract}
-Chunked robot policies expose two distinct uses of inference compute:
-refining the current action prediction and obtaining a new prediction from a
-fresher observation. We study how to allocate compute between these
-operations in a frozen SmolVLA policy. We formalize deployment compute rate as
-$b(h,d)=F_{\mathrm{gen}}(d)/h$, where $d$ controls denoising refinement and $h$
-is the number of predicted actions executed before replanning. Full-generation
-profiling reveals a substantial denoising-independent cost per generation:
-82.1\% of native counted arithmetic is independent of denoising, so reducing
-refinement alone cannot proportionally reduce deployment compute and tighter
-budgets can change which refresh schedules are feasible. We evaluate this
-trade-off with a paired 480-attempt, 12-configuration LIBERO discovery study
-and a completed 1,120-attempt confirmation study on eight tasks excluded from
-selection. At the primary two-action prefix,
-reducing denoising from five steps to two increases success from 122/160 to
-139/160, a paired difference of 10.6 percentage points with a task-conditional,
-descriptive 95\% interval of 4.4--16.9 points, while reducing reference-calibrated
-arithmetic by 5.9\% per control step. At two denoising steps, a five-action
-prefix records 138/160 successes while using 60.7\% less arithmetic per attempt
-than the two-action prefix, although the quality difference remains unresolved.
-A simple cost-aware rule matches the fitted response model's
-choices at three compute ceilings, so fitting provides no demonstrated
-selection advantage. As a worked case study, the experiment demonstrates a
-general procedure for evaluating refinement and refresh jointly under explicit
-compute constraints. The checkpoint-specific results show that more inference
-refinement need not improve closed-loop control and narrow the broader question:
-when is the fixed cost of obtaining a fresh prediction worth paying, and how
-much refinement should that prediction receive?
+Chunked robot policies allocate inference compute between refining a predicted
+action chunk and replanning from a fresh observation. We present a procedure for
+studying this trade-off: calibrate full-generation cost, separate configuration
+discovery from confirmation, and evaluate success and expenditure under explicit
+compute constraints. We apply it to one frozen SmolVLA checkpoint in synchronous
+LIBERO using 480 discovery attempts and 1,120 confirmation attempts on held-out
+tasks. At a fixed two-action prefix, reducing denoising from five to two steps
+increases success from 122/160 to 139/160 (+10.6 percentage points; descriptive
+task-conditional 95\% interval: 4.4--16.9) while reducing arithmetic per control
+step by 5.9\%. At two denoising steps, a five-action prefix records 138/160
+successes with 60.7\% less arithmetic per attempt than a two-action prefix,
+although equivalent quality is not established. Because 82.1\% of native
+generation arithmetic is denoising-independent, refinement and refresh should be
+evaluated jointly. This case study illustrates a reproducible way to analyze
+closed-loop inference allocation; its configuration findings remain
+checkpoint-specific.
 \end{abstract}
 
 \section{Introduction}

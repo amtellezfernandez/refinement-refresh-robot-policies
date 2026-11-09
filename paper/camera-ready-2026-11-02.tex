@@ -23,27 +23,22 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Robot policies must continually adapt their actions to changing environments,
-but inference is computationally expensive. Chunked policies therefore face a
-trade-off: spend more computation refining a predicted action sequence, or
-replan sooner using a fresher observation. We investigate whether additional
-refinement justifies its cost using one frozen SmolVLA checkpoint in synchronous
-LIBERO simulation. We evaluate 12 configurations on four Spatial discovery
-tasks (480 attempts), then test seven frozen configurations on eight Goal and
-Object tasks excluded from selection (1,120 attempts). At a fixed two-action
-execution prefix, reducing denoising from five to two steps increases success
-from 122/160 to 139/160 (+10.6 percentage points; descriptive task-conditional
-95\% interval: 4.4--16.9), while reducing reference-calibrated arithmetic per
-control step by 5.9\%. Savings are limited because 82.1\% of native generation
-arithmetic is independent of denoising. At two denoising steps, executing five
-rather than two actions before replanning yields 138/160 versus 139/160
-successes with 60.7\% less arithmetic per attempt, although equivalent quality
-is not established. A simple cost-aware rule matches the fitted response
-model's choices at three compute budgets, with no demonstrated advantage from
-fitting. As a worked case study, the experiment demonstrates a general procedure
-for evaluating refinement and refresh jointly under explicit compute constraints.
-The checkpoint-specific findings show that additional refinement need not
-improve closed-loop success.
+Chunked robot policies allocate inference compute between refining a predicted
+action chunk and replanning from a fresh observation. We present a procedure for
+studying this trade-off: calibrate full-generation cost, separate configuration
+discovery from confirmation, and evaluate success and expenditure under explicit
+compute constraints. We apply it to one frozen SmolVLA checkpoint in synchronous
+LIBERO using 480 discovery attempts and 1,120 confirmation attempts on held-out
+tasks. At a fixed two-action prefix, reducing denoising from five to two steps
+increases success from 122/160 to 139/160 (+10.6 percentage points; descriptive
+task-conditional 95\% interval: 4.4--16.9) while reducing arithmetic per control
+step by 5.9\%. At two denoising steps, a five-action prefix records 138/160
+successes with 60.7\% less arithmetic per attempt than a two-action prefix,
+although equivalent quality is not established. Because 82.1\% of native
+generation arithmetic is denoising-independent, refinement and refresh should be
+evaluated jointly. This case study illustrates a reproducible way to analyze
+closed-loop inference allocation; its configuration findings remain
+checkpoint-specific.
 \end{abstract}
 
 \section{Introduction}
