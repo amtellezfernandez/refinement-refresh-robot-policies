@@ -31,7 +31,7 @@
 \node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{86}{90}\selectfont]
   at (420.5,1176) {Refinement vs. Refresh};
 \node[anchor=north,align=center,font=\rmfamily\fontsize{48}{54}\selectfont]
-  at (420.5,1099) {Compute Allocation for Closed-Loop Robot Policies};
+  at (420.5,1099) {A Reproducible Evaluation Protocol for Closed-Loop Robot Policies};
 \draw[line width=1.6pt] (32,1057)--(168,1057);
 \draw[line width=1.6pt] (673,1057)--(809,1057);
 \node[anchor=center,align=center,font=\sffamily\fontsize{28}{34}\selectfont]
@@ -41,49 +41,65 @@
 \draw[card] (12,675) rectangle (829,1028);
 \fill[softgray,rounded corners=8mm] (12,982) rectangle (286,1028);
 \fill[softgray] (278,982)--(329,1028)--(278,1028)--cycle;
-\node[anchor=west,heading] at (30,1004) {Chunked Closed-Loop Policy};
+\node[anchor=west,heading] at (30,1004) {Closed-Loop Controls: Refinement and Refresh};
 
 % Supplied closed-loop execution diagram
 \node[anchor=center] at (420.5,850)
   {\includegraphics[width=780mm]{paper/figures/closed_loop_policy_diagram.png}};
 
-% Central research question
-\fill[softgray] (36,596) circle (25mm);
-\node[font=\rmfamily\bfseries\fontsize{52}{56}\selectfont] at (36,596) {?};
-\draw[line width=1.5pt] (76,561)--(76,630);
-\node[anchor=west,align=left,text width=720mm,font=\rmfamily\fontsize{31}{39}\selectfont]
-  at (96,596) {Under a fixed inference budget, should we allocate compute to additional denoising steps
-  (\textbf{refinement}) or to more frequent observation-conditioned replanning (\textbf{refresh})?};
+% Reproducible protocol
+\draw[card] (10,535) rectangle (831,660);
+\fill[softgray,rounded corners=8mm] (10,620) rectangle (831,660);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont]
+  at (28,640) {Reproducible Protocol: Separate Design, Measurement, and Evidence Status};
+\foreach \x/\title/\body in {
+  28/{1. Define}/{Fix the checkpoint and all paired rollout conditions.},
+  230/{2. Account}/{Measure the full cost of each prediction and episode.},
+  432/{3. Freeze}/{Freeze primary comparisons before held-out evaluation.},
+  634/{4. Interpret}/{Label later contrasts descriptive and limit claims.}}
+  {
+    \fill[panelgray,rounded corners=5mm] (\x,550) rectangle +(175,58);
+    \node[anchor=north west,font=\sffamily\bfseries\fontsize{29}{33}\selectfont]
+      at (\x+10,600) {\title};
+    \node[anchor=north west,align=left,text width=155mm,font=\sffamily\fontsize{24}{30}\selectfont]
+      at (\x+10,579) {\body};
+  }
+\draw[thinflow] (205,579)--(224,579);
+\draw[thinflow] (407,579)--(426,579);
+\draw[thinflow] (609,579)--(628,579);
 
 % Result card 1
-\draw[card] (10,297) rectangle (411,533);
-\fill[softgray,rounded corners=8mm] (10,495) rectangle (411,533);
+\draw[card] (10,285) rectangle (411,520);
+\fill[softgray,rounded corners=8mm] (10,482) rectangle (411,520);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,513) {Why the Trade-Off Exists};
-\node[anchor=center] at (210.5,395)
+  at (25,500) {Complete Compute Accounting};
+\node[anchor=center] at (210.5,382)
   {\includegraphics[width=390mm]{paper/generated/cost_decomposition.pdf}};
 
 % Result card 2
-\draw[card] (430,297) rectangle (831,533);
-\fill[softgray,rounded corners=8mm] (430,495) rectangle (831,533);
+\draw[card] (430,285) rectangle (831,520);
+\fill[softgray,rounded corners=8mm] (430,482) rectangle (831,520);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (444,513) {Held-Out Success and Compute};
-\node[anchor=center] at (630.5,395)
+  at (444,500) {Worked Example: Frozen SmolVLA};
+\node[anchor=center] at (630.5,382)
   {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff.pdf}};
 
-% Compact interpretation
-\draw[card] (10,24) rectangle (831,275);
-\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,245)
-  {A Recipe for Closed-Loop Compute Studies};
-\draw[line width=1.4pt] (420.5,48)--(420.5,219);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,209)
-  {Evaluate allocations within each model};
-\node[anchor=north west,align=left,text width=360mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,194) {1. Define refinement and refresh controls.\\2. Measure the complete cost of a fresh prediction.\\3. Freeze primary comparisons before held-out evaluation.\\4. Report success and expenditure together.};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,209)
-  {Interpretation boundary};
-\node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (445,194) {SmolVLA is the worked example, not a universal allocation rule. Arithmetic is not deployment latency, and similar observed success does not establish equivalent quality.};
+% Evidence status and interpretation
+\draw[card] (10,24) rectangle (831,265);
+\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,236)
+  {Evidence Status: What the SmolVLA Example Supports};
+\draw[line width=1.4pt] (420.5,76)--(420.5,210);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,198)
+  {Frozen before confirmation};
+\node[anchor=north west,align=left,text width=355mm,font=\rmfamily\fontsize{27}{34}\selectfont]
+  at (30,181) {At fixed refresh frequency, reducing denoising from five to two steps increased success from 122/160 to 139/160. This is the prespecified primary comparison.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,198)
+  {Added later: descriptive only};
+\node[anchor=north west,align=left,text width=355mm,font=\rmfamily\fontsize{27}{34}\selectfont]
+  at (445,181) {Refreshing after five rather than two actions produced 138/160 versus 139/160 successes with 60.7\% lower arithmetic per attempt. Similar observed success does not prove equal quality, and arithmetic is not deployment latency.};
+\fill[panelgray,rounded corners=5mm] (28,43) rectangle (813,78);
+\node[anchor=center,align=center,text width=750mm,font=\rmfamily\bfseries\fontsize{26}{32}\selectfont]
+  at (420.5,60) {SmolVLA is a worked example, not a universal allocation rule. Report success and complete computational expenditure together.\\Keep confirmatory and descriptive evidence visibly separate.};
 
 \end{scope}
 \end{tikzpicture}

@@ -759,7 +759,7 @@ def success_compute_figure(data, path):
         ylim=(-0.2, 2.8),
         xticks=[-10, 0, 10, 20],
         yticks=[1.25, 2.2],
-        yticklabels=["Refresh less often", "Less refinement"],
+        yticklabels=["Later descriptive\nrefresh", "Frozen\nrefinement test"],
     )
     effects.spines[["top", "right", "left"]].set_visible(False)
     effects.tick_params(axis="y", length=0)
