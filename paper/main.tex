@@ -42,10 +42,12 @@ prefix records 138/160 successes while using 60.7\% less arithmetic per attempt
 than the two-action prefix, although the quality difference remains unresolved.
 A simple cost-aware rule matches the fitted response model's
 choices at three compute ceilings, so fitting provides no demonstrated
-selection advantage. These results show that more inference refinement need not
-improve closed-loop control and narrow the broader allocation question: when
-is the fixed cost of obtaining a fresh prediction worth paying, and how much
-refinement should that prediction receive?
+selection advantage. As a worked case study, the experiment demonstrates a
+general procedure for evaluating refinement and refresh jointly under explicit
+compute constraints. The checkpoint-specific results show that more inference
+refinement need not improve closed-loop control and narrow the broader question:
+when is the fixed cost of obtaining a fresh prediction worth paying, and how
+much refinement should that prediction receive?
 \end{abstract}
 
 \section{Introduction}
@@ -86,8 +88,9 @@ from fitting.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a refinement--refresh allocation formulation and full-generation
-    calibration exposing the fixed cost of obtaining a fresh prediction;
+    \item a reusable refinement--refresh evaluation procedure combining
+    full-generation calibration, explicit compute ceilings, frozen comparisons,
+    and closed-loop outcome measurement;
     \item a paired twelve-configuration study reporting both nominal compute
     rate and realized episode expenditure; and
     \item a completed task-transfer evaluation separating frozen refinement
@@ -418,15 +421,18 @@ but does not determine the quality ranking on new tasks.
 \clearpage
 \section{Discussion and Conclusion}
 
-Full-generation cost determines which refresh schedules are feasible, while
-closed-loop outcomes determine which feasible expenditure is useful. The fixed
-cost of a fresh prediction makes refinement reduction alone insufficient at
-tight arithmetic ceilings. Within those constraints, the frozen primary result
-favors less denoising at a two-action prefix. The descriptive prefix comparisons
-identify a much cheaper five-action setting whose quality difference remains
-unresolved. These findings constrain the allocation question without identifying
-a universal optimum, and the fitted selector adds no demonstrated advantage
-over the simple rule.
+This study provides a worked methodology for evaluating how a chunked robot
+policy allocates inference compute between refinement and observation-conditioned
+refresh. The procedure separates configuration discovery from confirmation,
+holds the checkpoint and predicted chunk length fixed, measures full-generation
+arithmetic, and evaluates success and expenditure together under explicit compute
+ceilings. Applied to SmolVLA, it shows that full-generation cost determines which
+refresh schedules are feasible, while closed-loop outcomes determine which
+feasible expenditure is useful. The checkpoint-specific results favor less
+denoising at a two-action prefix and identify a much cheaper five-action candidate
+whose quality difference remains unresolved. They illustrate the value of the
+evaluation procedure rather than establishing a universal setting. The fitted
+selector adds no demonstrated advantage over the simple rule.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
@@ -454,9 +460,12 @@ the input instrumentation and checking action positions can further separate
 the mechanisms behind prefix effects.
 A new, predeclared quality-preservation test for the cheaper $(5,2)$ setting
 and replication on another policy are needed to assess whether its observed
-cost advantage supports deployment. The broader objective is to determine when
-the fixed cost of a fresh prediction is worth paying, and how much refinement
-that prediction needs.
+cost advantage supports deployment. More broadly, the same study design can be
+applied within other policies and simulator or robot stacks: define the refinement
+and refresh controls, calibrate their complete inference cost, freeze the
+comparisons, and evaluate success and expenditure jointly. This supports the
+broader objective of determining when the fixed cost of a fresh prediction is
+worth paying and how much refinement that prediction needs.
 
 \clearpage
 \bibliographystyle{unsrtnat}

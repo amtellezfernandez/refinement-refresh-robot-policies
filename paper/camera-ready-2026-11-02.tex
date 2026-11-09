@@ -40,9 +40,10 @@ rather than two actions before replanning yields 138/160 versus 139/160
 successes with 60.7\% less arithmetic per attempt, although equivalent quality
 is not established. A simple cost-aware rule matches the fitted response
 model's choices at three compute budgets, with no demonstrated advantage from
-fitting. These findings show that additional refinement need not improve
-closed-loop success and motivate evaluating refinement and replanning jointly
-under explicit compute constraints.
+fitting. As a worked case study, the experiment demonstrates a general procedure
+for evaluating refinement and refresh jointly under explicit compute constraints.
+The checkpoint-specific findings show that additional refinement need not
+improve closed-loop success.
 \end{abstract}
 
 \section{Introduction}
@@ -83,8 +84,9 @@ from fitting.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a refinement--refresh allocation formulation and full-generation
-    calibration exposing the fixed cost of obtaining a fresh prediction;
+    \item a reusable refinement--refresh evaluation procedure combining
+    full-generation calibration, explicit compute ceilings, frozen comparisons,
+    and closed-loop outcome measurement;
     \item a paired twelve-configuration study reporting both nominal compute
     rate and realized episode expenditure; and
     \item a completed task-transfer evaluation separating frozen refinement
@@ -147,6 +149,22 @@ For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target i
 A configuration need not exhaust the ceiling. This is a deployment compute-rate
 constraint for a fixed checkpoint, rather than a training-plus-deployment
 objective.
+
+Figure~\ref{fig:closed-loop-policy} summarizes the execution loop. Each policy
+call predicts a fixed-length chunk, executes only the first $h$ actions, discards
+the remainder, and refreshes from the resulting observation. The denoising
+count $d$ controls refinement inside the policy call, while $h$ controls how
+frequently the policy receives a new observation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
+\caption{Synchronous chunked closed-loop execution. A policy call predicts
+$K$ actions after $d$ denoising steps; only the first $h$ actions are executed,
+with the remaining $K-h$ actions discarded before the next observation and
+replanning step. In the experiments, $K=50$.}
+\label{fig:closed-loop-policy}
+\end{figure}
 
 We distinguish this rate from total arithmetic per attempted episode. If attempt
 $e$ executes $T_e$ actions, its generated-chunk expenditure is
@@ -404,10 +422,12 @@ but does not determine the quality ranking on new tasks.
 \clearpage
 \section{Discussion and Conclusion}
 
-Chunked policies allocate inference compute between refining a predicted action
-sequence and replanning from a newer observation. For the frozen SmolVLA
-checkpoint studied here, the separate-task comparison shows that additional
-refinement need not improve closed-loop success. At a fixed two-action execution
+This study provides a worked methodology for evaluating how a chunked robot
+policy allocates inference compute between refinement and observation-conditioned
+refresh. The procedure separates configuration discovery from confirmation,
+holds the checkpoint and predicted chunk length fixed, measures full-generation
+arithmetic, and evaluates success and expenditure together under explicit compute
+ceilings. SmolVLA serves as the case study: at a fixed two-action execution
 prefix, reducing denoising from five to two steps raises success from 122/160 to
 139/160 while reducing reference-calibrated arithmetic per control step by
 5.9\%. This primary comparison follows a 480-attempt discovery study and is part
@@ -420,9 +440,10 @@ denoising. At two denoising steps, executing five rather than two actions before
 replanning yields 138/160 versus 139/160 successes with 60.7\% less arithmetic
 per attempt, but equivalent quality is not established. A simple cost-aware rule
 matches the fitted response model's choices at three compute budgets, so fitting
-has no demonstrated decision-making advantage. Together, the results support
-evaluating refinement and replanning jointly through closed-loop success and
-explicit compute constraints; they do not identify a universal allocation.
+has no demonstrated decision-making advantage. These checkpoint-specific
+results illustrate the value of evaluating refinement and replanning jointly
+through closed-loop success and explicit compute constraints; they do not
+identify a universal allocation.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
@@ -447,10 +468,13 @@ A controlled stale-input diagnostic is needed to separate observation freshness
 from the action-position effects introduced by changing the executed prefix. A
 predeclared quality-preservation test should evaluate the cheaper $(5,2)$
 setting, and independent outcome replay should test the retained primary
-trajectories in a separate, version-matched simulator. Replication across other
-checkpoints, policy architectures, benchmark families, and asynchronous or
-physical-robot execution is required to determine when the fixed cost of a
-fresh prediction is worth paying and how much refinement that prediction needs.
+trajectories in a separate, version-matched simulator. The same study design can
+then be applied within other policies and execution stacks: define the refinement
+and refresh controls, calibrate complete inference cost, freeze the comparisons,
+and evaluate success and expenditure jointly. Replication across checkpoints,
+policy architectures, benchmark families, and asynchronous or physical-robot
+execution is required to determine when the fixed cost of a fresh prediction is
+worth paying and how much refinement that prediction needs.
 
 \clearpage
 \bibliographystyle{unsrtnat}

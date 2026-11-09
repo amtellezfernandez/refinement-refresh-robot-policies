@@ -132,11 +132,11 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,157)
   {Takeaway};
 \node[anchor=north west,align=left,text width=370mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (30,143) {The experiment shows that closed-loop compute should be allocated across two coupled choices: how much to refine an action chunk and when to refresh it from a new observation. Evaluating both choices together exposes useful success--compute trade-offs.};
+  at (30,143) {RoboPAD is a worked example of how to study closed-loop inference allocation: define refinement and refresh controls, measure complete inference cost, freeze comparisons, and evaluate success and expenditure together.};
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (450,157)
   {Interpretation and limits};
 \node[anchor=north west,align=left,text width=350mm,font=\rmfamily\fontsize{25}{32}\selectfont]
-  at (450,143) {The evidence supports a joint evaluation framework, not a universal setting. The study uses one frozen checkpoint in synchronous LIBERO; observed similarity does not establish equivalence, arithmetic is not deployment latency, and transfer remains untested.};
+  at (450,143) {SmolVLA provides the case study, not a universal allocation rule. The framework transfers to other policies, but each policy requires within-model confirmation; arithmetic is not deployment latency, and equivalent quality is not established.};
 
 \end{scope}
 \end{tikzpicture}
