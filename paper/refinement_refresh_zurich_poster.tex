@@ -34,7 +34,7 @@
   at (420.5,1099) {Compute Allocation for Closed-Loop Robot Policies};
 \draw[line width=1.6pt] (32,1057)--(168,1057);
 \draw[line width=1.6pt] (673,1057)--(809,1057);
-\node[anchor=center,align=center,font=\sffamily\fontsize{25}{31}\selectfont]
+\node[anchor=center,align=center,font=\sffamily\fontsize{28}{34}\selectfont]
   at (420.5,1057) {Alba Mar\'ia T\'ellez Fern\'andez, MAAT Institute (alba.tellez@maatinstitute.com)};
 
 % Closed-loop policy panel
@@ -109,9 +109,9 @@
   (416,787)--(548,787);
 \draw[decorate,decoration={brace,mirror,amplitude=4mm},line width=1.4pt]
   (548,787)--(682,787);
-\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{23}{28}\selectfont]
+\node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont]
   at (482,772) {execute\\($h$ actions)};
-\node[anchor=north,align=center,font=\rmfamily\fontsize{23}{28}\selectfont,text=darkgray]
+\node[anchor=north,align=center,font=\rmfamily\fontsize{26}{31}\selectfont,text=darkgray]
   at (615,772) {discard\\($K-h$ actions)};
 
 % New observation and loop
@@ -133,13 +133,13 @@
 % Variable key and experimental setup
 \fill[softgray,rounded corners=8mm] (28,611) rectangle (476,699);
 \node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (50,657) {$K$: \textbf{chunk length}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(total predicted actions)}};
+  at (50,657) {$K$: \textbf{chunk length}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(total predicted actions)}};
 \draw[line width=1.2pt] (180,624)--(180,686);
 \node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (202,657) {$d$: \textbf{refinement}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(denoising steps)}};
+  at (202,657) {$d$: \textbf{refinement}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(denoising steps)}};
 \draw[line width=1.2pt] (335,624)--(335,686);
 \node[anchor=west,align=left,font=\rmfamily\fontsize{25}{31}\selectfont]
-  at (356,657) {$h$: \textbf{refresh}\\[-1mm]{\sffamily\fontsize{19}{24}\selectfont(actions before replanning)}};
+  at (356,657) {$h$: \textbf{refresh}\\[-1mm]{\sffamily\fontsize{23}{28}\selectfont(actions before replanning)}};
 
 \draw[line width=1.5pt] (492,610)--(492,701);
 \fill[panelgray,rounded corners=8mm] (503,611) rectangle (814,699);
@@ -166,64 +166,64 @@
 % Result card 1
 \draw[card] (10,242) rectangle (411,478);
 \fill[softgray,rounded corners=8mm] (10,440) rectangle (411,478);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{28}{33}\selectfont]
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
   at (25,458) {Result 1: Fewer Denoising Steps Improve Success};
 
 \draw[line width=1.7pt] (72,278)--(72,414);
 \draw[line width=1.7pt] (72,278)--(260,278);
 \foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
   \draw[line width=1pt] (66,\yy)--(72,\yy);
-  \node[anchor=east,font=\sffamily\fontsize{16}{19}\selectfont] at (63,\yy) {\lab};
+  \node[anchor=east,font=\sffamily\fontsize{22}{26}\selectfont] at (63,\yy) {\lab};
 }
-\node[rotate=90,font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (30,346) {Success rate};
+\node[rotate=90,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (30,346) {Success rate};
 \fill[darkgray] (98,278) rectangle (158,378);
 \fill[midgray] (176,278) rectangle (236,349);
-\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (128,382) {86.9\%};
-\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (206,353) {76.3\%};
-\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (128,312) {139 /\\160};
-\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (206,312) {122 /\\160};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (128,270) {$d=2$};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (206,270) {$d=5$};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (128,382) {86.9\%};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (206,353) {76.3\%};
+\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (128,312) {139 /\\160};
+\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (206,312) {122 /\\160};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (128,270) {$d=2$};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (206,270) {$d=5$};
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (185,420) {$+10.6$ percentage points};
+  font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (185,420) {$+10.6$ percentage points};
 \draw[thinflow,bend left=25] (153,393) to (203,387);
 
 \draw[line width=1.3pt] (270,264)--(270,422);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=116mm,align=left] at (281,414) {Takeaway};
-\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{21}{27}\selectfont]
-  at (284,382) {Reducing denoising from 5 to 2 steps improves success by \textbf{10.6 pp} while using \textbf{5.9\% less} arithmetic per control step.};
+\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
+  at (284,378) {At $h=2$, reducing denoising from 5 to 2 steps raises success by \textbf{10.6 pp} and uses \textbf{5.9\% less} arithmetic per control step.};
 
 % Result card 2
 \draw[card] (430,242) rectangle (831,478);
 \fill[softgray,rounded corners=8mm] (430,440) rectangle (831,478);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{27}{33}\selectfont]
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
   at (444,458) {Result 2: Less Frequent Refresh Is Much Cheaper};
 
 \draw[line width=1.7pt] (492,278)--(492,414);
 \draw[line width=1.7pt] (492,278)--(680,278);
 \foreach \yy/\lab in {278/0.5,305/0.6,332/0.7,359/0.8,386/0.9,413/1.0}{
   \draw[line width=1pt] (486,\yy)--(492,\yy);
-  \node[anchor=east,font=\sffamily\fontsize{16}{19}\selectfont] at (483,\yy) {\lab};
+  \node[anchor=east,font=\sffamily\fontsize{22}{26}\selectfont] at (483,\yy) {\lab};
 }
-\node[rotate=90,font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (450,346) {Success rate};
+\node[rotate=90,font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (450,346) {Success rate};
 \fill[darkgray] (518,278) rectangle (578,378);
 \fill[midgray] (596,278) rectangle (656,376);
-\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (548,382) {86.9\%};
-\node[anchor=south,font=\sffamily\bfseries\fontsize{23}{27}\selectfont] at (626,380) {86.3\%};
-\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (548,312) {139 /\\160};
-\node[align=center,font=\sffamily\fontsize{20}{24}\selectfont,text=white] at (626,312) {138 /\\160};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (548,270) {$h=2$};
-\node[anchor=north,font=\rmfamily\itshape\fontsize{22}{26}\selectfont] at (626,270) {$h=5$};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (548,382) {86.9\%};
+\node[anchor=south,font=\sffamily\bfseries\fontsize{28}{32}\selectfont] at (626,380) {86.3\%};
+\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (548,312) {139 /\\160};
+\node[align=center,font=\sffamily\fontsize{26}{30}\selectfont,text=white] at (626,312) {138 /\\160};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (548,270) {$h=2$};
+\node[anchor=north,font=\rmfamily\itshape\fontsize{26}{30}\selectfont] at (626,270) {$h=5$};
 \node[draw=ink,fill=white,line width=1.2pt,rounded corners=4mm,
-  font=\sffamily\bfseries\fontsize{18}{22}\selectfont] at (605,420) {$+0.6$ percentage points};
+  font=\sffamily\bfseries\fontsize{24}{28}\selectfont] at (605,420) {$+0.6$ percentage points};
 \draw[thinflow,bend left=25] (573,393) to (623,390);
 
 \draw[line width=1.3pt] (690,264)--(690,422);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=116mm,align=left] at (701,414) {Takeaway};
-\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{20}{26}\selectfont]
-  at (704,382) {At $d=2$, executing 5 actions rather than 2 before replanning gives similar observed success (138/160 vs. 139/160) with \textbf{60.7\% less} arithmetic per attempt.};
+\node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
+  at (704,378) {At $d=2$, $h=5$ gives 138/160 successes versus 139/160 for $h=2$, with \textbf{60.7\% less} arithmetic per attempt. Equivalent quality is not established.};
 
 % Bottom cards
 \draw[card] (10,34) rectangle (337,218);
@@ -231,23 +231,23 @@
   at (48,184) {$\nearrow$};
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (74,184) {Why This Matters};
 \draw[line width=1.4pt] (48,62)--(48,153);
-\node[anchor=west,align=left,text width=250mm,font=\rmfamily\fontsize{25}{33}\selectfont]
-  at (65,105) {Inference compute is a control decision. For this checkpoint, fewer denoising steps improved success; executing more of each predicted chunk cut arithmetic sharply with similar observed success.};
+\node[anchor=west,align=left,text width=250mm,font=\rmfamily\fontsize{28}{36}\selectfont]
+  at (65,105) {Treat inference compute as a control decision. For this checkpoint, fewer denoising steps improved success. Executing more of each predicted chunk cut arithmetic sharply with similar observed success.};
 
 \draw[card] (349,34) rectangle (831,218);
 \draw[line width=2.2pt,rounded corners=2mm] (369,167)--(386,202)--(403,167)--cycle;
 \node[font=\sffamily\bfseries\fontsize{27}{31}\selectfont] at (386,178) {!};
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (416,184) {Interpretation \& Limitations};
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=192mm,align=left] at (365,150) {Takeaways};
-\node[anchor=north west,align=left,text width=205mm,font=\sffamily\fontsize{20}{27}\selectfont]
-  at (367,119) {$\blacksquare$\; Fewer denoising steps improved success at $h=2$.\\[3mm]
+\node[anchor=north west,align=left,text width=205mm,font=\sffamily\fontsize{24}{31}\selectfont]
+  at (367,115) {$\blacksquare$\; Fewer denoising steps improved success at $h=2$.\\[3mm]
   $\blacksquare$\; At $d=2$, longer execution was far cheaper with similar observed success.};
 \draw[line width=1.3pt] (589,56)--(589,150);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{22}{26}\selectfont,
+\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
   minimum width=206mm,align=left] at (606,150) {Limitations};
-\node[anchor=north west,align=left,text width=207mm,font=\sffamily\fontsize{19}{26}\selectfont]
-  at (608,119) {$\blacksquare$\; One SmolVLA checkpoint; synchronous simulation.\\[3mm]
+\node[anchor=north west,align=left,text width=207mm,font=\sffamily\fontsize{24}{31}\selectfont]
+  at (608,115) {$\blacksquare$\; One SmolVLA checkpoint; synchronous simulation.\\[3mm]
   $\blacksquare$\; Prefix comparison is descriptive; equivalence is not established.\\[3mm]
   $\blacksquare$\; Arithmetic does not establish physical-robot latency.};
 
