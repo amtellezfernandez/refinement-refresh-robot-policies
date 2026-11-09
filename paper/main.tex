@@ -151,6 +151,22 @@ A configuration need not exhaust the ceiling. This is a deployment compute-rate
 constraint for a fixed checkpoint, rather than a training-plus-deployment
 objective.
 
+Figure~\ref{fig:closed-loop-policy} summarizes the execution loop. Each policy
+call predicts a fixed-length chunk, executes only the first $h$ actions, discards
+the remainder, and refreshes from the resulting observation. The denoising
+count $d$ controls refinement inside the policy call, while $h$ controls how
+frequently the policy receives a new observation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
+\caption{Synchronous chunked closed-loop execution. A policy call predicts
+$K$ actions after $d$ denoising steps; only the first $h$ actions are executed,
+with the remaining $K-h$ actions discarded before the next observation and
+replanning step. In the experiments, $K=50$.}
+\label{fig:closed-loop-policy}
+\end{figure}
+
 We distinguish this rate from total arithmetic per attempted episode. If attempt
 $e$ executes $T_e$ actions, its generated-chunk expenditure is
 \begin{equation}
