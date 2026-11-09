@@ -69,14 +69,16 @@ substantial cost per generation: sufficiently tight budgets require less frequen
 refresh even at low denoising counts. This cost boundary determines what is
 feasible, but not which feasible setting controls the robot best.
 
-We separate two empirical questions. First, does additional denoising improve
-success at a fixed execution prefix? Second, does more frequent refresh justify
-its additional expenditure? We evaluate twelve configurations in a paired
-480-attempt discovery study, then seven configurations in 1,120 confirmation
-attempts on eight tasks excluded from selection. Three frozen comparisons test
-the first question. Later-amended descriptive prefix comparisons address the
-second; they neither isolate observation freshness from action-position effects
-nor establish an optimal allocation rule.
+We operationalize this allocation question through two within-checkpoint
+comparisons. The primary comparison varies denoising at a fixed execution prefix
+to evaluate whether additional refinement improves success. A complementary,
+descriptive comparison varies the execution prefix at fixed denoising to examine
+whether more frequent refresh justifies its additional expenditure. We evaluate
+twelve configurations in a paired 480-attempt discovery study, then seven
+configurations in 1,120 confirmation attempts on eight tasks excluded from
+selection. Three frozen comparisons evaluate refinement. The later-amended
+prefix comparisons examine refresh; they neither isolate observation freshness
+from action-position effects nor establish an optimal allocation rule.
 
 At the primary two-action prefix, two denoising steps yield 139/160 successes
 versus 122/160 for five steps, with lower reference arithmetic. At two denoising
