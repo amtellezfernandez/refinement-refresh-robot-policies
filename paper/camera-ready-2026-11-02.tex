@@ -15,7 +15,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{placeins}
 \title{Refinement versus Refresh:\\
-Compute Allocation for Closed-Loop Robot Policies}
+A Reproducible Evaluation Protocol for Closed-Loop Robot Policies}
 \author{Alba Mar\'ia T\'ellez Fern\'andez\\
 MAAT Institute\\
 \texttt{alba.tellez@maatinstitute.com}}
@@ -24,22 +24,24 @@ MAAT Institute\\
 
 \begin{abstract}
 How should a chunked robot policy spend inference compute: refine its current
-action chunk, or replan from a newer observation? We present a case-study
-protocol for answering this question within a frozen policy. The protocol treats
-denoising depth and executed prefix as separate controls, calibrates complete
-generation cost, separates configuration discovery from held-out confirmation,
-and evaluates closed-loop success together with realized episode expenditure.
-Applied to SmolVLA in synchronous LIBERO, the study shows why both controls must
-be considered jointly. At a fixed refresh schedule, fewer denoising steps
-improved success while reducing arithmetic. At low denoising, a longer execution
-prefix substantially reduced expenditure while producing similar observed
-success, although equivalence was not established. Most generation arithmetic
-was independent of denoising, so reducing refinement alone could not deliver
-proportional savings. A fitted response model offered no demonstrated selection
-advantage over a simple cost-aware rule. These findings are checkpoint-specific.
-The broader contribution is a reproducible procedure for testing
-refinement--refresh allocations without treating arithmetic efficiency, latency,
-or apparent quality preservation as interchangeable.
+action chunk, or replan from a newer observation? We introduce a reproducible
+protocol for evaluating this trade-off within a frozen policy. The protocol
+defines refinement and refresh separately, measures complete generation and
+episode expenditure, separates discovery from held-out evaluation, freezes
+confirmatory comparisons before outcomes are observed, and labels later analyses
+as descriptive. We apply it to frozen SmolVLA in synchronous LIBERO simulation.
+The denoising comparisons were frozen before confirmation; refresh-prefix
+contrasts were added later and are interpreted descriptively. In the
+prespecified primary comparison, at a fixed two-action prefix, reducing
+denoising from five to two steps increased success from 122/160 to 139/160 while
+reducing counted arithmetic. Full-generation calibration showed that 82.1\% of
+native arithmetic was independent of denoising. A later descriptive comparison
+observed 138/160 versus 139/160 successes when refreshing after five rather than
+two actions, with 60.7\% lower arithmetic per attempt; equivalence was not
+established. A simple cost-aware rule matched the fitted model's choices.
+SmolVLA provides a worked example rather than a universal allocation rule. The
+transferable contribution is a procedure for evaluating success, compute, and
+evidence status together.
 \end{abstract}
 
 \section{Introduction}
@@ -80,16 +82,19 @@ remains unresolved. A simple cost-aware rule also matches the fitted response
 model's choices at all three ceilings, with no demonstrated selection advantage
 from fitting.
 
+These checkpoint-specific outcomes demonstrate how to apply the protocol and
+how its evidence boundaries constrain the resulting claims.
+
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a worked refinement--refresh evaluation procedure combining
-    full-generation calibration, explicit compute ceilings, frozen comparisons,
-    and closed-loop outcome measurement;
-    \item a paired twelve-configuration study reporting both nominal compute
-    rate and realized episode expenditure; and
-    \item a completed task-transfer evaluation separating frozen refinement
-    tests from descriptive refresh comparisons, with their uncertainty and
-    selection provenance retained.
+    \item a reproducible refinement--refresh protocol that defines the controls,
+    accounts for complete prediction and episode expenditure, and freezes
+    confirmatory comparisons before held-out evaluation;
+    \item an evidence-reporting procedure that keeps prespecified refinement
+    tests separate from later descriptive refresh contrasts and retains their
+    uncertainty and provenance; and
+    \item a paired SmolVLA study that demonstrates the protocol across twelve
+    discovery configurations and seven held-out confirmation settings.
 \end{itemize}
 
 \section{Related Work}
@@ -120,8 +125,17 @@ comparisons. It neither introduces an adaptive scheduler nor establishes an
 advantage over these methods; their reported speedups have different policies,
 hardware, and measurement boundaries.
 
-\section{Refinement--Refresh Allocation}
+\section{Protocol for Refinement--Refresh Evaluation}
 \label{sec:allocation}
+
+The protocol has four stages. First, define refinement and refresh as separate
+deployment controls while holding the checkpoint and paired rollout conditions
+fixed. Second, measure complete prediction cost and realized episode expenditure
+under an explicit counting boundary. Third, use discovery data to freeze the
+confirmatory comparisons before held-out outcomes are observed. Fourth, report
+success and expenditure together, label any later contrasts as descriptive, and
+avoid interpreting arithmetic savings as latency improvement or similar observed
+success as equivalent quality. The following subsections instantiate each stage.
 
 \subsection{Compute rate and episode expenditure}
 
@@ -157,14 +171,10 @@ frequently the policy receives a new observation.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
-\vspace{2pt}
-\includegraphics[width=\linewidth]{../paper/generated/study_design.pdf}
 \caption{Synchronous chunked closed-loop execution. A policy call predicts
 $K$ actions after $d$ denoising steps; only the first $h$ actions are executed,
 with the remaining $K-h$ actions discarded before the next observation and
-replanning step. In the experiments, $K=50$. The study-design strip separates
-configuration discovery from held-out confirmation; prefix contrasts were
-added later as descriptive analyses.}
+replanning step. In the experiments, $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
@@ -232,7 +242,7 @@ task-shaped arithmetic and elapsed time. The cost model defines feasible
 schedules; the following experiments ask which feasible expenditures help
 closed-loop control.
 
-\section{Controlled Study and Frozen Comparisons}
+\section{Applying the Protocol to Frozen SmolVLA}
 \label{sec:method}
 
 \subsection{Discovery and confirmation protocol}
@@ -335,7 +345,7 @@ Model fitting, the full candidate set, and selector diagnostics are retained
 in Appendix~\ref{app:selectors}.
 
 \FloatBarrier
-\section{Refinement and Refresh on Transfer Tasks}
+\section{SmolVLA Worked Example: Held-Out Results}
 \label{sec:transfer}
 
 \subsection{Complete confirmation overview}
@@ -346,6 +356,8 @@ paired identities. The audit excludes two repeated completed records under the
 documented precedence rule; continuation completes the original design, not
 an independent replication (\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
 We first report the frozen denoising tests, then the amended prefix comparisons.
+Only the former support confirmatory claims; the latter are reported as
+descriptive analyses with their provenance and uncertainty retained.
 
 \begin{table}[htbp]
 \centering\small
@@ -367,9 +379,10 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 The horizontal coordinate is nominal reference arithmetic per control step,
 relative to native deployment. Arrows isolate refinement at fixed $h=2$ and
 refresh at fixed $d=2$; the right panel reports paired, task-conditional
-descriptive 95\% intervals in each arrow's direction. The refresh episode-cost
-annotation uses mean arithmetic per attempted episode, a separate coordinate.
-The refresh interval does not establish equivalent success.}
+descriptive 95\% intervals in each arrow's direction. The refinement row is a
+frozen confirmatory test; the refresh row is a later-added descriptive contrast.
+The refresh episode-cost annotation uses mean arithmetic per attempted episode,
+a separate coordinate. Its interval does not establish equivalent success.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
@@ -456,21 +469,24 @@ This study develops a procedure for evaluating how chunked robot policies
 allocate inference compute between refining an action prediction and refreshing
 it from a new observation. The procedure measures the complete cost of a policy
 call, separates configuration discovery from held-out confirmation, freezes the
-comparisons before evaluation, and reports closed-loop success together with
-episode expenditure. This prevents a cheap configuration from being treated as
-useful without behavioral evidence, or a successful configuration from being
-discussed without its compute cost.
+confirmatory comparisons before evaluation, labels later contrasts as
+descriptive, and reports closed-loop success together with episode expenditure.
+This prevents a cheap configuration from being treated as useful without
+behavioral evidence, or a successful configuration from being discussed without
+its compute cost.
 
-The SmolVLA case study demonstrates why this joint evaluation is necessary.
+The transferable contribution is this evaluation protocol. The SmolVLA case
+study demonstrates how to apply it and how evidence status changes the permitted
+claims.
 Additional refinement did not consistently produce better closed-loop behavior,
 and reducing refinement alone delivered limited savings because most generation
 work was independent of denoising. Changing the execution prefix affected cost
 more strongly, but similar observed success was insufficient to establish
 equivalent quality. The fitted response model also did not improve configuration
-choices over a simple cost-aware rule. The conclusion is methodological:
-refinement and refresh should be evaluated together within each model, under
-explicit counting boundaries and prespecified comparisons. The case study does
-not establish a universal allocation.
+choices over a simple cost-aware rule. Refinement and refresh should therefore
+be evaluated together within each model, under explicit counting boundaries,
+with frozen confirmatory tests visibly separated from later descriptive
+analyses. The case study does not establish a universal allocation.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
@@ -480,7 +496,9 @@ positions. The mechanism behind the benefit of coarser sampling remains open.
 The study covers one checkpoint and twelve fixed tasks in simulation, with
 only four discovery task-level validation folds. Intervals are task-conditional,
 secondary contrasts are unadjusted, and no quality-preservation margin was
-prespecified. Two steps is the minimum denoising tested; $d=1$ is untested.
+prespecified. The refresh-prefix contrasts were added after individual outcomes
+were visible and remain descriptive. Two steps is the minimum denoising tested;
+$d=1$ is untested.
 The arithmetic boundary excludes several operation classes; language lengths
 are audited but image shape is fixed. Sampled GPU checks have coverage gaps,
 and simulated control steps do not establish real-time responsiveness.
@@ -497,8 +515,8 @@ predeclared quality-preservation test should evaluate the cheaper $(5,2)$
 setting, and independent outcome replay should test the retained primary
 trajectories in a separate, version-matched simulator. The same study design can
 then be applied within other policies and execution stacks: define the refinement
-and refresh controls, calibrate complete inference cost, freeze the comparisons,
-and evaluate success and expenditure jointly. Replication across checkpoints,
+and refresh controls, calibrate complete inference cost, freeze confirmatory
+comparisons, and evaluate success and expenditure jointly. Replication across checkpoints,
 policy architectures, benchmark families, and asynchronous or physical-robot
 execution is required to determine when the fixed cost of a fresh prediction is
 worth paying and how much refinement that prediction needs.
