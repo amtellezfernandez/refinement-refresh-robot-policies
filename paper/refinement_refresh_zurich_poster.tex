@@ -225,33 +225,24 @@
 \node[anchor=north west,align=left,text width=112mm,font=\rmfamily\fontsize{26}{33}\selectfont]
   at (704,378) {At $d=2$, $h=5$ gives 138/160 successes versus 139/160 for $h=2$, with \textbf{60.7\% less} arithmetic per attempt. Equivalent quality is not established.};
 
-% Bottom cards: interpretation and the practical decision
-\draw[card] (10,34) rectangle (337,218);
-\draw[line width=2.2pt] (36,184) circle (13mm);
-\draw[line width=2.2pt] (36,184) circle (7mm);
-\fill[ink] (36,184) circle (2.5mm);
-\draw[-Latex,line width=2.2pt] (25,173)--(47,195);
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (74,184) {Why This Matters};
-\draw[line width=1.4pt] (48,62)--(48,153);
-\node[anchor=west,align=left,text width=250mm,font=\rmfamily\fontsize{28}{36}\selectfont]
-  at (65,105) {Closed-loop inference has two levers: refine the current chunk or refresh from a new observation. The primary comparison favors less refinement, while the prefix comparison identifies a much cheaper candidate. Together, they turn compute allocation into a control decision.};
-
-\draw[card] (349,34) rectangle (831,218);
-\draw[line width=2.2pt,rounded corners=2mm] (369,167)--(386,202)--(403,167)--cycle;
-\node[font=\sffamily\bfseries\fontsize{27}{31}\selectfont] at (386,178) {!};
-\node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (416,184) {Interpretation \& Limitations};
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
-  minimum width=192mm,align=left] at (365,150) {Takeaways};
-\node[anchor=north west,align=left,text width=205mm,font=\sffamily\fontsize{24}{31}\selectfont]
-  at (367,115) {$\blacksquare$\; Primary: less refinement improved success at fixed $h=2$.\\[3mm]
-  $\blacksquare$\; Secondary: $h=5$ is much cheaper at $d=2$, but remains a descriptive candidate.};
-\draw[line width=1.3pt] (589,56)--(589,150);
-\node[labelbox,anchor=north west,font=\rmfamily\bfseries\fontsize{26}{31}\selectfont,
-  minimum width=206mm,align=left] at (606,150) {Limitations};
-\node[anchor=north west,align=left,text width=207mm,font=\sffamily\fontsize{24}{31}\selectfont]
-  at (608,115) {$\blacksquare$\; One frozen SmolVLA checkpoint in synchronous LIBERO.\\[3mm]
-  $\blacksquare$\; Changing $h$ changes refresh timing and action positions together.\\[3mm]
-  $\blacksquare$\; Similar success is not an equivalence claim; arithmetic is not latency.};
+% Compact interpretation band
+\draw[card] (10,34) rectangle (831,218);
+\node[font=\rmfamily\bfseries\fontsize{35}{40}\selectfont] at (420.5,190)
+  {What the results mean};
+\draw[line width=1.4pt] (280,55)--(280,170);
+\draw[line width=1.4pt] (560,55)--(560,170);
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (30,157)
+  {Why it matters};
+\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (30,143) {Closed-loop inference has two levers: refine the current chunk or refresh from a new observation. This study makes that allocation visible in both success and arithmetic.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (300,157)
+  {What we can claim};
+\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (300,143) {At fixed $h=2$, less refinement improved success and lowered arithmetic. At $d=2$, $h=5$ is much cheaper with similar observed success, but remains a descriptive candidate.};
+\node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (580,157)
+  {Limits};
+\node[anchor=north west,align=left,text width=230mm,font=\rmfamily\fontsize{25}{32}\selectfont]
+  at (580,143) {One frozen checkpoint in synchronous LIBERO. Changing $h$ changes refresh timing and action positions together. Similar success is not equivalence; arithmetic is not latency.};
 
 \end{scope}
 \end{tikzpicture}
