@@ -25,11 +25,12 @@ MAAT Institute\\
 \begin{abstract}
 How should a chunked robot policy spend inference compute: refine its current
 action chunk, or replan from a newer observation? We introduce a reproducible
-protocol for evaluating this trade-off within a frozen policy. The protocol
+protocol for evaluating this trade-off within a frozen policy and use one frozen
+SmolVLA checkpoint as a worked case study. The protocol
 defines refinement and refresh separately, measures complete generation and
 episode expenditure, separates discovery from held-out evaluation, freezes
 confirmatory comparisons before outcomes are observed, and labels later analyses
-as descriptive. We apply it to frozen SmolVLA in synchronous LIBERO simulation.
+as descriptive. The case study runs in synchronous LIBERO simulation.
 The denoising comparisons were frozen before confirmation; refresh-prefix
 contrasts were added later and are interpreted descriptively. In the
 prespecified primary comparison, at a fixed two-action prefix, reducing
@@ -39,9 +40,9 @@ native arithmetic was independent of denoising. An amended descriptive compariso
 observed 138/160 versus 139/160 successes when refreshing after five rather than
 two actions, with 60.7\% lower arithmetic per attempt; equivalence was not
 established. A simple cost-aware rule matched the fitted model's choices.
-SmolVLA provides a worked example rather than a universal allocation rule. The
-transferable contribution is a procedure for evaluating success, compute, and
-evidence status together.
+These checkpoint-specific findings illustrate the protocol; they do not define
+a general SmolVLA or cross-policy allocation rule. The transferable contribution
+is the procedure for evaluating success, compute, and evidence status together.
 \end{abstract}
 
 \section{Introduction}
@@ -459,9 +460,9 @@ This prevents a cheap configuration from being treated as useful without
 behavioral evidence, or a successful configuration from being discussed without
 its compute cost.
 
-The transferable contribution is this evaluation protocol. The SmolVLA case
-study demonstrates how to apply it and how evidence status changes the permitted
-claims.
+The transferable contribution is this evaluation protocol. SmolVLA serves as a
+worked case study for one checkpoint and simulator stack, demonstrating how to
+apply the procedure and how evidence status changes the permitted claims.
 Additional refinement did not consistently produce better closed-loop behavior,
 and reducing refinement alone delivered limited savings because most generation
 work was independent of denoising. Changing the execution prefix affected cost
@@ -470,7 +471,9 @@ equivalent quality. The fitted response model also did not improve configuration
 choices over a simple cost-aware rule. Refinement and refresh should therefore
 be evaluated together within each model, under explicit counting boundaries,
 with frozen confirmatory tests visibly separated from amended descriptive
-analyses. The case study does not establish a universal allocation.
+analyses. These outcomes remain checkpoint-specific; broader allocation claims
+require the same within-model study across other checkpoints, policy
+architectures, tasks, and execution stacks.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
