@@ -347,17 +347,25 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.96\linewidth]{../paper/generated/success_compute_tradeoff.pdf}
-\caption{SmolVLA case-study held-out success, compute, and paired effects. (a) All seven
-confirmation settings on a success--arithmetic coordinate. Points are $(h,d)$;
-blue marks the frozen primary pair, the horizontal axis is relative to the
-$(d=10,h=1)$ per-control-step baseline, and the success axis starts at 70\%.
-Arrows point from B to A for the primary
-$(2,2)-(2,5)$ comparison and the amended $(2,2)-(5,2)$ refresh comparison. (b) All
-effects use the same A-minus-B convention; whiskers are task-conditional,
-descriptive 95\% paired state-bootstrap intervals. The filled diamond marks the
-prespecified primary test. The primary direction is positive on seven tasks and
-tied on one; the refresh comparison has three positive tasks, three negative
-tasks, and two ties. Episode expenditures are reported in
+\caption{SmolVLA case-study held-out success, compute, and paired effects.
+(a) Each point is one of the seven confirmation settings, labelled $(h,d)$ for
+executed prefix and denoising count, and aggregates 160 attempts over eight tasks.
+The vertical axis gives observed success and begins at 70\%; the horizontal axis
+gives nominal counted generation arithmetic per control step, normalized so that
+$(d=10,h=1)$ is 100\%. Leftward therefore means less counted work per executed
+action. Blue identifies the prespecified $(2,2)$ versus $(2,5)$ refinement pair.
+The curved arrows run from comparator B to setting A: fewer refinement steps for
+$(2,2)-(2,5)$ and more frequent refresh for the later-amended
+$(2,2)-(5,2)$ comparison. The 60.7\% annotation is the separate reduction in mean
+arithmetic per attempted episode for $(5,2)$ relative to $(2,2)$.
+(b) Each row reports the labelled A-minus-B success difference; positive values
+favor A. Markers are point estimates, whiskers and adjacent numbers give
+task-conditional, descriptive 95\% paired state-bootstrap intervals, and the
+dashed vertical line denotes zero difference. Circles are frozen refinement
+comparisons, the filled blue diamond is the prespecified primary test, and squares
+are later-amended descriptive comparisons. The primary direction is positive on
+seven tasks and tied on one; the refresh comparison has three positive tasks,
+three negative tasks, and two ties. Full episode expenditures are reported in
 Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
