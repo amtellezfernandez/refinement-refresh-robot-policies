@@ -709,19 +709,20 @@ def success_compute_figure(
     }
     fig = plt.figure(figsize=(figure_width, figure_height))
     tradeoff = fig.add_axes([0.10, 0.19, 0.30, 0.68])
-    effects = fig.add_axes([0.60, 0.19, 0.16, 0.68])
+    effects = fig.add_axes([0.79, 0.19, 0.10, 0.68])
     tradeoff.set_facecolor(".965")
     effects.set_facecolor(".985")
     offsets = {
-        (1, 2): (10, 18),
-        (1, 5): (-31, -18),
-        (1, 10): (-31, 25),
+        (1, 2): (-8, 24),
+        (1, 5): (0, -14),
+        (1, 10): (-2, 25),
         (1, 20): (-9, -18),
         (2, 2): (5, 9),
         (2, 5): (5, -16),
         (5, 2): (-5, 9),
         (5, 5): (-4, -16),
     }
+    label_alignments = {(1, 2): "right", (1, 5): "center", (1, 10): "right"}
     for cell, row in resources.items():
         x = row["nominal_fraction_native"]
         y = 100 * row["success_rate"]
@@ -742,6 +743,7 @@ def success_compute_figure(
             (x, y),
             xytext=offsets[cell],
             textcoords="offset points",
+            ha=label_alignments.get(cell, "left"),
             fontweight="bold" if primary else "normal",
             arrowprops=(
                 {"arrowstyle": "-", "color": ".45", "lw": 0.55}
@@ -783,14 +785,16 @@ def success_compute_figure(
         va="center",
         fontweight="bold",
     )
-    tradeoff.text(
-        0.04,
-        0.04,
+    tradeoff.annotate(
         "$(5,2)$: 60.7% less cost\nper attempted episode",
-        transform=tradeoff.transAxes,
+        xy=(0.29, 86.5),
+        xycoords="data",
+        xytext=(0.04, 0.04),
+        textcoords="axes fraction",
         ha="left",
         va="bottom",
         fontsize=font_size,
+        arrowprops={"arrowstyle": "-", "color": ".40", "lw": 0.65},
         bbox={"boxstyle": "round,pad=0.22", "facecolor": "white", "edgecolor": ".78", "lw": 0.5},
     )
     tradeoff.set(
@@ -844,7 +848,8 @@ def success_compute_figure(
         effects.text(
             1.05,
             y,
-            f"{effect:+.1f} [{bounds[0]:+.1f}, {bounds[1]:+.1f}]",
+            f"{number(effect, signed=True)}\n"
+            f"[{number(bounds[0])}, {number(bounds[1])}]",
             transform=transform,
             ha="left",
             va="center",
@@ -857,10 +862,17 @@ def success_compute_figure(
     effects.spines[["top", "right", "bottom", "left"]].set_color(".72")
     effects.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
     effects.tick_params(axis="y", length=0)
-    effects.text(-0.90, 8.42, "Frozen refinement", transform=transform, fontweight="bold", va="center")
-    effects.text(-0.90, 4.43, "Amended descriptive", transform=transform, fontweight="bold", va="center")
+    heading_box = {"facecolor": "white", "edgecolor": "none", "pad": 0.8}
+    effects.text(
+        -0.90, 8.42, "Frozen refinement", transform=transform,
+        fontweight="bold", va="center", bbox=heading_box, zorder=5
+    )
+    effects.text(
+        -0.90, 4.43, "Amended descriptive", transform=transform,
+        fontweight="bold", va="center", bbox=heading_box, zorder=5
+    )
     fig.text(0.25, 0.96, "Held-out settings", ha="center", va="top", fontweight="bold")
-    fig.text(0.68, 0.96, "Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
+    fig.text(0.84, 0.96, "Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
 
