@@ -713,13 +713,12 @@ def success_compute_figure(
     tradeoff.set_facecolor(".965")
     effects.set_facecolor(".985")
     offsets = {
-        (1, 2): (-8, 24),
-        (1, 5): (0, -14),
-        (1, 10): (-2, 25),
-        (1, 20): (-9, -18),
-        (2, 2): (5, 9),
-        (2, 5): (5, -16),
-        (5, 2): (4, 10),
+        (1, 2): (-4, 25),
+        (1, 5): (0, -17),
+        (1, 10): (-2, 40),
+        (2, 2): (5, 10),
+        (2, 5): (5, -17),
+        (5, 2): (4, -15),
         (5, 5): (-4, -16),
     }
     label_alignments = {
@@ -744,17 +743,14 @@ def success_compute_figure(
             zorder=3,
         )
         tradeoff.annotate(
-            f"$({cell[0]},{cell[1]})$",
+            f"$({cell[0]},{cell[1]})$ {round(y):d}%",
             (x, y),
             xytext=offsets[cell],
             textcoords="offset points",
             ha=label_alignments.get(cell, "left"),
             fontweight="bold" if primary else "normal",
-            arrowprops=(
-                {"arrowstyle": "-", "color": ".45", "lw": 0.55}
-                if cell[0] == 1
-                else None
-            ),
+            color=ACCENT if primary_pair else INK,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
         )
     # Arrows point from B to A, matching the A-minus-B convention on the right.
     tradeoff.annotate(
@@ -767,13 +763,14 @@ def success_compute_figure(
         color=ACCENT,
     )
     tradeoff.text(
-        0.52,
-        79.0,
-        "Less refinement\n76% $\\rightarrow$ 87%",
+        0.51,
+        78.8,
+        "Less refinement: +10.6 pp",
         color=ACCENT,
         ha="left",
         va="center",
         fontweight="bold",
+        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
     )
     tradeoff.annotate(
         "",
@@ -782,26 +779,29 @@ def success_compute_figure(
         arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
     )
     tradeoff.text(
-        0.28,
-        94.0,
-        "More frequent\nrefresh",
+        0.31,
+        86.8,
+        "More frequent refresh",
         color=INK,
         ha="center",
         va="center",
         fontweight="bold",
+        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
     )
-    tradeoff.text(
-        0.98,
-        0.96,
-        "At $(5,2)$: 60.7% less cost per attempt",
-        transform=tradeoff.transAxes,
-        ha="right",
+    tradeoff.annotate(
+        "60.7% less cost/attempt",
+        xy=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
+        xytext=(4, 44),
+        textcoords="offset points",
+        ha="left",
         va="top",
         fontsize=font_size,
-        color=".28",
+        color=INK,
+        arrowprops={"arrowstyle": "-", "color": INK, "lw": 0.7},
+        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.12},
     )
     tradeoff.set(
-        xlabel="Compute per control step\n($d=10,h=1$: 100%; cheaper $\\leftarrow$)",
+        xlabel="Compute per step (% of $d=10,h=1$)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
         ylim=(70, 100),
