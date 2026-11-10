@@ -801,7 +801,7 @@ def success_compute_figure(
     tradeoff.text(
         0.20,
         90.5,
-        "60.7% less cost/attempt",
+        "60.7% less arithmetic/attempt",
         ha="left",
         va="center",
         fontsize=font_size,

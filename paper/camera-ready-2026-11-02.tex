@@ -35,7 +35,7 @@ five: a paired difference of 10.6 percentage points with a descriptive,
 task-conditional 95\% interval of 4.4--16.9 points and 5.9\% less counted
 arithmetic per control step. Full-generation calibration showed
 that 82.1\% of native arithmetic was independent of denoising, creating a fixed
-per-call cost floor. A later descriptive comparison found 138/160 versus 139/160
+arithmetic floor per policy call. A later descriptive comparison found 138/160 versus 139/160
 successes when executing five rather than two actions per prediction, with 60.7\%
 lower arithmetic per attempt; equivalence was not established. The large
 refinement effect is localized at the two-action prefix, and a simple cost-aware
@@ -376,7 +376,8 @@ each comparison supports.
 \caption{SmolVLA case-study confirmation: 160 attempts per configuration on eight tasks.
 $K=50$ is the fixed predicted chunk length, $h$ is the executed prefix, and $d$
 is the denoising count.
-Nominal rate/native is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
+The nominal rate as a fraction of native is
+$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
 All-attempt arithmetic uses the length-20 reference calibration and charges
 every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \label{tab:primary-transfer}
@@ -423,7 +424,7 @@ intervals span zero & A uniform benefit is not established for this checkpoint.\
 \addlinespace[2pt]
 $(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
 $(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
-cost savings; equivalent quality is unresolved.\\
+arithmetic savings; equivalent quality is unresolved.\\
 \bottomrule
 \end{tabular}
 \caption{Evidence status and permitted interpretation. Effects use A minus B.
@@ -585,8 +586,8 @@ resampling uses 20,000 draws with analysis seed 20260913.\par}
 \centering\small
 \input{../paper/generated/discovery_tasks.tex}
 \caption{Discovery successes on Spatial tasks 5--8. Each task contributes five
-states and two seeds per configuration. Rate/native is
-$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized episode cost.
+states and two seeds per configuration. The nominal-rate fraction is
+$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized episode expenditure.
 The best observed count is 28/40 at $(1,5)$; no monotonic denoising trend is
 assumed.}
 \label{tab:discovery-grid}
@@ -902,7 +903,7 @@ is then refitted on the discovery set. No individual seed repeat is held out
 while another repeat from the same task remains in training.
 
 The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
-the 12 discovery configurations and 12 untested configurations. Their calibrated costs determine
+the 12 discovery configurations and 12 untested configurations. Their calibrated arithmetic rates determine
 eligibility; the fitted model selects the highest predicted success under each
 ceiling. Ties favor lower compute, then lexicographic order.
 
@@ -914,7 +915,8 @@ The learned choices and comparisons were frozen before transfer; additional
 selector baselines were documented after collection began.
 The empirical selector uses the measured grid; other selectors use the declared
 candidate set. The simple rule exactly matches the learned choices. Selected
-rate/native is the learned recommendation's arithmetic rate. Frozen comparators
+The selected rate divided by native rate is the learned recommendation's
+arithmetic-rate fraction. Frozen comparators
 and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
 the half-native row is primary.
 }
