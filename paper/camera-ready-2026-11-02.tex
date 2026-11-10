@@ -582,6 +582,9 @@ tasks 5--8, states 20--29, and policy seeds 3000 and 3001. Its 80 task--state
 blocks each contain both seeds and all seven configurations. Discovery bootstrap
 resampling uses 20,000 draws with analysis seed 20260913.\par}
 
+\subsection{Discovery outcomes and resource measurements}
+\label{app:discovery-details}
+
 \begin{table}[htbp]
 \centering\small
 \input{../paper/generated/discovery_tasks.tex}
@@ -603,21 +606,6 @@ paired state-bootstrap intervals. The $d$ axes are categorical.}
 \label{fig:frontier}
 \end{figure}
 
-Calibration uses one real observation from Spatial task 0, initial state 0,
-and common explicit noise. For each $d\in\{2,3,5,8,10,20\}$, profiling records
-solver timesteps and dense operation counts, separately from elapsed timing.
-Each setting receives 20 warm-up generations, followed by three randomized
-timing blocks of 20 measured calls per setting. The rollout evaluator also
-performs 20 warm-up generations once per configuration.
-
-Host generation timing brackets prediction and completion synchronization;
-CUDA events measure the current-stream prediction interval. The outer rollout
-clock additionally includes observation processing, action handling,
-simulation/rendering, and record writing. Model loading, environment creation,
-reset, and warm-up are measured separately. Process sampling occurs approximately
-every five seconds; the largest recorded gap during discovery is below
-5.03 seconds. Display processes remain on the measurement GPU.
-
 \begin{table}[htbp]
 \centering\small
 \input{../paper/generated/discovery_resources.tex}
@@ -633,6 +621,25 @@ Calibration requires approximately 291 seconds and discovery 31,245 seconds
 expenditure is additional to subsequent deployments. The experiment does not
 estimate an amortization threshold or a training--deployment cost crossover.
 
+\FloatBarrier
+\subsection{Fixed-input generation timing}
+\label{app:fixed-timing}
+
+Calibration uses one real observation from Spatial task 0, initial state 0,
+and common explicit noise. For each $d\in\{2,3,5,8,10,20\}$, profiling records
+solver timesteps and dense operation counts, separately from elapsed timing.
+Each setting receives 20 warm-up generations, followed by three randomized
+timing blocks of 20 measured calls per setting. The rollout evaluator also
+performs 20 warm-up generations once per configuration.
+
+Host generation timing brackets prediction and completion synchronization;
+CUDA events measure the current-stream prediction interval. The outer rollout
+clock additionally includes observation processing, action handling,
+simulation/rendering, and record writing. Model loading, environment creation,
+reset, and warm-up are measured separately. Process sampling occurs approximately
+every five seconds; the largest recorded gap during discovery is below
+5.03 seconds. Display processes remain on the measurement GPU.
+
 All measurements use an RTX 4060 Ti. Five-second process samples show no
 unrelated CUDA compute process during calibration, discovery, or the initially
 scheduled transfer phase; display processes remain. Process samples were not
@@ -642,9 +649,6 @@ but these coverage gaps make aggregate transfer rollout times descriptive.
 Host and CUDA-stream generation intervals are measured separately
 from the outer synchronous rollout interval. Warm-up is excluded from these
 rollout measurements.
-
-\subsection{Fixed-input generation timing}
-\label{app:fixed-timing}
 
 \begin{table}[htbp]
 \centering\small
@@ -742,6 +746,69 @@ In particular, $(2,10)$ remains within the original half-native ceiling for all
 evaluated lengths; shorter inputs reduce rather than increase its counted work.
 The audit changes neither policy execution nor the frozen selections.
 
+\FloatBarrier
+\section{Frozen Selection and Diagnostic Analyses}
+\label{app:selectors}
+
+We compare two logistic response-model families. A compute-only model uses a
+quadratic in log normalized rate. An allocation model uses $\log h$,
+$\log(d/10)$, both squared terms, and their interaction. Each family is fitted
+with ridge penalty 1 or 10. Leave-one-task-out log loss selects the model, which
+is then refitted on the discovery set. No individual seed repeat is held out
+while another repeat from the same task remains in training.
+
+The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
+the 12 discovery configurations and 12 untested configurations. Their calibrated arithmetic rates determine
+eligibility; the fitted model selects the highest predicted success under each
+ceiling. Ties favor lower compute, then lexicographic order.
+
+\begin{table}[htbp]
+\centering\small
+\input{../paper/generated/selector_choices.tex}
+\caption{Discovery-based selector choices.
+The learned choices and comparisons were frozen before transfer; additional
+selector baselines were documented after collection began.
+The empirical selector uses the measured grid; other selectors use the declared
+candidate set. The simple rule exactly matches the learned choices. The selected rate divided
+by native rate is the learned recommendation's
+arithmetic-rate fraction. Frozen comparators
+and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
+the half-native row is primary.
+}
+\label{tab:selectors}
+\label{tab:predictions}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\input{../paper/generated/confirmation_predictions.tex}
+\caption{All original frozen denoising tests: selected minus comparator,
+holding $h$ fixed within each row. Predicted and observed gaps and intervals are
+percentage points. The half-native row is primary; secondary intervals are
+descriptive, task-conditional, and unadjusted.}
+\label{tab:confirmation-predictions}
+\end{table}
+
+The simple rule minimizes denoising count, then chooses the shortest feasible
+prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
+transfer outcomes cannot distinguish these selectors at the tested budgets.
+The compute-only choices use the original ridge-10 fit. Its quarter- and
+half-budget choices are absent from the transfer plan, so this evaluation
+cannot compare those decisions on transfer tasks.
+
+The selected allocation model has log loss 0.7048, compared with 0.7067 for the
+best compute-only model. This small difference provides no evidence of an added
+predictive advantage. Under the same mean natural-log binary cross-entropy,
+constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
+each training fold scores 0.7170. The response-model probabilities should
+therefore not be read as calibrated task-transfer forecasts. The primary test
+evaluates a recommendation shared with simpler selectors, so it does not
+establish an additional benefit from model-based ranking.
+
+\FloatBarrier
+\section{Held-Out Outcomes and Verification}
+\label{app:heldout-details}
+
 \subsection{Primary expenditure and runtime}
 \label{app:primary-costs}
 
@@ -790,6 +857,7 @@ supplement retains source digests and distinguishes conflicting installed
 distribution metadata from these loaded versions.}
 \label{tab:runtime}
 \end{table}
+\FloatBarrier
 
 The retained provenance does not characterize numerical precision and attention
 execution for every model component. Table~\ref{tab:runtime} therefore supports
@@ -797,6 +865,9 @@ the stated model configuration, but not component- or kernel-level claims.
 
 \subsection{Complete confirmation outcomes}
 \label{app:confirmation-details}
+
+This subsection reports the task-level confirmation counts first, followed by
+the amended descriptive contrasts and their expenditure interpretation.
 
 \begin{table}[htbp]
 \centering\small
@@ -829,8 +900,7 @@ trajectory lengths; it is not an elapsed-time comparison or evidence of
 equivalent quality.
 
 \FloatBarrier
-\paragraph{Measurement verification.}
-\phantomsection
+\subsection{Measurement verification}
 \label{app:verification}
 
 The retained records support a complete internal reconciliation of planned
@@ -864,8 +934,7 @@ inspection remain outside this audit.\\
 \label{tab:verification-summary}
 \end{table}
 \FloatBarrier
-\paragraph{Analysis provenance.}
-\phantomsection
+\subsection{Analysis provenance and artifacts}
 \label{app:analysis-provenance}
 
 The three refinement comparisons, identities, and primary analysis were frozen
@@ -891,63 +960,5 @@ seven-setting resource table, original and amended comparisons, and task-level
 counts. The submitted supplement remains separate from these post-submission
 additions.
 
-\FloatBarrier
-\section{Frozen Selection and Diagnostic Analyses}
-\label{app:selectors}
-
-We compare two logistic response-model families. A compute-only model uses a
-quadratic in log normalized rate. An allocation model uses $\log h$,
-$\log(d/10)$, both squared terms, and their interaction. Each family is fitted
-with ridge penalty 1 or 10. Leave-one-task-out log loss selects the model, which
-is then refitted on the discovery set. No individual seed repeat is held out
-while another repeat from the same task remains in training.
-
-The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
-the 12 discovery configurations and 12 untested configurations. Their calibrated arithmetic rates determine
-eligibility; the fitted model selects the highest predicted success under each
-ceiling. Ties favor lower compute, then lexicographic order.
-
-\begin{table}[htbp]
-\centering\small
-\input{../paper/generated/selector_choices.tex}
-\caption{Discovery-based selector choices.
-The learned choices and comparisons were frozen before transfer; additional
-selector baselines were documented after collection began.
-The empirical selector uses the measured grid; other selectors use the declared
-candidate set. The simple rule exactly matches the learned choices. Selected
-The selected rate divided by native rate is the learned recommendation's
-arithmetic-rate fraction. Frozen comparators
-and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
-the half-native row is primary.
-}
-\label{tab:selectors}
-\label{tab:predictions}
-\end{table}
-
-\begin{table}[htbp]
-\centering\small
-\input{../paper/generated/confirmation_predictions.tex}
-\caption{All original frozen denoising tests: selected minus comparator,
-holding $h$ fixed within each row. Predicted and observed gaps and intervals are
-percentage points. The half-native row is primary; secondary intervals are
-descriptive, task-conditional, and unadjusted.}
-\label{tab:confirmation-predictions}
-\end{table}
-
-The simple rule minimizes denoising count, then chooses the shortest feasible
-prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
-transfer outcomes cannot distinguish these selectors at the tested budgets.
-The compute-only choices use the original ridge-10 fit. Its quarter- and
-half-budget choices are absent from the transfer plan, so this evaluation
-cannot compare those decisions on transfer tasks.
-
-The selected allocation model has log loss 0.7048, compared with 0.7067 for the
-best compute-only model. This small difference provides no evidence of an added
-predictive advantage. Under the same mean natural-log binary cross-entropy,
-constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
-each training fold scores 0.7170. The response-model probabilities should
-therefore not be read as calibrated task-transfer forecasts. The primary test
-evaluates a recommendation shared with simpler selectors, so it does not
-establish an additional benefit from model-based ranking.
 
 \end{document}
