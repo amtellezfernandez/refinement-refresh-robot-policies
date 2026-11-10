@@ -759,11 +759,29 @@ def success_compute_figure(
         va="bottom",
         color=ACCENT,
     )
+    tradeoff.text(
+        0.52,
+        79.0,
+        "Less refinement\n76% $\\rightarrow$ 87%",
+        color=ACCENT,
+        ha="left",
+        va="center",
+        fontweight="bold",
+    )
     tradeoff.annotate(
         "",
         xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
         xytext=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
         arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
+    )
+    tradeoff.text(
+        0.28,
+        92.0,
+        "More frequent\nrefresh",
+        color=INK,
+        ha="center",
+        va="center",
+        fontweight="bold",
     )
     tradeoff.text(
         0.04,
