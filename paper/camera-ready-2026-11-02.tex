@@ -351,6 +351,7 @@ descriptive analyses with their provenance and uncertainty retained.
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/confirmation_resources.tex}
 \caption{SmolVLA case-study confirmation: 160 attempts per configuration on eight tasks.
 $K=50$ is the fixed predicted chunk length, $h$ is the executed prefix, and $d$
 is the denoising count.
@@ -359,16 +360,13 @@ All-attempt arithmetic uses the length-20 reference calibration and charges
 every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \label{tab:primary-transfer}
 \label{tab:confirmation-grid}
-\input{../paper/generated/confirmation_resources.tex}
 \end{table}
 
 \begin{figure}[htbp]
 \centering
-\textbf{Held-Out Success vs. Compute Across Refinement and Refresh Settings}\par\smallskip
-\includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
-{\small Compute per control step (\% of baseline)\par
-$d=10,h=1$ is 100\%; lower values use less compute.}
-\caption{SmolVLA case-study held-out success, compute, and paired comparisons.
+\includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}
+\caption{\textbf{Held-out success versus compute across refinement and refresh settings.}
+SmolVLA case-study success, compute, and paired comparisons.
 Each point is one of the seven confirmation settings, labelled $(h,d)$ for
 executed prefix and denoising count, and aggregates 160 attempts over eight tasks.
 The vertical axis gives observed success and begins at 75\%. The horizontal axis
@@ -390,9 +388,6 @@ Appendix~\ref{app:confirmation-details} and Table~\ref{tab:confirmation-grid}.}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Evidence status and permitted interpretation. Effects use A minus B.
-The table separates prespecified confirmation from amended descriptive analysis.}
-\label{tab:evidence-status}
 \begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
 \toprule
 Comparison & Status & Result & Supported claim\\
@@ -408,6 +403,9 @@ $(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
 cost savings; equivalent quality is unresolved.\\
 \bottomrule
 \end{tabular}
+\caption{Evidence status and permitted interpretation. Effects use A minus B.
+The table separates prespecified confirmation from amended descriptive analysis.}
+\label{tab:evidence-status}
 \end{table}
 
 \begin{samepage}
@@ -562,13 +560,13 @@ resampling uses 20,000 draws with analysis seed 20260913.\par}
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/discovery_tasks.tex}
 \caption{Discovery successes on Spatial tasks 5--8. Each task contributes five
 states and two seeds per configuration. Rate/native is
 $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized episode cost.
 The best observed count is 28/40 at $(1,5)$; no monotonic denoising trend is
 assumed.}
 \label{tab:discovery-grid}
-\input{../paper/generated/discovery_tasks.tex}
 \end{table}
 
 \begin{figure}[htbp]
@@ -598,12 +596,12 @@ every five seconds; the largest recorded gap during discovery is below
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/discovery_resources.tex}
 \caption{Discovery resource measurements. Generated-chunk totals use the declared
 dense-arithmetic boundary and charge partially executed final prefixes.
 Episode means include unsuccessful attempts. $(2,2)$ has 26/40 observed
 successes at 42.9\% of native arithmetic rate.}
 \label{tab:resources}
-\input{../paper/generated/discovery_resources.tex}
 \end{table}
 
 Calibration requires approximately 291 seconds and discovery 31,245 seconds
@@ -626,11 +624,6 @@ rollout measurements.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Fixed-input full-generation calibration. Each setting has 60 calls in
-three randomized blocks. Range gives the minimum and maximum host block means,
-not a confidence interval. Host time falls more steeply with $d$ than counted
-arithmetic. Host and CUDA columns average separate retained measurements of all
-60 calls; the extra decimals distinguish their means, not timing accuracy.}
 \begin{tabular}{@{}cS[table-format=3.1]S[table-format=4.3]S[table-format=4.3]r@{}}
 \toprule
 $d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
@@ -643,6 +636,11 @@ $d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
 20 & 756.2 & 1158.635 & 1158.608 & 1133.5--1172.6\\
 \bottomrule
 \end{tabular}
+\caption{Fixed-input full-generation calibration. Each setting has 60 calls in
+three randomized blocks. Range gives the minimum and maximum host block means,
+not a confidence interval. Host time falls more steeply with $d$ than counted
+arithmetic. Host and CUDA columns average separate retained measurements of all
+60 calls; the extra decimals distinguish their means, not timing accuracy.}
 \end{table}
 
 The calibration stores full-generation intervals and global operator arithmetic
@@ -699,10 +697,6 @@ over evaluated lengths 5--17 against the original length-20 value.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Dense generation arithmetic across evaluated language shapes. Budget
-tests retain the original absolute ceilings; none of the reported transfer
-configurations changes eligibility.}
-\label{tab:shape-audit}
 \begin{tabular}{@{}crS[table-format=3.1]c@{}}
 \toprule
 $d$ & \shortstack{Evaluated lengths\\GFLOPs (range)} & {\shortstack{Length 20\\GFLOPs}} & \shortstack{Eligibility\\changes}\\
@@ -712,6 +706,10 @@ $d$ & \shortstack{Evaluated lengths\\GFLOPs (range)} & {\shortstack{Length 20\\G
 10 & 629.8--639.3 & 641.7 & 0\\
 \bottomrule
 \end{tabular}
+\caption{Dense generation arithmetic across evaluated language shapes. Budget
+tests retain the original absolute ceilings; none of the reported transfer
+configurations changes eligibility.}
+\label{tab:shape-audit}
 \end{table}
 
 In particular, $(2,10)$ remains within the original half-native ceiling for all
@@ -732,22 +730,17 @@ retain all state and seed identities needed to reproduce the primary interval.
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/primary_resources.tex}
 \caption{Descriptive primary expenditure differences, selected minus comparator
 at $h=2$, including all attempts. Intervals use the paired state bootstrap
 conditional on the eight tasks and were added after outcomes were observed.
 Timing intervals summarize sampling variation in the observed records; they
 do not account for unmonitored runtime interference during priority completion.}
 \label{tab:primary-costs}
-\input{../paper/generated/primary_resources.tex}
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Runtime and protocol shared by all four confirmation execution phases.
-Module versions are the loaded versions reported at evaluation time. The
-supplement retains source digests and distinguishes conflicting installed
-distribution metadata from these loaded versions.}
-\label{tab:runtime}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
 \toprule
 Setting & Value\\
@@ -765,6 +758,11 @@ Compilation/warm-up & Model compilation disabled; 20 warm-up generations per con
 Evaluator provenance & Source revision and full digest retained in supplement\\
 \bottomrule
 \end{tabular}
+\caption{Runtime and protocol shared by all four confirmation execution phases.
+Module versions are the loaded versions reported at evaluation time. The
+supplement retains source digests and distinguishes conflicting installed
+distribution metadata from these loaded versions.}
+\label{tab:runtime}
 \end{table}
 
 The retained provenance does not characterize numerical precision and attention
@@ -776,23 +774,23 @@ the stated model configuration, but not component- or kernel-level claims.
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/confirmation_tasks.tex}
 \caption{Confirmation successes by task and configuration. Each task row has
 20 attempts: ten paired initial states, each with two policy seeds. The total
 aggregates 160 attempts per configuration. The primary
 $(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
 \label{tab:primary-tasks}
 \label{tab:confirmation-tasks}
-\input{../paper/generated/confirmation_tasks.tex}
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/confirmation_secondary.tex}
 \caption{Amended descriptive comparisons using all 160 attempts per setting.
 These contrasts were documented after collection began and are not originally
 prespecified or fully outcome-blind. Intervals are task-conditional,
 unadjusted, and do not test a quality-preservation margin.}
 \label{tab:confirmation-secondary}
-\input{../paper/generated/confirmation_secondary.tex}
 \end{table}
 
 The four amended comparisons are reported in their documented order, using
@@ -816,8 +814,6 @@ independent outcome replay in a separate simulator.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Internal measurement-verification checklist.}
-\label{tab:verification-summary}
 \begin{tabular}{@{}p{0.25\linewidth}p{0.67\linewidth}@{}}
 \toprule
 Check & Evidence\\
@@ -838,6 +834,8 @@ Remaining boundary & Independent, version-matched replay and direct terminal-sta
 inspection remain outside this audit.\\
 \bottomrule
 \end{tabular}
+\caption{Internal measurement-verification checklist.}
+\label{tab:verification-summary}
 \end{table}
 \FloatBarrier
 \paragraph{Analysis provenance.}
@@ -885,6 +883,7 @@ ceiling. Ties favor lower compute, then lexicographic order.
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/selector_choices.tex}
 \caption{Discovery-based selector choices.
 The learned choices and comparisons were frozen before transfer; additional
 selector baselines were documented after collection began.
@@ -896,17 +895,16 @@ the half-native row is primary.
 }
 \label{tab:selectors}
 \label{tab:predictions}
-\input{../paper/generated/selector_choices.tex}
 \end{table}
 
 \begin{table}[htbp]
 \centering\small
+\input{../paper/generated/confirmation_predictions.tex}
 \caption{All original frozen denoising tests: selected minus comparator,
 holding $h$ fixed within each row. Predicted and observed gaps and intervals are
 percentage points. The half-native row is primary; secondary intervals are
 descriptive, task-conditional, and unadjusted.}
 \label{tab:confirmation-predictions}
-\input{../paper/generated/confirmation_predictions.tex}
 \end{table}
 
 The simple rule minimizes denoising count, then chooses the shortest feasible
