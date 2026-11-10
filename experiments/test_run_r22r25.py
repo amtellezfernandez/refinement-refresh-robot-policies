@@ -1,0 +1,155 @@
+"""Full orchestration with fake subprocesses only; no native stacks or identities."""
+import importlib.util
+import json
+from pathlib import Path
+import socket
+import sys
+import tempfile
+import unittest
+
+spec = importlib.util.spec_from_file_location('run_r22r25', Path(__file__).with_name('run_r22r25.py'))
+runner = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(runner)
+
+
+class Operator(unittest.TestCase):
+    def fixture(self, root):
+        tools = root / 'repo with spaces/experiments/tooling/cross_policy_v3'
+        tools.mkdir(parents=True)
+        workspace = runner.canonical_workspace(tools.parents[2])
+        for model in ('smolvla', 'pi05'):
+            (workspace / model / 'checkpoint').mkdir(parents=True)
+        (tools / 'verify_campaign.py').write_text('print("fake qualification checked")')
+        (tools / 'launch_v3.py').write_text('''import argparse
+from pathlib import Path
+p=argparse.ArgumentParser(); p.add_argument('--output'); a,_=p.parse_known_args()
+Path(a.output).mkdir(); (Path(a.output)/'attempts').mkdir()
+print('fake run finished')
+''')
+        (tools / 'analysis_v2.py').write_text('''import argparse
+from pathlib import Path
+p=argparse.ArgumentParser(); p.add_argument('--output'); a,_=p.parse_known_args()
+Path(a.output).write_text('fake analysis')
+''')
+        (tools / 'server_openpi_v3.py').write_text('''import argparse,socket,time
+from pathlib import Path
+p=argparse.ArgumentParser(); p.add_argument('--output'); p.add_argument('--port',type=int); a,_=p.parse_known_args()
+Path(a.output).mkdir(); (Path(a.output)/'startup_gate.json').write_text('{}')
+s=socket.socket(); s.bind(('127.0.0.1',a.port)); s.listen(); time.sleep(60)
+''')
+        return tools.parents[2], workspace
+
+    def test_default_preview_uses_existing_release_gate_directory(self):
+        import subprocess
+        script = Path(__file__).with_name('run_r22r25.py')
+        result = subprocess.run([sys.executable, str(script),
+            '--smolvla-python', '/fake/smol/python', '--pi05-client-python', '/fake/pi05-client/python',
+            '--pi05-server-python', '/fake/pi05-server/python'],
+            capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        expected = script.resolve().parents[1] / 'experiments/runs/cross_policy_confirmation_v2'
+        self.assertIn(str(expected / 'smolvla/schedule.json'), result.stdout)
+        self.assertIn(str(expected / 'pi05/schedule.json'), result.stdout)
+
+    def test_pi05_client_and_server_use_independent_interpreters(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            commands = dict(runner.plan(runner.canonical_workspace(root), '/smol312/python',
+                '/client38/python', pi05_server_python='/server311/python', root=root))
+            self.assertEqual(commands['pi05-server'][0], '/server311/python')
+            self.assertEqual(commands['pi05-server-verify'][0], '/server311/python')
+            self.assertEqual(commands['pi05-campaign'][0], '/client38/python')
+            self.assertEqual(commands['pi05-verify'][0], '/client38/python')
+            self.assertEqual(commands['pi05-analysis'][0], '/client38/python')
+            self.assertEqual(list(root.iterdir()), [])
+
+    def test_wrong_workspace_is_rejected_as_layout_not_authorization(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, 'released schedule directory'):
+                runner.plan(root / 'arbitrary-workspace', sys.executable, sys.executable, pi05_server_python=sys.executable, root=root)
+            self.assertEqual(list(root.iterdir()), [])
+
+    def test_complete_fake_round_and_service_cleanup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            with socket.socket() as probe:
+                probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
+            plan = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, port=port, root=root)
+            self.assertEqual([n for n,_ in plan][:2], ['smolvla-verify', 'pi05-verify'])
+            runner.execute(plan, workspace, port=port, startup_timeout=10, root=root)
+            for model in ('smolvla', 'pi05'):
+                self.assertEqual((workspace / model / 'analysis.json').read_text(), 'fake analysis')
+            receipt = json.loads(next((workspace / 'operator-logs').glob('launch-*/pi05-server.receipt.json')).read_text())
+            self.assertIsNotNone(receipt['exit_code'])
+            with self.assertRaisesRegex(ValueError, 'Existing output'):
+                runner.execute(plan, workspace, port=port, root=root)
+
+    def test_server_death_after_readiness_stops_client_and_analysis(self):
+        from benchstudio.processes import ProcessFailure
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            tools = root / 'experiments/tooling/cross_policy_v3'
+            server = tools / 'server_openpi_v3.py'
+            source = server.read_text().replace("time.sleep(60)",
+                "\nwhile not Path('client-running').exists(): time.sleep(0.01)\n")
+            server.write_text(source)
+            client = tools / 'launch_v3.py'
+            client.write_text(client.read_text() +
+                "\nimport sys,time\nif 'pi05' in sys.argv:\n"
+                "    Path('client-running').touch()\n    time.sleep(1)\n"
+                "    Path('client-incorrectly-completed').touch()\n")
+            with socket.socket() as probe:
+                probe.bind(('127.0.0.1', 0)); port = probe.getsockname()[1]
+            commands = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, port=port, root=root)
+            with self.assertRaisesRegex(ProcessFailure, 'required service'):
+                runner.execute(commands, workspace, port=port, startup_timeout=10, root=root)
+            self.assertFalse((root / 'client-incorrectly-completed').exists())
+            self.assertFalse((workspace / 'pi05/analysis.json').exists())
+            receipt = json.loads(next((workspace / 'operator-logs').glob('launch-*/pi05-campaign.receipt.json')).read_text())
+            self.assertEqual(receipt['reason'], 'ProcessFailure')
+
+    def test_stopped_native_run_is_analyzed_without_starting_other_model(self):
+        from benchstudio.processes import ProcessFailure
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            script = root / 'experiments/tooling/cross_policy_v3/launch_v3.py'
+            script.write_text("import argparse; from pathlib import Path\n"
+                "p=argparse.ArgumentParser(); p.add_argument('--output'); a,_=p.parse_known_args()\n"
+                "Path(a.output).mkdir(); (Path(a.output)/'run_summary.json').write_text('{}')\n"
+                "raise SystemExit(3)\n")
+            plan = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, root=root)
+            with self.assertRaises(ProcessFailure, msg='must preserve the native stop'):
+                runner.execute(plan, workspace, root=root)
+            self.assertTrue((workspace / 'smolvla/analysis.json').exists())
+            self.assertFalse((workspace / 'pi05/server').exists())
+
+    def test_server_interpreter_precheck_fails_before_any_model_starts(self):
+        from benchstudio.processes import ProcessFailure
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            script = root / 'experiments/tooling/cross_policy_v3/verify_campaign.py'
+            script.write_text('import sys; raise SystemExit(2 if "--role" in sys.argv else 0)')
+            commands = runner.plan(workspace, sys.executable, sys.executable,
+                pi05_server_python=sys.executable, root=root)
+            with self.assertRaisesRegex(ProcessFailure, 'pi05-server-verify'):
+                runner.execute(commands, workspace, root=root)
+            self.assertFalse((workspace / 'smolvla/run').exists())
+            self.assertFalse((workspace / 'pi05/server').exists())
+
+    def test_failed_second_precheck_prevents_all_native_jobs(self):
+        from benchstudio.processes import ProcessFailure
+        with tempfile.TemporaryDirectory() as directory:
+            root, workspace = self.fixture(Path(directory))
+            script = root / 'experiments/tooling/cross_policy_v3/verify_campaign.py'
+            script.write_text('import sys; raise SystemExit(2 if "pi05" in sys.argv else 0)')
+            plan = runner.plan(workspace, sys.executable, sys.executable, pi05_server_python=sys.executable, root=root)
+            with self.assertRaises(ProcessFailure):
+                runner.execute(plan, workspace, root=root)
+            self.assertFalse((workspace / 'smolvla/run').exists())
+            self.assertFalse((workspace / 'pi05/server').exists())
+
+
+if __name__ == '__main__':
+    unittest.main()
+
