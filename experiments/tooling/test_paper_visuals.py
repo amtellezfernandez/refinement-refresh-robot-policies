@@ -175,7 +175,7 @@ class PaperVisualTests(unittest.TestCase):
             ]
         )
         np.testing.assert_allclose(points, expected)
-        self.assertEqual(tradeoff.get_ylim(), (0, 100))
+        self.assertEqual(tradeoff.get_ylim(), (60, 100))
         self.assertEqual(len(effects.containers), 7)
         for comparison, container in zip(
             self.data["confirmation"]["comparisons"], effects.containers

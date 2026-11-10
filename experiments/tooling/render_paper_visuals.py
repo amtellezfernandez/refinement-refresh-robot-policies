@@ -708,6 +708,7 @@ def success_compute_figure(data, path):
     fig = plt.figure(figsize=(FIGURE_WIDTH, 3.25))
     tradeoff = fig.add_axes([0.09, 0.17, 0.32, 0.72])
     effects = fig.add_axes([0.70, 0.17, 0.27, 0.72])
+    tradeoff.set_facecolor(".965")
     offsets = {
         (1, 2): (7, 15),
         (1, 5): (-18, -16),
@@ -722,13 +723,14 @@ def success_compute_figure(data, path):
         x = row["nominal_fraction_native"]
         y = 100 * row["success_rate"]
         primary = cell == (2, 2)
+        primary_pair = cell in {(2, 2), (2, 5)}
         tradeoff.scatter(
             x,
             y,
             s=44 if primary else 28,
             marker="D" if primary else "o",
             facecolor=ACCENT if primary else "white",
-            edgecolor=ACCENT if primary else INK,
+            edgecolor=ACCENT if primary_pair else INK,
             linewidth=0.8,
             zorder=3,
         )
@@ -759,9 +761,9 @@ def success_compute_figure(data, path):
         xlabel="Nominal arithmetic / native\n(per control step)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
-        ylim=(0, 100),
+        ylim=(60, 100),
         xticks=[0.2, 0.4, 0.6, 0.8, 1.0],
-        yticks=[0, 25, 50, 75, 100],
+        yticks=[60, 70, 80, 90, 100],
     )
     tradeoff.set_axisbelow(True)
     tradeoff.grid(color=".91", lw=0.55)
