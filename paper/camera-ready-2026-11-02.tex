@@ -23,92 +23,81 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-As vision--language--action policies become more computationally demanding,
-deployment under explicit resource constraints poses an allocation problem: how
-much inference effort should construct each action chunk, and how long should it
-execute before prediction is refreshed from a new observation? We give a
-reproducible evaluation and reporting recipe for frozen chunked policies with a
-controllable generation setting. It measures complete generation and episode
-expenditure, separates discovery from held-out evaluation, freezes confirmatory
-comparisons, and labels later analyses descriptive. We demonstrate it with one
-frozen SmolVLA checkpoint in synchronous LIBERO simulation, using denoising count
-as its generation control. At a fixed two-action prefix, the prespecified
+How should a frozen chunked robot policy spend inference compute: refine its
+current action chunk, or replan from a newer observation? We introduce a
+reproducible protocol for evaluating this trade-off and demonstrate it with one
+frozen SmolVLA checkpoint in synchronous LIBERO simulation. The protocol measures
+complete generation and episode expenditure, separates discovery from held-out
+evaluation, freezes confirmatory comparisons before outcomes are observed, and
+labels later analyses descriptive. At a fixed two-action prefix, the prespecified
 comparison found 139/160 successes with two denoising steps versus 122/160 with
-five while using less counted arithmetic. Because 82.1\% of native generation
-arithmetic was independent of denoising, tight rate limits can require a longer
-execution prefix before quality is considered. A later descriptive comparison
-found 138/160 versus 139/160 successes when executing five rather than two actions
-per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. These results are checkpoint-specific; the transferable contribution
-is the evaluation procedure, not a general allocation rule.
+five while using less counted arithmetic. Full-generation calibration showed
+that 82.1\% of native arithmetic was independent of denoising, creating a fixed
+per-call cost floor. A later descriptive comparison found 138/160 versus 139/160
+successes when executing five rather than two actions per prediction, with 60.7\%
+lower arithmetic per attempt; equivalence was not established. The large
+refinement effect is localized at the two-action prefix, and a simple cost-aware
+rule matched the fitted model's choices. These checkpoint-specific findings do
+not define a general allocation rule. The contribution is a controlled SmolVLA
+study and a procedure for reporting success, complete compute, and evidence
+status together.
 \end{abstract}
 
 \section{Introduction}
 
-Deploying vision--language--action policies under a finite inference budget is
-an allocation problem. A chunked policy spends internal computation constructing
-an action sequence, executes some prefix of that sequence, and then pays for
-another prediction conditioned on a newer observation. More generation effort
-may change the predicted chunk; a longer execution prefix reduces prediction
-frequency but delays feedback and exposes later action positions. Comparing these
-controls therefore requires closed-loop outcomes and a common resource boundary,
-not generation cost alone.
+A frozen chunked robot policy can reduce inference work in two ways: spend less
+computation refining each action prediction, or execute more actions before
+requesting a new prediction. These interventions affect behavior differently.
+Reduced refinement changes the prediction itself; longer execution prefixes
+delay observation-conditioned revision and expose later positions of the
+predicted sequence. Their relative value should therefore be evaluated through
+closed-loop outcomes under a common resource constraint.
 
-We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
-compute between action generation and observation-conditioned execution?} To
-answer this without turning one architecture's control into a general rule, we
-introduce a reproducible evaluation protocol. It defines the model-specific
-generation-effort setting and execution prefix separately, measures complete
-prediction and realized episode expenditure, separates discovery from held-out
-evaluation, freezes confirmatory comparisons before outcomes are observed, and
-marks later analyses as descriptive. Whenever generation cost contains work
-independent of $r$, the per-step compute rate is bounded below by that fixed cost
-divided by $h$; a tight ceiling can therefore force a minimum execution prefix
-before any quality comparison. The protocol and its evidence-reporting
-procedure are the primary transferable contributions. Throughout, \emph{refinement}
-denotes model-specific generation effort $r$, while \emph{refresh} denotes replanning
-after an execution prefix $h$; smaller $h$ means more frequent refresh.
+We ask: \emph{given a fixed inference budget, how should a frozen policy divide
+compute between prediction refinement and observation-conditioned refresh?}
+Throughout, \emph{refinement} denotes a model-specific generation-effort control
+$r$, while \emph{refresh} denotes replanning after an execution prefix $h$;
+smaller $h$ means more frequent refresh. This paper instantiates $r$ only as the
+denoising count $d$ of one SmolVLA checkpoint. Synchronous execution fixes the
+sequencing and measurement boundaries; it does not establish an asynchronous
+scheduling optimum, physical-robot latency, or a universal hardware winner.
 
-The protocol is intended for chunked policies that expose a controllable generation
-effort; only denoising is instantiated in this study. Other possible controls include integration steps in an iterative flow or diffusion policy,
-or candidate, search, or verification effort in a policy that uses those
-procedures. These controls need not have comparable units across architectures.
-We use synchronous execution to hold sequencing and measurement boundaries fixed;
-the study does not identify an asynchronous scheduling optimum, real-robot
-latency, or a universal hardware winner.
+The cost of a fresh prediction makes the allocation question nontrivial. In the
+SmolVLA case study \cite{smolvla}, work independent of denoising accounts for
+82.1\% of native counted arithmetic. This fixed share imposes a per-call floor:
+under a sufficiently tight rate ceiling, some short execution prefixes are
+infeasible before behavioral quality is considered. The floor is a structural
+property of the declared cost decomposition, while its magnitude is specific to
+the implementation and measurement boundary.
 
-SmolVLA provides the worked case study \cite{smolvla}. Its generation control is
-denoising count, and its execution control is the number of actions applied before
-replanning. We evaluate twelve configurations in a paired 480-attempt discovery
-study, then seven configurations in 1,120 held-out attempts on eight tasks excluded
-from selection. Three denoising comparisons were frozen before confirmation. The
-execution-prefix contrasts were added later and remain descriptive; they neither
-isolate observation freshness from action-position effects nor establish an
-optimal allocation rule.
+We evaluate twelve configurations in a paired 480-attempt discovery study, then
+seven configurations in 1,120 held-out attempts on eight tasks excluded from
+selection. The primary comparison varies denoising at a fixed execution prefix.
+Three denoising comparisons were frozen before confirmation. Execution-prefix
+contrasts were added later and remain descriptive; they neither isolate
+observation freshness from action-position effects nor establish an optimal
+allocation rule.
 
-For this checkpoint, the prespecified primary comparison yields 139/160 successes
-with two denoising steps versus 122/160 with five at the same two-action prefix,
-while using less counted arithmetic. Calibration shows that 82.1\% of native
-generation arithmetic is independent of denoising, so reducing refinement alone
-leaves substantial fixed work. At two denoising steps, executing five actions per
-prediction yields 138/160 successes and 60.7\% less arithmetic per attempt than
-executing two; equivalent quality is not established. A simple cost-aware rule
-also matches the fitted response model's choices at all three ceilings, with no
-demonstrated selection advantage from fitting.
-
-These checkpoint-specific outcomes show how to apply the protocol and how its
-evidence boundaries constrain the resulting claims.
+For this checkpoint, the prespecified two-action comparison yields 139/160
+successes with two denoising steps versus 122/160 with five, while using less
+counted arithmetic. The large effect is localized at $h=2$; the corresponding
+point differences are much smaller at $h=1$ and $h=5$. At two denoising steps,
+executing five actions per prediction yields 138/160 successes and 60.7\% less
+arithmetic per attempt than executing two; equivalent quality is not established.
+A simple cost-aware rule also matches the fitted response model's choices at all
+three ceilings, with no demonstrated selection advantage from fitting.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a generation--execution allocation protocol for chunked policies with
-    a controllable inference setting, mapping that setting and the execution
-    prefix to complete prediction and episode expenditure;
-    \item an evidence-reporting procedure that separates prespecified tests from
-    amended descriptive contrasts and retains their uncertainty and provenance;
-    and
-    \item a paired SmolVLA case study, using denoising count as the generation
-    control, across twelve discovery configurations and seven held-out settings.
+    \item a reproducible refinement--refresh evaluation protocol that defines the
+    controls, accounts for complete prediction and episode expenditure, and
+    freezes confirmatory comparisons before held-out evaluation;
+    \item an evidence-reporting procedure that separates prespecified denoising
+    tests from amended descriptive prefix contrasts and retains their uncertainty
+    and provenance; and
+    \item a paired SmolVLA study across twelve discovery configurations and seven
+    held-out settings, including a prespecified primary success comparison and
+    complete compute accounting.
 \end{itemize}
 
 \section{Related Work}
@@ -128,10 +117,7 @@ SmolVLA studies asynchronous inference and robot behavior \cite{smolvla}.
 Here predicted chunk size remains fixed, while executed prefix changes; task
 success is measured alongside computation. RoboMonkey studies test-time sampling
 and action verification \cite{robomonkey}, an adjacent allocation axis that
-would require counting candidate generation and verification costs. Together,
-these systems motivate a common evaluation recipe for architecture-specific
-deployment controls; they do not imply a shared control value or cost model.
-
+would require counting candidate generation and verification costs.
 Adaptive VLA scheduling is directly related. DVAC uses denoising-derived action
 variance to choose an execution prefix before replanning \cite{dvac}.
 ElegantVLA schedules vision--language recomputation or reuse together with action
@@ -141,7 +127,7 @@ comparisons. It neither introduces an adaptive scheduler nor establishes an
 advantage over these methods; their reported speedups have different policies,
 hardware, and measurement boundaries.
 
-\section{Protocol for Generation--Execution Allocation}
+\section{Protocol for Refinement--Refresh Evaluation}
 \label{sec:allocation}
 
 The protocol has four stages. First, choose an architecture-specific generation
@@ -198,21 +184,19 @@ the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
-We distinguish this rate from total arithmetic per attempted episode. Let
-$N_e=\lceil T_e/h\rceil$ be the number of generated chunks in attempt $e$, and
-let $x_{e,j}$ denote the realized input and execution context of generation $j$.
-The general episode expenditure is
+We distinguish this rate from total arithmetic per attempted episode. If attempt
+$e$ executes $T_e$ actions under a fixed setting and reference-shape calibration,
+its generated-chunk expenditure is
 \begin{equation}
- C_e=\sum_{j=1}^{N_e}F_{\mathrm{gen}}(r_{e,j};x_{e,j}).
+ C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(r).
  \label{eq:episode-cost}
 \end{equation}
-This sum accommodates sampling, search, verification, adaptive early exit, or
-other systems whose control or cost varies across chunks. Under the fixed setting
-and reference-shape calibration used for the reported SmolVLA arithmetic, it
-reduces to $C_e=N_eF_{\mathrm{gen}}(d)$. The final generated chunk is charged even
-if only part of its execution prefix is used. All-attempt means include
-unsuccessful episodes. Different trajectories and termination times can therefore
-change expenditure at the same nominal rate.
+The final generated chunk is charged even if only part of its execution prefix
+is used. All-attempt means include unsuccessful episodes. Different trajectories
+and termination times can therefore change expenditure at the same nominal rate.
+For a policy whose control or cost varies across generations, Equation~\ref{eq:episode-cost}
+would be replaced by the sum of measured per-generation costs; that extension is
+not instantiated here.
 FLOPs, host elapsed time, and CUDA-stream time retain separate units and
 measurement boundaries.
 
@@ -501,25 +485,20 @@ but does not determine the quality ranking on new tasks.
 
 \section{Discussion and Conclusion}
 
-This study develops a procedure for evaluating how chunked robot policies
-allocate inference compute between constructing an action chunk and deciding how
-long to execute it before generation is refreshed from a new observation. The
-procedure measures the complete cost of a policy
-call, separates configuration discovery from held-out confirmation, freezes the
-confirmatory comparisons before evaluation, labels later contrasts as
-descriptive, and reports closed-loop success together with episode expenditure.
+This study evaluates how one frozen SmolVLA checkpoint allocates inference
+compute between denoising refinement and observation-conditioned replanning. Its
+methodological contribution is a controlled within-policy procedure: measure the
+complete cost of each policy call, separate discovery from held-out confirmation,
+freeze confirmatory comparisons before evaluation, label later contrasts
+descriptive, and report closed-loop success together with episode expenditure.
 This prevents a cheap configuration from being treated as useful without
 behavioral evidence, or a successful configuration from being discussed without
 its compute cost.
 
-The transferable contribution is this evaluation protocol. It treats generation
-effort as a policy-specific control rather than assuming that every architecture
-uses denoising. For diffusion or flow policies it may be an integration-step
-count; for sampling, search, or verification systems it may be the number of
-candidates, search expansions, or verification passes, provided the control and
-its complete cost are defined in advance. SmolVLA serves as a worked case study
-for one checkpoint and simulator stack, demonstrating the procedure with
-denoising count and showing how evidence status changes the permitted claims.
+The empirical conclusions are specific to this checkpoint and synchronous LIBERO
+stack. The protocol supplies a reporting template for replication, but the paper
+does not validate a common refinement variable or allocation rule across policy
+architectures.
 In this SmolVLA case study, additional refinement did not consistently produce
 better closed-loop behavior. For this implementation, reducing refinement alone
 delivered limited savings because most generation work was independent of
