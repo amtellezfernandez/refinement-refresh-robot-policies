@@ -776,13 +776,14 @@ def success_compute_figure(
         bbox={"boxstyle": "round,pad=0.22", "facecolor": "white", "edgecolor": ".78", "lw": 0.5},
     )
     tradeoff.set(
-        xlabel="Nominal arithmetic / native\n(per control step)",
+        xlabel="Compute per control step\n(% of native; lower = cheaper)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
         ylim=(70, 100),
         xticks=[0.2, 0.4, 0.6, 0.8, 1.0],
         yticks=[70, 80, 90, 100],
     )
+    tradeoff.set_xticklabels(["20", "40", "60", "80", "100"])
     tradeoff.set_axisbelow(True)
     tradeoff.grid(color=".91", lw=0.55)
     tradeoff.spines[["top", "right"]].set_visible(True)
