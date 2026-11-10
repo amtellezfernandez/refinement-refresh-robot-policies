@@ -379,6 +379,105 @@ def feasible_prefixes(calibration):
     ]
 
 
+def discovery_success_figure(data, path):
+    """Compact main-text discovery panel with no narrative annotations."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig, ax = plt.subplots(figsize=(FIGURE_WIDTH, 1.72))
+    fig.subplots_adjust(left=0.10, right=0.985, bottom=0.27, top=0.73)
+    for offset, h, color, marker in zip((-0.14, 0, 0.14), (1, 2, 5), COLORS, MARKERS):
+        rows = [r for r in data["discovery"]["cells"] if r["h"] == h]
+        means = np.array([r["success"] for r in rows]) * 100
+        bounds = np.array([r["descriptive_95_interval"] for r in rows]) * 100
+        ax.errorbar(
+            np.arange(4) + offset,
+            means,
+            yerr=np.array([means - bounds[:, 0], bounds[:, 1] - means]),
+            color=color,
+            marker=marker,
+            ls="none",
+            capsize=2,
+            elinewidth=0.9,
+            markersize=4.5,
+            label=f"$h={h}$",
+        )
+    ax.set(
+        xlabel="Denoising steps",
+        ylabel="Success (%)",
+        ylim=(15, 90),
+        xlim=(-0.42, 3.42),
+        xticks=range(4),
+        xticklabels=[2, 5, 10, 20],
+        yticks=[20, 40, 60, 80],
+    )
+    ax.legend(
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.01),
+        ncol=3,
+        frameon=False,
+        handlelength=1,
+        columnspacing=1.4,
+        handletextpad=0.25,
+    )
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=".90", lw=0.55)
+    ax.spines[["top", "right"]].set_visible(False)
+    save_figure(fig, path)
+    plt.close(fig)
+
+
+def selector_feasibility_figure(data, path):
+    """Appendix-only resource-coordinate sensitivity panel."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    fig, ax = plt.subplots(figsize=(3.35, 1.62))
+    fig.subplots_adjust(left=0.19, right=0.97, bottom=0.29, top=0.70)
+    selected = feasible_prefixes(data["calibration"])
+    for offset, choices, marker, color, label in zip(
+        (-0.075, 0.075),
+        selected,
+        ("o", "s"),
+        (ACCENT, MID),
+        ("Arithmetic", "Host time"),
+    ):
+        ax.plot(
+            np.arange(3) + offset,
+            [{5: 0, 2: 1, 1: 2}[h] for h in choices],
+            marker=marker,
+            color=color,
+            ms=5,
+            ls="none",
+            markerfacecolor=color if label == "Arithmetic" else "white",
+            label=label,
+        )
+    ax.set(
+        xlabel="Ceiling / native",
+        ylabel="Actions before refresh",
+        xlim=(-0.4, 2.4),
+        ylim=(-0.4, 2.4),
+        xticks=range(3),
+        xticklabels=["0.25", "0.50", "1.00"],
+        yticks=[0, 1, 2],
+        yticklabels=["5", "2", "1"],
+    )
+    ax.legend(
+        loc="lower center",
+        bbox_to_anchor=(0.5, 1.01),
+        frameon=False,
+        ncol=2,
+        handlelength=1,
+        handletextpad=0.3,
+        columnspacing=1.0,
+    )
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=".90", lw=0.55)
+    ax.spines[["top", "right"]].set_visible(False)
+    save_figure(fig, path)
+    plt.close(fig)
+
+
 def discovery_figure(data, path):
     import matplotlib.pyplot as plt
     import numpy as np
@@ -791,6 +890,8 @@ def render(destination):
         (destination / name).write_text(content, encoding="utf-8")
     style()
     discovery_figure(data, destination / "discovery_allocation.pdf")
+    discovery_success_figure(data, destination / "discovery_success.pdf")
+    selector_feasibility_figure(data, destination / "selector_feasibility.pdf")
     confirmation_figure(data, destination / "confirmation_effects.pdf")
     study_design_figure(data, destination / "study_design.pdf")
     cost_decomposition_figure(data, destination / "cost_decomposition.pdf")
@@ -798,6 +899,8 @@ def render(destination):
     names = [
         *contents,
         "discovery_allocation.pdf",
+        "discovery_success.pdf",
+        "selector_feasibility.pdf",
         "confirmation_effects.pdf",
         "study_design.pdf",
         "cost_decomposition.pdf",

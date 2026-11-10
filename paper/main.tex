@@ -169,10 +169,9 @@ frequently the policy receives a new observation.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
-\caption{Synchronous chunked closed-loop execution. A policy call predicts
-$K$ actions after $d$ denoising steps; only the first $h$ actions are executed,
-with the remaining $K-h$ actions discarded before the next observation and
-replanning step. In the experiments, $K=50$.}
+\caption{Closed-loop execution used throughout the protocol. Each policy call
+predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
+the remainder, and replans from a new observation. In the experiments, $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
@@ -211,18 +210,6 @@ ten to five saves 8.9\% of counted generation work; reducing it to two saves
  \frac{b(h,d)}{b_{\mathrm{native}}}
  \simeq \frac{0.821+0.179(d/10)}{h}.
 \]
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/cost_decomposition.pdf}
-\caption{Why refinement and refresh must be considered together. Each complete
-generation contains the same denoising-independent arithmetic plus a component
-that grows with $d$. At native $d=10$, 82.1\% of the counted arithmetic is
-independent of denoising. Increasing $h$ amortizes the complete generation over
-more executed actions. This is a dense-arithmetic decomposition under the
-declared counting boundary, not a component-level timing attribution.}
-\label{fig:cost-decomposition}
-\end{figure}
 
 We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
 Eligibility uses measured per-$d$ values, not the rounded affine expression.
@@ -289,32 +276,28 @@ are reported separately in Appendix~\ref{app:fixed-timing}.
 Native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
 for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$, successes
 are 21, 18, 16, and 14 out of 40 as $d$ increases from 2 to 20.
-Figure~\ref{fig:frontier}(a) shows every configuration.
+Figure~\ref{fig:frontier} shows every configuration.
 These point estimates do not justify imposing monotonic improvement with
 denoising. The small paired sample also does not certify equal quality for
 configurations with similar observed counts.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{../paper/generated/discovery_allocation.pdf}
-\caption{Quality and feasibility are distinct. (a) Discovery success, with
-40 attempts per configuration. Colors and shapes identify executed prefix $h$; bars give
-descriptive, task-conditional 95\% paired state-bootstrap intervals.
-The $d$ axis is categorical; horizontal offsets only separate overlapping bars.
-(b) A minimum-denoising, shortest-feasible-prefix rule selects different
-prefixes under separately normalized arithmetic and fixed-input host-time
-ceilings. The $h$ axis shows the selected prefix categories, not elapsed time.
-These are feasibility-dependent choices, not established quality
-optima; timing details are in Appendix~\ref{app:timing-sensitivity}.}
+\includegraphics[width=\linewidth]{../paper/generated/discovery_success.pdf}
+\caption{Discovery success for all twelve configurations, with 40 attempts per
+configuration on four Spatial tasks. Marker shape and color identify the
+executed prefix $h$; whiskers are descriptive, task-conditional 95\% paired
+state-bootstrap intervals. The $d$ axis is categorical, and horizontal offsets
+only separate overlapping estimates.}
 \label{fig:frontier}
 \end{figure}
 
 The resource coordinate also matters: nominal rate differs from realized episode
 expenditure, and arithmetic savings differ from elapsed savings.
-Figure~\ref{fig:frontier}(b) illustrates how substituting a host-time constraint
-changes feasible refresh choices. This sensitivity analysis does not change the
-frozen arithmetic-based experiment. Full task and resource tables appear in
-Appendix~\ref{app:calibration}.
+Substituting a host-time constraint changes feasible refresh choices; the
+appendix reports this sensitivity analysis separately from the discovery
+success figure. It does not change the frozen arithmetic-based experiment.
+Full task and resource tables appear in Appendix~\ref{app:calibration}.
 
 \subsection{Frozen tests and the role of selection}
 \label{sec:prediction}
@@ -375,7 +358,10 @@ refresh at fixed $d=2$; the right panel reports paired, task-conditional
 descriptive 95\% intervals in each arrow's direction. The refinement row is a
 frozen confirmatory test; the refresh row is a later-added descriptive contrast.
 The refresh episode-cost annotation uses mean arithmetic per attempted episode,
-a separate coordinate. Its interval does not establish equivalent success.}
+a separate coordinate. The refinement direction is positive on seven tasks and
+tied on one; refresh differences are mixed across tasks (three positive, three
+negative, and two ties). The refresh interval does not establish equivalent
+success.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
@@ -400,26 +386,11 @@ The primary direction is positive on seven tasks and tied on one, with
 task sensitivity and expenditure intervals. These measurements do not establish
 a controlled physical-latency improvement.
 Figure~\ref{fig:success-compute} places the primary setting in the joint
-success--compute coordinate; Figure~\ref{fig:confirmation-effects} places its
-effect alongside all other frozen and amended comparisons.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
-\caption{Confirmation effects: 160 paired attempts per setting on eight tasks.
-Rows compare $(h,d)$ as A minus B; bars are task-conditional, descriptive 95\%
-paired state-bootstrap intervals (secondary intervals unadjusted).
-The filled diamond marks the prespecified primary test. All three frozen tests
-and all four amended contrasts appear in their documented order; the latter
-were not fully outcome-blind. Intervals crossing zero do not establish
-equivalence. Predicted and observed gaps are tabulated in
-Tables~\ref{tab:confirmation-predictions} and~\ref{tab:confirmation-secondary}.}
-\label{fig:confirmation-effects}
-\end{figure}
-\FloatBarrier
+success--compute coordinate; Appendix~\ref{app:confirmation-details} retains
+the complete seven-contrast interval plot.
 
 The other two frozen tests have positive point estimates but intervals spanning
-zero (Figure~\ref{fig:confirmation-effects}). At $h=5$, two versus five
+zero (Appendix Figure~\ref{fig:confirmation-effects}). At $h=5$, two versus five
 denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
 137/160 versus 136/160. The largest observed benefit is at the primary prefix.
 The primary gap exceeds its frozen prediction, while matching the signs of
@@ -644,9 +615,20 @@ For $(1,2)$, $(2,2)$, and $(5,2)$, the normalized arithmetic rates are
 0.857, 0.429, and 0.171, while the normalized host-time rates are 0.346, 0.173,
 and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
 ceiling but eligible at a separately normalized half-native host-time ceiling.
-Figure~\ref{fig:frontier}(b) shows the resulting choices at all three ceilings.
+Appendix Figure~\ref{fig:selector-feasibility} shows the resulting choices at
+all three ceilings.
 These resource constraints admit different refresh schedules; the choices do
 not establish quality optima. The frozen experiment remains arithmetic-based.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\linewidth]{../paper/generated/selector_feasibility.pdf}
+\caption{Appendix sensitivity analysis. A minimum-denoising,
+shortest-feasible-prefix rule selects different prefixes under separately
+normalized arithmetic and fixed-input host-time ceilings. The vertical axis
+shows selected prefix categories, not elapsed time.}
+\label{fig:selector-feasibility}
+\end{figure}
 
 \subsection{Language-shape transport audit}
 \label{app:shape-audit}
@@ -760,6 +742,19 @@ unadjusted, and do not test a quality-preservation margin.}
 \label{tab:confirmation-secondary}
 \input{../paper/generated/confirmation_secondary.tex}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
+\caption{Complete confirmation effects: 160 paired attempts per setting on
+eight tasks. Rows compare $(h,d)$ as A minus B; whiskers are task-conditional,
+descriptive 95\% paired state-bootstrap intervals (secondary intervals
+unadjusted). The filled diamond marks the prespecified primary test. The three
+frozen tests and four amended contrasts appear in their documented order; the
+latter were not fully outcome-blind. Intervals crossing zero do not establish
+equivalence.}
+\label{fig:confirmation-effects}
+\end{figure}
 
 The stale-input intervention is reported separately from the confirmation
 comparisons. It is a 40-attempt mechanism diagnostic on the discovery identities,
