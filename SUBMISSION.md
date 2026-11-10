@@ -1,4 +1,4 @@
-# Submission and working-version notes
+# Submission, camera-ready, and working-version notes
 
 Title: **Refinement versus Refresh: Compute Allocation for Closed-Loop Robot
 Policies**.
@@ -8,8 +8,12 @@ Policies**.
 - [release/submitted.pdf](release/submitted.pdf) is the frozen submitted manuscript.
 - The dated [submission archive](release/archive/2026-09-13/) retains
   another copy and the submission materials.
-- [paper/main.tex](paper/main.tex) and [paper/working.pdf](paper/working.pdf) are the continuing
-  working version. Post-submission results belong here.
+- [output/pdf/camera-ready-submission-2026-11-02.pdf](output/pdf/camera-ready-submission-2026-11-02.pdf)
+  is the de-anonymized accepted-paper edition; its source is
+  [paper/camera-ready-2026-11-02.tex](paper/camera-ready-2026-11-02.tex).
+- [paper/main.tex](paper/main.tex) remains the anonymous development source for
+  a possible future archival submission. New research results belong there until
+  they are deliberately incorporated into another release.
 
 Both submitted PDF copies must retain SHA-256:
 
@@ -17,10 +21,25 @@ Both submitted PDF copies must retain SHA-256:
 9a23d4e8b603f20b2b0aed45ab68f55300a975d979d9814259ff5679499c19f5
 ```
 
-The working manuscript uses the existing anonymous NeurIPS 2026 workshop style
-with the RoboPAD workshop title. It now includes the full 1,120-attempt
-confirmation study, in addition to 480 discovery attempts. This revision is not
-a new submission and does not change the submitted PDF.
+The accepted-paper edition uses the final NeurIPS 2026 workshop style with the
+RoboPAD workshop title and author information. It includes the full 1,120-attempt
+confirmation study, in addition to 480 discovery attempts. It is maintained
+separately and does not change the frozen submitted PDF.
+
+Current accepted-paper artifact digests:
+
+```text
+PDF:    3effaea58f23d49eb10a2e9518c26a25ce096adda2b75a661071d08e58db55aa
+Source: 56345e83dd78f308808df8e54e1c8ad26d2bb590271ec34cc31f3dae38c5f161
+```
+
+RoboPAD compliance was checked on 10 November 2026 against the workshop
+[call for papers](https://robotpad2026.github.io/call-for-papers.html). The
+accepted-paper edition has eight main-content pages, within the nine-page cap;
+references begin on page 9 and the appendix on page 10, both outside that cap.
+It uses the official workshop style. RoboPAD does not require the main-conference
+paper checklist and describes accepted-paper updates as optional because the
+workshop is non-archival.
 
 ## Next target: ICLR 2027
 
@@ -69,14 +88,24 @@ python3 experiments/tooling/render_paper_visuals.py --check
 latexmk -pdf -outdir=build paper/main.tex
 # Render and review build/main.pdf before copying:
 cp build/main.pdf paper/working.pdf
+
+# Build the accepted-paper edition from the paper directory:
+cd paper
+latexmk -pdf -outdir=../build/camera-ready camera-ready-2026-11-02.tex
+cd ..
+cp build/camera-ready/camera-ready-2026-11-02.pdf \
+  output/pdf/camera-ready-submission-2026-11-02.pdf
+
 sha256sum release/submitted.pdf release/archive/2026-09-13/submitted.pdf
+sha256sum output/pdf/camera-ready-submission-2026-11-02.pdf \
+  paper/camera-ready-2026-11-02.tex
 ```
 
-The reviewed working build has seven main-content pages, one reference page,
-and six appendix pages. The final PDF and evidence checks are recorded in
+The reviewed accepted-paper build has eight main-content pages, one reference
+page, and six appendix pages. The final PDF and evidence checks are recorded in
 [review/REVISION_AUDIT.md](review/REVISION_AUDIT.md).
 The frozen primary-only supplement remains in
-[output/primary_transfer_supplement.zip](output/primary_transfer_supplement.zip);
+[release/primary_transfer_supplement.zip](release/primary_transfer_supplement.zip);
 the new full-confirmation evidence is indexed in
 [experiments/runs/README.md](experiments/runs/README.md).
 

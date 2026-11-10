@@ -3,13 +3,16 @@
 Compute allocation for closed-loop robot policies: when should inference compute
 refine an action prediction, and when should it obtain a fresh prediction?
 
-[Working paper](paper/working.pdf) · [Submitted version](release/submitted.pdf) ·
-[ICLR roadmap](ROADMAP.md) · [Manuscript source](paper/main.tex)
+[Accepted camera-ready](output/pdf/camera-ready-submission-2026-11-02.pdf) ·
+[Original submitted version](release/submitted.pdf) ·
+[Poster](output/pdf/refinement-refresh-zurich-poster.pdf) ·
+[ICLR roadmap](ROADMAP.md) ·
+[Camera-ready source](paper/camera-ready-2026-11-02.tex)
 
 Next target: **ICLR 2027 main conference**. Priorities are targeted second-policy
 evidence and the existing observation-age diagnostic. These are planned
-extensions, not completed results. The working PDF still uses the workshop
-template; [submission notes](SUBMISSION.md) track the conversion and author tasks.
+extensions, not completed results. The accepted PDF uses the NeurIPS workshop
+template; [submission notes](SUBMISSION.md) track version history and author tasks.
 
 ## Current evidence
 
@@ -38,7 +41,7 @@ inputs, a descriptive paired difference of -20.0 points with interval
 [-32.5, -7.5]. Its journals lack per-tick supplied-input hashes and observation
 ages, so it does not isolate every implementation detail.
 
-The working paper retains the allocation framework and reports all three frozen
+The accepted camera-ready retains the allocation framework and reports all three frozen
 comparisons, the amended descriptive comparisons, task-level counts, resource
 costs, and collection provenance. Its flow is allocation and fixed cost,
 controlled study, refinement results, then descriptive refresh results;
@@ -49,8 +52,7 @@ extended fitting and measurement diagnostics are in the appendices. See the
 
 | Location | Purpose |
 | --- | --- |
-| `paper/` | Active manuscript, bibliography, and generated publication assets |
-| `paper/` | Canonical manuscript source, bibliography, generated assets, and working PDF |
+| `paper/` | Manuscript sources, bibliography, and generated publication assets |
 | `release/` | Frozen submitted PDF, supplement, checksums, and dated archive |
 | `experiments/tooling/` | Evaluation runners, analysis tools, offline tests |
 | `experiments/runs/` | Recorded experiments and reproducible derived evidence |
@@ -80,8 +82,10 @@ python3 -m unittest discover -s experiments/tooling -p 'test_*.py'
 python3 experiments/tooling/render_paper_visuals.py
 python3 experiments/tooling/render_paper_visuals.py --check
 
-# Build the working manuscript; review before updating the root PDF.
-latexmk -pdf -outdir=build paper/main.tex
+# Build the accepted camera-ready manuscript.
+cd paper
+latexmk -pdf -outdir=../build/camera-ready camera-ready-2026-11-02.tex
+cd ..
 ```
 
 For `analyze_confirmation.py`, omit `--check` only to regenerate the confirmation
@@ -100,5 +104,6 @@ The broader `python3 verify_artifacts.py` currently fails the legacy
 instrument-validation frozen runner-hash check. Its frozen hashes have not been
 rewritten; this limitation is separate from the passing confirmation audit.
 
-The submitted PDF is immutable. See [version/build notes](SUBMISSION.md) for
-its digest and [the roadmap](ROADMAP.md) for the next research steps.
+The original submitted PDF is immutable. The accepted camera-ready and its source
+are maintained separately. See [version/build notes](SUBMISSION.md) for artifact
+digests and [the roadmap](ROADMAP.md) for the next research steps.
