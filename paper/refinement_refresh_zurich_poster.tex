@@ -56,7 +56,7 @@
   28/{1. Define}/{Fix the checkpoint and all paired rollout conditions.},
   230/{2. Account}/{Measure the full cost of each prediction and episode.},
   432/{3. Freeze}/{Freeze primary comparisons before held-out evaluation.},
-  634/{4. Interpret}/{Label later contrasts descriptive and limit claims.}}
+  634/{4. Interpret}/{Label amended contrasts descriptive and limit claims.}}
   {
     \fill[panelgray,rounded corners=5mm] (\x,550) rectangle +(175,58);
     \node[anchor=north west,font=\sffamily\bfseries\fontsize{29}{33}\selectfont]
@@ -82,7 +82,7 @@
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
   at (444,500) {Worked Example: Frozen SmolVLA};
 \node[anchor=center] at (630.5,382)
-  {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff.pdf}};
+  {\includegraphics[width=385mm]{paper/generated/success_compute_tradeoff_poster.pdf}};
 
 % Evidence status and interpretation
 \draw[card] (10,24) rectangle (831,265);
@@ -94,7 +94,7 @@
 \node[anchor=north west,align=left,text width=355mm,font=\rmfamily\fontsize{27}{34}\selectfont]
   at (30,181) {At fixed refresh frequency, reducing denoising from five to two steps increased success from 122/160 to 139/160. This is the prespecified primary comparison.};
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{29}{34}\selectfont] at (445,198)
-  {Added later: descriptive only};
+  {Amended: descriptive only};
 \node[anchor=north west,align=left,text width=355mm,font=\rmfamily\fontsize{27}{34}\selectfont]
   at (445,181) {Refreshing after five rather than two actions produced 138/160 versus 139/160 successes with 60.7\% lower arithmetic per attempt. Similar observed success does not prove equal quality, and arithmetic is not deployment latency.};
 \fill[panelgray,rounded corners=5mm] (28,43) rectangle (813,78);

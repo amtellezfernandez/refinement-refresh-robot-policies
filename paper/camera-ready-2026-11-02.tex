@@ -35,7 +35,7 @@ contrasts were added later and are interpreted descriptively. In the
 prespecified primary comparison, at a fixed two-action prefix, reducing
 denoising from five to two steps increased success from 122/160 to 139/160 while
 reducing counted arithmetic. Full-generation calibration showed that 82.1\% of
-native arithmetic was independent of denoising. A later descriptive comparison
+native arithmetic was independent of denoising. An amended descriptive comparison
 observed 138/160 versus 139/160 successes when refreshing after five rather than
 two actions, with 60.7\% lower arithmetic per attempt; equivalence was not
 established. A simple cost-aware rule matched the fitted model's choices.
@@ -70,7 +70,7 @@ descriptive comparison varies the execution prefix at fixed denoising to examine
 whether more frequent refresh justifies its additional expenditure. We evaluate
 twelve configurations in a paired 480-attempt discovery study, then seven
 configurations in 1,120 confirmation attempts on eight tasks excluded from
-selection. Three frozen comparisons evaluate refinement. The later-amended
+selection. Three frozen comparisons evaluate refinement. The amended
 prefix comparisons examine refresh; they neither isolate observation freshness
 from action-position effects nor establish an optimal allocation rule.
 
@@ -91,7 +91,7 @@ The contributions are:
     accounts for complete prediction and episode expenditure, and freezes
     confirmatory comparisons before held-out evaluation;
     \item an evidence-reporting procedure that keeps prespecified refinement
-    tests separate from later descriptive refresh contrasts and retains their
+    tests separate from amended descriptive refresh contrasts and retains their
     uncertainty and provenance; and
     \item a paired SmolVLA study that demonstrates the protocol across twelve
     discovery configurations and seven held-out confirmation settings.
@@ -257,7 +257,7 @@ configuration, totaling 1,120. These eight tasks are excluded from configuration
 selection; prior exposure during unrelated development is not assessed.
 The sample allocation prioritizes task and state coverage; no
 quality-preservation margin is prespecified. Appendix~\ref{app:analysis-provenance}
-distinguishes the original tests from the later-amended descriptive comparisons.
+distinguishes the original tests from the amended descriptive comparisons.
 
 Initial simulator states and observations match across conditions. Policy noise
 is keyed by task, state, seed, and simulation tick, preserving a common noise
@@ -353,9 +353,9 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \includegraphics[width=0.92\linewidth]{../paper/generated/success_compute_tradeoff.pdf}
 \caption{Held-out success, compute, and paired effects. Left: all seven
 confirmation settings on a success--arithmetic coordinate. Points are $(h,d)$;
-blue marks the frozen primary pair, and the success axis starts at 60\%.
+blue marks the frozen primary pair, and the success axis starts at 70\%.
 Arrows point from B to A for the primary
-$(2,2)-(2,5)$ comparison and the later $(2,2)-(5,2)$ refresh comparison. Right:
+$(2,2)-(2,5)$ comparison and the amended $(2,2)-(5,2)$ refresh comparison. Right:
 all effects use the same A-minus-B convention; whiskers are task-conditional,
 descriptive 95\% paired state-bootstrap intervals. The filled diamond marks the
 prespecified primary test. The primary direction is positive on seven tasks and
@@ -369,7 +369,7 @@ Table~\ref{tab:confirmation-grid}.}
 \begin{table}[htbp]
 \centering\small
 \caption{Evidence status and permitted interpretation. Effects use A minus B.
-The table separates prespecified confirmation from later descriptive analysis.}
+The table separates prespecified confirmation from amended descriptive analysis.}
 \label{tab:evidence-status}
 \begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
 \toprule
@@ -381,7 +381,7 @@ At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
 Other fixed-$h$ refinement tests & Frozen & Positive point estimates;
 intervals span zero & The benefit is not established uniformly across prefixes.\\
 \addlinespace[2pt]
-$(2,2)-(5,2)$ & Later descriptive & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
+$(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
 $(5,2)$ uses 60.7\% less arithmetic per attempt & Large cost savings are
 observed; equivalent quality is unresolved.\\
 \bottomrule
@@ -469,7 +469,7 @@ more strongly, but similar observed success was insufficient to establish
 equivalent quality. The fitted response model also did not improve configuration
 choices over a simple cost-aware rule. Refinement and refresh should therefore
 be evaluated together within each model, under explicit counting boundaries,
-with frozen confirmatory tests visibly separated from later descriptive
+with frozen confirmatory tests visibly separated from amended descriptive
 analyses. The case study does not establish a universal allocation.
 
 \paragraph{Interpretation and limits.}
@@ -814,7 +814,7 @@ order after 114 attempts per primary setting had been recorded; settings,
 identities, stopping rules, and inclusion remained fixed. Continuation completed
 the original identities, and deduplication retained the earliest completed
 record under the documented phase precedence. The frozen analyses use seed
-20260912. Later prefix contrasts and diagnostics use seed 20260913 and are
+20260912. Amended prefix contrasts and diagnostics use seed 20260913 and are
 descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 

@@ -175,7 +175,7 @@ class PaperVisualTests(unittest.TestCase):
             ]
         )
         np.testing.assert_allclose(points, expected)
-        self.assertEqual(tradeoff.get_ylim(), (60, 100))
+        self.assertEqual(tradeoff.get_ylim(), (70, 100))
         self.assertEqual(len(effects.containers), 7)
         for comparison, container in zip(
             self.data["confirmation"]["comparisons"], effects.containers
@@ -206,7 +206,7 @@ class PaperVisualTests(unittest.TestCase):
         self.assertIn("480 attempts · 12 settings", text)
         self.assertIn("3 denoising comparisons", text)
         self.assertIn("1,120 attempts · 7 settings", text)
-        self.assertIn("later-amended descriptive analyses", text)
+        self.assertIn("amended descriptive analyses", text)
 
     def test_undersized_figure_text_is_rejected(self):
         import matplotlib.pyplot as plt

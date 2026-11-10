@@ -621,7 +621,7 @@ def study_design_figure(data, path):
     ax.text(
         0.72,
         0.08,
-        "Prefix contrasts: later-amended descriptive analyses",
+        "Prefix contrasts: amended descriptive analyses",
         ha="center",
         va="center",
         color=MID,
@@ -699,21 +699,23 @@ def cost_decomposition_figure(data, path):
     plt.close(fig)
 
 
-def success_compute_figure(data, path):
+def success_compute_figure(
+    data, path, font_size=FIGURE_FONT_PT, figure_width=FIGURE_WIDTH, figure_height=2.85
+):
     import matplotlib.pyplot as plt
 
     resources = {
         (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
     }
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.85))
+    fig = plt.figure(figsize=(figure_width, figure_height))
     tradeoff = fig.add_axes([0.10, 0.19, 0.30, 0.68])
-    effects = fig.add_axes([0.72, 0.19, 0.24, 0.68])
+    effects = fig.add_axes([0.60, 0.19, 0.16, 0.68])
     tradeoff.set_facecolor(".965")
     effects.set_facecolor(".985")
     offsets = {
-        (1, 2): (7, 15),
-        (1, 5): (-18, -16),
-        (1, 10): (-36, 21),
+        (1, 2): (10, 18),
+        (1, 5): (-31, -18),
+        (1, 10): (-31, 25),
         (1, 20): (-9, -18),
         (2, 2): (5, 9),
         (2, 5): (5, -16),
@@ -741,6 +743,11 @@ def success_compute_figure(data, path):
             xytext=offsets[cell],
             textcoords="offset points",
             fontweight="bold" if primary else "normal",
+            arrowprops=(
+                {"arrowstyle": "-", "color": ".45", "lw": 0.55}
+                if cell[0] == 1
+                else None
+            ),
         )
     # Arrows point from B to A, matching the A-minus-B convention on the right.
     tradeoff.annotate(
@@ -758,13 +765,23 @@ def success_compute_figure(data, path):
         xytext=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
         arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
     )
+    tradeoff.text(
+        0.04,
+        0.04,
+        "$(5,2)$: 60.7% less cost\nper attempted episode",
+        transform=tradeoff.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=font_size,
+        bbox={"boxstyle": "round,pad=0.22", "facecolor": "white", "edgecolor": ".78", "lw": 0.5},
+    )
     tradeoff.set(
         xlabel="Nominal arithmetic / native\n(per control step)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
-        ylim=(60, 100),
+        ylim=(70, 100),
         xticks=[0.2, 0.4, 0.6, 0.8, 1.0],
-        yticks=[60, 70, 80, 90, 100],
+        yticks=[70, 80, 90, 100],
     )
     tradeoff.set_axisbelow(True)
     tradeoff.grid(color=".91", lw=0.55)
@@ -805,15 +822,26 @@ def success_compute_figure(data, path):
             va="center",
             fontweight="bold" if primary else "normal",
         )
+        effects.text(
+            1.05,
+            y,
+            f"{effect:+.1f} [{bounds[0]:+.1f}, {bounds[1]:+.1f}]",
+            transform=transform,
+            ha="left",
+            va="center",
+            fontsize=font_size,
+            color=color,
+            fontweight="bold" if primary else "normal",
+        )
     effects.set_xlabel("A minus B success rate\n(percentage points)")
     effects.spines[["top", "right", "left"]].set_visible(True)
     effects.spines[["top", "right", "bottom", "left"]].set_color(".72")
     effects.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
     effects.tick_params(axis="y", length=0)
     effects.text(-0.90, 8.42, "Frozen refinement", transform=transform, fontweight="bold", va="center")
-    effects.text(-0.90, 4.43, "Later descriptive", transform=transform, fontweight="bold", va="center")
+    effects.text(-0.90, 4.43, "Amended descriptive", transform=transform, fontweight="bold", va="center")
     fig.text(0.25, 0.96, "Held-out settings", ha="center", va="top", fontweight="bold")
-    fig.text(0.82, 0.96, "Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
+    fig.text(0.68, 0.96, "Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
 
@@ -838,6 +866,22 @@ def render(destination):
     study_design_figure(data, destination / "study_design.pdf")
     cost_decomposition_figure(data, destination / "cost_decomposition.pdf")
     success_compute_figure(data, destination / "success_compute_tradeoff.pdf")
+    with matplotlib.rc_context(
+        {
+            "font.size": 10.5,
+            "axes.labelsize": 10.5,
+            "axes.titlesize": 10.5,
+            "xtick.labelsize": 10.5,
+            "ytick.labelsize": 10.5,
+        }
+    ):
+        success_compute_figure(
+            data,
+            destination / "success_compute_tradeoff_poster.pdf",
+            font_size=10.5,
+            figure_width=6.1,
+            figure_height=3.2,
+        )
     names = [
         *contents,
         "discovery_allocation.pdf",
@@ -846,6 +890,7 @@ def render(destination):
         "study_design.pdf",
         "cost_decomposition.pdf",
         "success_compute_tradeoff.pdf",
+        "success_compute_tradeoff_poster.pdf",
     ]
     manifest = {
         "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
