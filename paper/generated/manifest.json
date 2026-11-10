@@ -3,7 +3,7 @@
   "script_sha256": "e50817bb64089f39b539223bb30e82da7f858378d587df4ae80552686f4ceab8",
   "input_sha256": {
     "experiments/runs/refinement_refresh_final_001/paper_analysis/discovery_audit.json": "0a4a26754151fe203f06637fcfaec85931f1f40218722f979dbdffd7fbcb4cec",
-    "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "93ae4aab553893ffc44b68dd58b160d13eb8c8e0ff9e237dd0c4053e946958bb",
+    "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "cd0e42cd418cb48604f7271c8f1000d0ccc00262eae6fbca9b359e6ed6d2657c",
     "experiments/runs/refinement_refresh_final_001/paper_analysis/primary_report.json": "16dbe73a4d8413c0bbcab5520ac3864f2b260d28f7ebd4e7b8c956f2634f389d",
     "experiments/runs/refinement_refresh_final_001/calibration.json": "b5cf102627fac4c56efc19a1975a49584fa0be36e7de4a3106f0a71a495c1b6d",
     "experiments/runs/refinement_refresh_final_001/paper_analysis/selector_diagnostics.json": "12bbea3d730fe952252d12bbfe73c1560f1ebe0bdc0abefc783521fd42ae94ce",
