@@ -709,7 +709,7 @@ def success_compute_figure(
     }
     fig = plt.figure(figsize=(figure_width, figure_height))
     tradeoff = fig.add_axes([0.12, 0.22, 0.34, 0.65])
-    effects = fig.add_axes([0.70, 0.22, 0.17, 0.65])
+    effects = fig.add_axes([0.67, 0.22, 0.23, 0.65])
     tradeoff.set_facecolor(".965")
     effects.set_facecolor(".985")
     offsets = {
@@ -849,7 +849,7 @@ def success_compute_figure(
             fontweight="bold" if primary else "normal",
         )
         effects.text(
-            1.05,
+            0.98,
             y,
             f"{number(effect, signed=True)}\n"
             f"[{number(bounds[0])}, {number(bounds[1])}]",
