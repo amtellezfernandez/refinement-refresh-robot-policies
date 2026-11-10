@@ -719,10 +719,15 @@ def success_compute_figure(
         (1, 20): (-9, -18),
         (2, 2): (5, 9),
         (2, 5): (5, -16),
-        (5, 2): (-5, 9),
+        (5, 2): (4, 10),
         (5, 5): (-4, -16),
     }
-    label_alignments = {(1, 2): "right", (1, 5): "center", (1, 10): "right"}
+    label_alignments = {
+        (1, 2): "right",
+        (1, 5): "center",
+        (1, 10): "right",
+        (5, 2): "left",
+    }
     for cell, row in resources.items():
         x = row["nominal_fraction_native"]
         y = 100 * row["success_rate"]
@@ -785,17 +790,15 @@ def success_compute_figure(
         va="center",
         fontweight="bold",
     )
-    tradeoff.annotate(
-        "$(5,2)$: 60.7% less cost\nper attempted episode",
-        xy=(0.29, 86.5),
-        xycoords="data",
-        xytext=(0.04, 0.04),
-        textcoords="axes fraction",
-        ha="left",
-        va="bottom",
+    tradeoff.text(
+        0.98,
+        0.96,
+        "At $(5,2)$: 60.7% less cost per attempt",
+        transform=tradeoff.transAxes,
+        ha="right",
+        va="top",
         fontsize=font_size,
-        arrowprops={"arrowstyle": "-", "color": ".40", "lw": 0.65},
-        bbox={"boxstyle": "round,pad=0.22", "facecolor": "white", "edgecolor": ".78", "lw": 0.5},
+        color=".28",
     )
     tradeoff.set(
         xlabel="Compute per control step\n(% of native; lower = cheaper)",
