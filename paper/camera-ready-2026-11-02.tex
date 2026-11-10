@@ -146,20 +146,24 @@ each stage with $r=d$, the denoising count of SmolVLA.
 
 \subsection{Compute rate and episode expenditure}
 
-Let $K$ be the predicted action-chunk length, $h<K$ the execution prefix, and
-$r$ the architecture-specific generation-effort control. At each policy query,
+Let $K$ be the predicted action-chunk length, $h$ the execution prefix with
+$1\leq h\leq K$, and $r$ the architecture-specific generation-effort control.
+At each policy query,
 the policy predicts $K$ actions, executes only the first $h$, discards the
 remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
 controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
 complete measured arithmetic of one generation under a stated counting boundary.
 The protocol compares configurations $(h,r)$ within a policy; it does not assume
-that numerical values of $r$ are comparable across architectures. For complete
-execution prefixes, the nominal compute rate per simulated control step is
+that numerical values of $r$ are comparable across architectures. Away from a
+partially consumed final prefix, the nominal compute rate per simulated control
+step is
 \[
  b(h,r)=\frac{F_{\mathrm{gen}}(r)}{h}.
 \]
-For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
+Let $p_{\mathrm{success}}(h,r)$ denote closed-loop success probability under the
+declared evaluation distribution. For a candidate set $\mathcal C$ and budget
+ceiling $B$, the allocation target is
 \begin{equation}
  (h^\star,r^\star)(B)\in
  \arg\max_{(h,r)\in\mathcal C:\,b(h,r)\le B}
@@ -212,6 +216,10 @@ elementwise arithmetic, and external preprocessing are excluded. We therefore
 refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
 shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
+We call the resulting fixed-shape count per generation \emph{reference-calibrated
+arithmetic}; applying it to every generated chunk gives reference-calibrated
+attempt expenditure. It remains distinct from task-shaped operation counts and
+elapsed time.
 
 For a fixed reference input, suppose generation arithmetic decomposes as
 $F_{\mathrm{gen}}(r)=F_{\mathrm{fixed}}+F_{\mathrm{variable}}(r)$ with
@@ -231,7 +239,8 @@ For the case-study checkpoint and reference input, the measured arithmetic satis
 at all six calibrated denoising settings. Native generation at $d=10$ costs
 641.675 GFLOPs, of which 82.1\% is independent of $d$. Halving denoising from
 ten to five saves 8.9\% of counted generation work; reducing it to two saves
-14.3\%. Equivalently, relative to native deployment $(h,d)=(1,10)$,
+14.3\%. Define the native setting as $(h,d)=(1,10)$ and its nominal rate as
+$b_{\mathrm{native}}=b(1,10)=F_{\mathrm{gen}}(10)$. The relative rate is then
 \[
  \frac{b(h,d)}{b_{\mathrm{native}}}
  \simeq \frac{0.821+0.179(d/10)}{h}.
@@ -354,7 +363,7 @@ All 1,120 originally planned SmolVLA case-study confirmation attempts are comple
 Table~\ref{tab:confirmation-grid} reports the seven configurations on the same
 paired identities. The audit excludes two repeated completed records under the
 documented precedence rule; continuation completes the original design, not
-an independent replication (\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
+an independent replication (Appendix~\ref{app:verification}).
 We first report the frozen denoising tests, then the amended prefix comparisons.
 Only the former support confirmatory claims; the latter are reported as
 descriptive analyses with their provenance and uncertainty retained.
@@ -564,8 +573,8 @@ from fresher feedback.
 
 {\raggedright
 The checkpoint is \texttt{HuggingFaceVLA/smolvla\_libero}, revision
-\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk size is 50;
-native execution uses $h=1,d=10$. Discovery uses Spatial tasks 5--8, initial
+\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk length is 50;
+native execution uses $(h,d)=(1,10)$. Discovery uses Spatial tasks 5--8, initial
 states 10--14, and policy seeds 2000 and 2001. The 20 task--state blocks
 contain both seeds and all 12 configurations. Confirmation uses Goal and Object
 tasks 5--8, states 20--29, and policy seeds 3000 and 3001. Its 80 task--state
@@ -685,8 +694,10 @@ A FLOP-constrained choice is not necessarily a latency- or throughput-optimal
 choice.
 
 As a descriptive sensitivity analysis, define calibrated host-time rate
-$b_T(h,d)=\overline{T}_{\mathrm{gen}}(d)/h$, the amortized fixed-input generation
-time per simulated control step, and normalize it by native host-time rate.
+$b_{\tau}(h,d)=\overline{\tau}_{\mathrm{gen}}(d)/h$, where
+$\overline{\tau}_{\mathrm{gen}}(d)$ is mean fixed-input generation time at
+denoising count $d$. We normalize this rate by its native value
+$b_{\tau}(1,10)$.
 For $(1,2)$, $(2,2)$, and $(5,2)$, the normalized arithmetic rates are
 0.857, 0.429, and 0.171, while the normalized host-time rates are 0.346, 0.173,
 and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
