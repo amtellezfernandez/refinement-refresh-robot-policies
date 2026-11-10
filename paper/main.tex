@@ -21,73 +21,76 @@ Compute Allocation for Closed-Loop Robot Policies}
 \maketitle
 
 \begin{abstract}
-Chunked robot policies allocate inference compute between constructing an
-action chunk and deciding how long to execute it before replanning from a new
-observation. We introduce a protocol for evaluating this generation--execution allocation
-within a frozen chunked policy that exposes a controllable generation-effort
-setting. The protocol defines an
-architecture-specific generation-effort control and an execution prefix,
-measures complete generation and episode expenditure, separates discovery from
-held-out evaluation, and distinguishes prespecified from later descriptive
-comparisons. We demonstrate it with one frozen SmolVLA checkpoint in synchronous
-LIBERO simulation, where generation effort is varied through denoising steps.
-In the prespecified primary comparison at a fixed two-action prefix, reducing
-denoising from five to two steps increased success from 122/160 to 139/160 while
-reducing counted arithmetic. Calibration showed that 82.1\% of native generation
-arithmetic was independent of denoising. A later descriptive comparison observed
-138/160 versus 139/160 successes when executing five rather than two actions per
-replan, with 60.7\% lower arithmetic per attempt; equivalence was not established.
-These checkpoint-specific results demonstrate the protocol rather than a general
-allocation rule. The transferable contribution is a controlled way to evaluate
-behavior, complete inference cost, and evidence status in chunked policies
-with controllable generation effort.
+As vision--language--action policies become more computationally demanding,
+deployment under explicit resource constraints poses an allocation problem: how
+much inference effort should construct each action chunk, and how long should it
+execute before prediction is refreshed from a new observation? We introduce a
+reproducible protocol for frozen chunked policies with a controllable generation
+setting. It separates generation effort from execution prefix, measures complete
+generation and episode expenditure, separates discovery from held-out evaluation,
+freezes confirmatory comparisons, and labels later analyses descriptive. We use
+one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
+with denoising count as its generation control. At a fixed two-action prefix, the
+prespecified comparison found 139/160 successes with two denoising steps versus
+122/160 with five, while using less counted arithmetic; 82.1\% of native
+generation arithmetic was independent of denoising. A later descriptive contrast
+found 138/160 versus 139/160 successes when executing five rather than two actions
+per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
+established. These checkpoint-specific results illustrate the protocol rather
+than a general allocation rule. The transferable contribution is a procedure for
+evaluating behavior, complete inference cost, and evidence status together.
 \end{abstract}
 
 \section{Introduction}
 
-A chunked robot policy allocates deployment compute along two distinct axes:
-internal computation used to construct each action chunk and the number of actions
-executed before generating another chunk from a new observation. The first axis
-is architecture-specific: it can include iterative denoising or flow integration,
-candidate generation and verification, search, or another controllable inference
-procedure. The second controls observation-conditioned replanning. Changing
-generation effort can alter the predicted chunk; lengthening the execution prefix
-delays feedback and exposes later action positions. Their relative value should
-therefore be evaluated through closed-loop outcomes under a common resource
-constraint.
+Deploying vision--language--action policies under a finite inference budget is
+an allocation problem. A chunked policy spends internal computation constructing
+an action sequence, executes some prefix of that sequence, and then pays for
+another prediction conditioned on a newer observation. More generation effort
+may change the predicted chunk; a longer execution prefix reduces prediction
+frequency but delays feedback and exposes later action positions. Comparing these
+controls therefore requires closed-loop outcomes and a common resource boundary,
+not generation cost alone.
 
 We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
-compute between action generation and observation-conditioned execution?}
-The cost of a fresh prediction makes this question nontrivial. In the frozen
-SmolVLA case study \cite{smolvla}, work independent of denoising accounts for
-82.1\% of native counted arithmetic. For this checkpoint, reducing refinement
-therefore leaves a substantial cost per generation: sufficiently tight budgets
-require less frequent refresh even at low denoising counts. This cost boundary
-determines what is feasible, but not which feasible setting controls the robot
-best.
+compute between action generation and observation-conditioned execution?} To
+answer this without turning one architecture's control into a general rule, we
+introduce a reproducible evaluation protocol. It defines the model-specific
+generation-effort setting and execution prefix separately, measures complete
+prediction and realized episode expenditure, separates discovery from held-out
+evaluation, freezes confirmatory comparisons before outcomes are observed, and
+marks later analyses as descriptive. The protocol and its evidence-reporting
+procedure are the primary transferable contributions.
 
-We operationalize this allocation question through two within-checkpoint
-comparisons. The primary comparison varies denoising at a fixed execution prefix
-to evaluate whether additional refinement improves success. A complementary,
-descriptive comparison varies the execution prefix at fixed denoising to examine
-whether more frequent refresh justifies its additional expenditure. We evaluate
-twelve configurations in a paired 480-attempt discovery study, then seven
-configurations in 1,120 confirmation attempts on eight tasks excluded from
-selection. Three frozen comparisons evaluate refinement. The amended
-prefix comparisons examine refresh; they neither isolate observation freshness
-from action-position effects nor establish an optimal allocation rule.
+The protocol applies when a chunked policy exposes a controllable generation
+effort: for example, integration steps in an iterative flow or diffusion policy,
+or candidate, search, or verification effort in a policy that uses those
+procedures. These controls need not have comparable units across architectures.
+We use synchronous execution to hold sequencing and measurement boundaries fixed;
+the study does not identify an asynchronous scheduling optimum, real-robot
+latency, or a universal hardware winner.
 
-Within the SmolVLA case study, the primary two-action prefix with two denoising
-steps yields 139/160 successes versus 122/160 for five steps, with lower reference
-arithmetic. At two denoising
-steps, however, a five-action prefix yields 138/160 successes at 60.7\% less
-arithmetic per attempt than the two-action prefix; their quality difference
-remains unresolved. A simple cost-aware rule also matches the fitted response
-model's choices at all three ceilings, with no demonstrated selection advantage
-from fitting.
+SmolVLA provides the worked case study \cite{smolvla}. Its generation control is
+denoising count, and its execution control is the number of actions applied before
+replanning. We evaluate twelve configurations in a paired 480-attempt discovery
+study, then seven configurations in 1,120 held-out attempts on eight tasks excluded
+from selection. Three denoising comparisons were frozen before confirmation. The
+execution-prefix contrasts were added later and remain descriptive; they neither
+isolate observation freshness from action-position effects nor establish an
+optimal allocation rule.
 
-These checkpoint-specific outcomes demonstrate how to apply the protocol and
-how its evidence boundaries constrain the resulting claims.
+For this checkpoint, the prespecified primary comparison yields 139/160 successes
+with two denoising steps versus 122/160 with five at the same two-action prefix,
+while using less counted arithmetic. Calibration shows that 82.1\% of native
+generation arithmetic is independent of denoising, so reducing refinement alone
+leaves substantial fixed work. At two denoising steps, executing five actions per
+prediction yields 138/160 successes and 60.7\% less arithmetic per attempt than
+executing two; equivalent quality is not established. A simple cost-aware rule
+also matches the fitted response model's choices at all three ceilings, with no
+demonstrated selection advantage from fitting.
+
+These checkpoint-specific outcomes show how to apply the protocol and how its
+evidence boundaries constrain the resulting claims.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
