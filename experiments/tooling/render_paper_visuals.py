@@ -783,7 +783,7 @@ def success_compute_figure(
     )
     tradeoff.text(
         0.28,
-        92.0,
+        94.0,
         "More frequent\nrefresh",
         color=INK,
         ha="center",
