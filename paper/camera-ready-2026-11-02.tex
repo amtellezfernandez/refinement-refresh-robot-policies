@@ -26,21 +26,21 @@ MAAT Institute\\
 As vision--language--action policies become more computationally demanding,
 deployment under explicit resource constraints poses an allocation problem: how
 much inference effort should construct each action chunk, and how long should it
-execute before prediction is refreshed from a new observation? We introduce a
-reproducible protocol for frozen chunked policies with a controllable generation
-setting. It separates generation effort from execution prefix, measures complete
-generation and episode expenditure, separates discovery from held-out evaluation,
-freezes confirmatory comparisons, and labels later analyses descriptive. We use
-one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
-with denoising count as its generation control. At a fixed two-action prefix, the
-prespecified comparison found 139/160 successes with two denoising steps versus
-122/160 with five, while using less counted arithmetic; 82.1\% of native
-generation arithmetic was independent of denoising. A later descriptive contrast
+execute before prediction is refreshed from a new observation? We give a
+reproducible evaluation and reporting recipe for frozen chunked policies with a
+controllable generation setting. It measures complete generation and episode
+expenditure, separates discovery from held-out evaluation, freezes confirmatory
+comparisons, and labels later analyses descriptive. We demonstrate it with one
+frozen SmolVLA checkpoint in synchronous LIBERO simulation, using denoising count
+as its generation control. At a fixed two-action prefix, the prespecified
+comparison found 139/160 successes with two denoising steps versus 122/160 with
+five while using less counted arithmetic. Because 82.1\% of native generation
+arithmetic was independent of denoising, tight rate limits can require a longer
+execution prefix before quality is considered. A later descriptive comparison
 found 138/160 versus 139/160 successes when executing five rather than two actions
 per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. These checkpoint-specific results illustrate the protocol rather
-than a general allocation rule. The transferable contribution is a procedure for
-evaluating behavior, complete inference cost, and evidence status together.
+established. These results are checkpoint-specific; the transferable contribution
+is the evaluation procedure, not a general allocation rule.
 \end{abstract}
 
 \section{Introduction}
@@ -61,11 +61,16 @@ introduce a reproducible evaluation protocol. It defines the model-specific
 generation-effort setting and execution prefix separately, measures complete
 prediction and realized episode expenditure, separates discovery from held-out
 evaluation, freezes confirmatory comparisons before outcomes are observed, and
-marks later analyses as descriptive. The protocol and its evidence-reporting
-procedure are the primary transferable contributions.
+marks later analyses as descriptive. Whenever generation cost contains work
+independent of $r$, the per-step compute rate is bounded below by that fixed cost
+divided by $h$; a tight ceiling can therefore force a minimum execution prefix
+before any quality comparison. The protocol and its evidence-reporting
+procedure are the primary transferable contributions. Throughout, \emph{refinement}
+denotes model-specific generation effort $r$, while \emph{refresh} denotes replanning
+after an execution prefix $h$; smaller $h$ means more frequent refresh.
 
-The protocol applies when a chunked policy exposes a controllable generation
-effort: for example, integration steps in an iterative flow or diffusion policy,
+The protocol is intended for chunked policies that expose a controllable generation
+effort; only denoising is instantiated in this study. Other possible controls include integration steps in an iterative flow or diffusion policy,
 or candidate, search, or verification effort in a policy that uses those
 procedures. These controls need not have comparable units across architectures.
 We use synchronous execution to hold sequencing and measurement boundaries fixed;
@@ -112,8 +117,8 @@ Resource-allocation studies motivate evaluating configurations across explicit
 budgets. Chinchilla studies model-size and training-data allocation
 \cite{chinchilla}; embodied scaling studies consider world modeling, behavior
 cloning, and closed-loop forecasting and planning
-\cite{pearcescaling,motionscaling}. Our comparison instead varies deployment
-refinement and execution prefix within a fixed policy. Work distinguishing
+\cite{pearcescaling,motionscaling}. Our comparison instead varies model-specific generation effort (refinement)
+and execution prefix (refresh) within a fixed policy. Work distinguishing
 FLOP-optimal from elapsed- or monetary-cost-optimal allocation
 \cite{beyondchinchilla} also motivates retaining separate resource coordinates.
 
@@ -123,7 +128,9 @@ SmolVLA studies asynchronous inference and robot behavior \cite{smolvla}.
 Here predicted chunk size remains fixed, while executed prefix changes; task
 success is measured alongside computation. RoboMonkey studies test-time sampling
 and action verification \cite{robomonkey}, an adjacent allocation axis that
-would require counting candidate generation and verification costs.
+would require counting candidate generation and verification costs. Together,
+these systems motivate a common evaluation recipe for architecture-specific
+deployment controls; they do not imply a shared control value or cost model.
 
 Adaptive VLA scheduling is directly related. DVAC uses denoising-derived action
 variance to choose an execution prefix before replanning \cite{dvac}.
@@ -191,15 +198,21 @@ the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
-We distinguish this rate from total arithmetic per attempted episode. If attempt
-$e$ executes $T_e$ actions, its generated-chunk expenditure is
+We distinguish this rate from total arithmetic per attempted episode. Let
+$N_e=\lceil T_e/h\rceil$ be the number of generated chunks in attempt $e$, and
+let $x_{e,j}$ denote the realized input and execution context of generation $j$.
+The general episode expenditure is
 \begin{equation}
- C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(r).
+ C_e=\sum_{j=1}^{N_e}F_{\mathrm{gen}}(r_{e,j};x_{e,j}).
  \label{eq:episode-cost}
 \end{equation}
-The final generated chunk is charged even if only part of its execution prefix
-is used. All-attempt means include unsuccessful episodes. Different trajectories
-and termination times can therefore change expenditure at the same nominal rate.
+This sum accommodates sampling, search, verification, adaptive early exit, or
+other systems whose control or cost varies across chunks. Under the fixed setting
+and reference-shape calibration used for the reported SmolVLA arithmetic, it
+reduces to $C_e=N_eF_{\mathrm{gen}}(d)$. The final generated chunk is charged even
+if only part of its execution prefix is used. All-attempt means include
+unsuccessful episodes. Different trajectories and termination times can therefore
+change expenditure at the same nominal rate.
 FLOPs, host elapsed time, and CUDA-stream time retain separate units and
 measurement boundaries.
 
@@ -213,6 +226,17 @@ elementwise arithmetic, and external preprocessing are excluded. We therefore
 refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
 shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
+
+For a fixed reference input, suppose generation arithmetic decomposes as
+$F_{\mathrm{gen}}(r)=F_{\mathrm{fixed}}+F_{\mathrm{variable}}(r)$ with
+$F_{\mathrm{variable}}(r)\geq0$. Then
+\[
+ b(h,r)\geq\frac{F_{\mathrm{fixed}}}{h}.
+\]
+This lower bound is structural: under a sufficiently tight rate ceiling, some
+short execution prefixes are infeasible regardless of their behavioral quality.
+Its magnitude and even the appropriate resource coordinate remain implementation
+and measurement specific.
 
 For the case-study checkpoint and reference input, the measured arithmetic satisfies, to rounding,
 \[
@@ -348,6 +372,8 @@ an independent replication (\hyperref[app:verification]{Appendix~\ref{app:calibr
 We first report the frozen denoising tests, then the amended prefix comparisons.
 Only the former support confirmatory claims; the latter are reported as
 descriptive analyses with their provenance and uncertainty retained.
+Table~\ref{tab:evidence-status} states these evidence boundaries and the claims
+each comparison supports.
 
 \begin{table}[htbp]
 \centering\small
@@ -365,13 +391,14 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}
+{\centering\small Compute per control step (\% of native setting); $(h,d)=(1,10)$ is 100\%; lower means less counted arithmetic.\par}
 \caption{\textbf{Held-out success versus compute across refinement and refresh settings.}
 SmolVLA case-study success, compute, and paired comparisons.
 Each point is one of the seven confirmation settings, labelled $(h,d)$ for
 executed prefix and denoising count, and aggregates 160 attempts over eight tasks.
 The vertical axis gives observed success and begins at 75\%. The horizontal axis
 gives nominal counted generation arithmetic per control step as a percentage of
-the native $(d=10,h=1)$ deployment baseline; leftward means less counted work per
+the native deployment setting $(h,d)=(1,10)$; leftward means less counted work per
 executed action. Arrows run from comparator B to setting A and print the A-minus-B
 success difference with its task-conditional, descriptive 95\% paired
 state-bootstrap interval. Blue identifies the prespecified $(2,2)$ versus $(2,5)$
@@ -379,16 +406,17 @@ refinement test. Black arrows show two other frozen refinement comparisons and t
 later-amended descriptive contrasts. The 60.7\% annotation is the separate
 reduction in mean arithmetic per attempted episode for $(5,2)$ relative to
 $(2,2)$; the associated $+0.6$-point success contrast does not establish
-equivalent quality. The two additional amended contrasts involving $(1,10)$,
-complete task-level outcomes, and full episode expenditures are reported in
-Appendix~\ref{app:confirmation-details} and Table~\ref{tab:confirmation-grid}.}
+equivalent quality. The two additional amended contrasts involving $(1,10)$ are reported in
+Table~\ref{tab:confirmation-secondary}; complete task-level outcomes and full
+episode expenditures appear in Appendix~\ref{app:confirmation-details} and
+Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
 
 \begin{table}[htbp]
 \centering\small
-\begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}@{\hspace{8pt}}>{\raggedright\arraybackslash}p{0.13\linewidth}@{\hspace{8pt}}>{\raggedright\arraybackslash}p{0.25\linewidth}@{\hspace{8pt}}>{\raggedright\arraybackslash}p{0.29\linewidth}@{}}
 \toprule
 Comparison & Status & Result & Supported claim\\
 \midrule
@@ -409,7 +437,7 @@ The table separates prespecified confirmation from amended descriptive analysis.
 \end{table}
 
 \begin{samepage}
-\subsection{Refinement: the frozen denoising comparisons}
+\subsection{Generation effort (refinement): frozen denoising comparisons}
 
 For the case-study checkpoint, the primary two-action prefix with two denoising
 steps yields 139/160 successes versus 122/160 for five steps. The paired difference is $+10.6$ percentage
@@ -429,19 +457,22 @@ The primary direction is positive on seven tasks and tied on one, with
 task sensitivity and expenditure intervals. These measurements do not establish
 a controlled physical-latency improvement.
 Figure~\ref{fig:success-compute} places the primary setting in the joint
-success--compute coordinate and places its interval alongside all seven
-confirmation contrasts.
+success--compute coordinate and places its interval alongside four other
+displayed contrasts; two additional amended contrasts appear in
+Table~\ref{tab:confirmation-secondary}.
 
 Within the same checkpoint, the other two frozen tests have positive point estimates but intervals spanning
 zero (Figure~\ref{fig:success-compute}). At $h=5$, two versus five
 denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
-137/160 versus 136/160. The largest observed benefit is at the primary prefix.
-The primary gap exceeds its frozen prediction, while matching the signs of
+137/160 versus 136/160. The primary effect is concentrated at $h=2$: the two-versus-five-step
+differences are $+0.6$ points at $h=1$, $+10.6$ at $h=2$, and $+3.1$ at $h=5$.
+Thus $(2,5)$ appears as a localized low-success setting rather than evidence of a
+monotone denoising trend. The primary gap exceeds its frozen prediction, while matching the signs of
 three point estimates does not establish calibrated effect-size prediction.
 These results do not demonstrate a uniform denoising benefit across prefixes.
 
 \FloatBarrier
-\subsection{Refresh: descriptive prefix comparisons}
+\subsection{Execution prefix (refresh): descriptive comparisons}
 
 Within the SmolVLA case study, we now hold denoising fixed and compare
 expenditures on different refresh schedules. Table~\ref{tab:evidence-status} records the later amendment and the
