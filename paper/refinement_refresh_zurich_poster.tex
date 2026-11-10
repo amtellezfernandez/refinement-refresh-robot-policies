@@ -31,7 +31,7 @@
 \node[anchor=north,align=center,font=\rmfamily\bfseries\fontsize{86}{90}\selectfont]
   at (420.5,1176) {Refinement vs. Refresh};
 \node[anchor=north,align=center,font=\rmfamily\fontsize{48}{54}\selectfont]
-  at (420.5,1099) {A Reproducible Evaluation Protocol for Closed-Loop Robot Policies};
+  at (420.5,1099) {Compute Allocation for Closed-Loop Robot Policies};
 \draw[line width=1.6pt] (32,1057)--(168,1057);
 \draw[line width=1.6pt] (673,1057)--(809,1057);
 \node[anchor=center,align=center,font=\sffamily\fontsize{28}{34}\selectfont]
@@ -41,7 +41,7 @@
 \draw[card] (12,675) rectangle (829,1028);
 \fill[softgray,rounded corners=8mm] (12,982) rectangle (286,1028);
 \fill[softgray] (278,982)--(329,1028)--(278,1028)--cycle;
-\node[anchor=west,heading] at (30,1004) {Closed-Loop Controls: Refinement and Refresh};
+\node[anchor=west,heading] at (30,1004) {Generation Effort vs. Execution Prefix};
 
 % Supplied closed-loop execution diagram
 \node[anchor=center] at (420.5,850)
@@ -51,12 +51,12 @@
 \draw[card] (10,535) rectangle (831,660);
 \fill[softgray,rounded corners=8mm] (10,620) rectangle (831,660);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{35}{40}\selectfont]
-  at (28,640) {Reproducible Protocol: Separate Design, Measurement, and Evidence Status};
+  at (28,640) {Evaluation Framework: Separate Design, Measurement, and Evidence Status};
 \foreach \x/\title/\body in {
-  28/{1. Define}/{Fix the checkpoint and all paired rollout conditions.},
-  230/{2. Account}/{Measure the full cost of each prediction and episode.},
-  432/{3. Freeze}/{Freeze primary comparisons before held-out evaluation.},
-  634/{4. Interpret}/{Label amended contrasts descriptive and limit claims.}}
+  28/{1. Define}/{Choose generation control $r$ and execution prefix $h$.},
+  230/{2. Control}/{Fix the checkpoint and paired rollout conditions.},
+  432/{3. Account}/{Measure full generation and episode expenditure.},
+  634/{4. Freeze}/{Prespecify tests; label later contrasts descriptive.}}
   {
     \fill[panelgray,rounded corners=5mm] (\x,550) rectangle +(175,58);
     \node[anchor=north west,font=\sffamily\bfseries\fontsize{29}{33}\selectfont]
@@ -72,7 +72,7 @@
 \draw[card] (10,285) rectangle (411,520);
 \fill[softgray,rounded corners=8mm] (10,482) rectangle (411,520);
 \node[anchor=west,font=\rmfamily\bfseries\fontsize{32}{37}\selectfont]
-  at (25,500) {Complete Compute Accounting};
+  at (25,500) {SmolVLA: Complete Compute Accounting};
 \node[anchor=center] at (210.5,382)
   {\includegraphics[width=390mm]{paper/generated/cost_decomposition.pdf}};
 
@@ -103,7 +103,7 @@
   at (445,181) {Refreshing after five rather than two actions produced 138/160 versus 139/160 successes with 60.7\% lower arithmetic per attempt. Similar observed success does not prove equal quality, and arithmetic is not deployment latency.};
 \fill[panelgray,rounded corners=5mm] (28,43) rectangle (813,78);
 \node[anchor=center,align=center,text width=750mm,font=\rmfamily\bfseries\fontsize{26}{32}\selectfont]
-  at (420.5,60) {SmolVLA is a worked example, not a universal allocation rule. Report success and complete computational expenditure together.\\Keep confirmatory and descriptive evidence visibly separate.};
+  at (420.5,60) {General recipe: define the policy's generation-effort control and execution prefix; measure success and complete expenditure together.\\SmolVLA is one instantiation, not a cross-policy rule; keep prespecified and later descriptive evidence separate.};
 
 \end{scope}
 \end{tikzpicture}
