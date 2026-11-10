@@ -25,8 +25,9 @@ MAAT Institute\\
 \begin{abstract}
 Chunked robot policies allocate inference compute between constructing an
 action chunk and deciding how long to execute it before replanning from a new
-observation. We introduce a policy-agnostic protocol for evaluating this
-generation--execution allocation within a frozen policy. The protocol defines an
+observation. We introduce a protocol for evaluating this generation--execution allocation
+within a frozen chunked policy that exposes a controllable generation-effort
+setting. The protocol defines an
 architecture-specific generation-effort control and an execution prefix,
 measures complete generation and episode expenditure, separates discovery from
 held-out evaluation, and distinguishes prespecified from later descriptive
@@ -40,8 +41,8 @@ arithmetic was independent of denoising. A later descriptive comparison observed
 replan, with 60.7\% lower arithmetic per attempt; equivalence was not established.
 These checkpoint-specific results demonstrate the protocol rather than a general
 allocation rule. The transferable contribution is a controlled way to evaluate
-behavior, complete inference cost, and evidence status across chunked policy
-architectures.
+behavior, complete inference cost, and evidence status in chunked policies
+with controllable generation effort.
 \end{abstract}
 
 \section{Introduction}
@@ -92,9 +93,9 @@ how its evidence boundaries constrain the resulting claims.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a policy-agnostic generation--execution allocation protocol that maps
-    an architecture-specific inference control and an execution prefix to complete
-    prediction and episode expenditure;
+    \item a generation--execution allocation protocol for chunked policies with
+    a controllable inference setting, mapping that setting and the execution
+    prefix to complete prediction and episode expenditure;
     \item an evidence-reporting procedure that separates prespecified tests from
     amended descriptive contrasts and retains their uncertainty and provenance;
     and
@@ -153,45 +154,44 @@ the policy predicts $K$ actions, executes only the first $h$, discards the
 remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
 controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
-complete calibrated arithmetic of one generation. The protocol compares
-configurations $(h,r)$ within a policy; it does not assume that numerical values
-of $r$ are comparable across architectures. In the SmolVLA case study, $K=50$
-and $r=d$, where $d$ is the denoising count. Accordingly, the equations below
-use $d$ for the measured case-study configurations. For complete execution prefixes, the nominal
-compute rate per simulated control step is
+complete measured arithmetic of one generation under a stated counting boundary.
+The protocol compares configurations $(h,r)$ within a policy; it does not assume
+that numerical values of $r$ are comparable across architectures. For complete
+execution prefixes, the nominal compute rate per simulated control step is
 \[
- b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}.
+ b(h,r)=\frac{F_{\mathrm{gen}}(r)}{h}.
 \]
 For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
 \begin{equation}
- (h^\star,d^\star)(B)\in
- \arg\max_{(h,d)\in\mathcal C:\,b(h,d)\le B}
- p_{\mathrm{success}}(h,d).
+ (h^\star,r^\star)(B)\in
+ \arg\max_{(h,r)\in\mathcal C:\,b(h,r)\le B}
+ p_{\mathrm{success}}(h,r).
  \label{eq:allocation}
 \end{equation}
 A configuration need not exhaust the ceiling. This is a deployment compute-rate
 constraint for a fixed checkpoint, rather than a training-plus-deployment
 objective.
 
-Figure~\ref{fig:closed-loop-policy} summarizes the execution loop. Each policy
-call predicts a fixed-length chunk, executes only the first $h$ actions, discards
-the remainder, and refreshes from the resulting observation. The denoising
-count $d$ controls refinement inside the policy call, while $h$ controls how
-frequently the policy receives a new observation.
+In the SmolVLA instantiation, $K=50$ and $r=d$, where $d$ is the denoising
+count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
+Each policy call predicts a fixed-length chunk, executes only the first $h$
+actions, discards the remainder, and refreshes from the resulting observation.
+The denoising count controls generation effort inside the policy call, while $h$
+controls how frequently the policy receives a new observation.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
-\caption{Closed-loop execution used throughout the protocol. Each policy call
+\caption{SmolVLA instantiation of the closed-loop protocol. Each policy call
 predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
-the remainder, and replans from a new observation. In the experiments, $K=50$.}
+the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
 We distinguish this rate from total arithmetic per attempted episode. If attempt
 $e$ executes $T_e$ actions, its generated-chunk expenditure is
 \begin{equation}
- C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(d).
+ C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(r).
  \label{eq:episode-cost}
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
@@ -471,7 +471,8 @@ but does not determine the quality ranking on new tasks.
 
 This study develops a procedure for evaluating how chunked robot policies
 allocate inference compute between constructing an action chunk and deciding how
-long to execute it before generation is refreshed from a new observation. The procedure measures the complete cost of a policy
+long to execute it before generation is refreshed from a new observation. The
+procedure measures the complete cost of a policy
 call, separates configuration discovery from held-out confirmation, freezes the
 confirmatory comparisons before evaluation, labels later contrasts as
 descriptive, and reports closed-loop success together with episode expenditure.
@@ -493,7 +494,8 @@ delivered limited savings because most generation work was independent of
 denoising. For this implementation, changing the execution prefix affected cost
 more strongly, but similar observed success was insufficient to establish
 equivalent quality. In the case study, the fitted response model also did not
-improve configuration choices over a simple cost-aware rule. Refinement and refresh should therefore
+improve configuration choices over a simple cost-aware rule. Generation effort
+and execution prefix should therefore
 be evaluated together within each model, under explicit counting boundaries,
 with frozen confirmatory tests visibly separated from amended descriptive
 analyses. These outcomes remain checkpoint-specific; broader allocation claims
@@ -525,7 +527,8 @@ A controlled stale-input diagnostic is needed to separate observation freshness
 from the action-position effects introduced by changing the executed prefix. A
 predeclared quality-preservation test should evaluate the cheaper $(5,2)$
 setting, and independent outcome replay should test the retained primary
-trajectories in a separate, version-matched simulator. The same study design can then be applied within other policies and execution
+trajectories in a separate, version-matched simulator. The same study design can
+then be applied within other policies and execution
 stacks: define a controllable generation-effort axis and execution prefix,
 calibrate complete inference cost, freeze within-policy comparisons, and evaluate
 success and expenditure jointly. Cross-architecture evidence should compare the
