@@ -175,22 +175,24 @@ class PaperVisualTests(unittest.TestCase):
             ]
         )
         np.testing.assert_allclose(points, expected)
-        self.assertEqual(len(effects.containers), 2)
-        np.testing.assert_allclose(
-            np.asarray(effects.containers[0].lines[0].get_xdata(), dtype=float),
-            [10.625],
-        )
-        np.testing.assert_allclose(
-            np.asarray(effects.containers[1].lines[0].get_xdata(), dtype=float),
-            [-0.625],
-        )
+        self.assertEqual(tradeoff.get_ylim(), (0, 100))
+        self.assertEqual(len(effects.containers), 7)
+        for comparison, container in zip(
+            self.data["confirmation"]["comparisons"], effects.containers
+        ):
+            np.testing.assert_allclose(
+                np.asarray(container.lines[0].get_xdata(), dtype=float),
+                [100 * comparison["mean_difference"][0]],
+            )
+            segment = container.lines[2][0].get_segments()[0]
+            np.testing.assert_allclose(
+                segment[:, 0], 100 * np.array(comparison["interval95"][0])
+            )
         text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("+10.6 pp", text)
-        self.assertIn("+4.4 to +16.9", text)
-        self.assertIn("-0.6 pp", text)
-        self.assertIn("-6.9 to +6.3", text)
-        self.assertIn("41.1 to 16.1 TFLOPs", text)
-        self.assertIn("No equivalence claim", text)
+        self.assertIn("$(2,2)-(2,5)$", text)
+        self.assertIn("$(2,2)-(5,2)$", text)
+        for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
+            self.assertIn(f"$({cell[0]},{cell[1]})$", text)
 
     def test_study_design_figure_keeps_selection_and_confirmation_separate(self):
         from matplotlib.text import Text

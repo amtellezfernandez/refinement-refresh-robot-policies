@@ -225,7 +225,10 @@ floor under the declared counting boundary, not a universal VLA scaling law.
 Calibration uses a fixed input shape; a separate language-length audit leaves
 eligibility unchanged under the original absolute ceilings
 (Appendix~\ref{app:shape-audit}). Reference arithmetic remains distinct from
-task-shaped arithmetic and elapsed time. The cost model defines feasible
+task-shaped arithmetic and elapsed time. On a fixed input, reducing $d$ from 10
+to 5 lowers measured host generation time by 40.5\% while counted arithmetic
+falls by 8.9\% (Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a
+latency proxy. The cost model defines feasible
 schedules; the following experiments ask which feasible expenditures help
 closed-loop control.
 
@@ -283,28 +286,18 @@ are reported separately in Appendix~\ref{app:fixed-timing}.
 Native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
 for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$, successes
 are 21, 18, 16, and 14 out of 40 as $d$ increases from 2 to 20.
-Figure~\ref{fig:frontier} shows every configuration.
+Appendix Figure~\ref{fig:frontier} shows every configuration.
 These point estimates do not justify imposing monotonic improvement with
 denoising. The small paired sample also does not certify equal quality for
 configurations with similar observed counts.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/discovery_success.pdf}
-\caption{Discovery success for all twelve configurations, with 40 attempts per
-configuration on four Spatial tasks. Marker shape and color identify the
-executed prefix $h$; whiskers are descriptive, task-conditional 95\% paired
-state-bootstrap intervals. The $d$ axis is categorical, and horizontal offsets
-only separate overlapping estimates.}
-\label{fig:frontier}
-\end{figure}
 
 The resource coordinate also matters: nominal rate differs from realized episode
 expenditure, and arithmetic savings differ from elapsed savings.
 Substituting a host-time constraint changes feasible refresh choices; the
 appendix reports this sensitivity analysis separately from the discovery
 success figure. It does not change the frozen arithmetic-based experiment.
-Full task and resource tables appear in Appendix~\ref{app:calibration}.
+Full plots, task counts, and resource tables appear in
+Appendix~\ref{app:calibration}.
 
 \subsection{Frozen tests and the role of selection}
 \label{sec:prediction}
@@ -358,20 +351,41 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}
-\caption{Held-out success and compute for all seven confirmation settings.
-The horizontal coordinate is nominal reference arithmetic per control step,
-relative to native deployment. Arrows isolate refinement at fixed $h=2$ and
-refresh at fixed $d=2$; the right panel reports paired, task-conditional
-descriptive 95\% intervals in each arrow's direction. The refinement row is a
-frozen confirmatory test; the refresh row is a later-added descriptive contrast.
-The refresh episode-cost annotation uses mean arithmetic per attempted episode,
-a separate coordinate. The refinement direction is positive on seven tasks and
-tied on one; refresh differences are mixed across tasks (three positive, three
-negative, and two ties). The refresh interval does not establish equivalent
-success.}
+\caption{Held-out success, compute, and paired effects. Left: all seven
+confirmation settings, labeled $(h,d)$, on a success--arithmetic coordinate
+whose success axis spans 0--100\%. Arrows point from B to A for the primary
+$(2,2)-(2,5)$ comparison and the later $(2,2)-(5,2)$ refresh comparison. Right:
+all effects use the same A-minus-B convention; whiskers are task-conditional,
+descriptive 95\% paired state-bootstrap intervals. The filled diamond marks the
+prespecified primary test. The primary direction is positive on seven tasks and
+tied on one; the refresh comparison has three positive tasks, three negative
+tasks, and two ties. Episode expenditures are reported in
+Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
+
+\begin{table}[htbp]
+\centering\small
+\caption{Evidence status and permitted interpretation. Effects use A minus B.
+The table separates prespecified confirmation from later descriptive analysis.}
+\label{tab:evidence-status}
+\begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
+\toprule
+Comparison & Status & Result & Supported claim\\
+\midrule
+$(2,2)-(2,5)$ & Frozen primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
+At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
+\addlinespace[2pt]
+Other fixed-$h$ refinement tests & Frozen & Positive point estimates;
+intervals span zero & The benefit is not established uniformly across prefixes.\\
+\addlinespace[2pt]
+$(2,2)-(5,2)$ & Later descriptive & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
+$(5,2)$ uses 60.7\% less arithmetic per attempt & Large cost savings are
+observed; equivalent quality is unresolved.\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{samepage}
 \subsection{Refinement: the frozen denoising comparisons}
@@ -393,11 +407,11 @@ The primary direction is positive on seven tasks and tied on one, with
 task sensitivity and expenditure intervals. These measurements do not establish
 a controlled physical-latency improvement.
 Figure~\ref{fig:success-compute} places the primary setting in the joint
-success--compute coordinate; Appendix~\ref{app:confirmation-details} retains
-the complete seven-contrast interval plot.
+success--compute coordinate and places its interval alongside all seven
+confirmation contrasts.
 
 The other two frozen tests have positive point estimates but intervals spanning
-zero (Appendix Figure~\ref{fig:confirmation-effects}). At $h=5$, two versus five
+zero (Figure~\ref{fig:success-compute}). At $h=5$, two versus five
 denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
 137/160 versus 136/160. The largest observed benefit is at the primary prefix.
 The primary gap exceeds its frozen prediction, while matching the signs of
@@ -408,16 +422,14 @@ These results do not demonstrate a uniform denoising benefit across prefixes.
 \subsection{Refresh: descriptive prefix comparisons}
 
 We now hold denoising fixed and compare expenditures on different refresh
-schedules. These contrasts were documented after collection began, when
-individual outcomes were visible; they are not originally prespecified or
-fully outcome-blind (Appendix~\ref{app:confirmation-details}).
+schedules. Table~\ref{tab:evidence-status} records the later amendment and the
+claim boundary; Appendix~\ref{app:confirmation-details} gives full provenance.
 
 At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
 a paired difference of $+0.6$ percentage points $[-6.3,+6.9]$. Yet $(5,2)$ uses
 60\% less nominal arithmetic per control step and 60.7\% less reference
 arithmetic per attempt: 16.1 versus 41.1 TFLOPs. The interval permits meaningful
-differences in either direction; similar counts do not certify equivalent
-quality or justify a non-inferiority claim.
+differences in either direction.
 At task level, the $(5,2)-(2,2)$ difference is positive on three tasks,
 negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}). Thus
 the near-equal aggregate counts contain mixed descriptive task-level changes.
@@ -522,6 +534,16 @@ assumed.}
 \input{../paper/generated/discovery_tasks.tex}
 \end{table}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/discovery_success.pdf}
+\caption{Discovery success by executed prefix $h$, with 40 attempts per
+configuration on four Spatial tasks. Connected estimates make the within-prefix
+response to denoising visible; whiskers are descriptive, task-conditional 95\%
+paired state-bootstrap intervals. The $d$ axes are categorical.}
+\label{fig:frontier}
+\end{figure}
+
 Calibration uses one real observation from Spatial task 0, initial state 0,
 and common explicit noise. For each $d\in\{2,3,5,8,10,20\}$, profiling records
 solver timesteps and dense operation counts, separately from elapsed timing.
@@ -620,20 +642,8 @@ For $(1,2)$, $(2,2)$, and $(5,2)$, the normalized arithmetic rates are
 0.857, 0.429, and 0.171, while the normalized host-time rates are 0.346, 0.173,
 and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
 ceiling but eligible at a separately normalized half-native host-time ceiling.
-Appendix Figure~\ref{fig:selector-feasibility} shows the resulting choices at
-all three ceilings.
 These resource constraints admit different refresh schedules; the choices do
 not establish quality optima. The frozen experiment remains arithmetic-based.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.62\linewidth]{../paper/generated/selector_feasibility.pdf}
-\caption{Appendix sensitivity analysis. A minimum-denoising,
-shortest-feasible-prefix rule selects different prefixes under separately
-normalized arithmetic and fixed-input host-time ceilings. The vertical axis
-shows selected prefix categories, not elapsed time.}
-\label{fig:selector-feasibility}
-\end{figure}
 
 \subsection{Language-shape transport audit}
 \label{app:shape-audit}
@@ -748,19 +758,6 @@ unadjusted, and do not test a quality-preservation margin.}
 \input{../paper/generated/confirmation_secondary.tex}
 \end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
-\caption{Complete confirmation effects: 160 paired attempts per setting on
-eight tasks. Rows compare $(h,d)$ as A minus B; whiskers are task-conditional,
-descriptive 95\% paired state-bootstrap intervals (secondary intervals
-unadjusted). The filled diamond marks the prespecified primary test. The three
-frozen tests and four amended contrasts appear in their documented order; the
-latter were not fully outcome-blind. Intervals crossing zero do not establish
-equivalence.}
-\label{fig:confirmation-effects}
-\end{figure}
-
 The four amended comparisons are reported in their documented order, using
 20,000 paired state-bootstrap resamples and analysis seed 20260913.
 Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
@@ -775,55 +772,50 @@ equivalent quality.
 \phantomsection
 \label{app:verification}
 
-Evaluation records preserve identities, paired initial states and observations,
-generation and denoising counts, action sequences, and outcomes. Reconciliation
-verifies planned coverage and condition pairing across 87,364 discovery actions.
-The complete confirmation audit covers all 1,120 unique attempts and 171,805
-actions across all four collection phases.
-It reproduces the unchanged primary subset of 320 attempts and 50,451 actions.
-Two additional completed repeats have identical outcomes and action sequences;
-they are checked but excluded from the canonical sample. One interrupted attempt
-contains ten actions and no completed outcome, so it is recorded separately and
-excluded. Checkpoint, reset, noise, and environment controls further strengthen
-the internal-consistency evidence; shared upstream errors remain outside this
-boundary.
+The retained records support a complete internal reconciliation of planned
+identities, paired states, executed actions, and recorded outcomes. The checks
+below constrain recording and execution errors; they do not constitute an
+independent outcome replay in a separate simulator.
 
-A separate outcome audit covers all 1,122 raw completed confirmation records and
-172,243 steps. Every generated action matches the action applied to the
-simulator, and all recorded outcome fields agree. All 171,302 nonsuccess steps
-have reward 0, and all 941 success steps have reward 1. This reward agreement is
-not independent validation because LIBERO derives reward and success from the
-same task-goal evaluation. Source tracing connects that evaluation to the task's
-BDDL goal predicates. In a separate parity check, one native Spatial episode
-also reproduces the upstream evaluator's initial state, observation, 70-action
-sequence, length, and outcome. These checks constrain recording and execution
-errors, but do not replace model-free replay in a separate, version-matched
-simulator with direct inspection of terminal states and task predicates.
-
+\begin{table}[htbp]
+\centering\small
+\caption{Internal measurement-verification checklist.}
+\label{tab:verification-summary}
+\begin{tabular}{@{}p{0.25\linewidth}p{0.67\linewidth}@{}}
+\toprule
+Check & Evidence\\
+\midrule
+Canonical coverage & 1,120 confirmation attempts and 171,805 actions; the
+primary subset remains 320 attempts and 50,451 actions.\\
+Pairing and dispatch & Planned identities, paired initial states and
+observations, generation counts, denoising counts, and applied actions reconcile.\\
+Excluded records & Two repeated completed attempts are checked and excluded;
+one interrupted ten-action record has no completed outcome and is excluded.\\
+Outcome path & All 1,122 raw completed records and 172,243 steps reconcile;
+generated actions match simulator actions and recorded outcome fields agree.\\
+Shared predicate & Reward and success both use LIBERO's task-goal evaluation,
+traced to BDDL predicates, so their agreement is an internal consistency check.\\
+Native parity & One Spatial episode matches the upstream path in initial state,
+observation, 70-action sequence, length, and outcome.\\
+Remaining boundary & Independent, version-matched replay and direct terminal-state
+inspection remain outside this audit.\\
+\bottomrule
+\end{tabular}
+\end{table}
 \FloatBarrier
 \paragraph{Analysis provenance.}
 \phantomsection
 \label{app:analysis-provenance}
 
-The three budget-specific comparisons, identities, and primary analysis were
-fixed before transfer outcomes. A deadline-driven scheduling amendment changed
-execution order. Its record states that outcomes were not used for scheduling;
-114 attempts per primary setting had already been completed and recorded when it was written.
-Policy execution settings remained fixed and all 320 primary attempts were
-included. Subsequent continuation completes the
-remaining original identities, not an independent replication. Deduplication
-retains the earliest completed record under the documented phase precedence.
-
-The original comparisons use analysis seed 20260912 in quarter-, half-, then
-full-native order; a separate replay resets that seed for the submitted primary
-interval and reproduces its endpoints. The amended contrasts use seed 20260913.
-Their amendment was written after collection began, when individual outcomes
-were visible, and is not fully outcome-blind. The simple, empirical, and
-compute-only baselines were likewise documented after collection began and are
-interpreted descriptively. Task disaggregation, leave-one-task-out sensitivity,
-and expenditure intervals were added after primary outcomes were observed;
-they do not alter the original comparison or stopping condition. No response
-model is refitted on confirmation outcomes.
+The three refinement comparisons, identities, and primary analysis were frozen
+before transfer outcomes. A deadline-driven amendment changed only execution
+order after 114 attempts per primary setting had been recorded; settings,
+identities, stopping rules, and inclusion remained fixed. Continuation completed
+the original identities, and deduplication retained the earliest completed
+record under the documented phase precedence. The frozen analyses use seed
+20260912. Later prefix contrasts and diagnostics use seed 20260913 and are
+descriptive because they were added after collection began. No response model
+was refitted on confirmation outcomes.
 
 \paragraph{Analysis artifact.}
 The accompanying supplement contains the primary episode and action records,

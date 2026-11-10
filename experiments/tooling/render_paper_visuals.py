@@ -380,100 +380,41 @@ def feasible_prefixes(calibration):
 
 
 def discovery_success_figure(data, path):
-    """Compact main-text discovery panel with no narrative annotations."""
+    """Appendix discovery small multiples showing within-prefix trends."""
     import matplotlib.pyplot as plt
     import numpy as np
 
-    fig, ax = plt.subplots(figsize=(FIGURE_WIDTH, 1.72))
-    fig.subplots_adjust(left=0.10, right=0.985, bottom=0.27, top=0.73)
-    for offset, h, color, marker in zip((-0.14, 0, 0.14), (1, 2, 5), COLORS, MARKERS):
+    fig, axes = plt.subplots(1, 3, figsize=(FIGURE_WIDTH, 1.78), sharey=True)
+    fig.subplots_adjust(left=0.10, right=0.985, bottom=0.28, top=0.79, wspace=0.16)
+    for ax, h, color, marker in zip(axes, (1, 2, 5), COLORS, MARKERS):
         rows = [r for r in data["discovery"]["cells"] if r["h"] == h]
         means = np.array([r["success"] for r in rows]) * 100
         bounds = np.array([r["descriptive_95_interval"] for r in rows]) * 100
         ax.errorbar(
-            np.arange(4) + offset,
+            np.arange(4),
             means,
             yerr=np.array([means - bounds[:, 0], bounds[:, 1] - means]),
             color=color,
             marker=marker,
-            ls="none",
+            ls="-",
+            lw=0.9,
             capsize=2,
             elinewidth=0.9,
             markersize=4.5,
-            label=f"$h={h}$",
         )
-    ax.set(
-        xlabel="Denoising steps",
-        ylabel="Success (%)",
-        ylim=(15, 90),
-        xlim=(-0.42, 3.42),
-        xticks=range(4),
-        xticklabels=[2, 5, 10, 20],
-        yticks=[20, 40, 60, 80],
-    )
-    ax.legend(
-        loc="lower center",
-        bbox_to_anchor=(0.5, 1.01),
-        ncol=3,
-        frameon=False,
-        handlelength=1,
-        columnspacing=1.4,
-        handletextpad=0.25,
-    )
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color=".90", lw=0.55)
-    ax.spines[["top", "right"]].set_visible(False)
-    save_figure(fig, path)
-    plt.close(fig)
-
-
-def selector_feasibility_figure(data, path):
-    """Appendix-only resource-coordinate sensitivity panel."""
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    fig, ax = plt.subplots(figsize=(3.35, 1.62))
-    fig.subplots_adjust(left=0.19, right=0.97, bottom=0.29, top=0.70)
-    selected = feasible_prefixes(data["calibration"])
-    for offset, choices, marker, color, label in zip(
-        (-0.075, 0.075),
-        selected,
-        ("o", "s"),
-        (ACCENT, MID),
-        ("Arithmetic", "Host time"),
-    ):
-        ax.plot(
-            np.arange(3) + offset,
-            [{5: 0, 2: 1, 1: 2}[h] for h in choices],
-            marker=marker,
-            color=color,
-            ms=5,
-            ls="none",
-            markerfacecolor=color if label == "Arithmetic" else "white",
-            label=label,
+        ax.set(
+            xlabel="Denoising steps",
+            ylim=(15, 90),
+            xlim=(-0.35, 3.35),
+            xticks=range(4),
+            xticklabels=[2, 5, 10, 20],
+            yticks=[20, 40, 60, 80],
         )
-    ax.set(
-        xlabel="Ceiling / native",
-        ylabel="Actions before refresh",
-        xlim=(-0.4, 2.4),
-        ylim=(-0.4, 2.4),
-        xticks=range(3),
-        xticklabels=["0.25", "0.50", "1.00"],
-        yticks=[0, 1, 2],
-        yticklabels=["5", "2", "1"],
-    )
-    ax.legend(
-        loc="lower center",
-        bbox_to_anchor=(0.5, 1.01),
-        frameon=False,
-        ncol=2,
-        handlelength=1,
-        handletextpad=0.3,
-        columnspacing=1.0,
-    )
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color=".90", lw=0.55)
-    ax.spines[["top", "right"]].set_visible(False)
+        ax.set_title(f"$h={h}$", fontweight="bold", pad=4)
+        ax.set_axisbelow(True)
+        ax.grid(axis="y", color=".90", lw=0.55)
+        ax.spines[["top", "right"]].set_visible(False)
+    axes[0].set_ylabel("Success (%)")
     save_figure(fig, path)
     plt.close(fig)
 
@@ -764,39 +705,41 @@ def success_compute_figure(data, path):
     resources = {
         (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
     }
-    fig, (tradeoff, effects) = plt.subplots(
-        1, 2, figsize=(FIGURE_WIDTH, 2.50), gridspec_kw={"width_ratios": [1.55, 1]}
-    )
-    fig.subplots_adjust(left=0.095, right=0.985, bottom=0.36, top=0.88, wspace=0.48)
-    highlighted = {(2, 5), (2, 2), (5, 2)}
-    offsets = {(2, 5): (5, 5), (2, 2): (5, 7), (5, 2): (4, -17)}
-    point_labels = {
-        (2, 5): "More refinement",
-        (2, 2): "Reference",
-        (5, 2): "Less frequent refresh",
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.25))
+    tradeoff = fig.add_axes([0.09, 0.17, 0.32, 0.72])
+    effects = fig.add_axes([0.70, 0.17, 0.27, 0.72])
+    offsets = {
+        (1, 2): (7, 15),
+        (1, 5): (-18, -16),
+        (1, 10): (-36, 21),
+        (1, 20): (-9, -18),
+        (2, 2): (5, 9),
+        (2, 5): (5, -16),
+        (5, 2): (-5, 9),
+        (5, 5): (-4, -16),
     }
     for cell, row in resources.items():
         x = row["nominal_fraction_native"]
         y = 100 * row["success_rate"]
-        prominent = cell in highlighted
+        primary = cell == (2, 2)
         tradeoff.scatter(
             x,
             y,
-            s=44 if prominent else 25,
-            marker="D" if cell == (2, 2) else "o",
-            facecolor=ACCENT if prominent else "white",
-            edgecolor=INK if prominent else MID,
+            s=44 if primary else 28,
+            marker="D" if primary else "o",
+            facecolor=ACCENT if primary else "white",
+            edgecolor=ACCENT if primary else INK,
             linewidth=0.8,
             zorder=3,
         )
-        if prominent:
-            tradeoff.annotate(
-                point_labels[cell],
-                (x, y),
-                xytext=offsets[cell],
-                textcoords="offset points",
-                fontweight="bold",
-            )
+        tradeoff.annotate(
+            f"$({cell[0]},{cell[1]})$",
+            (x, y),
+            xytext=offsets[cell],
+            textcoords="offset points",
+            fontweight="bold" if primary else "normal",
+        )
+    # Arrows point from B to A, matching the A-minus-B convention on the right.
     tradeoff.annotate(
         "",
         xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
@@ -808,69 +751,62 @@ def success_compute_figure(data, path):
     )
     tradeoff.annotate(
         "",
-        xy=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
-        xytext=(0.38, 85.2),
+        xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
+        xytext=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
         arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
-        ha="left",
-        va="top",
     )
     tradeoff.set(
         xlabel="Nominal arithmetic / native\n(per control step)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
-        ylim=(73, 90),
+        ylim=(0, 100),
         xticks=[0.2, 0.4, 0.6, 0.8, 1.0],
-        yticks=[75, 80, 85, 90],
+        yticks=[0, 25, 50, 75, 100],
     )
     tradeoff.set_axisbelow(True)
     tradeoff.grid(color=".91", lw=0.55)
     tradeoff.spines[["top", "right"]].set_visible(False)
 
-    primary = data["confirmation"]["comparisons"][1]
-    refresh = data["confirmation"]["comparisons"][4]
-    rows = (
-        (2.2, 100 * primary["mean_difference"][0], [100 * v for v in primary["interval95"][0]], ACCENT, "Less refinement"),
-        (1.25, -100 * refresh["mean_difference"][0], [-100 * refresh["interval95"][0][1], -100 * refresh["interval95"][0][0]], INK, "Refresh less often"),
-    )
+    comparisons = data["confirmation"]["comparisons"]
+    ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
+    labels = [f"$({c['a'][0]},{c['a'][1]})-({c['b'][0]},{c['b'][1]})$" for c in comparisons]
+    effects.set(xlim=(-10, 20), ylim=(-0.1, 8.5), xticks=[-10, 0, 10, 20], yticks=[])
     effects.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8)
-    for y, effect, bounds, color, label in rows:
+    effects.axhline(4.55, color=".86", lw=0.7, zorder=0)
+    transform = effects.get_yaxis_transform()
+    for i, (y, comparison, label) in enumerate(zip(ys, comparisons, labels)):
+        effect = 100 * comparison["mean_difference"][0]
+        bounds = [100 * value for value in comparison["interval95"][0]]
+        primary = comparison["kind"] == "original primary"
+        color = ACCENT if primary else (INK if i < 3 else MID)
         effects.errorbar(
             effect,
             y,
             xerr=[[effect - bounds[0]], [bounds[1] - effect]],
-            fmt="D" if label == "Less refinement" else "o",
+            fmt="D" if primary else ("o" if i < 3 else "s"),
             color=color,
-            mfc=color if label == "Less refinement" else "white",
+            mfc=ACCENT if primary else "white",
             capsize=2.5,
             ms=5,
+            elinewidth=1.1,
+            zorder=3,
         )
         effects.text(
-            effect,
-            y + 0.28,
-            f"{number(effect, True)} pp\n{number(bounds[0], True)} to {number(bounds[1], True)}",
-            ha="center",
-            va="bottom",
-            fontweight="bold" if label == "Less refinement" else "normal",
+            -0.08,
+            y,
+            label,
+            transform=transform,
+            ha="right",
+            va="center",
+            fontweight="bold" if primary else "normal",
         )
-    effects.set(
-        xlabel="Change in success rate\n(percentage points)",
-        xlim=(-10, 20),
-        ylim=(-0.2, 2.8),
-        xticks=[-10, 0, 10, 20],
-        yticks=[1.25, 2.2],
-        yticklabels=["Later descriptive\nrefresh", "Frozen\nrefinement test"],
-    )
+    effects.set_xlabel("A minus B success rate\n(percentage points)")
     effects.spines[["top", "right", "left"]].set_visible(False)
     effects.tick_params(axis="y", length=0)
-    effects.text(
-        5,
-        0.28,
-        "Episode cost: 60.7% lower\n41.1 to 16.1 TFLOPs\nNo equivalence claim",
-        ha="center",
-        va="center",
-        color=MID,
-        bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.5},
-    )
+    effects.text(-0.90, 8.42, "Frozen refinement", transform=transform, fontweight="bold", va="center")
+    effects.text(-0.90, 4.43, "Later descriptive", transform=transform, fontweight="bold", va="center")
+    fig.text(0.25, 0.96, "Held-out settings", ha="center", va="top", fontweight="bold")
+    fig.text(0.82, 0.96, "Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
 
@@ -891,7 +827,6 @@ def render(destination):
     style()
     discovery_figure(data, destination / "discovery_allocation.pdf")
     discovery_success_figure(data, destination / "discovery_success.pdf")
-    selector_feasibility_figure(data, destination / "selector_feasibility.pdf")
     confirmation_figure(data, destination / "confirmation_effects.pdf")
     study_design_figure(data, destination / "study_design.pdf")
     cost_decomposition_figure(data, destination / "cost_decomposition.pdf")
@@ -900,7 +835,6 @@ def render(destination):
         *contents,
         "discovery_allocation.pdf",
         "discovery_success.pdf",
-        "selector_feasibility.pdf",
         "confirmation_effects.pdf",
         "study_design.pdf",
         "cost_decomposition.pdf",
