@@ -1,0 +1,140 @@
+{
+  "excluded_hosts": [
+    "RTX 4060 Ti, NVIDIA EGL (D4)"
+  ],
+  "items": {
+    "action_normalization_clipping": {
+      "bindings": {
+        "loaded_equals_file": null,
+        "norm_stats_sha256": "b3a44bb2810436fb62917decaea58bd4d9110255df527dea21e8fd40c960bd84",
+        "openpi_clipping": null,
+        "quantile_mode": null,
+        "robosuite_scale_action_clipping": null
+      },
+      "decision": "D8",
+      "evidence": null,
+      "requirement": "Normalization file hashes, loaded-statistics equality and mode; where any clipping happens, from pinned source",
+      "status": "UNVERIFIED"
+    },
+    "asset_hashes": {
+      "bindings": {
+        "asset_root": null,
+        "bddl_manifest_sha256": null,
+        "libero_asset_manifest_sha256": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "One bound manifest sha256 over this stack's LIBERO assets and BDDL files (G4/G5)",
+      "status": "UNVERIFIED"
+    },
+    "controller_mapping": {
+      "bindings": {
+        "controller_source_sha256": null,
+        "controller_type": null,
+        "delta_frame": null,
+        "input_range": null,
+        "output_range": null,
+        "robosuite_version": "1.4.1"
+      },
+      "decision": "D8",
+      "evidence": null,
+      "requirement": "OSC controller type, input/output ranges and delta frame, read from pinned robosuite source (path + sha256) and from the live env (G12)",
+      "status": "UNVERIFIED"
+    },
+    "count_gate": {
+      "bindings": {
+        "att_drill_record_sha256": null,
+        "cnt_ind_record_sha256": null,
+        "server_code_sha256": null,
+        "startup_gate_record_sha256": null
+      },
+      "decision": "D5",
+      "evidence": null,
+      "requirement": "Startup G02 gate + PRES + CNT-IND on the served object, and per-request attestation verified on the served path (09 C4)",
+      "status": "UNVERIFIED"
+    },
+    "determinism_config": {
+      "bindings": {
+        "cnt_t_record_sha256": null,
+        "xla_flags": "--xla_gpu_deterministic_ops=true --xla_gpu_autotune_level=0"
+      },
+      "decision": "D8",
+      "evidence": null,
+      "requirement": "Exact determinism configuration certified in Protocol A and used unchanged in Protocol B",
+      "status": "UNVERIFIED"
+    },
+    "driver_package_locks": {
+      "bindings": {
+        "cuda_umd": null,
+        "lock_file_sha256": null,
+        "native_stack": "OpenPI client stack: OpenPI LIBERO submodule, robosuite 1.4.1, MuJoCo 3.2.3, Python 3.8; server: OpenPI 215abfb, JAX/jaxlib 0.5.3, Python 3.11",
+        "nvidia_smi_driver": null,
+        "openpi_commit": "215abfb217dbac7d5f1273282331b9b1866c0479",
+        "wsl_driver_library": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "Driver, CUDA UMD, WSL driver library version (G9) and this stack's package lock file sha256 (G6)",
+      "status": "UNVERIFIED"
+    },
+    "evaluator": {
+      "bindings": {
+        "protocol_e_record_sha256": null,
+        "verdict": null
+      },
+      "decision": "D3",
+      "evidence": null,
+      "requirement": "Protocol E verdict EVALUATOR_QUALIFIED for this stack (13)",
+      "status": "UNVERIFIED"
+    },
+    "host_renderer": {
+      "bindings": {
+        "gl_renderer": null,
+        "gl_vendor": null,
+        "gl_version": null,
+        "gpu_uuid": null,
+        "hostname": null,
+        "kernel": null,
+        "mujoco_gl": "osmesa",
+        "os_release": null,
+        "planned_host": "RTX 5090, WSL, OSMesa",
+        "uname_m": null
+      },
+      "decision": "D4",
+      "evidence": null,
+      "requirement": "Actual renderer strings under MUJOCO_GL=osmesa on the planned host, recorded first-hand (G3, G8)",
+      "status": "UNVERIFIED"
+    },
+    "parity": {
+      "bindings": {
+        "noise_match_record_sha256": null,
+        "p2a_record_sha256": null,
+        "r9_record_sha256": null
+      },
+      "decision": "D8",
+      "evidence": null,
+      "requirement": "R9 same-host bitwise parity, stock vs candidate, matched noise, DO1-DO3 at d=10; P2a preprocessing comparison",
+      "status": "UNVERIFIED"
+    },
+    "protocol_a_preflight": {
+      "bindings": {
+        "preflight_record_sha256": null,
+        "verdict": null
+      },
+      "decision": "Protocol A",
+      "evidence": null,
+      "requirement": "Protocol A PREFLIGHT_PASS for this model on the planned host",
+      "status": "UNVERIFIED"
+    },
+    "smolvla_horizons_termination": {
+      "bindings": {},
+      "decision": "D7",
+      "evidence": null,
+      "requirement": "Per-suite _max_episode_steps and whether success terminates the episode, from Protocol E fixtures and source (G10)",
+      "status": "NOT_APPLICABLE"
+    }
+  },
+  "model": "pi05",
+  "schema": "cross_policy_v3_qualification_v1",
+  "status_note": "Every item is UNVERIFIED. Implementation existing is not evidence that any check passed. No check has been run."
+}
