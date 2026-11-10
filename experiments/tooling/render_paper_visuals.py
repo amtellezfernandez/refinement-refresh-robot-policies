@@ -708,8 +708,8 @@ def success_compute_figure(
         (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
     }
     fig = plt.figure(figsize=(figure_width, figure_height))
-    tradeoff = fig.add_axes([0.10, 0.19, 0.34, 0.68])
-    effects = fig.add_axes([0.70, 0.19, 0.17, 0.68])
+    tradeoff = fig.add_axes([0.12, 0.22, 0.34, 0.65])
+    effects = fig.add_axes([0.70, 0.22, 0.17, 0.65])
     tradeoff.set_facecolor(".965")
     effects.set_facecolor(".985")
     offsets = {
@@ -801,7 +801,7 @@ def success_compute_figure(
         color=".28",
     )
     tradeoff.set(
-        xlabel="Compute per control step\n(% of native; lower = cheaper)",
+        xlabel="Compute per control step\n($d=10,h=1$: 100%; cheaper $\\leftarrow$)",
         ylabel="Observed success (%)",
         xlim=(0.12, 1.04),
         ylim=(70, 100),
@@ -874,7 +874,7 @@ def success_compute_figure(
         -0.90, 4.43, "Amended descriptive", transform=transform,
         fontweight="bold", va="center", bbox=heading_box, zorder=5
     )
-    fig.text(0.27, 0.96, "(a) Held-out settings", ha="center", va="top", fontweight="bold")
+    fig.text(0.29, 0.96, "(a) Held-out settings", ha="center", va="top", fontweight="bold")
     fig.text(0.785, 0.96, "(b) Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
