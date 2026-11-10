@@ -874,8 +874,8 @@ def success_compute_figure(
         -0.90, 4.43, "Amended descriptive", transform=transform,
         fontweight="bold", va="center", bbox=heading_box, zorder=5
     )
-    fig.text(0.27, 0.96, "Figure 2.1 — Held-out settings", ha="center", va="top", fontweight="bold")
-    fig.text(0.785, 0.96, "Figure 2.2 — Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
+    fig.text(0.27, 0.96, "(a) Held-out settings", ha="center", va="top", fontweight="bold")
+    fig.text(0.785, 0.96, "(b) Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
 
