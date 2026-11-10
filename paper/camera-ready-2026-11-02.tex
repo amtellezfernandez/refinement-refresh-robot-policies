@@ -57,12 +57,13 @@ closed-loop outcomes under a common resource constraint.
 
 We ask: \emph{given a fixed inference budget, how should a robot divide
 computation between prediction refinement and observation-conditioned refresh?}
-The cost of a fresh prediction makes this question nontrivial. In our frozen
-SmolVLA implementation \cite{smolvla}, work independent of denoising accounts
-for 82.1\% of native counted arithmetic. Reducing refinement therefore leaves a
-substantial cost per generation: sufficiently tight budgets require less frequent
-refresh even at low denoising counts. This cost boundary determines what is
-feasible, but not which feasible setting controls the robot best.
+The cost of a fresh prediction makes this question nontrivial. In the frozen
+SmolVLA case study \cite{smolvla}, work independent of denoising accounts for
+82.1\% of native counted arithmetic. For this checkpoint, reducing refinement
+therefore leaves a substantial cost per generation: sufficiently tight budgets
+require less frequent refresh even at low denoising counts. This cost boundary
+determines what is feasible, but not which feasible setting controls the robot
+best.
 
 We operationalize this allocation question through two within-checkpoint
 comparisons. The primary comparison varies denoising at a fixed execution prefix
@@ -75,8 +76,9 @@ selection. Three frozen comparisons evaluate refinement. The amended
 prefix comparisons examine refresh; they neither isolate observation freshness
 from action-position effects nor establish an optimal allocation rule.
 
-At the primary two-action prefix, two denoising steps yield 139/160 successes
-versus 122/160 for five steps, with lower reference arithmetic. At two denoising
+Within the SmolVLA case study, the primary two-action prefix with two denoising
+steps yields 139/160 successes versus 122/160 for five steps, with lower reference
+arithmetic. At two denoising
 steps, however, a five-action prefix yields 138/160 successes at 60.7\% less
 arithmetic per attempt than the two-action prefix; their quality difference
 remains unresolved. A simple cost-aware rule also matches the fitted response
@@ -201,7 +203,7 @@ refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
 shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
 
-For the reference input, the measured arithmetic satisfies, to rounding,
+For the case-study checkpoint and reference input, the measured arithmetic satisfies, to rounding,
 \[
  F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
 \]
@@ -226,7 +228,7 @@ floor under the declared counting boundary, not a universal VLA scaling law.
 Calibration uses a fixed input shape; a separate language-length audit leaves
 eligibility unchanged under the original absolute ceilings
 (Appendix~\ref{app:shape-audit}). Reference arithmetic remains distinct from
-task-shaped arithmetic and elapsed time. On a fixed input, reducing $d$ from 10
+task-shaped arithmetic and elapsed time. For the case-study implementation on a fixed input, reducing $d$ from 10
 to 5 lowers measured host generation time by 40.5\% while counted arithmetic
 falls by 8.9\% (Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a
 latency proxy. The cost model defines feasible
@@ -284,7 +286,7 @@ are reported separately in Appendix~\ref{app:fixed-timing}.
 \subsection{Discovery: quality does not increase monotonically with refinement}
 \label{sec:discovery-quality}
 
-Native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
+In discovery for the case-study checkpoint, native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
 for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$, successes
 are 21, 18, 16, and 14 out of 40 as $d$ increases from 2 to 20.
 Appendix Figure~\ref{fig:frontier} shows every configuration.
@@ -303,7 +305,7 @@ Appendix~\ref{app:calibration}.
 \subsection{Frozen tests and the role of selection}
 \label{sec:prediction}
 
-A response model fitted only to discovery selects $(5,2)$, $(2,2)$, and $(1,2)$
+For this case study, a response model fitted only to discovery selects $(5,2)$, $(2,2)$, and $(1,2)$
 at the quarter-, half-, and full-native ceilings. Their frozen comparators are
 $(5,5)$, $(2,5)$, and $(1,5)$, respectively; the half-native comparison is primary.
 All selected settings are existing discovery grid points, so confirmation tests
@@ -311,7 +313,7 @@ task transfer rather than extrapolation to an untested configuration. Each pair
 changes denoising at a fixed prefix. These are comparisons under common ceilings,
 not equal-rate tests of how to divide compute between refinement and refresh.
 
-At the primary ceiling, $(2,2)$ has the highest eligible discovery success.
+Within this case study, $(2,2)$ has the highest eligible discovery success at the primary ceiling.
 Its comparator $(2,5)$ ties with $(2,10)$ for the highest count among distinct
 eligible alternatives and wins the lower-cost tie-break. A simple rule choosing
 minimum denoising and then the shortest feasible prefix makes the same choices
@@ -327,7 +329,7 @@ in Appendix~\ref{app:selectors}.
 
 \subsection{Complete confirmation overview}
 
-All 1,120 originally planned confirmation attempts are complete.
+All 1,120 originally planned SmolVLA case-study confirmation attempts are complete.
 Table~\ref{tab:confirmation-grid} reports the seven configurations on the same
 paired identities. The audit excludes two repeated completed records under the
 documented precedence rule; continuation completes the original design, not
@@ -338,7 +340,7 @@ descriptive analyses with their provenance and uncertainty retained.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Confirmation overview: 160 attempts per configuration on eight tasks.
+\caption{SmolVLA case-study confirmation: 160 attempts per configuration on eight tasks.
 $K=50$ is the fixed predicted chunk length, $h$ is the executed prefix, and $d$
 is the denoising count.
 Nominal rate/native is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
@@ -352,7 +354,7 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\linewidth]{../paper/generated/success_compute_tradeoff.pdf}
-\caption{Held-out success, compute, and paired effects. Left: all seven
+\caption{SmolVLA case-study held-out success, compute, and paired effects. Left: all seven
 confirmation settings on a success--arithmetic coordinate. Points are $(h,d)$;
 blue marks the frozen primary pair, and the success axis starts at 70\%.
 Arrows point from B to A for the primary
@@ -380,11 +382,11 @@ $(2,2)-(2,5)$ & Frozen primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
 At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
 \addlinespace[2pt]
 Other fixed-$h$ refinement tests & Frozen & Positive point estimates;
-intervals span zero & The benefit is not established uniformly across prefixes.\\
+intervals span zero & A uniform benefit is not established for this checkpoint.\\
 \addlinespace[2pt]
 $(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
-$(5,2)$ uses 60.7\% less arithmetic per attempt & Large cost savings are
-observed; equivalent quality is unresolved.\\
+$(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
+cost savings; equivalent quality is unresolved.\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -392,12 +394,13 @@ observed; equivalent quality is unresolved.\\
 \begin{samepage}
 \subsection{Refinement: the frozen denoising comparisons}
 
-At the primary two-action prefix, two denoising steps yield 139/160 successes
-versus 122/160 for five steps. The paired difference is $+10.6$ percentage
+For the case-study checkpoint, the primary two-action prefix with two denoising
+steps yields 139/160 successes versus 122/160 for five steps. The paired difference is $+10.6$ percentage
 points, with descriptive 95\% interval $[+4.4,+16.9]$, conditional on the eight
 tasks. The selected setting also uses 5.9\% less nominal reference arithmetic
-per control step: 275.0 versus 292.2 GFLOPs. Thus reducing refinement improves
-observed success while reducing counted work at this fixed prefix.
+per control step: 275.0 versus 292.2 GFLOPs. Thus, in this SmolVLA comparison,
+reducing refinement improves observed success while reducing counted work at
+this fixed prefix.
 \par\end{samepage}
 
 Mean reference arithmetic per attempt falls from 48.7 to 41.1 TFLOPs
@@ -412,7 +415,7 @@ Figure~\ref{fig:success-compute} places the primary setting in the joint
 success--compute coordinate and places its interval alongside all seven
 confirmation contrasts.
 
-The other two frozen tests have positive point estimates but intervals spanning
+Within the same checkpoint, the other two frozen tests have positive point estimates but intervals spanning
 zero (Figure~\ref{fig:success-compute}). At $h=5$, two versus five
 denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
 137/160 versus 136/160. The largest observed benefit is at the primary prefix.
@@ -423,8 +426,8 @@ These results do not demonstrate a uniform denoising benefit across prefixes.
 \FloatBarrier
 \subsection{Refresh: descriptive prefix comparisons}
 
-We now hold denoising fixed and compare expenditures on different refresh
-schedules. Table~\ref{tab:evidence-status} records the later amendment and the
+Within the SmolVLA case study, we now hold denoising fixed and compare
+expenditures on different refresh schedules. Table~\ref{tab:evidence-status} records the later amendment and the
 claim boundary; Appendix~\ref{app:confirmation-details} gives full provenance.
 
 At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
@@ -439,10 +442,10 @@ the near-equal aggregate counts contain mixed descriptive task-level changes.
 Refreshing every action with $(1,2)$ instead of every two actions gives two
 fewer successes, a difference of $-1.3$ points $[-7.5,+5.0]$, at 83.3 versus
 41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
-benefit in these contrasts. Native-relative comparisons, which also change
+benefit in these SmolVLA contrasts. Native-relative comparisons, which also change
 denoising, are reported separately in Appendix~\ref{app:confirmation-details}.
 
-The discovery point estimates favor shorter prefixes at $d=2$
+Within the case study, the discovery point estimates favor shorter prefixes at $d=2$
 (Section~\ref{sec:discovery-quality}), but their quality advantage is not
 established on transfer. The task populations differ, so this comparison
 does not identify a causal task effect. The cost model explains feasibility,
@@ -463,12 +466,13 @@ its compute cost.
 The transferable contribution is this evaluation protocol. SmolVLA serves as a
 worked case study for one checkpoint and simulator stack, demonstrating how to
 apply the procedure and how evidence status changes the permitted claims.
-Additional refinement did not consistently produce better closed-loop behavior,
-and reducing refinement alone delivered limited savings because most generation
-work was independent of denoising. Changing the execution prefix affected cost
+In this SmolVLA case study, additional refinement did not consistently produce
+better closed-loop behavior. For this implementation, reducing refinement alone
+delivered limited savings because most generation work was independent of
+denoising. For this implementation, changing the execution prefix affected cost
 more strongly, but similar observed success was insufficient to establish
-equivalent quality. The fitted response model also did not improve configuration
-choices over a simple cost-aware rule. Refinement and refresh should therefore
+equivalent quality. In the case study, the fitted response model also did not
+improve configuration choices over a simple cost-aware rule. Refinement and refresh should therefore
 be evaluated together within each model, under explicit counting boundaries,
 with frozen confirmatory tests visibly separated from amended descriptive
 analyses. These outcomes remain checkpoint-specific; broader allocation claims
@@ -479,7 +483,7 @@ architectures, tasks, and execution stacks.
 The two deployment controls are not isolated causal interventions on prediction
 quality and observation freshness. Changing denoising changes numerical
 integration; changing prefix changes both observation age and executed action
-positions. The mechanism behind the benefit of coarser sampling remains open.
+positions. The mechanism behind the observed primary difference remains open.
 The study covers one checkpoint and twelve fixed tasks in simulation, with
 only four discovery task-level validation folds. Intervals are task-conditional,
 secondary contrasts are unadjusted, and no quality-preservation margin was
