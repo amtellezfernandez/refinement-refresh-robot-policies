@@ -38,9 +38,9 @@ successes when executing five rather than two actions per prediction, with 60.7\
 lower arithmetic per attempt; equivalence was not established. The large
 refinement effect is localized at the two-action prefix, and a simple cost-aware
 rule matched the fitted model's choices. These checkpoint-specific findings do
-not define a general allocation rule. The contribution is a controlled SmolVLA
-study and a procedure for reporting success, complete compute, and evidence
-status together.
+not define a general allocation rule. Together, the controlled study and its
+reporting procedure show how to evaluate success, complete compute, and evidence
+status as one deployment decision.
 \end{abstract}
 
 \section{Introduction}
@@ -343,7 +343,7 @@ Model fitting, the full candidate set, and selector diagnostics are retained
 in Appendix~\ref{app:selectors}.
 
 \FloatBarrier
-\section{SmolVLA Worked Example: Held-Out Results}
+\section{Held-Out Evaluation on SmolVLA}
 \label{sec:transfer}
 
 \subsection{Complete confirmation overview}
@@ -495,23 +495,25 @@ This prevents a cheap configuration from being treated as useful without
 behavioral evidence, or a successful configuration from being discussed without
 its compute cost.
 
-The empirical conclusions are specific to this checkpoint and synchronous LIBERO
-stack. The protocol supplies a reporting template for replication, but the paper
-does not validate a common refinement variable or allocation rule across policy
-architectures.
-In this SmolVLA case study, additional refinement did not consistently produce
-better closed-loop behavior. For this implementation, reducing refinement alone
-delivered limited savings because most generation work was independent of
-denoising. For this implementation, changing the execution prefix affected cost
-more strongly, but similar observed success was insufficient to establish
-equivalent quality. In the case study, the fitted response model also did not
-improve configuration choices over a simple cost-aware rule. Generation effort
-and execution prefix should therefore
-be evaluated together within each model, under explicit counting boundaries,
-with frozen confirmatory tests visibly separated from amended descriptive
-analyses. These outcomes remain checkpoint-specific; broader allocation claims
-require the same within-model study across other checkpoints, policy
-architectures, tasks, and execution stacks.
+The prespecified held-out comparison establishes the paper's central empirical
+result for this checkpoint: reducing denoising from five steps to two at a fixed
+two-action prefix improved observed closed-loop success while reducing counted
+work. The other fixed-prefix comparisons show much smaller differences, so this
+is evidence for a configuration-specific gain rather than a monotone law that
+less refinement is always better. The cost decomposition explains why the
+arithmetic reduction is modest: most generation work is independent of
+denoising. Changing the execution prefix has a much larger effect on expenditure,
+but the amended comparison does not establish equivalent quality. The fitted
+response model also provides no demonstrated selection advantage over a simple
+cost-aware rule.
+
+These findings make the allocation decision empirical: generation effort and
+execution prefix should be evaluated jointly within each model, under explicit
+counting boundaries, with confirmatory tests separated from later descriptive
+analyses. The conclusions are specific to one checkpoint and synchronous LIBERO
+stack. The protocol supplies a reporting template for replication; broader
+allocation claims require the same within-model study across other checkpoints,
+policy architectures, tasks, and execution stacks.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
