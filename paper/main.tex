@@ -21,40 +21,42 @@ Compute Allocation for Closed-Loop Robot Policies}
 \maketitle
 
 \begin{abstract}
-How should a chunked robot policy spend inference compute: refine its current
-action chunk, or replan from a newer observation? We introduce a reproducible
-protocol for evaluating this trade-off within a frozen policy and use one frozen
-SmolVLA checkpoint as a worked case study. The protocol
-defines refinement and refresh separately, measures complete generation and
-episode expenditure, separates discovery from held-out evaluation, freezes
-confirmatory comparisons before outcomes are observed, and labels later analyses
-as descriptive. The case study runs in synchronous LIBERO simulation.
-The denoising comparisons were frozen before confirmation; refresh-prefix
-contrasts were added later and are interpreted descriptively. In the
-prespecified primary comparison, at a fixed two-action prefix, reducing
+Chunked robot policies allocate inference compute between constructing an
+action chunk and deciding how long to execute it before replanning from a new
+observation. We introduce a policy-agnostic protocol for evaluating this
+generation--execution allocation within a frozen policy. The protocol defines an
+architecture-specific generation-effort control and an execution prefix,
+measures complete generation and episode expenditure, separates discovery from
+held-out evaluation, and distinguishes prespecified from later descriptive
+comparisons. We demonstrate it with one frozen SmolVLA checkpoint in synchronous
+LIBERO simulation, where generation effort is varied through denoising steps.
+In the prespecified primary comparison at a fixed two-action prefix, reducing
 denoising from five to two steps increased success from 122/160 to 139/160 while
-reducing counted arithmetic. Full-generation calibration showed that 82.1\% of
-native arithmetic was independent of denoising. An amended descriptive comparison
-observed 138/160 versus 139/160 successes when refreshing after five rather than
-two actions, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. A simple cost-aware rule matched the fitted model's choices.
-These checkpoint-specific findings illustrate the protocol; they do not define
-a general SmolVLA or cross-policy allocation rule. The transferable contribution
-is the procedure for evaluating success, compute, and evidence status together.
+reducing counted arithmetic. Calibration showed that 82.1\% of native generation
+arithmetic was independent of denoising. A later descriptive comparison observed
+138/160 versus 139/160 successes when executing five rather than two actions per
+replan, with 60.7\% lower arithmetic per attempt; equivalence was not established.
+These checkpoint-specific results demonstrate the protocol rather than a general
+allocation rule. The transferable contribution is a controlled way to evaluate
+behavior, complete inference cost, and evidence status across chunked policy
+architectures.
 \end{abstract}
 
 \section{Introduction}
 
-A robot policy can reduce inference work in two ways: spend less computation
-refining each action prediction, or execute more actions before requesting a
-new prediction. These interventions affect behavior differently. Reduced
-refinement changes the prediction itself; longer execution prefixes delay
-observation-conditioned revision and expose later positions of the predicted
-action sequence. Their relative value should therefore be evaluated through
-closed-loop outcomes under a common resource constraint.
+A chunked robot policy allocates deployment compute along two distinct axes:
+internal computation used to construct each action chunk and the number of actions
+executed before generating another chunk from a new observation. The first axis
+is architecture-specific: it can include iterative denoising or flow integration,
+candidate generation and verification, search, or another controllable inference
+procedure. The second controls observation-conditioned replanning. Changing
+generation effort can alter the predicted chunk; lengthening the execution prefix
+delays feedback and exposes later action positions. Their relative value should
+therefore be evaluated through closed-loop outcomes under a common resource
+constraint.
 
-We ask: \emph{given a fixed inference budget, how should a robot divide
-computation between prediction refinement and observation-conditioned refresh?}
+We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
+compute between action generation and observation-conditioned execution?}
 The cost of a fresh prediction makes this question nontrivial. In the frozen
 SmolVLA case study \cite{smolvla}, work independent of denoising accounts for
 82.1\% of native counted arithmetic. For this checkpoint, reducing refinement
@@ -88,14 +90,14 @@ how its evidence boundaries constrain the resulting claims.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a reproducible refinement--refresh protocol that defines the controls,
-    accounts for complete prediction and episode expenditure, and freezes
-    confirmatory comparisons before held-out evaluation;
-    \item an evidence-reporting procedure that keeps prespecified refinement
-    tests separate from amended descriptive refresh contrasts and retains their
-    uncertainty and provenance; and
-    \item a paired SmolVLA study that demonstrates the protocol across twelve
-    discovery configurations and seven held-out confirmation settings.
+    \item a policy-agnostic generation--execution allocation protocol that maps
+    an architecture-specific inference control and an execution prefix to complete
+    prediction and episode expenditure;
+    \item an evidence-reporting procedure that separates prespecified tests from
+    amended descriptive contrasts and retains their uncertainty and provenance;
+    and
+    \item a paired SmolVLA case study, using denoising count as the generation
+    control, across twelve discovery configurations and seven held-out settings.
 \end{itemize}
 
 \section{Related Work}
@@ -126,28 +128,34 @@ comparisons. It neither introduces an adaptive scheduler nor establishes an
 advantage over these methods; their reported speedups have different policies,
 hardware, and measurement boundaries.
 
-\section{Protocol for Refinement--Refresh Evaluation}
+\section{Protocol for Generation--Execution Allocation}
 \label{sec:allocation}
 
-The protocol has four stages. First, define refinement and refresh as separate
-deployment controls while holding the checkpoint and paired rollout conditions
-fixed. Second, measure complete prediction cost and realized episode expenditure
-under an explicit counting boundary. Third, use discovery data to freeze the
-confirmatory comparisons before held-out outcomes are observed. Fourth, report
-success and expenditure together, label any later contrasts as descriptive, and
-avoid interpreting arithmetic savings as latency improvement or similar observed
-success as equivalent quality. The following subsections instantiate each stage.
+The protocol has four stages. First, choose an architecture-specific generation
+effort control $r$ and an execution prefix $h$, while holding the checkpoint and
+paired rollout conditions fixed. Here $r$ denotes a controllable amount of
+internal inference work used to produce one chunk; its implementation depends on
+the policy. Second, measure complete generation cost and realized episode
+expenditure under an explicit counting boundary. Third, use discovery data to
+freeze confirmatory comparisons before held-out outcomes are observed. Fourth,
+report success and expenditure together, label later contrasts as descriptive,
+and avoid interpreting arithmetic savings as latency improvement or similar
+observed success as equivalent quality. The following subsections instantiate
+each stage with $r=d$, the denoising count of SmolVLA.
 
 \subsection{Compute rate and episode expenditure}
 
-Let $K$ be the predicted action-chunk length and $h<K$ the execution prefix.
-At each policy query, the policy predicts $K$ actions, executes only the first
-$h$, discards the remaining $K-h$, and then generates a new chunk from a new
-observation. Thus $h$ controls replanning frequency without changing the
-predicted chunk length. In all experiments, $K=50$. We reserve $T_e$ for the
-number of actions actually executed in attempt $e$. Let $d$ be the denoising
-count and $F_{\mathrm{gen}}(d)$ the reference-calibrated neural arithmetic for a full
-action-chunk generation at denoising setting $d$. For complete execution prefixes, the nominal
+Let $K$ be the predicted action-chunk length, $h<K$ the execution prefix, and
+$r$ the architecture-specific generation-effort control. At each policy query,
+the policy predicts $K$ actions, executes only the first $h$, discards the
+remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
+controls replanning frequency without changing $K$. We reserve $T_e$ for the
+number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
+complete calibrated arithmetic of one generation. The protocol compares
+configurations $(h,r)$ within a policy; it does not assume that numerical values
+of $r$ are comparable across architectures. In the SmolVLA case study, $K=50$
+and $r=d$, where $d$ is the denoising count. Accordingly, the equations below
+use $d$ for the measured case-study configurations. For complete execution prefixes, the nominal
 compute rate per simulated control step is
 \[
  b(h,d)=\frac{F_{\mathrm{gen}}(d)}{h}.
@@ -265,8 +273,13 @@ is keyed by task, state, seed, and simulation tick, preserving a common noise
 key whenever conditions generate at the same tick. Solver timesteps and a
 constant-field integration check verify that every $d$ traverses the full
 interval from 1 to 0; fewer steps change the discretization, not the integration
-endpoint. Action and outcome journals reconcile independently across software
-boundaries (\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
+endpoint. Recorded initial conditions, generated and executed actions, and
+outcomes agree across the evaluation records. LIBERO's sparse reward and success indicator derive
+from the same task-goal evaluation, so their agreement checks record
+consistency rather than supplying an independent outcome measure. The recorded
+outcome path is traced to the benchmark's task-specific goal conditions. These checks
+establish strong internal consistency rather than an independent simulator replay
+(Appendix~\ref{app:verification}).
 
 Success averages both seeds within each state, then states and tasks with equal
 task weights. Descriptive 95\% intervals use 20,000 bootstrap draws of states
@@ -455,8 +468,8 @@ but does not determine the quality ranking on new tasks.
 \section{Discussion and Conclusion}
 
 This study develops a procedure for evaluating how chunked robot policies
-allocate inference compute between refining an action prediction and refreshing
-it from a new observation. The procedure measures the complete cost of a policy
+allocate inference compute between constructing an action chunk and deciding how
+long to execute it before generation is refreshed from a new observation. The procedure measures the complete cost of a policy
 call, separates configuration discovery from held-out confirmation, freezes the
 confirmatory comparisons before evaluation, labels later contrasts as
 descriptive, and reports closed-loop success together with episode expenditure.
@@ -464,9 +477,14 @@ This prevents a cheap configuration from being treated as useful without
 behavioral evidence, or a successful configuration from being discussed without
 its compute cost.
 
-The transferable contribution is this evaluation protocol. SmolVLA serves as a
-worked case study for one checkpoint and simulator stack, demonstrating how to
-apply the procedure and how evidence status changes the permitted claims.
+The transferable contribution is this evaluation protocol. It treats generation
+effort as a policy-specific control rather than assuming that every architecture
+uses denoising. For diffusion or flow policies it may be an integration-step
+count; for sampling, search, or verification systems it may be the number of
+candidates, search expansions, or verification passes, provided the control and
+its complete cost are defined in advance. SmolVLA serves as a worked case study
+for one checkpoint and simulator stack, demonstrating the procedure with
+denoising count and showing how evidence status changes the permitted claims.
 In this SmolVLA case study, additional refinement did not consistently produce
 better closed-loop behavior. For this implementation, reducing refinement alone
 delivered limited savings because most generation work was independent of
@@ -494,26 +512,26 @@ $d=1$ is untested.
 The arithmetic boundary excludes several operation classes; language lengths
 are audited but image shape is fixed. Sampled GPU checks have coverage gaps,
 and simulated control steps do not establish real-time responsiveness.
+The recorded outcomes trace to LIBERO's task-goal evaluation, and one
+native-setting parity episode reproduces the reference evaluator's initial state,
+action sequence, episode length, and outcome. However, the confirmation actions
+were not replayed in a separate, version-matched simulator. Outcome validity is
+therefore strongly supported internally but not fully independently established.
 
 \paragraph{Next steps.}
-A matched stale-input diagnostic on the 40 discovery identities changes the
-supplied images and proprioception refresh from every tick to every five ticks
-while generating at every tick at $(h,d)=(1,5)$. Success falls from 28/40 with
-fresh inputs to 20/40 with held inputs, a paired difference of $-20.0$ percentage
-points with a descriptive task-conditional 95\% interval $[-32.5,-7.5]$.
-This supports an observation-freshness contribution, but the step journal logs
-action age rather than per-step supplied-input hashes or observation age; the
-intervention therefore does not isolate every implementation detail. Completing
-the input instrumentation and checking action positions can further separate
-the mechanisms behind prefix effects.
-A new, predeclared quality-preservation test for the cheaper $(5,2)$ setting
-and replication on another policy are needed to assess whether its observed
-cost advantage supports deployment. More broadly, the same study design can be
-applied within other policies and simulator or robot stacks: define the refinement
-and refresh controls, calibrate their complete inference cost, freeze the
-confirmatory comparisons, and evaluate success and expenditure jointly. This
-supports the broader objective of determining when the fixed cost of a fresh prediction is
-worth paying and how much refinement that prediction needs.
+A controlled stale-input diagnostic is needed to separate observation freshness
+from the action-position effects introduced by changing the executed prefix. A
+predeclared quality-preservation test should evaluate the cheaper $(5,2)$
+setting, and independent outcome replay should test the retained primary
+trajectories in a separate, version-matched simulator. The same study design can then be applied within other policies and execution
+stacks: define a controllable generation-effort axis and execution prefix,
+calibrate complete inference cost, freeze within-policy comparisons, and evaluate
+success and expenditure jointly. Cross-architecture evidence should compare the
+within-model allocation results rather than pool unlike control values or counting
+boundaries. Replication across checkpoints, benchmark families, and asynchronous
+or physical-robot execution is required to determine when additional generation
+work is worth paying for and when compute is better spent producing a new chunk
+from fresher feedback.
 
 \clearpage
 \bibliographystyle{unsrtnat}
@@ -565,7 +583,7 @@ performs 20 warm-up generations once per configuration.
 Host generation timing brackets prediction and completion synchronization;
 CUDA events measure the current-stream prediction interval. The outer rollout
 clock additionally includes observation processing, action handling,
-simulation/rendering, and journal writes. Model loading, environment creation,
+simulation/rendering, and record writing. Model loading, environment creation,
 reset, and warm-up are measured separately. Process sampling occurs approximately
 every five seconds; the largest recorded gap during discovery is below
 5.03 seconds. Display processes remain on the measurement GPU.
@@ -736,14 +754,14 @@ Precision controls & Autocast and TF32 disabled; deterministic algorithms enable
 Attention and reuse & Eager language/action attention with float32 scores; within-generation KV cache enabled\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
-Evaluator source & \texttt{run\_paired.py}; SHA-256 prefix\newline \texttt{516375133d030ff4} (full digest in supplement)\\
+Evaluator provenance & Source revision and full digest retained in supplement\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The manifests do not retain a parameter-dtype inventory or a separate vision
-attention-backend inventory. The attention details in Table~\ref{tab:runtime} follow the pinned
-language/action implementation; they do not identify every runtime kernel.
+The retained provenance does not characterize numerical precision and attention
+execution for every model component. Table~\ref{tab:runtime} therefore supports
+the stated model configuration, but not component- or kernel-level claims.
 
 \subsection{Complete confirmation outcomes}
 \label{app:confirmation-details}
@@ -768,12 +786,6 @@ unadjusted, and do not test a quality-preservation margin.}
 \label{tab:confirmation-secondary}
 \input{../paper/generated/confirmation_secondary.tex}
 \end{table}
-
-The stale-input intervention is reported separately from the confirmation
-comparisons. It is a 40-attempt mechanism diagnostic on the discovery identities,
-not an additional confirmation configuration. The held-input and matched
-fresh-input records share all 40 initial state and observation hashes; the stale
-run's remote artifacts are retained with their own manifest and schedule hashes.
 
 The four amended comparisons are reported in their documented order, using
 20,000 paired state-bootstrap resamples and analysis seed 20260913.
@@ -835,21 +847,17 @@ descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 
 \paragraph{Analysis artifact.}
-The accompanying \texttt{primary\_transfer\_supplement.zip} contains the primary
-episode and action records, original planned identities, paired state values,
-calibrations, frozen predictions, runtime extract, and analysis code.
-Running \texttt{python primary\_reporting.py --check .} reproduces the primary
-counts, interval, task table, and descriptive expenditure analysis without
-inference. Its README specifies the selector features, penalized objective,
-candidate set, and normalization. Machine-specific paths are omitted from the
-runtime extract; checkpoint weights and simulator assets are not bundled.
-The continuing repository additionally retains a compressed completed-confirmation
-snapshot and \texttt{analyze\_confirmation.py}. Its \texttt{--check} mode
-reconciles the full journals, original schedule, runtime manifests, repeated
-identities, and paired blocks, then reproduces the seven-setting resource table,
-all original and amended comparisons, and task-level counts. Generated evidence
-records source, input, and snapshot hashes. The submitted supplement remains
-separate from these post-submission additions.
+The accompanying supplement contains the primary episode and action records,
+planned identities, paired state values, calibrations, frozen predictions,
+runtime provenance, and analysis code. Its bundled verification procedure
+reproduces the primary counts, interval, task table, and descriptive expenditure
+analysis. Documentation specifies the selector features, penalized objective,
+candidate set, and normalization. Checkpoint weights and simulator assets are
+not bundled. The continuing repository additionally retains a completed
+confirmation snapshot and verification code that reproduce the full
+seven-setting resource table, original and amended comparisons, and task-level
+counts. The submitted supplement remains separate from these post-submission
+additions.
 
 \FloatBarrier
 \section{Frozen Selection and Diagnostic Analyses}
