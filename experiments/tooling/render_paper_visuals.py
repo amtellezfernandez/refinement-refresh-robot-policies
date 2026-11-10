@@ -705,10 +705,11 @@ def success_compute_figure(data, path):
     resources = {
         (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
     }
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.25))
-    tradeoff = fig.add_axes([0.09, 0.17, 0.32, 0.72])
-    effects = fig.add_axes([0.70, 0.17, 0.27, 0.72])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.85))
+    tradeoff = fig.add_axes([0.10, 0.19, 0.30, 0.68])
+    effects = fig.add_axes([0.72, 0.19, 0.24, 0.68])
     tradeoff.set_facecolor(".965")
+    effects.set_facecolor(".985")
     offsets = {
         (1, 2): (7, 15),
         (1, 5): (-18, -16),
@@ -767,7 +768,9 @@ def success_compute_figure(data, path):
     )
     tradeoff.set_axisbelow(True)
     tradeoff.grid(color=".91", lw=0.55)
-    tradeoff.spines[["top", "right"]].set_visible(False)
+    tradeoff.spines[["top", "right"]].set_visible(True)
+    tradeoff.spines[["top", "right", "bottom", "left"]].set_color(".72")
+    tradeoff.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
 
     comparisons = data["confirmation"]["comparisons"]
     ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
@@ -803,7 +806,9 @@ def success_compute_figure(data, path):
             fontweight="bold" if primary else "normal",
         )
     effects.set_xlabel("A minus B success rate\n(percentage points)")
-    effects.spines[["top", "right", "left"]].set_visible(False)
+    effects.spines[["top", "right", "left"]].set_visible(True)
+    effects.spines[["top", "right", "bottom", "left"]].set_color(".72")
+    effects.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
     effects.tick_params(axis="y", length=0)
     effects.text(-0.90, 8.42, "Frozen refinement", transform=transform, fontweight="bold", va="center")
     effects.text(-0.90, 4.43, "Later descriptive", transform=transform, fontweight="bold", va="center")
