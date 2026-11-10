@@ -166,7 +166,8 @@ class PaperVisualTests(unittest.TestCase):
         with patch.object(visuals, "save_figure") as save:
             visuals.success_compute_figure(self.data, Path("unused.pdf"))
         figure = save.call_args.args[0]
-        tradeoff, effects = figure.axes
+        self.assertEqual(len(figure.axes), 1)
+        tradeoff = figure.axes[0]
         points = np.vstack([collection.get_offsets()[0] for collection in tradeoff.collections])
         expected = np.array(
             [
@@ -176,21 +177,15 @@ class PaperVisualTests(unittest.TestCase):
         )
         np.testing.assert_allclose(points, expected)
         self.assertEqual(tradeoff.get_ylim(), (70, 100))
-        self.assertEqual(len(effects.containers), 7)
-        for comparison, container in zip(
-            self.data["confirmation"]["comparisons"], effects.containers
-        ):
-            np.testing.assert_allclose(
-                np.asarray(container.lines[0].get_xdata(), dtype=float),
-                [100 * comparison["mean_difference"][0]],
-            )
-            segment = container.lines[2][0].get_segments()[0]
-            np.testing.assert_allclose(
-                segment[:, 0], 100 * np.array(comparison["interval95"][0])
-            )
+        labels = " ".join(text.get_text() for text in tradeoff.texts)
+        self.assertIn("Frozen: less refinement  +10.6 pp [4.4, 16.9]", labels)
+        self.assertIn("Amended: more frequent refresh  +0.6 pp [-6.3, 6.9]", labels)
+        arrows = [
+            text for text in tradeoff.texts
+            if getattr(text, "arrow_patch", None) is not None
+        ]
+        self.assertEqual(len(arrows), 2)
         text = " ".join(item.get_text() for item in figure.findobj(Text))
-        self.assertIn("$(2,2)-(2,5)$", text)
-        self.assertIn("$(2,2)-(5,2)$", text)
         for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
             self.assertIn(f"$({cell[0]},{cell[1]})$", text)
 

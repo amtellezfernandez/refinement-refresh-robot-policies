@@ -708,10 +708,8 @@ def success_compute_figure(
         (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
     }
     fig = plt.figure(figsize=(figure_width, figure_height))
-    tradeoff = fig.add_axes([0.12, 0.22, 0.34, 0.65])
-    effects = fig.add_axes([0.67, 0.22, 0.23, 0.65])
+    tradeoff = fig.add_axes([0.10, 0.22, 0.80, 0.65])
     tradeoff.set_facecolor(".965")
-    effects.set_facecolor(".985")
     offsets = {
         (1, 2): (-4, 25),
         (1, 5): (0, -17),
@@ -762,10 +760,21 @@ def success_compute_figure(
         va="bottom",
         color=ACCENT,
     )
+    comparisons = {
+        (tuple(c["a"]), tuple(c["b"])): c
+        for c in data["confirmation"]["comparisons"]
+    }
+    primary_effect = comparisons[((2, 2), (2, 5))]
+    primary_mean = 100 * primary_effect["mean_difference"][0]
+    primary_interval = [100 * v for v in primary_effect["interval95"][0]]
+    refresh_effect = comparisons[((2, 2), (5, 2))]
+    refresh_mean = 100 * refresh_effect["mean_difference"][0]
+    refresh_interval = [100 * v for v in refresh_effect["interval95"][0]]
     tradeoff.text(
         0.51,
         78.8,
-        "Less refinement: +10.6 pp",
+        f"Frozen: less refinement  {number(primary_mean, signed=True)} pp "
+        f"[{number(primary_interval[0])}, {number(primary_interval[1])}]",
         color=ACCENT,
         ha="left",
         va="center",
@@ -781,23 +790,22 @@ def success_compute_figure(
     tradeoff.text(
         0.31,
         86.8,
-        "More frequent refresh",
+        f"Amended: more frequent refresh  {number(refresh_mean, signed=True)} pp "
+        f"[{number(refresh_interval[0])}, {number(refresh_interval[1])}]",
         color=INK,
         ha="center",
         va="center",
         fontweight="bold",
         bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
     )
-    tradeoff.annotate(
+    tradeoff.text(
+        0.20,
+        90.5,
         "60.7% less cost/attempt",
-        xy=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
-        xytext=(4, 44),
-        textcoords="offset points",
         ha="left",
-        va="top",
+        va="center",
         fontsize=font_size,
         color=INK,
-        arrowprops={"arrowstyle": "-", "color": INK, "lw": 0.7},
         bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.12},
     )
     tradeoff.set(
@@ -815,67 +823,10 @@ def success_compute_figure(
     tradeoff.spines[["top", "right", "bottom", "left"]].set_color(".72")
     tradeoff.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
 
-    comparisons = data["confirmation"]["comparisons"]
-    ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
-    labels = [f"$({c['a'][0]},{c['a'][1]})-({c['b'][0]},{c['b'][1]})$" for c in comparisons]
-    effects.set(xlim=(-10, 20), ylim=(-0.1, 8.5), xticks=[-10, 0, 10, 20], yticks=[])
-    effects.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8)
-    effects.axhline(4.55, color=".86", lw=0.7, zorder=0)
-    transform = effects.get_yaxis_transform()
-    for i, (y, comparison, label) in enumerate(zip(ys, comparisons, labels)):
-        effect = 100 * comparison["mean_difference"][0]
-        bounds = [100 * value for value in comparison["interval95"][0]]
-        primary = comparison["kind"] == "original primary"
-        color = ACCENT if primary else (INK if i < 3 else MID)
-        effects.errorbar(
-            effect,
-            y,
-            xerr=[[effect - bounds[0]], [bounds[1] - effect]],
-            fmt="D" if primary else ("o" if i < 3 else "s"),
-            color=color,
-            mfc=ACCENT if primary else "white",
-            capsize=2.5,
-            ms=5,
-            elinewidth=1.1,
-            zorder=3,
-        )
-        effects.text(
-            -0.08,
-            y,
-            label,
-            transform=transform,
-            ha="right",
-            va="center",
-            fontweight="bold" if primary else "normal",
-        )
-        effects.text(
-            0.98,
-            y,
-            f"{number(effect, signed=True)}\n"
-            f"[{number(bounds[0])}, {number(bounds[1])}]",
-            transform=transform,
-            ha="left",
-            va="center",
-            fontsize=font_size,
-            color=color,
-            fontweight="bold" if primary else "normal",
-        )
-    effects.set_xlabel("A minus B success rate\n(percentage points)")
-    effects.spines[["top", "right", "left"]].set_visible(True)
-    effects.spines[["top", "right", "bottom", "left"]].set_color(".72")
-    effects.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
-    effects.tick_params(axis="y", length=0)
-    heading_box = {"facecolor": "white", "edgecolor": "none", "pad": 0.8}
-    effects.text(
-        -0.90, 8.42, "Frozen refinement", transform=transform,
-        fontweight="bold", va="center", bbox=heading_box, zorder=5
+    fig.text(
+        0.50, 0.96, "Held-out success, compute, and paired comparisons",
+        ha="center", va="top", fontweight="bold"
     )
-    effects.text(
-        -0.90, 4.43, "Amended descriptive", transform=transform,
-        fontweight="bold", va="center", bbox=heading_box, zorder=5
-    )
-    fig.text(0.29, 0.96, "(a) Held-out settings", ha="center", va="top", fontweight="bold")
-    fig.text(0.785, 0.96, "(b) Paired effects (A minus B)", ha="center", va="top", fontweight="bold")
     save_figure(fig, path)
     plt.close(fig)
 
