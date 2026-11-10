@@ -29,8 +29,8 @@ separately and does not change the frozen submitted PDF.
 Current accepted-paper artifact digests:
 
 ```text
-PDF:    1cd166205fcc03a3875a89fd9e444f8616217331ac3c69d9a5f2ff3406a1bd37
-Source: 3d4d8b08df8fb53831a3892e44e35f1af97ec28615b3a06944f10f7a7eecd566
+PDF:    1ca99ca460bd2303a603a24c6bbb59d9a481ce835b2b3a02e4ed4ce82c49ac10
+Source: 28c126d180ae778d7a26085b9a618731ea75a0c59e3e0f264bd16d8d4abb2fa8
 ```
 
 RoboPAD compliance was checked on 10 November 2026 against the workshop

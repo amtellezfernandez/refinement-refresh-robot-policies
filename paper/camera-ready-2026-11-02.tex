@@ -397,7 +397,8 @@ gives nominal counted generation arithmetic per control step as a percentage of
 the native deployment setting $(h,d)=(1,10)$; leftward means less counted work per
 executed action. Arrows run from comparator B to setting A and print the A-minus-B
 success difference with its task-conditional, descriptive 95\% paired
-state-bootstrap interval. Blue identifies the prespecified $(2,2)$ versus $(2,5)$
+state-bootstrap interval; pp denotes percentage points. Blue identifies the
+prespecified $(2,2)$ versus $(2,5)$
 refinement test. Black arrows show two other frozen refinement comparisons and two
 later-amended descriptive contrasts. The 60.7\% annotation is the separate
 reduction in mean arithmetic per attempted episode for $(5,2)$ relative to
@@ -499,24 +500,24 @@ but does not determine the quality ranking on new tasks.
 \section{Discussion and Conclusion}
 
 This study evaluates how one frozen SmolVLA checkpoint allocates inference
-compute between denoising refinement and observation-conditioned replanning. Its
-methodological contribution is a controlled within-policy procedure: measure the
-complete cost of each policy call, separate discovery from held-out confirmation,
-freeze confirmatory comparisons before evaluation, label later contrasts
-descriptive, and report closed-loop success together with episode expenditure.
-This prevents a cheap configuration from being treated as useful without
-behavioral evidence, or a successful configuration from being discussed without
-its compute cost.
+compute between denoising refinement and observation-conditioned replanning. We
+contribute a controlled within-policy procedure that measures policy-call and
+attempt expenditure, separates discovery from held-out confirmation, freezes
+confirmatory comparisons, labels later contrasts descriptive, and reports
+closed-loop success alongside compute.
 
 The prespecified held-out comparison establishes the paper's central empirical
 result for this checkpoint: reducing denoising from five steps to two at a fixed
-two-action prefix improved observed closed-loop success while reducing counted
-work. The other fixed-prefix comparisons show much smaller differences, so this
+two-action prefix improved observed closed-loop success from 122/160 to 139/160
+(+10.6 percentage points) while reducing nominal counted arithmetic per control
+step by 5.9\%. The other fixed-prefix comparisons show much smaller differences, so this
 is evidence for a configuration-specific gain rather than a monotone law that
 less refinement is always better. The cost decomposition explains why the
 arithmetic reduction is modest: most generation work is independent of
-denoising. Changing the execution prefix has a much larger effect on expenditure,
-but the amended comparison does not establish equivalent quality. The fitted
+denoising. Changing the execution prefix from two to five actions at $d=2$
+reduces mean reference arithmetic per attempt by 60.7\%, with 138/160 versus
+139/160 observed successes, but the amended comparison does not establish
+equivalent quality. The fitted
 response model also provides no demonstrated selection advantage over a simple
 cost-aware rule.
 
