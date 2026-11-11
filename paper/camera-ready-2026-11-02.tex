@@ -23,37 +23,40 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-How should a frozen chunked robot policy spend inference compute: refine its
-current action chunk, or replan from a newer observation? We introduce a
-reproducible protocol for evaluating this trade-off and demonstrate it with one
-frozen SmolVLA checkpoint in synchronous LIBERO simulation. The protocol measures
+Per-call inference efficiency does not determine closed-loop efficiency. A
+chunked robot policy's success and total computation depend jointly on how much
+effort produces each action chunk and how many actions are executed before that
+computation is repeated from a new observation. We introduce a reproducible
+procedure for evaluating this allocation and demonstrate it with one frozen
+SmolVLA checkpoint in synchronous LIBERO simulation. The procedure measures
 complete generation and episode expenditure, separates discovery from held-out
-evaluation, freezes confirmatory comparisons before outcomes are observed, and
-labels later analyses descriptive. At a fixed two-action prefix, the prespecified
-comparison found 139/160 successes with two denoising steps versus 122/160 with
-five: a paired difference of 10.6 percentage points with a descriptive,
-task-conditional 95\% interval of 4.4--16.9 points and 5.9\% less counted
-arithmetic per control step. Full-generation calibration showed
-that 82.1\% of native arithmetic was independent of denoising, creating a fixed
-arithmetic floor per policy call. A later descriptive comparison found 138/160 versus 139/160
-successes when executing five rather than two actions per prediction, with 60.7\%
-lower arithmetic per attempt; equivalence was not established. The large
-refinement effect is localized at the two-action prefix, and a simple cost-aware
-rule matched the fitted model's choices. These checkpoint-specific findings do
-not define a general allocation rule. Together, the controlled study and its
-reporting procedure show how to evaluate success, complete compute, and evidence
-status as one deployment decision.
+evaluation, and distinguishes prespecified comparisons from later descriptive
+analyses. At a fixed two-action prefix, the prespecified comparison found
+139/160 successes with two denoising steps versus 122/160 with five: a paired
+difference of 10.6 percentage points with a descriptive, task-conditional 95\%
+interval of 4.4--16.9 points, while using 5.9\% less counted arithmetic per
+control step. Full-generation calibration showed that 82.1\% of native
+arithmetic was independent of denoising, creating a per-call floor that limits
+savings from refinement alone. A later descriptive comparison found 138/160
+versus 139/160 successes when executing five rather than two actions per
+prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
+established. The primary effect is localized at the two-action prefix, and a
+simple cost-aware rule matched the fitted model's choices. The case study does
+not define a universal allocation rule; it shows why generation effort and
+execution prefix must be evaluated as one closed-loop deployment decision.
 \end{abstract}
 
 \section{Introduction}
 
-A frozen chunked robot policy can reduce inference work in two ways: spend less
-computation refining each action prediction, or execute more actions before
-requesting a new prediction. These interventions affect behavior differently.
-Reduced refinement changes the prediction itself; longer execution prefixes
-delay observation-conditioned revision and expose later positions of the
-predicted sequence. Their relative value should therefore be evaluated through
-closed-loop outcomes under a common resource constraint.
+Per-call efficiency is an incomplete measure of closed-loop deployment. A
+chunked policy pays to generate a prediction each time it replans, so total
+inference depends both on the effort spent producing a chunk and on how many
+actions are executed before generation is repeated. These controls also affect
+behavior differently: reduced refinement changes the prediction itself, while
+longer execution prefixes delay observation-conditioned revision and expose
+later positions of the predicted sequence. Optimizing either control in
+isolation can therefore miss the configuration that best balances success and
+complete episode expenditure.
 
 We ask: \emph{given a fixed inference budget, how should a frozen policy divide
 compute between prediction refinement and observation-conditioned refresh?}
@@ -91,9 +94,10 @@ three ceilings, with no demonstrated selection advantage from fitting.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a reproducible refinement--refresh evaluation protocol that defines the
-    controls, accounts for complete prediction and episode expenditure, and
-    freezes confirmatory comparisons before held-out evaluation;
+    \item a reproducible joint-allocation procedure that defines model-specific
+    refinement and refresh controls, accounts for complete prediction and
+    episode expenditure, and freezes confirmatory comparisons before held-out
+    evaluation;
     \item an evidence-reporting procedure that separates prespecified denoising
     tests from amended descriptive prefix contrasts and retains their uncertainty
     and provenance; and
@@ -499,12 +503,13 @@ but does not determine the quality ranking on new tasks.
 
 \section{Discussion and Conclusion}
 
-This study evaluates how one frozen SmolVLA checkpoint allocates inference
-compute between denoising refinement and observation-conditioned replanning. We
-contribute a controlled within-policy procedure that measures policy-call and
-attempt expenditure, separates discovery from held-out confirmation, freezes
-confirmatory comparisons, labels later contrasts descriptive, and reports
-closed-loop success alongside compute.
+Closed-loop efficiency is a joint property of generation effort and execution
+prefix, rather than a property of either policy-call cost or replanning
+frequency alone. We evaluate this allocation for one frozen SmolVLA checkpoint
+and contribute a controlled within-policy procedure that measures policy-call
+and attempt expenditure, separates discovery from held-out confirmation,
+freezes confirmatory comparisons, labels later contrasts descriptive, and
+reports closed-loop success alongside compute.
 
 The prespecified held-out comparison establishes the paper's central empirical
 result for this checkpoint: reducing denoising from five steps to two at a fixed
@@ -521,13 +526,13 @@ equivalent quality. The fitted
 response model also provides no demonstrated selection advantage over a simple
 cost-aware rule.
 
-These findings make the allocation decision empirical: generation effort and
-execution prefix should be evaluated jointly within each model, under explicit
-counting boundaries, with confirmatory tests separated from later descriptive
-analyses. The conclusions are specific to one checkpoint and synchronous LIBERO
-stack. The protocol supplies a reporting template for replication; broader
-allocation claims require the same within-model study across other checkpoints,
-policy architectures, tasks, and execution stacks.
+The transferable result is the evaluation structure, not a universal preference
+for less refinement or less frequent refresh. Generation effort and execution
+prefix should be evaluated jointly within each model, under explicit counting
+boundaries, with confirmatory tests separated from later descriptive analyses.
+The empirical conclusions remain specific to one checkpoint and synchronous
+LIBERO stack. Broader allocation claims require the same within-model study
+across other checkpoints, policy architectures, tasks, and execution stacks.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
