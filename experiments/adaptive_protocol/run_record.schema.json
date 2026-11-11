@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maatinstitute.com/schemas/robopad-run-record-v1.json",
+  "title": "RoboPAD adaptive run record",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "protocol_revision",
+    "evidence_stage",
+    "policy",
+    "allocation",
+    "evaluation",
+    "resources"
+  ],
+  "properties": {
+    "schema": { "const": "robopad.run_record.v1" },
+    "protocol_revision": { "type": "string", "minLength": 1 },
+    "evidence_stage": {
+      "enum": ["runtime_baseline", "adapter_parity", "preflight", "confirmation", "amended_descriptive"]
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["architecture", "checkpoint"],
+      "properties": {
+        "architecture": { "type": "string", "minLength": 1 },
+        "checkpoint": { "type": "string", "minLength": 1 },
+        "revision": { "type": ["string", "null"] }
+      }
+    },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["generation_control", "predicted_chunk_length", "executed_prefix"],
+      "properties": {
+        "generation_control": {
+          "type": "object",
+          "required": ["name", "value"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "value": {}
+          }
+        },
+        "predicted_chunk_length": { "type": "integer", "minimum": 1 },
+        "executed_prefix": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["success_definition"],
+      "properties": {
+        "success_definition": { "type": "string", "minLength": 1 },
+        "simulator": { "type": ["string", "null"] },
+        "task": { "type": ["string", "null"] },
+        "initial_state": { "type": ["string", "null"] }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["hardware", "software"],
+      "properties": {
+        "hardware": { "type": "object" },
+        "software": { "type": "object" },
+        "measurements": { "type": "object" }
+      }
+    }
+  }
+}
