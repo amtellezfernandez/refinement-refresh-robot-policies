@@ -23,27 +23,24 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Per-call inference efficiency does not determine closed-loop efficiency. A
-chunked robot policy's success and total computation depend jointly on how much
-effort produces each action chunk and how many actions are executed before that
-computation is repeated from a new observation. We introduce a reproducible
-procedure for evaluating this allocation and demonstrate it with one frozen
-SmolVLA checkpoint in synchronous LIBERO simulation. The procedure measures
-complete generation and episode expenditure, separates discovery from held-out
-evaluation, and distinguishes prespecified comparisons from later descriptive
-analyses. At a fixed two-action prefix, the prespecified comparison found
-139/160 successes with two denoising steps versus 122/160 with five: a paired
-difference of 10.6 percentage points with a descriptive, task-conditional 95\%
-interval of 4.4--16.9 points, while using 5.9\% less counted arithmetic per
-control step. Full-generation calibration showed that 82.1\% of native
-arithmetic was independent of denoising, creating a per-call floor that limits
-savings from refinement alone. A later descriptive comparison found 138/160
-versus 139/160 successes when executing five rather than two actions per
-prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. The primary effect is localized at the two-action prefix, and a
-simple cost-aware rule matched the fitted model's choices. The case study does
-not define a universal allocation rule; it shows why generation effort and
-execution prefix must be evaluated as one closed-loop deployment decision.
+Per-call inference efficiency is insufficient to characterize closed-loop
+deployment: total computation and task success depend jointly on the effort
+used to generate each action chunk and the number of actions executed before
+generation is repeated from a new observation. We introduce a reproducible
+procedure for evaluating this allocation through complete episode expenditure,
+held-out confirmation, and explicit evidence status. We demonstrate it with one
+frozen SmolVLA checkpoint in synchronous LIBERO simulation. At a fixed
+two-action prefix, the prespecified comparison found 139/160 successes with two
+denoising steps versus 122/160 with five, a paired difference of 10.6 percentage
+points with a descriptive, task-conditional 95\% interval of 4.4--16.9 points,
+while using 5.9\% less counted arithmetic per control step. Full-generation
+calibration showed that 82.1\% of native arithmetic was independent of
+denoising, limiting savings from refinement alone. A later descriptive
+comparison found 138/160 versus 139/160 successes when executing five rather
+than two actions per prediction, with 60.7\% lower arithmetic per attempt;
+equivalence was not established. These checkpoint-specific results show why
+generation effort and execution prefix must be evaluated together rather than
+optimized as independent deployment controls.
 \end{abstract}
 
 \section{Introduction}
@@ -57,6 +54,13 @@ longer execution prefixes delay observation-conditioned revision and expose
 later positions of the predicted sequence. Optimizing either control in
 isolation can therefore miss the configuration that best balances success and
 complete episode expenditure.
+
+Evaluation design matters as much as cost accounting. Optimizing arithmetic per
+policy call can ignore how often that call is repeated; selecting and evaluating
+on the same tasks can overstate transfer; and similar observed success rates do
+not establish equivalent quality. We address these three problems by measuring
+full attempts, separating discovery from held-out confirmation, and labeling
+later analyses according to their evidence status.
 
 We ask: \emph{given a fixed inference budget, how should a frozen policy divide
 compute between prediction refinement and observation-conditioned refresh?}
@@ -85,25 +89,22 @@ allocation rule.
 
 For this checkpoint, the prespecified two-action comparison yields 139/160
 successes with two denoising steps versus 122/160 with five, while using less
-counted arithmetic. The large effect is localized at $h=2$; the corresponding
-point differences are much smaller at $h=1$ and $h=5$. At two denoising steps,
-executing five actions per prediction yields 138/160 successes and 60.7\% less
-arithmetic per attempt than executing two; equivalent quality is not established.
-A simple cost-aware rule also matches the fitted response model's choices at all
-three ceilings, with no demonstrated selection advantage from fitting.
+counted arithmetic. At two denoising steps, executing five actions per
+prediction yields 138/160 successes and 60.7\% less arithmetic per attempt than
+executing two; equivalent quality is not established. Section~\ref{sec:results}
+reports the remaining comparisons and their claim boundaries.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a reproducible joint-allocation procedure that defines model-specific
-    refinement and refresh controls, accounts for complete prediction and
-    episode expenditure, and freezes confirmatory comparisons before held-out
-    evaluation;
-    \item an evidence-reporting procedure that separates prespecified denoising
-    tests from amended descriptive prefix contrasts and retains their uncertainty
-    and provenance; and
-    \item a paired SmolVLA study across twelve discovery configurations and seven
-    held-out settings, including a prespecified primary success comparison and
-    complete compute accounting.
+    \item a joint-allocation procedure that defines model-specific refinement
+    and refresh controls and accounts for complete prediction and episode
+    expenditure;
+    \item a discovery--confirmation and evidence-reporting procedure that freezes
+    primary comparisons before held-out evaluation and distinguishes later
+    descriptive analyses; and
+    \item a bounded SmolVLA case study across twelve discovery configurations and
+    seven held-out settings, with paired success comparisons and complete compute
+    accounting.
 \end{itemize}
 
 \section{Related Work}
