@@ -277,18 +277,13 @@ The sample allocation prioritizes task and state coverage; no
 quality-preservation margin is prespecified. Appendix~\ref{app:analysis-provenance}
 distinguishes the original tests from the amended descriptive comparisons.
 
-Initial simulator states and observations match across conditions. Policy noise
-is keyed by task, state, seed, and simulation tick, preserving a common noise
-key whenever conditions generate at the same tick. Solver timesteps and a
-constant-field integration check verify that every $d$ traverses the full
-interval from 1 to 0; fewer steps change the discretization, not the integration
-endpoint. Recorded initial conditions, generated and executed actions, and
-outcomes agree across the evaluation records. LIBERO's sparse reward and success indicator derive
-from the same task-goal evaluation, so their agreement checks record
-consistency rather than supplying an independent outcome measure. The recorded
-outcome path is traced to the benchmark's task-specific goal conditions. These checks
-establish strong internal consistency rather than an independent simulator replay
-(Appendix~\ref{app:verification}).
+Paired conditions share initial simulator states and keyed policy noise whenever
+they generate at the same simulation tick. Every denoising setting traverses the
+same integration interval; changing $d$ changes its discretization. Recorded
+initial conditions, generated and executed actions, and outcomes pass internal
+consistency checks. These checks do not constitute an independent simulator
+replay; Appendix~\ref{app:verification} gives the implementation trace and
+validation boundary.
 
 Success averages both seeds within each state, then states and tasks with equal
 task weights. Descriptive 95\% intervals use 20,000 bootstrap draws of states
@@ -466,34 +461,29 @@ but does not determine the quality ranking on new tasks.
 
 \section{Discussion and Conclusion}
 
-This study asks how a chunked robot policy should divide inference compute between
-constructing an action chunk and deciding how long to execute it before generation
-is refreshed from a new observation. Answering that question requires complete
-policy-call cost, held-out closed-loop outcomes, and a clear distinction between
-prespecified and later comparisons. Together, these prevent a cheap setting from
-being treated as useful without behavioral evidence, or a successful setting from
-being discussed without its compute cost.
+Allocating inference compute in a chunked policy requires three measurements:
+complete policy-call cost, held-out closed-loop outcomes, and realized expenditure
+over an attempt. It also requires separating prespecified comparisons from later
+analyses. Without these elements, a cheap setting can appear useful without
+behavioral evidence, or a successful setting can be reported without its cost.
 
-The broader methodological proposal is that this comparison can be defined across
-policy classes by treating generation effort as an architecture-specific control.
-For diffusion or flow policies it may be an integration-step
-count; for sampling, search, or verification systems it may be the number of
-candidates, search expansions, or verification passes, provided the control and
-its complete cost are defined in advance. SmolVLA serves as a worked case study
-for one checkpoint and simulator stack, demonstrating the comparison with
-denoising count and showing how evidence status changes the permitted claims.
-In this SmolVLA case study, additional refinement did not consistently produce
-better closed-loop behavior. Reducing refinement alone delivered limited savings
-because most generation work was independent of denoising. Changing the execution
-prefix affected cost more strongly, but similar observed success was insufficient
-to establish equivalent quality. In the case study, the fitted response model also did not
-improve configuration choices over a simple cost-aware rule. Generation effort
-and execution prefix should therefore
-be evaluated together within each model, under explicit counting boundaries,
-with frozen confirmatory tests visibly separated from amended descriptive
-analyses. These outcomes remain checkpoint-specific; broader allocation claims
-require the same within-model study across other checkpoints, policy
-architectures, tasks, and execution stacks.
+The SmolVLA results illustrate the resulting decision boundary. At $h=2$, reducing
+denoising improved observed success while modestly reducing counted work, but the
+other frozen prefixes did not establish a uniform benefit. Executing five actions
+instead of two reduced episode arithmetic much more strongly, while the available
+data did not establish equivalent quality. Most generation arithmetic was
+independent of denoising, and the fitted response model selected the same settings
+as a simple cost-aware rule.
+
+The transferable conclusion is therefore about evaluation rather than a universal
+setting: generation effort and execution prefix should be studied jointly within
+each model, using an explicit cost boundary and held-out outcomes. Generation
+effort may mean integration steps for diffusion or flow policies, or candidate,
+search, or verification effort for other policies, provided the control and its
+complete cost are defined in advance. The reported outcomes remain specific to
+one checkpoint and simulator stack; broader allocation claims require the same
+within-model comparison across other checkpoints, policy architectures, tasks,
+and execution stacks.
 
 \paragraph{Interpretation and limits.}
 The two deployment controls are not isolated causal interventions on prediction
