@@ -50,7 +50,6 @@ The original identifiers resolve to the intended works. No nonexistent reference
 
 | Key | Record inspected and version/status | Disposition |
 | --- | --- | --- |
-| `robotpadcfp` | [RoboPAD call for papers](https://robotpad2026.github.io/call-for-papers.html), 2026 organizer webpage | Retained with access date. Non-archival workshop; page is a policy/scope source, not scientific evidence. |
 | `persistentwm` | [arXiv 2603.25685v2](https://arxiv.org/abs/2603.25685v2), revised 2026-09-04 | Authors/title verified. Record reports ECCV 2026 acceptance; cite the versioned author manuscript without invented proceedings pages. |
 | `hiwm` | [arXiv 2604.21741v2](https://arxiv.org/abs/2604.21741v2), revised 2026-05-05; preprint | Authors/title verified; version pinned. |
 | `tauzero` | [arXiv 2608.16885v1](https://arxiv.org/abs/2608.16885v1), 2026-08-17; preprint | Expanded all 39 authors; version pinned. |
@@ -97,7 +96,7 @@ The original identifiers resolve to the intended works. No nonexistent reference
 
 6. **Model or Harness does not demonstrate independent human inter-annotator agreement.** Its abstract describes independent reasoning-agent judges compared against human category labels. A generic assertion that it tests annotation reproducibility is supportable, but it cannot substitute for independent human coding of this proposal's literature audit.
 
-7. **Workshop websites support scope and community priorities.** The RSS page asks for shared problem definitions, evaluation protocols, reusable reports, and baselines. It does not establish adoption of this resource card or a dedicated resource-disclosure standard. RoboPAD's call explicitly welcomes early results, negative results, positions, and evaluation work; it supports a clearly labeled instrument/position submission.
+7. **Workshop websites support scope and community priorities.** The RSS page asks for shared problem definitions, evaluation protocols, reusable reports, and baselines. It does not establish adoption of this resource card or a dedicated resource-disclosure standard. The workshop call explicitly welcomes early results, negative results, positions, and evaluation work; it supports a clearly labeled instrument or position submission.
 
 8. **Efficiency precedents are contextual, not evidence for this pilot.** FLASH, SV-VLA, STEP, and A2C2 motivate the latency/reactivity trade-off; they do not establish that the proposal's specific chunk schedule preserves success or safety. SmolVLA and LIBERO citations establish model/benchmark provenance only. Exact checkpoint, software, timing boundary, seeds, paired initial states, and uncertainty must come from the experiment artifacts.
 

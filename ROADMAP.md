@@ -7,7 +7,7 @@ Continue in [paper/main.tex](paper/main.tex). Never overwrite either
 
 Target: **ICLR 2027 main conference**. This is a research and submission plan,
 not a claim of readiness or an authorization to launch new campaigns.
-The working PDF still uses the RoboPAD/NeurIPS workshop template.
+The working PDF still uses the NeurIPS workshop template.
 Venue requirements and author-side tasks are in [SUBMISSION.md](SUBMISSION.md).
 
 ## Scientific objective

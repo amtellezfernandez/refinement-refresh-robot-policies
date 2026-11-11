@@ -76,7 +76,7 @@ cite the paper and this version of its artifacts. A copyable entry is:
   author  = {Tellez Fernandez, Alba Maria},
   title   = {Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies},
   year    = {2026},
-  note    = {NeurIPS 2026 RoboPAD Workshop},
+  note    = {NeurIPS 2026 Workshop on Post-Training Adaptation of Robot Foundation Models},
   url     = {https://github.com/amtellezfernandez/refinement-refresh-robot-policies}
 }
 ```

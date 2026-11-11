@@ -1,4 +1,4 @@
-# Submission, camera-ready, and working-version notes
+# Submission and public-version notes
 
 Title: **Refinement versus Refresh: Compute Allocation for Closed-Loop Robot
 Policies**.
@@ -9,11 +9,11 @@ Policies**.
 - The dated [submission archive](release/archive/2026-09-13/) retains
   another copy and the submission materials.
 - [output/pdf/camera-ready-submission-2026-11-02.pdf](output/pdf/camera-ready-submission-2026-11-02.pdf)
-  is the de-anonymized accepted-paper edition; its source is
+  is the optional de-anonymized accepted-paper edition; its source is
   [paper/camera-ready-2026-11-02.tex](paper/camera-ready-2026-11-02.tex).
-- [paper/main.tex](paper/main.tex) remains the anonymous development source for
-  a possible future archival submission. New research results belong there until
-  they are deliberately incorporated into another release.
+- [paper/main.tex](paper/main.tex) and the dated accepted-paper source are
+  synchronized. A future anonymous archival submission must be prepared as a
+  separate release rather than by changing the frozen submitted manuscript.
 
 Both submitted PDF copies must retain SHA-256:
 
@@ -22,24 +22,24 @@ Both submitted PDF copies must retain SHA-256:
 ```
 
 The accepted-paper edition uses the final NeurIPS 2026 workshop style with the
-RoboPAD workshop title and author information. It includes the full 1,120-attempt
+workshop title and author information. It includes the full 1,120-attempt
 confirmation study, in addition to 480 discovery attempts. It is maintained
 separately and does not change the frozen submitted PDF.
 
 Current accepted-paper artifact digests:
 
 ```text
-PDF:    80d86a80e4d05f738fd792bcbfe8cfd2b39e20ad75762564054b2640a5c46579
-Source: d99f8d1be297546a15dd3e8f5d7b7607d24e60b80214010267f410a57c9cc8ad
+PDF:    b97811bd68ca78fbffa4cef37fe42f856e2e525f4647d0b49e72aa218f1794b9
+Source: 5e51e2c53b82edb36eedb70ae73198c196a70a702b7bcb312e1c0bb0ba675fb2
 ```
 
-RoboPAD compliance was checked on 10 November 2026 against the workshop
+Compliance was checked on 11 November 2026 against the workshop
 [call for papers](https://robotpad2026.github.io/call-for-papers.html). The
 accepted-paper edition has eight main-content pages, within the nine-page cap;
 references begin on page 9 and the appendix on page 10, both outside that cap.
-It uses the official workshop style. RoboPAD does not require the main-conference
-paper checklist and describes accepted-paper updates as optional because the
-workshop is non-archival.
+It uses the official workshop style. The workshop does not require the
+main-conference paper checklist or a formal camera-ready submission. This
+de-anonymized edition is maintained as an optional updated public version.
 
 ## Next target: ICLR 2027
 
@@ -69,10 +69,10 @@ Official requirements checked on 13 September 2026:
   archive. Keep the frozen primary-only supplement unchanged; prepare any new
   full-evidence artifact separately. Include a reproducibility statement.
 - Do not submit substantially the same work concurrently to ICLR and ICRA.
-  ICLR permits relevant prior non-proceedings workshop presentations; RoboPAD
+  ICLR permits relevant prior non-proceedings workshop presentations; this workshop
   describes itself as non-archival. This does not certify submission status.
   [ICLR policy](https://iclr.cc/Conferences/2027/AuthorGuidelines),
-  [RoboPAD policy](https://robotpad2026.github.io/call-for-papers.html).
+  [workshop policy](https://robotpad2026.github.io/call-for-papers.html).
 
 ICRA 2027 remains an alternative requiring an explicit venue switch: its
 15 September 2026, 23:59 deadline is labeled PST, and its two-column eight-page
