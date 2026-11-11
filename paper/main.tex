@@ -339,28 +339,32 @@ Model fitting, the full candidate set, and selector diagnostics are retained
 in Appendix~\ref{app:selectors}.
 
 \FloatBarrier
-\section{SmolVLA Worked Example: Held-Out Results}
+\section{Held-Out Results for the SmolVLA Case Study}
 \label{sec:transfer}
 
-\subsection{Complete confirmation overview}
+\subsection{Comparisons and evidence status}
 
-All 1,120 originally planned SmolVLA case-study confirmation attempts are complete.
-Table~\ref{tab:confirmation-grid} reports the seven configurations on the same
-paired identities. The audit excludes two repeated completed records under the
-documented precedence rule; continuation completes the original design, not
-an independent replication (\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
-We first report the frozen denoising tests, then the amended prefix comparisons.
-Only the former support confirmatory claims; the latter are reported as
-descriptive analyses with their provenance and uncertainty retained.
+The held-out evaluation contains 1,120 attempts: seven settings evaluated on the
+same 160 task--state--seed identities. We write each setting as $(h,d)$, where
+$h$ is the number of actions executed before replanning and $d$ is the number of
+denoising steps. Before collecting these outcomes, we froze three comparisons of
+$d=2$ against $d=5$ at fixed $h\in\{1,2,5\}$; $(2,2)$ versus $(2,5)$ is the
+primary comparison. Comparisons that change $h$ were added later and are
+descriptive. Table~\ref{tab:confirmation-grid} reports all seven settings,
+Figure~\ref{fig:success-compute} shows their success and compute jointly, and
+Table~\ref{tab:evidence-status} states what each comparison supports.
+
+All originally planned attempts are complete. Two repeated completed records are
+excluded under the documented precedence rule. The continuation completed the
+original evaluation; it is not an independent replication
+(\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
 
 \begin{table}[htbp]
 \centering\small
-\caption{SmolVLA case-study confirmation: 160 attempts per configuration on eight tasks.
-$K=50$ is the fixed predicted chunk length, $h$ is the executed prefix, and $d$
-is the denoising count.
-Nominal rate/native is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$.
-All-attempt arithmetic uses the length-20 reference calibration and charges
-every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
+\caption{Held-out results for the seven SmolVLA settings. Each setting has 160
+attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
+Nominal rate is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$; mean arithmetic
+per attempt charges every generated chunk.}
 \label{tab:primary-transfer}
 \label{tab:confirmation-grid}
 \input{../paper/generated/confirmation_resources.tex}
@@ -368,29 +372,46 @@ every generation. The primary pair is $(2,2)$ versus $(2,5)$.}
 
 \begin{figure}[htbp]
 \centering
-\textbf{Held-Out Success vs. Compute Across Refinement and Refresh Settings}\par\smallskip
+\textbf{Held-Out Success and Compute Across the Seven Settings}\par\smallskip
 \includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
-{\small Compute per control step (\% of baseline)\par
-$d=10,h=1$ is 100\%; lower values use less compute.}
-\caption{SmolVLA case-study held-out success, compute, and paired comparisons.
-Each point is one of the seven confirmation settings, labelled $(h,d)$ for
-executed prefix and denoising count, and aggregates 160 attempts over eight tasks.
-The vertical axis gives observed success and begins at 75\%. The horizontal axis
-gives nominal counted generation arithmetic per control step as a percentage of
-the native $(d=10,h=1)$ deployment baseline; leftward means less counted work per
-executed action. Arrows run from comparator B to setting A and print the A-minus-B
-success difference with its task-conditional, descriptive 95\% paired
-state-bootstrap interval. Blue identifies the prespecified $(2,2)$ versus $(2,5)$
-refinement test. Black arrows show two other frozen refinement comparisons and two
-later-amended descriptive contrasts. The 60.7\% annotation is the separate
-reduction in mean arithmetic per attempted episode for $(5,2)$ relative to
-$(2,2)$; the associated $+0.6$-point success contrast does not establish
-equivalent quality. The two additional amended contrasts involving $(1,10)$,
-complete task-level outcomes, and full episode expenditures are reported in
-Appendix~\ref{app:confirmation-details} and Table~\ref{tab:confirmation-grid}.}
+\caption{Observed success and nominal arithmetic per control step. Each point is
+labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
+relative to native $(1,10)$ compute; farther left is cheaper. Arrows point from
+comparator B to setting A and show the A-minus-B success difference with its
+task-conditional 95\% paired interval. Blue marks the prespecified primary
+comparison; black marks the other frozen refinement tests and later descriptive
+prefix contrasts. The 60.7\% annotation instead refers to mean arithmetic per
+attempt for $(5,2)$ relative to $(2,2)$; equivalent success is not established.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
+
+\begin{samepage}
+\subsection{Prespecified refinement comparisons}
+
+The primary comparison holds the execution prefix fixed at $h=2$. Reducing
+denoising from $d=5$ to $d=2$ raises observed success from 122/160 to 139/160.
+The paired difference is $+10.6$ percentage points, with a task-conditional 95\%
+interval of $[+4.4,+16.9]$. It also reduces nominal reference arithmetic per
+control step by 5.9\%, from 292.2 to 275.0 GFLOPs. For this checkpoint and prefix,
+less refinement therefore improves observed success while reducing counted work.
+\par\end{samepage}
+
+Mean arithmetic per attempt falls by 15.6\%, from 48.7 to 41.1 TFLOPs. This
+episode-level difference also reflects the changed trajectories: mean episode
+length is 149.0 control steps for $(2,2)$ and 166.3 for $(2,5)$. The primary
+direction is positive on seven tasks and tied on one, with 24 paired wins and
+seven losses. Appendix~\ref{app:primary-costs} reports task sensitivity and
+expenditure intervals. Counted arithmetic does not establish a physical-latency
+improvement.
+
+The other two prespecified comparisons are smaller and uncertain. At $h=5$,
+$d=2$ gives 138/160 successes and $d=5$ gives 133/160. At $h=1$, the counts are
+137/160 and 136/160. Both point estimates favor $d=2$, but both intervals include
+zero (Figure~\ref{fig:success-compute}). The evidence therefore supports the
+primary result at $h=2$, not a uniform benefit across execution prefixes. The
+primary effect also exceeds its frozen prediction; agreement in direction does
+not establish calibrated effect-size prediction.
 
 \begin{table}[htbp]
 \centering\small
@@ -414,57 +435,27 @@ cost savings; equivalent quality is unresolved.\\
 \end{tabular}
 \end{table}
 
-\begin{samepage}
-\subsection{Refinement: the frozen denoising comparisons}
-
-For the case-study checkpoint, the primary two-action prefix with two denoising
-steps yields 139/160 successes versus 122/160 for five steps. The paired difference is $+10.6$ percentage
-points, with descriptive 95\% interval $[+4.4,+16.9]$, conditional on the eight
-tasks. The selected setting also uses 5.9\% less nominal reference arithmetic
-per control step: 275.0 versus 292.2 GFLOPs. Thus, in this SmolVLA comparison,
-reducing refinement improves observed success while reducing counted work at
-this fixed prefix.
-\par\end{samepage}
-
-Mean reference arithmetic per attempt falls from 48.7 to 41.1 TFLOPs
-(15.6\%). This larger reduction includes changed trajectories and termination:
-mean episode length is 149.0 versus 166.3 control steps. All failures reach
-the task horizon (21 versus 38); the remaining attempts terminate successfully.
-The primary direction is positive on seven tasks and tied on one, with
-24 paired wins and seven losses. Appendix~\ref{app:primary-costs} gives
-task sensitivity and expenditure intervals. These measurements do not establish
-a controlled physical-latency improvement.
-Figure~\ref{fig:success-compute} places the primary setting in the joint
-success--compute coordinate and places its interval alongside all seven
-confirmation contrasts.
-
-Within the same checkpoint, the other two frozen tests have positive point estimates but intervals spanning
-zero (Figure~\ref{fig:success-compute}). At $h=5$, two versus five
-denoising steps give 138/160 versus 133/160 successes; at $h=1$, they give
-137/160 versus 136/160. The largest observed benefit is at the primary prefix.
-The primary gap exceeds its frozen prediction, while matching the signs of
-three point estimates does not establish calibrated effect-size prediction.
-These results do not demonstrate a uniform denoising benefit across prefixes.
-
 \FloatBarrier
-\subsection{Refresh: descriptive prefix comparisons}
+\subsection{Descriptive execution-prefix comparisons}
 
-Within the SmolVLA case study, we now hold denoising fixed and compare
-expenditures on different refresh schedules. Table~\ref{tab:evidence-status} records the later amendment and the
-claim boundary; Appendix~\ref{app:confirmation-details} gives full provenance.
+These comparisons hold denoising fixed and vary how many actions are executed
+before replanning. They were added after outcomes were visible and are not
+confirmatory tests. Appendix~\ref{app:confirmation-details} gives their full
+provenance and the two additional contrasts involving $(1,10)$.
 
 At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
-a paired difference of $+0.6$ percentage points $[-6.3,+6.9]$. Yet $(5,2)$ uses
-60\% less nominal arithmetic per control step and 60.7\% less reference
-arithmetic per attempt: 16.1 versus 41.1 TFLOPs. The interval permits meaningful
-differences in either direction.
+a paired difference of $+0.6$ percentage points with 95\% interval
+$[-6.3,+6.9]$. Executing five actions per prediction, $(5,2)$, uses 60\% less
+nominal arithmetic per control step and 60.7\% less mean arithmetic per attempt:
+16.1 versus 41.1 TFLOPs. The interval permits meaningful success differences in
+either direction, so the observed counts do not establish equivalent quality.
 At task level, the $(5,2)-(2,2)$ difference is positive on three tasks,
 negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}). Thus
-the near-equal aggregate counts contain mixed descriptive task-level changes.
+the nearly equal aggregate counts conceal mixed task-level changes.
 
 Refreshing every action with $(1,2)$ instead of every two actions gives two
-fewer successes, a difference of $-1.3$ points $[-7.5,+5.0]$, at 83.3 versus
-41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
+fewer successes, a difference of $-1.3$ points with 95\% interval
+$[-7.5,+5.0]$, at 83.3 versus 41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
 benefit in these SmolVLA contrasts. Native-relative comparisons, which also change
 denoising, are reported separately in Appendix~\ref{app:confirmation-details}.
 
