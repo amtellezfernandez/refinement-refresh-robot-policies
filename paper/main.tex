@@ -1,7 +1,7 @@
 \documentclass{article}
 \PassOptionsToPackage{numbers,sort&compress}{natbib}
-\usepackage[dblblindworkshop]{../shared/neurips_2026}
-\workshoptitle{RoboPAD: Post-Training Adaptation of Robot Foundation Models}
+\usepackage[final,dblblindworkshop]{../shared/neurips_2026}
+\workshoptitle{Post-Training Adaptation of Robot Foundation Models}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{microtype}
@@ -16,7 +16,9 @@
 \usepackage{placeins}
 \title{Refinement versus Refresh:\\
 Compute Allocation for Closed-Loop Robot Policies}
-\author{Anonymous Authors}
+\author{Alba Mar\'ia T\'ellez Fern\'andez\\
+MAAT Institute\\
+\texttt{alba.tellez@maatinstitute.com}}
 \begin{document}
 \maketitle
 
@@ -24,21 +26,21 @@ Compute Allocation for Closed-Loop Robot Policies}
 As vision--language--action policies become more computationally demanding,
 deployment under explicit resource constraints poses an allocation problem: how
 much inference effort should construct each action chunk, and how long should it
-execute before prediction is refreshed from a new observation? We introduce a
-structured study design for frozen chunked policies with a controllable generation
-setting. It separates generation effort from execution prefix, measures complete
-generation and episode expenditure, separates discovery from held-out evaluation,
-freezes confirmatory comparisons, and labels later analyses descriptive. We use
+execute before prediction is refreshed from a new observation? We study this
+question by varying generation effort and execution prefix separately, measuring
+both closed-loop success and complete inference expenditure, and distinguishing
+prespecified comparisons from later descriptive analyses. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
 with denoising count as its generation control. At a fixed two-action prefix, the
 prespecified comparison found 139/160 successes with two denoising steps versus
-122/160 with five, while using less counted arithmetic; 82.1\% of native
-generation arithmetic was independent of denoising. A later descriptive contrast
+122/160 with five, while using 5.9\% less reference-calibrated arithmetic per
+control step; 82.1\% of native generation arithmetic was independent of
+denoising. A later descriptive contrast
 found 138/160 versus 139/160 successes when executing five rather than two actions
 per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. These checkpoint-specific results demonstrate the study design rather
-than a general allocation rule. The transferable contribution is a procedure for
-evaluating behavior, complete inference cost, and evidence status together.
+established. These checkpoint-specific results do not define a general allocation
+rule. They show why closed-loop behavior, complete inference cost, and the status
+of each comparison must be considered together.
 \end{abstract}
 
 \section{Introduction}
@@ -55,17 +57,18 @@ not generation cost alone.
 We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
 compute between action generation and observation-conditioned execution?} To
 answer this without turning one architecture's control into a general rule, we
-propose a controlled study design. It defines the model-specific
-generation-effort setting and execution prefix separately, measures complete
-prediction and realized episode expenditure, separates discovery from held-out
-evaluation, freezes confirmatory comparisons before outcomes are observed, and
-marks later analyses as descriptive. The study design and the rules for
-interpreting its evidence are the primary transferable contributions.
+compare the model-specific generation-effort setting and execution prefix
+separately. We measure complete prediction and realized episode expenditure,
+separate discovery from held-out evaluation, freeze confirmatory comparisons
+before outcomes are observed, and mark later analyses as descriptive. This
+combination of controlled comparison, complete cost accounting, and explicit
+evidence status is the primary transferable contribution.
 
-This study design is intended for cases in which a chunked policy exposes a
-controllable generation effort: for example, integration steps in an iterative flow or diffusion policy,
-or candidate, search, or verification effort in a policy that uses those
-procedures. These controls need not have comparable units across architectures.
+The comparison is intended for chunked policies that expose a controllable
+generation effort. That control could be the number of integration steps in an
+iterative flow or diffusion policy, or the candidate, search, or verification
+effort in a policy that uses such mechanisms. Only denoising count is tested here,
+and the controls need not have comparable units across architectures.
 We use synchronous execution to hold sequencing and measurement boundaries fixed;
 the study does not identify an asynchronous scheduling optimum, real-robot
 latency, or a universal hardware winner.
@@ -89,16 +92,15 @@ executing two; equivalent quality is not established. A simple cost-aware rule
 also matches the fitted response model's choices at all three ceilings, with no
 demonstrated selection advantage from fitting.
 
-These checkpoint-specific outcomes show how to use the study design and how its
-evidence boundaries constrain the resulting claims.
+These checkpoint-specific outcomes show both what the comparison can reveal and
+where its evidence limits the resulting claims.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a controlled comparison of generation effort and execution prefix for
-    chunked policies with a controllable inference setting, mapping that setting and the execution
-    prefix to complete prediction and episode expenditure;
-    \item clear evidence rules that separate prespecified tests from amended
-    descriptive contrasts and retain their uncertainty and provenance;
+    \item a formulation that relates generation effort and execution prefix to
+    complete prediction and episode expenditure;
+    \item a controlled evaluation that distinguishes prespecified tests from
+    amended descriptive contrasts and retains their uncertainty and provenance;
     and
     \item a paired SmolVLA case study, using denoising count as the generation
     control, across twelve discovery configurations and seven held-out settings.
@@ -470,31 +472,27 @@ but does not determine the quality ranking on new tasks.
 
 \section{Discussion and Conclusion}
 
-This study develops a procedure for evaluating how chunked robot policies
-allocate inference compute between constructing an action chunk and deciding how
-long to execute it before generation is refreshed from a new observation. The
-procedure measures the complete cost of a policy
-call, separates configuration discovery from held-out confirmation, freezes the
-confirmatory comparisons before evaluation, labels later contrasts as
-descriptive, and reports closed-loop success together with episode expenditure.
-This prevents a cheap configuration from being treated as useful without
-behavioral evidence, or a successful configuration from being discussed without
-its compute cost.
+This study asks how a chunked robot policy should divide inference compute between
+constructing an action chunk and deciding how long to execute it before generation
+is refreshed from a new observation. Answering that question requires complete
+policy-call cost, held-out closed-loop outcomes, and a clear distinction between
+prespecified and later comparisons. Together, these prevent a cheap setting from
+being treated as useful without behavioral evidence, or a successful setting from
+being discussed without its compute cost.
 
-The transferable contribution is the study design. It treats generation
-effort as a policy-specific control rather than assuming that every architecture
-uses denoising. For diffusion or flow policies it may be an integration-step
+The broader methodological proposal is that this comparison can be defined across
+policy classes by treating generation effort as an architecture-specific control.
+For diffusion or flow policies it may be an integration-step
 count; for sampling, search, or verification systems it may be the number of
 candidates, search expansions, or verification passes, provided the control and
 its complete cost are defined in advance. SmolVLA serves as a worked case study
-for one checkpoint and simulator stack, demonstrating the procedure with
+for one checkpoint and simulator stack, demonstrating the comparison with
 denoising count and showing how evidence status changes the permitted claims.
 In this SmolVLA case study, additional refinement did not consistently produce
-better closed-loop behavior. For this implementation, reducing refinement alone
-delivered limited savings because most generation work was independent of
-denoising. For this implementation, changing the execution prefix affected cost
-more strongly, but similar observed success was insufficient to establish
-equivalent quality. In the case study, the fitted response model also did not
+better closed-loop behavior. Reducing refinement alone delivered limited savings
+because most generation work was independent of denoising. Changing the execution
+prefix affected cost more strongly, but similar observed success was insufficient
+to establish equivalent quality. In the case study, the fitted response model also did not
 improve configuration choices over a simple cost-aware rule. Generation effort
 and execution prefix should therefore
 be evaluated together within each model, under explicit counting boundaries,

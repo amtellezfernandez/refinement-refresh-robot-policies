@@ -8,7 +8,7 @@ is held fixed, how cost is counted, and which conclusions its evidence supports.
 Earlier checkpoints and simulators are worked cases rather than templates that
 later studies must reproduce.
 
-A study reports the following fields when they apply:
+To interpret a comparison, report the following quantities when they apply:
 
 1. the internal generation or refinement control;
 2. the predicted action-chunk length `K`;
@@ -20,18 +20,17 @@ A study reports the following fields when they apply:
 
 ## What each stage can establish
 
-- **Runtime baseline:** first test model loading, then run representative
-  inference and measure latency and memory. A load-only result establishes only
-  model-load feasibility; inference and closed-loop feasibility remain
-  untested.
-- **Adapter parity:** feed identical frozen observations through the native and
-  adapted paths, then compare their action outputs.
-- **Closed-loop preflight:** use a small set of identities excluded from
-  confirmation to validate reset, stepping, termination, and outcome capture.
-- **Confirmation:** for confirmatory studies, freeze the primary within-model
-  comparison and its attempt count before evaluation.
-- **Descriptive extensions:** report later contrasts separately from the
-  prespecified primary analysis.
+- **Feasibility:** establish separately whether the model can be loaded, whether
+  it can generate actions, and whether it can run in closed loop. Loading alone
+  does not establish the latter two.
+- **Agreement with the reference implementation:** give the native and modified
+  evaluation paths identical observations and compare their predicted actions.
+- **Evaluation check:** use a small set of cases excluded from the main comparison
+  to verify initialization, action execution, termination, and outcome capture.
+- **Held-out comparison:** specify the primary within-model comparison and sample
+  size before observing its outcomes.
+- **Additional analyses:** distinguish later comparisons from the prespecified
+  analysis.
 
 ## Evidence retained for each experiment
 
@@ -40,10 +39,6 @@ outcome rule, measurement boundary, observed resources, and evidence status.
 These details make the result auditable without prescribing how later studies
 must be conducted.
 
-The first local study uses SmolVLA as a worked case. Its initial order is:
-
-1. checkpoint download and load test;
-2. batch-one inference and resource measurement;
-3. native-adapter parity;
-4. closed-loop preflight; and
-5. a frozen paired confirmation comparison.
+The first local study uses SmolVLA as a worked case. It moves from feasibility
+and agreement checks to an excluded-case evaluation check, followed by a
+prespecified paired comparison.
