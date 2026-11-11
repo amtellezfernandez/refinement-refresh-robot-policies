@@ -231,7 +231,7 @@ FLOPs per multiply-add. Embedding lookups, normalization, activations,
 elementwise arithmetic, and external preprocessing are excluded. We therefore
 refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
-shapes; its calibration procedure is detailed in Appendix~\ref{app:calibration}.
+shapes; its procedure is detailed in Appendix~\ref{app:generation-calibration}.
 
 For the case-study checkpoint and reference input, the measured arithmetic satisfies, to rounding,
 \[
@@ -546,15 +546,21 @@ from fresher feedback.
 \section{Detailed Outcomes and Resource Measurements}
 \label{app:calibration}
 
+This appendix follows the order of the empirical argument: discovery outcomes;
+generation-cost calibration and timing; sensitivity to the resource coordinate
+and input shape; complete held-out outcomes and primary expenditure; and finally measurement
+verification and analysis provenance.
+
+\subsection{Discovery outcomes}
+\label{app:discovery-outcomes}
+
 {\raggedright
 The checkpoint is \texttt{HuggingFaceVLA/smolvla\_libero}, revision
 \texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk size is 50;
 native execution uses $h=1,d=10$. Discovery uses Spatial tasks 5--8, initial
 states 10--14, and policy seeds 2000 and 2001. The 20 task--state blocks
-contain both seeds and all 12 configurations. Confirmation uses Goal and Object
-tasks 5--8, states 20--29, and policy seeds 3000 and 3001. Its 80 task--state
-blocks each contain both seeds and all seven configurations. Discovery bootstrap
-resampling uses 20,000 draws with analysis seed 20260913.\par}
+contain both seeds and all 12 configurations. Discovery bootstrap resampling uses
+20,000 draws with analysis seed 20260913.\par}
 
 \begin{table}[htbp]
 \centering\small
@@ -576,6 +582,10 @@ response to denoising visible; whiskers are descriptive, task-conditional 95\%
 paired state-bootstrap intervals. The $d$ axes are categorical.}
 \label{fig:frontier}
 \end{figure}
+
+\FloatBarrier
+\subsection{Generation calibration and discovery resources}
+\label{app:generation-calibration}
 
 Calibration uses one real observation from Spatial task 0, initial state 0,
 and common explicit noise. For each $d\in\{2,3,5,8,10,20\}$, profiling records
@@ -714,6 +724,48 @@ In particular, $(2,10)$ remains within the original half-native ceiling for all
 evaluated lengths; shorter inputs reduce rather than increase its counted work.
 The audit changes neither policy execution nor the frozen selections.
 
+\subsection{Complete confirmation outcomes}
+\label{app:confirmation-details}
+
+This subsection first reports success for every held-out task and setting, then
+reports the four execution-prefix comparisons added after collection began.
+The held-out evaluation uses Goal and Object tasks 5--8, states 20--29, and
+policy seeds 3000 and 3001. Its 80 task--state blocks each contain both seeds and
+all seven configurations.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Confirmation successes by task and configuration. Each task row has
+20 attempts: ten paired initial states, each with two policy seeds. The total
+aggregates 160 attempts per configuration. The primary
+$(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
+\label{tab:primary-tasks}
+\label{tab:confirmation-tasks}
+\input{../paper/generated/confirmation_tasks.tex}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{Amended descriptive comparisons using all 160 attempts per setting.
+These contrasts were documented after collection began and are not originally
+prespecified or fully outcome-blind. Intervals are task-conditional,
+unadjusted, and do not test whether two settings preserve quality within a
+prespecified margin.}
+\label{tab:confirmation-secondary}
+\input{../paper/generated/confirmation_secondary.tex}
+\end{table}
+\FloatBarrier
+
+The four amended comparisons are reported in their documented order, using
+20,000 paired state-bootstrap resamples and analysis seed 20260913.
+Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
+In particular, the $(2,2)$ minus $(5,2)$ expenditure difference is
+$+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,+27.5]$.
+This interval describes generated-chunk arithmetic, including the different
+trajectory lengths; it is not an elapsed-time comparison or evidence of
+equivalent quality.
+
+\FloatBarrier
 \subsection{Primary expenditure and runtime}
 \label{app:primary-costs}
 
@@ -767,42 +819,8 @@ The retained provenance does not characterize numerical precision and attention
 execution for every model component. Table~\ref{tab:runtime} therefore supports
 the stated model configuration, but not component- or kernel-level claims.
 
-\subsection{Complete confirmation outcomes}
-\label{app:confirmation-details}
-
-\begin{table}[htbp]
-\centering\small
-\caption{Confirmation successes by task and configuration. Each task row has
-20 attempts: ten paired initial states, each with two policy seeds. The total
-aggregates 160 attempts per configuration. The primary
-$(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
-\label{tab:primary-tasks}
-\label{tab:confirmation-tasks}
-\input{../paper/generated/confirmation_tasks.tex}
-\end{table}
-
-\begin{table}[htbp]
-\centering\small
-\caption{Amended descriptive comparisons using all 160 attempts per setting.
-These contrasts were documented after collection began and are not originally
-prespecified or fully outcome-blind. Intervals are task-conditional,
-unadjusted, and do not test a quality-preservation margin.}
-\label{tab:confirmation-secondary}
-\input{../paper/generated/confirmation_secondary.tex}
-\end{table}
-
-The four amended comparisons are reported in their documented order, using
-20,000 paired state-bootstrap resamples and analysis seed 20260913.
-Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
-In particular, the $(2,2)$ minus $(5,2)$ expenditure difference is
-$+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,+27.5]$.
-This interval describes generated-chunk arithmetic, including the different
-trajectory lengths; it is not an elapsed-time comparison or evidence of
-equivalent quality.
-
 \FloatBarrier
-\paragraph{Measurement verification.}
-\phantomsection
+\subsection{Measurement verification}
 \label{app:verification}
 
 The retained records support a complete internal reconciliation of planned
@@ -836,8 +854,7 @@ inspection remain outside this audit.\\
 \end{tabular}
 \end{table}
 \FloatBarrier
-\paragraph{Analysis provenance.}
-\phantomsection
+\subsection{Analysis provenance}
 \label{app:analysis-provenance}
 
 The three refinement comparisons, identities, and primary analysis were frozen
