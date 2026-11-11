@@ -1,0 +1,47 @@
+{
+  "schema": "robopad.run_record.v1",
+  "protocol_revision": "adaptive-local-v1",
+  "evidence_stage": "runtime_baseline",
+  "policy": {
+    "architecture": "SmolVLA",
+    "checkpoint": "lerobot/smolvla_base",
+    "revision": "5e8d12a6e2975b0e5e5fce7c8caf47c371d257b6",
+    "base_vlm": "HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
+    "parameters": 450046176
+  },
+  "allocation": {
+    "generation_control": {
+      "name": "denoising_steps",
+      "value": 10
+    },
+    "predicted_chunk_length": 50,
+    "executed_prefix": 50
+  },
+  "evaluation": {
+    "success_definition": "Runtime load baseline only; no task outcome evaluated.",
+    "simulator": null,
+    "task": null,
+    "initial_state": null
+  },
+  "resources": {
+    "hardware": {
+      "gpu": "NVIDIA RTX 2000 Ada Generation Laptop GPU",
+      "gpu_total_bytes": 8184725504,
+      "driver": "580.173.02"
+    },
+    "software": {
+      "python": "3.10.19",
+      "torch": "2.7.1+cu126",
+      "lerobot": "0.4.3",
+      "transformers": "4.57.6"
+    },
+    "measurements": {
+      "cpu_load_seconds": 8.322988869000028,
+      "cuda_move_seconds": 0.0032041240000353355,
+      "cuda_allocated_bytes": 914427392,
+      "cuda_reserved_bytes": 1648361472,
+      "cuda_peak_allocated_bytes": 1624429056,
+      "cuda_free_bytes_after_load": 6414336000
+    }
+  }
+}
