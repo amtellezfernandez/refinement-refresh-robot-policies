@@ -42,7 +42,7 @@ inputs, a descriptive paired difference of -20.0 points with interval
 [-32.5, -7.5]. Its journals lack per-tick supplied-input hashes and observation
 ages, so it does not isolate every implementation detail.
 
-The accepted camera-ready retains the allocation framework and reports all three frozen
+The accepted camera-ready retains the allocation question and reports all three frozen
 comparisons, the amended descriptive comparisons, task-level counts, resource
 costs, and collection provenance. Its flow is allocation and fixed cost,
 controlled study, refinement results, then descriptive refresh results;

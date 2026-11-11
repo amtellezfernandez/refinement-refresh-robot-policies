@@ -134,10 +134,10 @@ comparisons. It neither introduces an adaptive scheduler nor establishes an
 advantage over these methods; their reported speedups have different policies,
 hardware, and measurement boundaries.
 
-\section{Protocol for Refinement--Refresh Evaluation}
+\section{Allocating Compute Between Refinement and Refresh}
 \label{sec:allocation}
 
-The protocol has four stages. First, choose an architecture-specific generation
+The evaluation has four stages. First, choose an architecture-specific generation
 effort control $r$ and an execution prefix $h$, while holding the checkpoint and
 paired rollout conditions fixed. Here $r$ denotes a controllable amount of
 internal inference work used to produce one chunk; its implementation depends on
@@ -159,7 +159,7 @@ remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
 controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
 complete measured arithmetic of one generation under a stated counting boundary.
-The protocol compares configurations $(h,r)$ within a policy; it does not assume
+The study compares configurations $(h,r)$ within a policy; it does not assume
 that numerical values of $r$ are comparable across architectures. Away from a
 partially consumed final prefix, the nominal compute rate per simulated control
 step is
@@ -189,7 +189,7 @@ controls how frequently the policy receives a new observation.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
-\caption{SmolVLA instantiation of the closed-loop protocol. Each policy call
+\caption{Closed-loop execution in the SmolVLA case study. Each policy call
 predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
 the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
@@ -220,7 +220,7 @@ FLOPs per multiply-add. Embedding lookups, normalization, activations,
 elementwise arithmetic, and external preprocessing are excluded. We therefore
 refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
-shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
+shapes; its calibration procedure is detailed in Appendix~\ref{app:calibration}.
 We call the resulting fixed-shape count per generation \emph{reference-calibrated
 arithmetic}; applying it to every generated chunk gives reference-calibrated
 attempt expenditure. It remains distinct from task-shaped operation counts and
@@ -270,10 +270,10 @@ latency proxy. The cost model defines feasible
 schedules; the following experiments ask which feasible expenditures help
 closed-loop control.
 
-\section{Applying the Protocol to Frozen SmolVLA}
+\section{SmolVLA Case Study}
 \label{sec:method}
 
-\subsection{Discovery and confirmation protocol}
+\subsection{Discovery and confirmation design}
 
 We evaluate the public \texttt{HuggingFaceVLA/smolvla\_libero} checkpoint on LIBERO
 \cite{libero}. The predicted chunk length remains fixed at $K=50$; native execution uses
@@ -859,7 +859,7 @@ Compilation/warm-up & Model compilation disabled; 20 warm-up generations per con
 Evaluator provenance & Source revision and full digest retained in supplement\\
 \bottomrule
 \end{tabular}
-\caption{Runtime and protocol shared by all four confirmation execution phases.
+\caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
 Module versions are the loaded versions reported at evaluation time. The
 supplement retains source digests and distinguishes conflicting installed
 distribution metadata from these loaded versions.}

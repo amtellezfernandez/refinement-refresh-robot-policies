@@ -1,11 +1,12 @@
-# Extensible evaluation framework for closed-loop compute allocation
+# Studying compute allocation in closed-loop robot policies
 
-This framework studies how closed-loop robot policies allocate inference
-computation between generating actions and obtaining new
-observation-conditioned predictions. Each study maps the controls exposed by
-its policy architecture onto this question and reports the applicable
-evaluation and cost boundaries. Earlier software stacks, checkpoints, and
-simulators provide reference cases rather than mandatory templates.
+The scientific question is how a closed-loop robot policy should divide
+inference computation between generating actions and obtaining a new
+observation-conditioned prediction. Different policy architectures expose
+different controls for this choice, so each study must define what varies, what
+is held fixed, how cost is counted, and which conclusions its evidence supports.
+Earlier checkpoints and simulators are worked cases rather than templates that
+later studies must reproduce.
 
 A study reports the following fields when they apply:
 
@@ -17,7 +18,7 @@ A study reports the following fields when they apply:
 6. whether each comparison is discovery, frozen confirmation, or amended
    descriptive analysis.
 
-## Evidence stages
+## What each stage can establish
 
 - **Runtime baseline:** first test model loading, then run representative
   inference and measure latency and memory. A load-only result establishes only
@@ -32,13 +33,12 @@ A study reports the following fields when they apply:
 - **Descriptive extensions:** report later contrasts separately from the
   prespecified primary analysis.
 
-## Run records
+## Evidence retained for each experiment
 
-Auditable executions should emit a compact run record conforming to
-`run_record.schema.json`. The record describes what happened in that execution;
-it is not a permanent recipe for future studies. Fields that do not apply to an
-evidence stage remain explicitly null rather than implying an operation that
-did not occur.
+Each experiment retains the model and data versions, comparison being tested,
+outcome rule, measurement boundary, observed resources, and evidence status.
+These details make the result auditable without prescribing how later studies
+must be conducted.
 
 The first local study uses SmolVLA as a worked case. Its initial order is:
 

@@ -25,7 +25,7 @@ As vision--language--action policies become more computationally demanding,
 deployment under explicit resource constraints poses an allocation problem: how
 much inference effort should construct each action chunk, and how long should it
 execute before prediction is refreshed from a new observation? We introduce a
-reproducible protocol for frozen chunked policies with a controllable generation
+structured study design for frozen chunked policies with a controllable generation
 setting. It separates generation effort from execution prefix, measures complete
 generation and episode expenditure, separates discovery from held-out evaluation,
 freezes confirmatory comparisons, and labels later analyses descriptive. We use
@@ -36,7 +36,7 @@ prespecified comparison found 139/160 successes with two denoising steps versus
 generation arithmetic was independent of denoising. A later descriptive contrast
 found 138/160 versus 139/160 successes when executing five rather than two actions
 per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. These checkpoint-specific results illustrate the protocol rather
+established. These checkpoint-specific results demonstrate the study design rather
 than a general allocation rule. The transferable contribution is a procedure for
 evaluating behavior, complete inference cost, and evidence status together.
 \end{abstract}
@@ -55,15 +55,15 @@ not generation cost alone.
 We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
 compute between action generation and observation-conditioned execution?} To
 answer this without turning one architecture's control into a general rule, we
-introduce a reproducible evaluation protocol. It defines the model-specific
+propose a controlled study design. It defines the model-specific
 generation-effort setting and execution prefix separately, measures complete
 prediction and realized episode expenditure, separates discovery from held-out
 evaluation, freezes confirmatory comparisons before outcomes are observed, and
-marks later analyses as descriptive. The protocol and its evidence-reporting
-procedure are the primary transferable contributions.
+marks later analyses as descriptive. The study design and the rules for
+interpreting its evidence are the primary transferable contributions.
 
-The protocol applies when a chunked policy exposes a controllable generation
-effort: for example, integration steps in an iterative flow or diffusion policy,
+This study design is intended for cases in which a chunked policy exposes a
+controllable generation effort: for example, integration steps in an iterative flow or diffusion policy,
 or candidate, search, or verification effort in a policy that uses those
 procedures. These controls need not have comparable units across architectures.
 We use synchronous execution to hold sequencing and measurement boundaries fixed;
@@ -89,16 +89,16 @@ executing two; equivalent quality is not established. A simple cost-aware rule
 also matches the fitted response model's choices at all three ceilings, with no
 demonstrated selection advantage from fitting.
 
-These checkpoint-specific outcomes show how to apply the protocol and how its
+These checkpoint-specific outcomes show how to use the study design and how its
 evidence boundaries constrain the resulting claims.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a generation--execution allocation protocol for chunked policies with
-    a controllable inference setting, mapping that setting and the execution
+    \item a controlled comparison of generation effort and execution prefix for
+    chunked policies with a controllable inference setting, mapping that setting and the execution
     prefix to complete prediction and episode expenditure;
-    \item an evidence-reporting procedure that separates prespecified tests from
-    amended descriptive contrasts and retains their uncertainty and provenance;
+    \item clear evidence rules that separate prespecified tests from amended
+    descriptive contrasts and retain their uncertainty and provenance;
     and
     \item a paired SmolVLA case study, using denoising count as the generation
     control, across twelve discovery configurations and seven held-out settings.
@@ -132,10 +132,10 @@ comparisons. It neither introduces an adaptive scheduler nor establishes an
 advantage over these methods; their reported speedups have different policies,
 hardware, and measurement boundaries.
 
-\section{Protocol for Generation--Execution Allocation}
+\section{Allocating Compute Between Generation and Execution}
 \label{sec:allocation}
 
-The protocol has four stages. First, choose an architecture-specific generation
+The evaluation has four stages. First, choose an architecture-specific generation
 effort control $r$ and an execution prefix $h$, while holding the checkpoint and
 paired rollout conditions fixed. Here $r$ denotes a controllable amount of
 internal inference work used to produce one chunk; its implementation depends on
@@ -156,7 +156,7 @@ remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
 controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
 complete measured arithmetic of one generation under a stated counting boundary.
-The protocol compares configurations $(h,r)$ within a policy; it does not assume
+The study compares configurations $(h,r)$ within a policy; it does not assume
 that numerical values of $r$ are comparable across architectures. For complete
 execution prefixes, the nominal compute rate per simulated control step is
 \[
@@ -183,7 +183,7 @@ controls how frequently the policy receives a new observation.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
-\caption{SmolVLA instantiation of the closed-loop protocol. Each policy call
+\caption{Closed-loop execution in the SmolVLA case study. Each policy call
 predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
 the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
@@ -210,7 +210,7 @@ FLOPs per multiply-add. Embedding lookups, normalization, activations,
 elementwise arithmetic, and external preprocessing are excluded. We therefore
 refer to \emph{dense neural arithmetic}, not an exact count of every scalar
 operation. Calibration uses one real development observation and fixed tensor
-shapes; its protocol is detailed in Appendix~\ref{app:calibration}.
+shapes; its calibration procedure is detailed in Appendix~\ref{app:calibration}.
 
 For the case-study checkpoint and reference input, the measured arithmetic satisfies, to rounding,
 \[
@@ -244,10 +244,10 @@ latency proxy. The cost model defines feasible
 schedules; the following experiments ask which feasible expenditures help
 closed-loop control.
 
-\section{Applying the Protocol to Frozen SmolVLA}
+\section{SmolVLA Case Study}
 \label{sec:method}
 
-\subsection{Discovery and confirmation protocol}
+\subsection{Discovery and confirmation design}
 
 We evaluate the public \texttt{HuggingFaceVLA/smolvla\_libero} checkpoint on LIBERO
 \cite{libero}. The predicted chunk length remains fixed at $K=50$; native execution uses
@@ -481,7 +481,7 @@ This prevents a cheap configuration from being treated as useful without
 behavioral evidence, or a successful configuration from being discussed without
 its compute cost.
 
-The transferable contribution is this evaluation protocol. It treats generation
+The transferable contribution is the study design. It treats generation
 effort as a policy-specific control rather than assuming that every architecture
 uses denoising. For diffusion or flow policies it may be an integration-step
 count; for sampling, search, or verification systems it may be the number of
@@ -741,7 +741,7 @@ do not account for unmonitored runtime interference during priority completion.}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Runtime and protocol shared by all four confirmation execution phases.
+\caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
 Module versions are the loaded versions reported at evaluation time. The
 supplement retains source digests and distinguishes conflicting installed
 distribution metadata from these loaded versions.}
