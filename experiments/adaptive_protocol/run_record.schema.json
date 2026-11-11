@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://maatinstitute.com/schemas/robopad-run-record-v1.json",
-  "title": "RoboPAD adaptive run record",
+  "$id": "https://maatinstitute.com/schemas/closed-loop-compute-run-record-v1.json",
+  "title": "Closed-loop compute-allocation run record",
   "type": "object",
   "additionalProperties": true,
   "required": [
@@ -14,7 +14,7 @@
     "resources"
   ],
   "properties": {
-    "schema": { "const": "robopad.run_record.v1" },
+    "schema": { "const": "closed_loop_compute.run_record.v1" },
     "protocol_revision": { "type": "string", "minLength": 1 },
     "evidence_stage": {
       "enum": ["runtime_baseline", "adapter_parity", "preflight", "confirmation", "amended_descriptive"]

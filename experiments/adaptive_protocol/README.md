@@ -1,7 +1,7 @@
-# Extensible RoboPAD evaluation framework
+# Extensible evaluation framework for closed-loop compute allocation
 
-RoboPAD is an extensible framework for studying how closed-loop robot policies
-allocate inference computation between generating actions and obtaining new
+This framework studies how closed-loop robot policies allocate inference
+computation between generating actions and obtaining new
 observation-conditioned predictions. Each study maps the controls exposed by
 its policy architecture onto this question and reports the applicable
 evaluation and cost boundaries. Earlier software stacks, checkpoints, and
@@ -36,9 +36,9 @@ A study reports the following fields when they apply:
 
 Auditable executions should emit a compact run record conforming to
 `run_record.schema.json`. The record describes what happened in that execution;
-it is not a permanent recipe for future RoboPAD studies. Fields that do not
-apply to an evidence stage remain explicitly null rather than implying an
-operation that did not occur.
+it is not a permanent recipe for future studies. Fields that do not apply to an
+evidence stage remain explicitly null rather than implying an operation that
+did not occur.
 
 The first local study uses SmolVLA as a worked case. Its initial order is:
 

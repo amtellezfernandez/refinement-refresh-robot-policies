@@ -1,5 +1,5 @@
 {
-  "schema": "robopad.run_record.v1",
+  "schema": "closed_loop_compute.run_record.v1",
   "protocol_revision": "adaptive-local-v1",
   "evidence_stage": "runtime_baseline",
   "policy": {
