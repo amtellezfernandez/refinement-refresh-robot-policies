@@ -354,17 +354,15 @@ descriptive. Table~\ref{tab:confirmation-grid} reports all seven settings,
 Figure~\ref{fig:success-compute} shows their success and compute jointly, and
 Table~\ref{tab:evidence-status} states what each comparison supports.
 
-All originally planned attempts are complete. Two repeated completed records are
-excluded under the documented precedence rule. The continuation completed the
-original evaluation; it is not an independent replication
-(\hyperref[app:verification]{Appendix~\ref{app:calibration}}).
+The analysis uses 1,120 canonical attempts. Appendix~\ref{app:verification}
+documents the exclusion of two repeated records and the retained provenance.
 
 \begin{table}[htbp]
 \centering\small
 \caption{Held-out results for the seven SmolVLA settings. Each setting has 160
 attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
-Nominal rate is $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$; mean arithmetic
-per attempt charges every generated chunk.}
+Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
+mean arithmetic per attempt charges every generated chunk.}
 \label{tab:primary-transfer}
 \label{tab:confirmation-grid}
 \input{../paper/generated/confirmation_resources.tex}
@@ -379,7 +377,7 @@ labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
 relative to native $(1,10)$ compute; farther left is cheaper. Arrows point from
 comparator B to setting A and show the A-minus-B success difference with its
 task-conditional 95\% paired interval. Blue marks the prespecified primary
-comparison; black marks the other frozen refinement tests and later descriptive
+comparison; black marks the other frozen refinement tests and amended descriptive
 prefix contrasts. The 60.7\% annotation instead refers to mean arithmetic per
 attempt for $(5,2)$ relative to $(2,2)$; equivalent success is not established.}
 \label{fig:success-compute}
@@ -410,8 +408,9 @@ $d=2$ gives 138/160 successes and $d=5$ gives 133/160. At $h=1$, the counts are
 137/160 and 136/160. Both point estimates favor $d=2$, but both intervals include
 zero (Figure~\ref{fig:success-compute}). The evidence therefore supports the
 primary result at $h=2$, not a uniform benefit across execution prefixes. The
-primary effect also exceeds its frozen prediction; agreement in direction does
-not establish calibrated effect-size prediction.
+observed $+10.6$-point effect is also larger than the frozen $+4.0$-point
+prediction; agreement in direction does not establish calibrated effect-size
+prediction.
 
 \begin{table}[htbp]
 \centering\small
@@ -436,7 +435,7 @@ cost savings; equivalent quality is unresolved.\\
 \end{table}
 
 \FloatBarrier
-\subsection{Descriptive execution-prefix comparisons}
+\subsection{Amended descriptive execution-prefix comparisons}
 
 These comparisons hold denoising fixed and vary how many actions are executed
 before replanning. They were added after outcomes were visible and are not
@@ -449,7 +448,7 @@ $[-6.3,+6.9]$. Executing five actions per prediction, $(5,2)$, uses 60\% less
 nominal arithmetic per control step and 60.7\% less mean arithmetic per attempt:
 16.1 versus 41.1 TFLOPs. The interval permits meaningful success differences in
 either direction, so the observed counts do not establish equivalent quality.
-At task level, the $(5,2)-(2,2)$ difference is positive on three tasks,
+At task level, the $(2,2)-(5,2)$ difference is positive on three tasks,
 negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}). Thus
 the nearly equal aggregate counts conceal mixed task-level changes.
 
