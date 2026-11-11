@@ -374,7 +374,6 @@ documents the exclusion of two repeated records and the retained provenance.
 attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
 Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
 mean arithmetic per attempt charges every generated chunk.}
-\label{tab:primary-transfer}
 \label{tab:confirmation-grid}
 \input{../paper/generated/confirmation_resources.tex}
 \end{table}
@@ -385,12 +384,14 @@ mean arithmetic per attempt charges every generated chunk.}
 \includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
 \caption{Observed success and nominal arithmetic per control step. Each point is
 labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
-relative to native $(1,10)$ compute; farther left is cheaper. Arrows point from
-comparator B to setting A and show the A-minus-B success difference with its
-task-conditional 95\% paired interval. Blue marks the prespecified primary
-comparison; black marks the other frozen refinement tests and amended descriptive
-prefix contrasts. The 60.7\% annotation instead refers to mean arithmetic per
-attempt for $(5,2)$ relative to $(2,2)$; equivalent success is not established.}
+relative to native $(1,10)$ compute; farther left is cheaper. The success axis
+begins at 75\%. Arrows point from comparator B to setting A and show the
+A-minus-B success difference with its task-conditional 95\% paired interval.
+Blue marks the prespecified primary comparison. Among the black arrows, those
+holding $h$ fixed are the other frozen refinement tests, whereas those changing
+$h$ are amended descriptive prefix contrasts. The 60.7\% annotation instead
+refers to mean arithmetic per attempt for $(5,2)$ relative to $(2,2)$;
+equivalent success is not established.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
