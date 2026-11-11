@@ -32,18 +32,32 @@
     "allocation": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["generation_control", "predicted_chunk_length", "executed_prefix"],
+      "required": ["applicability", "generation_control", "predicted_chunk_length", "executed_prefix"],
       "properties": {
-        "generation_control": {
-          "type": "object",
-          "required": ["name", "value"],
-          "properties": {
-            "name": { "type": "string", "minLength": 1 },
-            "value": {}
-          }
+        "applicability": {
+          "enum": ["not_exercised", "generation_only", "closed_loop"]
         },
-        "predicted_chunk_length": { "type": "integer", "minimum": 1 },
-        "executed_prefix": { "type": "integer", "minimum": 1 }
+        "generation_control": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["name", "value"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "value": {}
+              }
+            }
+          ]
+        },
+        "predicted_chunk_length": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "executed_prefix": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        }
       }
     },
     "evaluation": {

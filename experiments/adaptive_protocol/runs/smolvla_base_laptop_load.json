@@ -10,15 +10,18 @@
     "parameters": 450046176
   },
   "allocation": {
-    "generation_control": {
-      "name": "denoising_steps",
-      "value": 10
-    },
-    "predicted_chunk_length": 50,
-    "executed_prefix": 50
+    "applicability": "not_exercised",
+    "generation_control": null,
+    "predicted_chunk_length": null,
+    "executed_prefix": null,
+    "checkpoint_defaults_not_exercised": {
+      "denoising_steps": 10,
+      "predicted_chunk_length": 50,
+      "configured_action_steps": 50
+    }
   },
   "evaluation": {
-    "success_definition": "Runtime load baseline only; no task outcome evaluated.",
+    "success_definition": "Model-load baseline only. No action generation, action execution, simulator interaction, or task outcome was evaluated.",
     "simulator": null,
     "task": null,
     "initial_state": null
