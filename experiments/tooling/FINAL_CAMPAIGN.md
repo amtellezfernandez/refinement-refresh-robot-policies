@@ -1,6 +1,8 @@
 # Final refinement–refresh campaign — 2026-09-12
 
-Remote root: `/mnt/NVME1/projectx-robopad-proposal2` on `projectx@zetroc.fr:16641`.
+The original campaign ran on a dedicated remote compute checkout. Host and path
+details are intentionally omitted from the public release because they are not
+required to reproduce the retained evidence.
 Result directory: `results/refinement_refresh_final_001`.
 Supervisor log: `results/refinement_refresh_final_001.launch.log`.
 

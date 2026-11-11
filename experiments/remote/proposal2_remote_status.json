@@ -3,12 +3,8 @@
   "branch": "experiments/proposal2-remote",
   "base_commit": "a0e896c42fe89771abe8a19403444994dc0de095",
   "remote": {
-    "host": "zetroc.fr",
-    "port": 16641,
-    "user": "projectx",
-    "path": "/mnt/NVME1/projectx-robopad-proposal1",
     "git_checkout": false,
-    "note": "The remote experiment workspace is a data directory; repository coordination is performed from the laptop branch."
+    "note": "Public release: host, account, port, and private filesystem path are omitted. The experiment workspace was a data directory; repository coordination was performed from the local checkout."
   },
   "gpu": {
     "name": "NVIDIA GeForce RTX 4060 Ti",

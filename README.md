@@ -6,6 +6,7 @@ refine an action prediction, and when should it obtain a fresh prediction?
 [Accepted camera-ready](output/pdf/camera-ready-submission-2026-11-02.pdf) ·
 [Original submitted version](release/submitted.pdf) ·
 [Poster](output/pdf/refinement-refresh-zurich-poster.pdf) ·
+[BenchStudio](https://github.com/maatinstitute/BenchStudio) ·
 [ICLR roadmap](ROADMAP.md) ·
 [Camera-ready source](paper/camera-ready-2026-11-02.tex)
 
@@ -64,6 +65,28 @@ extended fitting and measurement diagnostics are in the appendices. See the
 Historical trace and instrument-validation materials remain under
 `experiments/real_smolvla/`, `experiments/instrument_validation/`, and
 `experiments/historical_temporal_reuse/`. They are not new deployment results.
+
+## Citation and reuse
+
+Use GitHub's **Cite this repository** menu or [`CITATION.cff`](CITATION.cff) to
+cite the paper and this version of its artifacts. A copyable entry is:
+
+```bibtex
+@article{tellezfernandez2026refinement,
+  author  = {Tellez Fernandez, Alba Maria},
+  title   = {Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies},
+  year    = {2026},
+  note    = {NeurIPS 2026 RoboPAD Workshop},
+  url     = {https://github.com/amtellezfernandez/refinement-refresh-robot-policies}
+}
+```
+
+The paper provides the scientific case study and evaluation procedure.
+[BenchStudio](https://github.com/maatinstitute/BenchStudio) provides reusable,
+source-available infrastructure for paired campaigns, retained evidence, and
+refinement/refresh audits. Cite both when both the study and software support
+your work. See [`LICENSE.md`](LICENSE.md) for code, manuscript, figure, and
+third-party licensing boundaries.
 
 ## Reproduce and build
 
