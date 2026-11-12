@@ -716,7 +716,7 @@ def success_compute_figure(
 
     fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
     grid = fig.add_gridspec(
-        1, 2, width_ratios=[0.78, 1.32], wspace=0.23,
+        1, 2, width_ratios=[0.96, 1.14], wspace=0.23,
         left=0.115, right=0.98, top=0.92, bottom=0.18,
     )
 
@@ -731,7 +731,7 @@ def success_compute_figure(
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
     ax.set_xlabel("Mean TFLOPs per attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
-    ax.set_ylabel("Success (%)", fontsize=font_size)
+    ax.set_ylabel("Success (%)", fontsize=font_size, labelpad=2)
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
@@ -796,25 +796,25 @@ def success_compute_figure(
     # same (h, d) transition notation.  The primary h=2 refinement row sits
     # next to the refresh rows because they share (2, 2) as a setting.
     rows = [
-        (7.35, *effect((5, 2), (5, 5)), "$h=5$",
+        (7.35, *effect((5, 2), (5, 5)), r"$(h=5,\ d=5\rightarrow2)$",
          "18.5 $\\rightarrow$ 16.1", gray, False),
-        (5.65, *effect((1, 2), (1, 5)), "$h=1$",
+        (5.65, *effect((1, 2), (1, 5)), r"$(h=1,\ d=5\rightarrow2)$",
          "89.1 $\\rightarrow$ 83.3", gray, False),
-        (3.95, *effect((2, 2), (2, 5)), "$h=2$",
+        (3.95, *effect((2, 2), (2, 5)), r"$(h=2,\ d=5\rightarrow2)$",
          "48.7 $\\rightarrow$ 41.1", accent, True),
-        (1.25, *effect((2, 2), (5, 2), sign=-1), "To $h=5$ (less frequent)",
+        (1.25, *effect((2, 2), (5, 2), sign=-1), r"$(h=2\rightarrow5,\ d=2)$",
          "41.1 $\\rightarrow$ 16.1", gray, False),
-        (-0.40, *effect((1, 2), (2, 2)), "To $h=1$ (more frequent)",
+        (-0.40, *effect((1, 2), (2, 2)), r"$(h=2\rightarrow1,\ d=2)$",
          "41.1 $\\rightarrow$ 83.3", gray, False),
     ]
     bx.text(-10, 9.25, "Cost: before $\\rightarrow$ after (TFLOPs/attempt)",
             fontsize=font_size, color=muted, va="center",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
-    bx.text(-10, 8.65, "Denoising: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
+    bx.text(-10, 8.65, "Denoising comparisons", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
     bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
-    bx.text(-10, 2.75, "Refresh from $h=2$ (at $d=2$)",
+    bx.text(-10, 2.75, "Refresh comparisons",
             fontsize=font_size + 0.4, color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
 
