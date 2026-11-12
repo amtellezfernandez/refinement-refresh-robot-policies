@@ -166,28 +166,36 @@ class PaperVisualTests(unittest.TestCase):
         with patch.object(visuals, "save_figure") as save:
             visuals.success_compute_figure(self.data, Path("unused.pdf"))
         figure = save.call_args.args[0]
-        self.assertEqual(len(figure.axes), 1)
-        tradeoff = figure.axes[0]
-        points = np.vstack([collection.get_offsets()[0] for collection in tradeoff.collections])
-        expected = np.array(
+        self.assertEqual(len(figure.axes), 2)
+        settings, effects = figure.axes
+        setting_points = np.vstack(
+            [collection.get_offsets()[0] for collection in settings.collections]
+        )
+        expected_settings = np.array(
             [
-                [r["nominal_fraction_native"], 100 * r["success_rate"]]
+                [r["mean_reference_tflops"], 100 * r["success_rate"]]
                 for r in self.data["confirmation"]["resources"]
             ]
         )
-        np.testing.assert_allclose(points, expected)
-        self.assertEqual(tradeoff.get_ylim(), (70, 100))
-        labels = " ".join(text.get_text() for text in tradeoff.texts)
-        self.assertIn("Frozen: less refinement  +10.6 pp [4.4, 16.9]", labels)
-        self.assertIn("Amended: more frequent refresh  +0.6 pp [-6.3, 6.9]", labels)
-        arrows = [
-            text for text in tradeoff.texts
-            if getattr(text, "arrow_patch", None) is not None
-        ]
-        self.assertEqual(len(arrows), 2)
+        np.testing.assert_allclose(setting_points, expected_settings)
+        self.assertEqual(settings.get_ylim(), (72, 90))
+        self.assertIn("Mean arithmetic per attempt", settings.get_xlabel())
+        effect_points = np.vstack(
+            [collection.get_offsets()[0] for collection in effects.collections]
+        )
+        np.testing.assert_allclose(
+            effect_points[:, 0], [10.625, 3.125, 0.625, -0.625, -1.25]
+        )
+        self.assertIn("Paired success difference", effects.get_xlabel())
         text = " ".join(item.get_text() for item in figure.findobj(Text))
         for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
             self.assertIn(f"$({cell[0]},{cell[1]})$", text)
+        self.assertIn("+10.6", text)
+        self.assertIn("[+4.4, +16.9]", text)
+        self.assertIn("-0.6", text)
+        self.assertIn("[-6.9, +6.3]", text)
+        self.assertNotIn("Prespecified before held-out outcomes", text)
+        self.assertNotIn("Added later: amended descriptive", text)
 
     def test_study_design_figure_keeps_selection_and_confirmation_separate(self):
         from matplotlib.text import Text

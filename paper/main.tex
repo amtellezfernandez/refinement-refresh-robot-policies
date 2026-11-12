@@ -385,17 +385,23 @@ mean arithmetic per attempt charges every generated chunk.}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
-\caption{Held-out success and compute across the seven settings. Each point is
-labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
-nominal arithmetic per control step as a percentage of native $(1,10)$; farther
-left is cheaper. The success axis begins at 75\%. Each arrow points from
-comparator B to setting A and reports the paired A-minus-B success difference with its
-task-conditional 95\% interval. Blue identifies the prespecified primary
-comparison. Black arrows holding $h$ fixed are the other prespecified refinement
-tests; black arrows changing $h$ are amended descriptive prefix comparisons.
-The 60.7\% annotation uses mean arithmetic per attempt for $(5,2)$ relative to
-$(2,2)$ and does not imply equivalent success.}
+\includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}\par\vspace{-0.4em}
+\caption{Held-out settings and paired comparisons. Panel A shows all seven
+settings, where $h$ is the executed prefix and $d$ is the denoising count; each
+point is labelled with its setting, success rate, and successes out of
+160 attempts. Horizontal position is mean reference-calibrated arithmetic per
+attempt, including failures; farther left is cheaper. This differs from the
+nominal arithmetic per control step used to define the selection ceilings in
+Section~\ref{sec:fixed-cost-floor}. The success axis begins at 72\%. Blue marks
+the prespecified primary pair. Panel B shows three prespecified refinement
+comparisons and two later, amended descriptive prefix comparisons. Each point is
+the paired success change for the displayed move (destination minus start), and
+each bar is its task-conditional 95\% interval; intervals crossing zero do not
+separate the settings under this analysis. Thus the $h=2\rightarrow5$ row is the
+negation of the $(2,2)-(5,2)$ convention in Table~\ref{tab:confirmation-secondary}.
+Two additional amended contrasts involving native $(1,10)$ are reported only in
+that table. Attempt arithmetic below each row is descriptive and does not imply
+latency improvement or equivalent success.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier

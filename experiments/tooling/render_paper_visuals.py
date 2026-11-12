@@ -700,133 +700,121 @@ def cost_decomposition_figure(data, path):
 
 
 def success_compute_figure(
-    data, path, font_size=FIGURE_FONT_PT, figure_width=FIGURE_WIDTH, figure_height=2.85
+    data, path, font_size=FIGURE_FONT_PT, figure_width=FIGURE_WIDTH, figure_height=5.8
 ):
+    """Render the held-out setting map and paired-effect forest plot."""
     import matplotlib.pyplot as plt
 
-    resources = {
-        (r["h"], r["d"]): r for r in data["confirmation"]["resources"]
-    }
-    fig = plt.figure(figsize=(figure_width, figure_height))
-    tradeoff = fig.add_axes([0.10, 0.22, 0.80, 0.65])
-    tradeoff.set_facecolor(".965")
-    offsets = {
-        (1, 2): (-4, 25),
-        (1, 5): (0, -17),
-        (1, 10): (-2, 40),
-        (2, 2): (5, 10),
-        (2, 5): (5, -17),
-        (5, 2): (4, -15),
-        (5, 5): (-4, -16),
-    }
-    label_alignments = {
-        (1, 2): "right",
-        (1, 5): "center",
-        (1, 10): "right",
-        (5, 2): "left",
-    }
-    for cell, row in resources.items():
-        x = row["nominal_fraction_native"]
-        y = 100 * row["success_rate"]
-        primary = cell == (2, 2)
-        primary_pair = cell in {(2, 2), (2, 5)}
-        tradeoff.scatter(
-            x,
-            y,
-            s=44 if primary else 28,
-            marker="D" if primary else "o",
-            facecolor=ACCENT if primary else "white",
-            edgecolor=ACCENT if primary_pair else INK,
-            linewidth=0.8,
-            zorder=3,
-        )
-        tradeoff.annotate(
-            f"$({cell[0]},{cell[1]})$ {round(y):d}%",
-            (x, y),
-            xytext=offsets[cell],
-            textcoords="offset points",
-            ha=label_alignments.get(cell, "left"),
-            fontweight="bold" if primary else "normal",
-            color=ACCENT if primary_pair else INK,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
-        )
-    # Arrows point from B to A, matching the A-minus-B convention on the right.
-    tradeoff.annotate(
-        "",
-        xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
-        xytext=(resources[(2, 5)]["nominal_fraction_native"], 100 * resources[(2, 5)]["success_rate"]),
-        arrowprops={"arrowstyle": "->", "color": ACCENT, "lw": 1.2, "connectionstyle": "arc3,rad=-0.18"},
-        ha="right",
-        va="bottom",
-        color=ACCENT,
-    )
+    resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
     comparisons = {
         (tuple(c["a"]), tuple(c["b"])): c
         for c in data["confirmation"]["comparisons"]
     }
-    primary_effect = comparisons[((2, 2), (2, 5))]
-    primary_mean = 100 * primary_effect["mean_difference"][0]
-    primary_interval = [100 * v for v in primary_effect["interval95"][0]]
-    refresh_effect = comparisons[((2, 2), (5, 2))]
-    refresh_mean = 100 * refresh_effect["mean_difference"][0]
-    refresh_interval = [100 * v for v in refresh_effect["interval95"][0]]
-    tradeoff.text(
-        0.51,
-        78.8,
-        f"Frozen: less refinement  {number(primary_mean, signed=True)} pp "
-        f"[{number(primary_interval[0])}, {number(primary_interval[1])}]",
-        color=ACCENT,
-        ha="left",
-        va="center",
-        fontweight="bold",
-        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
-    )
-    tradeoff.annotate(
-        "",
-        xy=(resources[(2, 2)]["nominal_fraction_native"], 100 * resources[(2, 2)]["success_rate"]),
-        xytext=(resources[(5, 2)]["nominal_fraction_native"], 100 * resources[(5, 2)]["success_rate"]),
-        arrowprops={"arrowstyle": "->", "color": INK, "lw": 1.0, "connectionstyle": "arc3,rad=0.16"},
-    )
-    tradeoff.text(
-        0.31,
-        86.8,
-        f"Amended: more frequent refresh  {number(refresh_mean, signed=True)} pp "
-        f"[{number(refresh_interval[0])}, {number(refresh_interval[1])}]",
-        color=INK,
-        ha="center",
-        va="center",
-        fontweight="bold",
-        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.12},
-    )
-    tradeoff.text(
-        0.20,
-        90.5,
-        "60.7% less arithmetic/attempt",
-        ha="left",
-        va="center",
-        fontsize=font_size,
-        color=INK,
-        bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.12},
-    )
-    tradeoff.set(
-        xlabel="Compute per step (% of $d=10,h=1$)",
-        ylabel="Observed success (%)",
-        xlim=(0.12, 1.04),
-        ylim=(70, 100),
-        xticks=[0.2, 0.4, 0.6, 0.8, 1.0],
-        yticks=[70, 80, 90, 100],
-    )
-    tradeoff.set_xticklabels(["20", "40", "60", "80", "100"])
-    tradeoff.set_axisbelow(True)
-    tradeoff.grid(color=".91", lw=0.55)
-    tradeoff.spines[["top", "right"]].set_visible(True)
-    tradeoff.spines[["top", "right", "bottom", "left"]].set_color(".72")
-    tradeoff.spines[["top", "right", "bottom", "left"]].set_linewidth(0.6)
+    accent = ACCENT
+    gray = "#555555"
+    muted = "#444444"
 
-    fig.text(
-        0.50, 0.96, "Held-out success, compute, and paired comparisons",
-        ha="center", va="top", fontweight="bold"
+    fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
+    grid = fig.add_gridspec(
+        2, 1, height_ratios=[0.88, 1.12], hspace=0.50,
+        left=0.11, right=0.96, top=0.96, bottom=0.10,
     )
+
+    # Panel A: every held-out setting on realized mean attempt arithmetic.
+    ax = fig.add_subplot(grid[0, 0])
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.set_xlim(0, 120)
+    ax.set_ylim(72, 90)
+    ax.set_xticks([0, 25, 50, 75, 100])
+    ax.set_yticks([75, 80, 85, 90])
+    ax.set_yticklabels(["75%", "80%", "85%", "90%"])
+    ax.grid(axis="y", color=".90", lw=0.55)
+    ax.set_axisbelow(True)
+    ax.set_xlabel("Mean arithmetic per attempt (TFLOPs; lower is cheaper)", fontsize=font_size)
+    ax.set_ylabel("Held-out success", fontsize=font_size)
+    ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
+
+    offsets = {
+        (5, 2): (2, 8, "left", "bottom"),
+        (5, 5): (2, -9, "left", "top"),
+        (2, 2): (2, 9, "left", "bottom"),
+        (2, 5): (2, -9, "left", "top"),
+        (1, 2): (0, 20, "center", "bottom"),
+        (1, 5): (0, -12, "center", "top"),
+        (1, 10): (-2, 10, "right", "bottom"),
+    }
+    for cell, row in resources.items():
+        successes = row["successes"]
+        rate = 100 * row["success_rate"]
+        attempt_cost = row["mean_reference_tflops"]
+        primary_pair = cell in {(2, 2), (2, 5)}
+        color = accent if primary_pair else gray
+        ax.scatter(
+            attempt_cost, rate, s=34, color=color, edgecolor="white",
+            linewidth=0.65, zorder=3,
+        )
+        dx, dy, ha, va = offsets[cell]
+        ax.annotate(
+            f"$({cell[0]},{cell[1]})$  {rate:.0f}% ({successes}/160)",
+            (attempt_cost, rate), xytext=(dx, dy), textcoords="offset points",
+            ha=ha, va=va, fontsize=font_size, color=color,
+            fontweight="bold" if primary_pair else "normal",
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.08},
+        )
+
+    # Panel B: paired success differences. Each direction is destination minus start.
+    bx = fig.add_subplot(grid[1, 0])
+    bx.spines[["top", "right", "left"]].set_visible(False)
+    bx.set_xlim(-10, 20)
+    bx.set_ylim(-1.3, 9.4)
+    bx.set_xticks([-10, 0, 10, 20])
+    bx.set_xticklabels(["-10", "0", "+10", "+20"])
+    bx.set_yticks([])
+    bx.axvline(0, color="#555555", lw=0.75, zorder=1)
+    bx.set_title("B  Paired success changes", loc="left", fontsize=font_size + 0.7,
+                 fontweight="bold", pad=5)
+    bx.set_xlabel("Paired success difference (percentage points)\n$\\leftarrow$ fewer successes     more successes $\\rightarrow$",
+                  fontsize=font_size)
+
+    def effect(a, b, sign=1.0):
+        item = comparisons[(a, b)]
+        estimate = sign * 100 * item["mean_difference"][0]
+        lo, hi = (100 * v for v in item["interval95"][0])
+        if sign < 0:
+            lo, hi = -hi, -lo
+        return estimate, lo, hi
+
+    rows = [
+        (7.6, *effect((2, 2), (2, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=2$",
+         "48.7 $\\rightarrow$ 41.1 TFLOPs/attempt", accent, True),
+        (5.8, *effect((5, 2), (5, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=5$",
+         "18.5 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
+        (4.0, *effect((1, 2), (1, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=1$",
+         "89.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
+        (1.45, *effect((2, 2), (5, 2), sign=-1), "Less frequent refresh: $h=2 \\rightarrow 5$",
+         "41.1 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
+        (-0.30, *effect((1, 2), (2, 2)), "More frequent refresh: $h=2 \\rightarrow 1$",
+         "41.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
+    ]
+    bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
+
+    for y, estimate, lo, hi, label, cost, color, bold in rows:
+        bx.plot([lo, hi], [y, y], color=color, lw=2.0 if bold else 1.45,
+                solid_capstyle="butt", zorder=2)
+        bx.scatter(estimate, y, s=30 if bold else 21, color=color,
+                   edgecolor="white", linewidth=0.5, zorder=3)
+        bx.text(-10, y + 0.76, label, fontsize=font_size, color=color,
+                va="center", fontweight="bold" if bold else "normal",
+                bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
+        bx.text(-10, y + 0.36, cost, fontsize=font_size, color=muted,
+                va="center", bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
+        bx.text(
+            20, y, f"{number(estimate, signed=True)}\n[{number(lo, signed=True)}, {number(hi, signed=True)}]",
+            fontsize=font_size, color=color, va="center", ha="right",
+            fontweight="bold" if bold else "normal", linespacing=1.0,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.05},
+        )
+
     save_figure(fig, path)
     plt.close(fig)
 
@@ -865,7 +853,7 @@ def render(destination):
             destination / "success_compute_tradeoff_poster.pdf",
             font_size=10.5,
             figure_width=6.1,
-            figure_height=3.2,
+            figure_height=6.4,
         )
     names = [
         *contents,
