@@ -730,18 +730,18 @@ def success_compute_figure(
     ax.set_yticklabels(["75%", "80%", "85%", "90%"])
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
-    ax.set_xlabel("Mean arithmetic per attempt (TFLOPs; lower is cheaper)", fontsize=font_size)
+    ax.set_xlabel("Mean arithmetic per attempt (TFLOPs)\n$\\leftarrow$ less compute     more compute $\\rightarrow$", fontsize=font_size)
     ax.set_ylabel("Held-out success", fontsize=font_size)
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
-        (5, 2): (2, 8, "left", "bottom"),
-        (5, 5): (2, -9, "left", "top"),
-        (2, 2): (2, 9, "left", "bottom"),
-        (2, 5): (2, -9, "left", "top"),
-        (1, 2): (0, 20, "center", "bottom"),
-        (1, 5): (0, -12, "center", "top"),
-        (1, 10): (-2, 10, "right", "bottom"),
+        (5, 2): (2, 7, "left"),
+        (5, 5): (2, -20, "left"),
+        (2, 2): (2, 8, "left"),
+        (2, 5): (2, -20, "left"),
+        (1, 2): (0, 10, "center"),
+        (1, 5): (0, -21, "center"),
+        (1, 10): (-2, 7, "right"),
     }
     for cell, row in resources.items():
         successes = row["successes"]
@@ -753,13 +753,19 @@ def success_compute_figure(
             attempt_cost, rate, s=34, color=color, edgecolor="white",
             linewidth=0.65, zorder=3,
         )
-        dx, dy, ha, va = offsets[cell]
+        dx, dy, ha = offsets[cell]
+        label_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.05}
         ax.annotate(
-            f"$({cell[0]},{cell[1]})$  {rate:.0f}% ({successes}/160)",
-            (attempt_cost, rate), xytext=(dx, dy), textcoords="offset points",
-            ha=ha, va=va, fontsize=font_size, color=color,
-            fontweight="bold" if primary_pair else "normal",
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.08},
+            f"{rate:.0f}%", (attempt_cost, rate),
+            xytext=(dx, dy + 10), textcoords="offset points",
+            ha=ha, va="bottom", fontsize=font_size, color=color,
+            fontweight="bold" if primary_pair else "normal", bbox=label_box,
+        )
+        ax.annotate(
+            f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
+            xytext=(dx, dy), textcoords="offset points",
+            ha=ha, va="bottom", fontsize=font_size + 2.0, color=color,
+            fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
 
     # Panel B: paired success differences. Each direction is destination minus start.
@@ -771,9 +777,9 @@ def success_compute_figure(
     bx.set_xticklabels(["-10", "0", "+10", "+20"])
     bx.set_yticks([])
     bx.axvline(0, color="#555555", lw=0.75, zorder=1)
-    bx.set_title("B  Paired success changes", loc="left", fontsize=font_size + 0.7,
+    bx.set_title("B  Change in success between settings", loc="left", fontsize=font_size + 0.7,
                  fontweight="bold", pad=5)
-    bx.set_xlabel("Paired success difference (percentage points)\n$\\leftarrow$ fewer successes     more successes $\\rightarrow$",
+    bx.set_xlabel("Difference in successful attempts per 100\n$\\leftarrow$ fewer successes     no difference     more successes $\\rightarrow$",
                   fontsize=font_size)
 
     def effect(a, b, sign=1.0):

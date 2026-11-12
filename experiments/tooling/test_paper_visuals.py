@@ -186,7 +186,7 @@ class PaperVisualTests(unittest.TestCase):
         np.testing.assert_allclose(
             effect_points[:, 0], [10.625, 3.125, 0.625, -0.625, -1.25]
         )
-        self.assertIn("Paired success difference", effects.get_xlabel())
+        self.assertIn("successful attempts per 100", effects.get_xlabel())
         text = " ".join(item.get_text() for item in figure.findobj(Text))
         for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
             self.assertIn(f"$({cell[0]},{cell[1]})$", text)

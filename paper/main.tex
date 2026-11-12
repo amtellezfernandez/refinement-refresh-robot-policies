@@ -388,16 +388,18 @@ mean arithmetic per attempt charges every generated chunk.}
 \includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}\par\vspace{-0.4em}
 \caption{Held-out settings and paired comparisons. Panel A shows all seven
 settings, where $h$ is the executed prefix and $d$ is the denoising count; each
-point is labelled with its setting, success rate, and successes out of
-160 attempts. Horizontal position is mean reference-calibrated arithmetic per
-attempt, including failures; farther left is cheaper. This differs from the
+point is labelled with its setting and success rate. Exact success counts are
+reported in Table~\ref{tab:confirmation-grid}. Horizontal position is mean reference-calibrated arithmetic per
+attempt, including failures. This differs from the
 nominal arithmetic per control step used to define the selection ceilings in
 Section~\ref{sec:fixed-cost-floor}. The success axis begins at 72\%. Blue marks
 the prespecified primary pair. Panel B shows three prespecified refinement
 comparisons and two later, amended descriptive prefix comparisons. Each point is
-the paired success change for the displayed move (destination minus start), and
-each bar is its task-conditional 95\% interval; intervals crossing zero do not
-separate the settings under this analysis. Thus the $h=2\rightarrow5$ row is the
+the paired difference in successful attempts per 100 evaluations for the
+displayed move (destination minus start); for example, $+10.6$ means about 11
+additional successes per 100 attempts. Each bar is its task-conditional 95\%
+interval; intervals crossing zero do not separate the settings under this
+analysis. Thus the $h=2\rightarrow5$ row is the
 negation of the $(2,2)-(5,2)$ convention in Table~\ref{tab:confirmation-secondary}.
 Two additional amended contrasts involving native $(1,10)$ are reported only in
 that table. Attempt arithmetic below each row is descriptive and does not imply
