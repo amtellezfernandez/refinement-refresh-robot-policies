@@ -790,19 +790,28 @@ def success_compute_figure(
             lo, hi = -hi, -lo
         return estimate, lo, hi
 
+    # Put the repeated change in a group heading and keep every row in the
+    # same (h, d) transition notation.  The primary h=2 refinement row sits
+    # next to the refresh rows because they share (2, 2) as a setting.
     rows = [
-        (7.6, *effect((2, 2), (2, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=2$",
-         "48.7 $\\rightarrow$ 41.1 TFLOPs/attempt", accent, True),
-        (5.8, *effect((5, 2), (5, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=5$",
+        (7.35, *effect((5, 2), (5, 5)), "$h=5$: $(5,5) \\rightarrow (5,2)$",
          "18.5 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
-        (4.0, *effect((1, 2), (1, 5)), "Fewer denoising: 5 $\\rightarrow$ 2; $h=1$",
+        (5.65, *effect((1, 2), (1, 5)), "$h=1$: $(1,5) \\rightarrow (1,2)$",
          "89.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
-        (1.45, *effect((2, 2), (5, 2), sign=-1), "Less frequent refresh: $h=2 \\rightarrow 5$",
+        (3.95, *effect((2, 2), (2, 5)), "$h=2$: $(2,5) \\rightarrow (2,2)$",
+         "48.7 $\\rightarrow$ 41.1 TFLOPs/attempt", accent, True),
+        (1.25, *effect((2, 2), (5, 2), sign=-1), "Less frequent: $(2,2) \\rightarrow (5,2)$",
          "41.1 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
-        (-0.30, *effect((1, 2), (2, 2)), "More frequent refresh: $h=2 \\rightarrow 1$",
+        (-0.40, *effect((1, 2), (2, 2)), "More frequent: $(2,2) \\rightarrow (1,2)$",
          "41.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
     ]
+    bx.text(-10, 8.85, "Fewer denoising steps: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
+            color="#222222", va="center", fontweight="bold",
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
     bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
+    bx.text(-10, 2.75, "Change refresh frequency from $h=2$ (at $d=2$)",
+            fontsize=font_size + 0.4, color="#222222", va="center", fontweight="bold",
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
 
     for y, estimate, lo, hi, label, cost, color, bold in rows:
         bx.plot([lo, hi], [y, y], color=color, lw=2.0 if bold else 1.45,

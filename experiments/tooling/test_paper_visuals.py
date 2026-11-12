@@ -184,7 +184,7 @@ class PaperVisualTests(unittest.TestCase):
             [collection.get_offsets()[0] for collection in effects.collections]
         )
         np.testing.assert_allclose(
-            effect_points[:, 0], [10.625, 3.125, 0.625, -0.625, -1.25]
+            effect_points[:, 0], [3.125, 0.625, 10.625, -0.625, -1.25]
         )
         self.assertIn("successful attempts per 100", effects.get_xlabel())
         text = " ".join(item.get_text() for item in figure.findobj(Text))
