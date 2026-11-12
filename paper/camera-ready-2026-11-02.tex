@@ -35,13 +35,13 @@ execute before prediction is refreshed from a new observation? We study this
 question by varying generation effort and execution prefix separately, measuring
 both closed-loop success and inference expenditure under a declared counting
 boundary, and distinguishing
-prespecified comparisons from later descriptive analyses. We use
+prespecified comparisons from amended descriptive analyses. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
-with denoising count as its generation control. At a fixed two-action prefix, the
+with denoising count as its refinement control. At a fixed two-action prefix, the
 prespecified comparison found 139/160 successes with two denoising steps versus
 122/160 with five, while using 5.9\% less counted arithmetic per control step;
 82.1\% of generation arithmetic at the default setting was independent of
-denoising. A later descriptive contrast
+denoising. An amended descriptive contrast
 found 138/160 versus 139/160 successes when executing five rather than two actions
 per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
 established. These checkpoint-specific results do not define a general allocation
@@ -103,9 +103,9 @@ tested budgets, so fitting has no demonstrated selection advantage here.
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
     \item a formulation that connects model-specific generation effort and
-    execution prefix to prediction rate and realized episode expenditure;
+    execution prefix to nominal compute rate and realized attempt expenditure;
     \item an evaluation procedure that separates discovery, prespecified held-out
-    comparisons, and later descriptive analyses; and
+    comparisons, and amended descriptive analyses; and
     \item a SmolVLA case study that demonstrates the procedure across 12
     discovery configurations and seven held-out settings.
 \end{itemize}
@@ -140,7 +140,7 @@ denoising to adapt the execution prefix \cite{dvac}. ElegantVLA schedules
 vision--language recomputation, reuse, and action generation during execution
 \cite{elegantvla}. These methods change the schedule within an episode. We map
 fixed refinement and prefix settings first, separate selection from held-out
-evaluation, and report both nominal prediction rate and realized episode cost.
+evaluation, and report both nominal compute rate and realized attempt cost.
 This design evaluates the axes available to an adaptive method; it does not test
 whether a fixed schedule is better than adaptation.
 
@@ -152,13 +152,13 @@ generate one action chunk and the number of actions executed before requesting a
 new prediction. We represent refinement by an architecture-specific effort
 control $r$ and refresh frequency by the execution prefix $h$. The evaluation
 procedure measures both nominal compute rate and
-realized episode expenditure, selects comparisons on discovery tasks, freezes
-the confirmatory comparisons, and evaluates them on separate tasks. Success and
+realized attempt expenditure, selects comparisons on discovery tasks,
+prespecifies the held-out comparisons, and evaluates them on separate tasks. Success and
 cost are reported together. Later analyses remain explicitly descriptive, and
 arithmetic savings are kept distinct from latency. The SmolVLA case study
 instantiates generation effort with its denoising count.
 
-\subsection{Compute rate and episode expenditure}
+\subsection{Compute rate and attempt expenditure}
 
 Let $K$ be the predicted action-chunk length, $1\leq h\leq K$ the execution
 prefix, and
@@ -214,7 +214,7 @@ $T_e$ actions, its generated-chunk expenditure is
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
 is used. If generation cost varies across calls, as it can for early-exit,
-sampling, search, or verification procedures, episode expenditure must instead
+sampling, search, or verification procedures, attempt expenditure must instead
 sum the measured cost of every call. All-attempt means include unsuccessful
 episodes. Different trajectories and termination times can therefore change
 expenditure at the same nominal rate. FLOPs, host elapsed time, and CUDA-stream
@@ -274,6 +274,9 @@ those comparisons on tasks excluded from selection.
 
 \subsection{Discovery and confirmation design}
 
+We call evaluation on tasks excluded from selection the \emph{held-out
+confirmation phase}, or confirmation for short.
+
 We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
 chunk length is fixed at $K=50$, and the model's native deployment uses
 $(h,d)=(1,10)$. We hold the checkpoint, observations, preprocessing, action
@@ -326,14 +329,14 @@ denoising. The small paired sample also does not certify equal quality for
 configurations with similar observed counts.
 
 Selection also depends on how cost is defined. Nominal arithmetic rate differs
-from realized episode expenditure, and arithmetic savings differ from elapsed
+from realized attempt expenditure, and arithmetic savings differ from elapsed
 time. Replacing the arithmetic ceiling with a host-time ceiling changes which
 prefixes are feasible. This sensitivity analysis does not alter the frozen
 arithmetic-based experiment. Appendix~\ref{app:discovery-outcomes} gives the
 full discovery results, and Appendix~\ref{app:timing-sensitivity} gives the
 resource-coordinate analysis.
 
-\subsection{Frozen comparisons and selection rules}
+\subsection{Selection rules and prespecified comparisons}
 \label{sec:prediction}
 
 Discovery freezes $(5,2)$, $(2,2)$, and $(1,2)$ at the quarter-, half-, and
@@ -393,7 +396,7 @@ the nominal arithmetic per control step of native $(1,10)$; farther left is
 cheaper. The success axis begins at 75\%. Each arrow points from comparator B to
 setting A and reports the paired A-minus-B success difference with its
 task-conditional 95\% interval. Blue identifies the prespecified primary
-comparison. Black arrows holding $h$ fixed are the other frozen refinement
+comparison. Black arrows holding $h$ fixed are the other prespecified refinement
 tests; black arrows changing $h$ are amended descriptive prefix comparisons.
 The 60.7\% annotation uses mean arithmetic per attempt for $(5,2)$ relative to
 $(2,2)$ and does not imply equivalent success.}
@@ -413,7 +416,7 @@ less refinement therefore improves observed success while reducing counted work.
 \par\end{samepage}
 
 Mean arithmetic per attempt falls by 15.6\%, from 48.7 to 41.1 TFLOPs. This
-episode-level difference also reflects the changed trajectories: mean episode
+attempt-level difference also reflects the changed trajectories: mean episode
 length is 149.0 control steps for $(2,2)$ and 166.3 for $(2,5)$. The effect is
 positive on seven tasks and tied on one. Across the 160 paired identities,
 $(2,2)$ has 24 wins, seven losses, and 129 ties.
@@ -439,10 +442,10 @@ The table separates prespecified confirmation from amended descriptive analysis.
 \toprule
 Comparison & Status & Result & Supported claim\\
 \midrule
-$(2,2)-(2,5)$ & Frozen primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
+$(2,2)-(2,5)$ & Prespecified primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
 At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
 \addlinespace[2pt]
-Other fixed-$h$ refinement tests & Frozen & Positive point estimates;
+Other fixed-$h$ refinement tests & Prespecified & Positive point estimates;
 intervals span zero & A uniform benefit is not established for this checkpoint.\\
 \addlinespace[2pt]
 $(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
@@ -487,7 +490,7 @@ on new tasks.
 
 The experiments expose two limits on inference allocation. First, reducing a
 model's adjustable refinement work may save little when most generation cost is
-fixed. Second, executing more actions from each chunk can reduce episode cost
+fixed. Second, executing more actions from each chunk can reduce attempt cost
 substantially, but it also delays feedback and changes which predicted action
 positions reach the environment. Cost and closed-loop success must therefore be
 measured together rather than inferred from a single per-call setting.
@@ -495,7 +498,7 @@ measured together rather than inferred from a single per-call setting.
 The SmolVLA case study demonstrates both points. At $h=2$, reducing denoising
 from five steps to two improved held-out success by 10.6 percentage points and
 reduced nominal counted arithmetic by 5.9\%. This result is specific to that
-prefix: the other two frozen comparisons did not establish a uniform benefit.
+prefix: the other two prespecified comparisons did not establish a uniform benefit.
 Meanwhile, 82.1\% of native generation arithmetic was independent of denoising.
 Changing the execution prefix had a much larger cost effect: $(5,2)$ used 60.7\%
 less arithmetic per attempt than $(2,2)$ and produced 138 rather than 139
@@ -506,7 +509,7 @@ rule, so fitting has no demonstrated selection advantage here.
 The transferable contribution is an evaluation procedure, rather than a
 universal setting. Within each model, define its adjustable generation effort,
 measure policy-call cost under an explicit boundary, vary the execution prefix,
-freeze comparisons before held-out evaluation, and report realized episode
+freeze comparisons before held-out evaluation, and report realized attempt
 expenditure with success. Generation effort can represent integration steps,
 candidate sampling, search, or verification, provided its cost is measured. When
 comparing architectures, the meaningful evidence is each model's within-model
@@ -570,7 +573,7 @@ contain both seeds and all 12 configurations. Discovery bootstrap resampling use
 \centering\small
 \caption{Discovery successes on Spatial tasks 5--8. Each task contributes five
 states and two seeds per configuration. Rate/native is
-$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized episode cost.
+$F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized attempt cost.
 The best observed count is 28/40 at $(1,5)$; no monotonic denoising trend is
 assumed.}
 \label{tab:discovery-grid}
@@ -611,7 +614,7 @@ every five seconds; the largest recorded gap during discovery is below
 \caption{Discovery resource measurements. Generated-chunk totals use the declared
 dense-arithmetic boundary and charge partially executed final prefixes.
 Episode means include unsuccessful attempts. $(2,2)$ has 26/40 observed
-successes at 42.9\% of native arithmetic rate.}
+successes at 42.9\% of the native nominal arithmetic rate.}
 \label{tab:resources}
 \input{../paper/generated/discovery_resources.tex}
 \end{table}
@@ -750,7 +753,7 @@ The learned choices and comparisons were frozen before confirmation; additional
 selector baselines were documented after collection began.
 The empirical selector uses the measured grid; other selectors use the declared
 candidate set. The simple rule exactly matches the learned choices. Selected
-rate/native is the learned recommendation's arithmetic rate. Frozen comparators
+rate/native is the learned recommendation's arithmetic rate. Prespecified comparators
 and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
 the half-native row is primary.
 }
