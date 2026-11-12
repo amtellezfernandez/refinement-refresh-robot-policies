@@ -348,20 +348,18 @@ Appendix~\ref{app:selectors}.
 \section{Held-Out Results for the SmolVLA Case Study}
 \label{sec:transfer}
 
-\subsection{Comparisons and evidence status}
+\subsection{Held-out settings and evidence status}
 
-The held-out evaluation contains 1,120 attempts: seven settings evaluated on the
-same 160 task--state--seed identities. We write each setting as $(h,d)$, where
-$h$ is the number of actions executed before replanning and $d$ is the number of
-denoising steps. Before collecting these outcomes, we froze three comparisons of
-$d=2$ against $d=5$ at fixed $h\in\{1,2,5\}$; $(2,2)$ versus $(2,5)$ is the
-primary comparison. Comparisons that change $h$ were added later and are
-descriptive. Table~\ref{tab:confirmation-grid} reports all seven settings,
-Figure~\ref{fig:success-compute} shows their success and compute jointly, and
-Table~\ref{tab:evidence-status} states what each comparison supports.
-
-The analysis uses 1,120 canonical attempts. Appendix~\ref{app:verification}
-documents the exclusion of two repeated records and the retained provenance.
+The held-out evaluation applies seven settings to the same 160
+task--state--seed identities, giving 1,120 attempts. Before observing these
+outcomes, we froze three comparisons of $d=2$ against $d=5$, each at a fixed
+$h\in\{1,2,5\}$. The comparison $(2,2)$ versus $(2,5)$ is primary. Comparisons
+that change $h$ were added after outcomes were visible and remain descriptive.
+Table~\ref{tab:confirmation-grid} reports the seven settings,
+Figure~\ref{fig:success-compute} connects success to compute, and
+Table~\ref{tab:evidence-status} states the interpretation supported by each
+comparison. All totals use the 1,120 planned attempts; Appendix~\ref{app:verification}
+documents the removal of two duplicated log records.
 
 \begin{table}[htbp]
 \centering\small
@@ -375,18 +373,17 @@ mean arithmetic per attempt charges every generated chunk.}
 
 \begin{figure}[htbp]
 \centering
-\textbf{Held-Out Success and Compute Across the Seven Settings}\par\smallskip
 \includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
-\caption{Observed success and nominal arithmetic per control step. Each point is
+\caption{Held-out success and compute across the seven settings. Each point is
 labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
-relative to native $(1,10)$ compute; farther left is cheaper. The success axis
-begins at 75\%. Arrows point from comparator B to setting A and show the
-A-minus-B success difference with its task-conditional 95\% paired interval.
-Blue marks the prespecified primary comparison. Among the black arrows, those
-holding $h$ fixed are the other frozen refinement tests, whereas those changing
-$h$ are amended descriptive prefix contrasts. The 60.7\% annotation instead
-refers to mean arithmetic per attempt for $(5,2)$ relative to $(2,2)$;
-equivalent success is not established.}
+the nominal arithmetic per control step of native $(1,10)$; farther left is
+cheaper. The success axis begins at 75\%. Each arrow points from comparator B to
+setting A and reports the paired A-minus-B success difference with its
+task-conditional 95\% interval. Blue identifies the prespecified primary
+comparison. Black arrows holding $h$ fixed are the other frozen refinement
+tests; black arrows changing $h$ are amended descriptive prefix comparisons.
+The 60.7\% annotation uses mean arithmetic per attempt for $(5,2)$ relative to
+$(2,2)$ and does not imply equivalent success.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
@@ -394,8 +391,8 @@ equivalent success is not established.}
 \begin{samepage}
 \subsection{Prespecified refinement comparisons}
 
-The primary comparison holds the execution prefix fixed at $h=2$. Reducing
-denoising from $d=5$ to $d=2$ raises observed success from 122/160 to 139/160.
+The primary comparison holds $h=2$ fixed. Reducing denoising from $d=5$ to
+$d=2$ raises observed success from 122/160 to 139/160.
 The paired difference is $+10.6$ percentage points, with a task-conditional 95\%
 interval of $[+4.4,+16.9]$. It also reduces nominal reference arithmetic per
 control step by 5.9\%, from 292.2 to 275.0 GFLOPs. For this checkpoint and prefix,
@@ -404,9 +401,10 @@ less refinement therefore improves observed success while reducing counted work.
 
 Mean arithmetic per attempt falls by 15.6\%, from 48.7 to 41.1 TFLOPs. This
 episode-level difference also reflects the changed trajectories: mean episode
-length is 149.0 control steps for $(2,2)$ and 166.3 for $(2,5)$. The primary
-direction is positive on seven tasks and tied on one, with 24 paired wins and
-seven losses. Appendix~\ref{app:primary-costs} reports task sensitivity and
+length is 149.0 control steps for $(2,2)$ and 166.3 for $(2,5)$. The effect is
+positive on seven tasks and tied on one. Across the 160 paired identities,
+$(2,2)$ has 24 wins, seven losses, and 129 ties.
+Appendix~\ref{app:primary-costs} reports task sensitivity and
 expenditure intervals. Counted arithmetic does not establish a physical-latency
 improvement.
 
@@ -445,9 +443,10 @@ cost savings; equivalent quality is unresolved.\\
 \subsection{Amended descriptive execution-prefix comparisons}
 
 These comparisons hold denoising fixed and vary how many actions are executed
-before replanning. They were added after outcomes were visible and are not
-confirmatory tests. Appendix~\ref{app:confirmation-details} gives their full
-provenance and the two additional contrasts involving $(1,10)$.
+before replanning. Because they were added after outcomes were visible, they
+describe observed trade-offs rather than test prespecified hypotheses.
+Appendix~\ref{app:confirmation-details} gives their provenance and two additional
+contrasts involving native $(1,10)$.
 
 At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
 a paired difference of $+0.6$ percentage points with 95\% interval
@@ -455,9 +454,8 @@ $[-6.3,+6.9]$. Executing five actions per prediction, $(5,2)$, uses 60\% less
 nominal arithmetic per control step and 60.7\% less mean arithmetic per attempt:
 16.1 versus 41.1 TFLOPs. The interval permits meaningful success differences in
 either direction, so the observed counts do not establish equivalent quality.
-At task level, the $(2,2)-(5,2)$ difference is positive on three tasks,
-negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}). Thus
-the nearly equal aggregate counts conceal mixed task-level changes.
+The aggregate also hides variation: $(2,2)-(5,2)$ is positive on three tasks,
+negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}).
 
 Refreshing every action with $(1,2)$ instead of every two actions gives two
 fewer successes, a difference of $-1.3$ points with 95\% interval
@@ -465,11 +463,12 @@ $[-7.5,+5.0]$, at 83.3 versus 41.1 TFLOPs per attempt. More frequent refresh has
 benefit in these SmolVLA contrasts. Native-relative comparisons, which also change
 denoising, are reported separately in Appendix~\ref{app:confirmation-details}.
 
-Within the case study, the discovery point estimates favor shorter prefixes at $d=2$
-(Section~\ref{sec:discovery-quality}), but their quality advantage is not
-established on transfer. The task populations differ, so this comparison
-does not identify a causal task effect. The cost model explains feasibility,
-but does not determine the quality ranking on new tasks.
+Discovery point estimates favor shorter prefixes at $d=2$
+(Section~\ref{sec:discovery-quality}), but confirmation does not establish that
+advantage on the held-out tasks. Because the two phases use different task sets,
+their different prefix patterns cannot be attributed to task family without a
+shared-task test. The cost model determines feasibility, not the quality ranking
+on new tasks.
 
 \section{Discussion and Conclusion}
 
