@@ -729,6 +729,8 @@ The audit changes neither policy execution nor the frozen selections.
 \section{Frozen Selection and Diagnostic Analyses}
 \label{app:selectors}
 
+\subsection{Frozen selection procedure}
+
 We compare two logistic response-model families. A compute-only model uses a
 quadratic in log normalized rate. An allocation model uses $\log h$,
 $\log(d/10)$, both squared terms, and their interaction. Each family is fitted
@@ -766,6 +768,8 @@ descriptive, task-conditional, and unadjusted.}
 \label{tab:confirmation-predictions}
 \input{../paper/generated/confirmation_predictions.tex}
 \end{table}
+
+\subsection{Selector diagnostics}
 
 The simple rule minimizes denoising count, then chooses the shortest feasible
 prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
@@ -830,7 +834,7 @@ trajectory lengths; it is not an elapsed-time comparison or evidence of
 equivalent quality.
 
 \FloatBarrier
-\subsection{Primary expenditure and runtime}
+\subsection{Primary contrast robustness, expenditure, and runtime}
 \label{app:primary-costs}
 
 The primary selected configuration $(2,2)$ has a higher success count than
