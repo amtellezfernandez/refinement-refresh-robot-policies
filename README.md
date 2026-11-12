@@ -81,7 +81,7 @@ cite the paper and this version of its artifacts. A copyable entry is:
 ```bibtex
 @article{tellezfernandez2026refinement,
   author  = {Tellez Fernandez, Alba Maria},
-  title   = {Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies},
+  title   = {Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies},
   year    = {2026},
   note    = {NeurIPS 2026 Workshop on Post-Training Adaptation of Robot Foundation Models},
   url     = {https://github.com/amtellezfernandez/refinement-refresh-robot-policies}

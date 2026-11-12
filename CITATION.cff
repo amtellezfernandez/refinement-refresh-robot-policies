@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this study, protocol, code, or retained evidence, please cite the paper."
-title: "Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies"
+title: "Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies"
 type: article
 version: 1.0.1
 date-released: 2026-11-11

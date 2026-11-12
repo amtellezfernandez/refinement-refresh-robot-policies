@@ -15,13 +15,13 @@
 \usepackage[hidelinks]{hyperref}
 \hypersetup{
   hypertexnames=false,
-  pdftitle={Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies},
+  pdftitle={Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies},
   pdfauthor={Alba Maria Tellez Fernandez}
 }
 \usepackage{placeins}
 \usepackage{float}
 \title{Refinement versus Refresh:\\
-Compute Allocation for Closed-Loop Robot Policies}
+Deployment-Time Compute Allocation for Chunked Robot Policies}
 \author{Alba Mar\'ia T\'ellez Fern\'andez\\
 MAAT Institute\\
 \texttt{alba.tellez@maatinstitute.com}}
@@ -29,79 +29,80 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Chunked vision--language--action policies expose three coupled deployment
-controls: generation configuration, predicted chunk length, and the number of
-actions executed before replanning. We formulate this three-way allocation
-problem and instantiate a controlled two-axis evaluation: predicted chunk length remains
-fixed at $K=50$ and is not evaluated, while denoising count and execution prefix
-vary. We measure closed-loop success and inference expenditure under a declared
-counting boundary. The prespecified comparisons were fixed before held-out
-outcomes; later analyses are marked amended descriptive, and an execution-order
-amendment did not change the settings or analysis. We use
-one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
-with denoising count as its refinement control. At a fixed two-action prefix, the
-prespecified comparison found 139/160 successes with two denoising steps versus
-122/160 with five, while using 5.9\% less counted arithmetic per control step;
-82.1\% of generation arithmetic at the default setting was independent of
-denoising. An amended descriptive contrast
-found 138/160 versus 139/160 successes when executing five rather than two actions
-per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
-established. These checkpoint-specific results do not define a general allocation
-rule. They show why closed-loop behavior, explicitly bounded inference cost, and the status
-of each comparison must be considered together.
+Chunked robot policies make three coupled choices that determine deployment-time
+compute: how much computation is spent generating one action chunk
+(refinement), how many actions each chunk contains, and how many are executed
+before replanning from a new observation (refresh). We formulate this allocation
+problem and evaluate it using one frozen SmolVLA checkpoint in synchronous LIBERO
+simulation, with denoising count as the refinement control and chunk length fixed
+at $K=50$. We report closed-loop success alongside dense neural arithmetic and
+host time under explicit measurement boundaries. Three denoising comparisons
+were selected on discovery tasks before 1,120 held-out attempts; execution-prefix
+comparisons were added later and are amended descriptive. Arithmetic and latency
+characterize per-call cost differently: at $d=10$, 82.1\% of counted arithmetic
+is independent of denoising, whereas a descriptive affine fit to fixed-input host
+time assigns 17.7\% to its intercept. At $h=2$, $d=2$ succeeds on 139/160
+attempts versus 122/160 for $d=5$ ($+10.6$ percentage points; task-conditional
+95\% interval: $+4.4$ to $+16.9$), while using 5.9\% less arithmetic per control
+step. Executing $h=5$ rather than $h=2$ at $d=2$ yields 138/160 versus 139/160
+successes and 60.7\% lower arithmetic per attempt; equivalence is not established.
+These checkpoint-specific results illustrate an evaluation procedure for
+allocation decisions; they do not define a universal setting.
 \end{abstract}
 
 \section{Introduction}
 
-Chunked robot policies make three coupled deployment choices: how generation is
-configured, how many actions each call predicts, and how many of those actions
-are executed before the next call. More computation inside a call may change the
-predicted actions. Predicting and executing longer sequences can amortize policy
-calls, but executing a longer prefix delays feedback and commits the robot to
-later actions from an older prediction. The useful configuration therefore
-depends on closed-loop behavior and total prediction cost over an attempt.
+Frozen chunked robot policies expose three coupled deployment-time choices: how
+much computation is spent generating one action chunk, how many actions the
+chunk contains, and how many are executed before the policy replans from a new
+observation. We call adjustable computation within one policy call
+\emph{refinement}. We call obtaining a new observation-conditioned prediction
+\emph{refresh}; the execution prefix controls how often it occurs. Predicted
+chunk length determines how many actions each call constructs.
 
-We call adjustable computation spent constructing one action chunk
-\emph{refinement}, and obtaining a new observation-conditioned prediction
-\emph{refresh}. The number of actions executed before replanning is the
-\emph{execution prefix}; it controls how often refresh occurs. Predicted chunk
-length determines how many candidate actions the call constructs. We ask:
-\emph{under an inference budget, how should generation be configured, how many
-actions should be predicted, and how many should execute before refresh?}
+These choices couple computation and feedback. Additional refinement can alter
+the predicted actions. A longer execution prefix amortizes a policy call, but it
+delays feedback and exposes later actions from an older prediction to the
+environment. We therefore ask one allocation question: \emph{under an explicit
+compute ceiling, which refinement, chunk-length, and refresh settings give the
+best closed-loop behavior?} We do not trade a fixed budget continuously between
+refinement and refresh; we compare configurations that are feasible under common
+compute ceilings and report their nominal rates and realized attempt costs.
 
 Our evaluation procedure separates a model-specific refinement configuration,
-predicted chunk length, and execution prefix. In the present experiment,
-refinement is denoising count, chunk length is fixed, and the execution prefix
-controls how often the policy refreshes its prediction. The procedure counts each
-policy call under a stated arithmetic boundary and aggregates that cost over
-complete attempts. Discovery tasks determine the prespecified comparisons;
-separate tasks provide held-out confirmation. Analyses added after outcomes were
-visible are labelled \emph{amended descriptive}.
+predicted chunk length, and execution prefix. It measures every policy call
+under a stated boundary, aggregates cost over complete attempts, uses discovery
+tasks to choose prespecified comparisons, and evaluates those comparisons on
+separate held-out tasks. Analyses added after outcomes were visible are labelled
+\emph{amended descriptive}. This is an evaluation and reporting procedure, not
+a learned allocator.
 
-This evaluation procedure is intended for chunked policies with a controllable generation
-effort. Depending on the architecture, that control could be integration steps,
-candidate generation, search, or verification effort. The present study tests
-only denoising count, and numerical control values should not be compared across
-architectures. Synchronous execution keeps sequencing and cost boundaries fixed;
-the study does not determine an asynchronous schedule, physical-robot latency, or
-a hardware-independent optimum.
+The procedure is intended for chunked policies with a controllable refinement
+setting. Depending on the architecture, that setting could control integration
+steps, candidate generation, search, or verification effort. This paper
+instantiates only denoising count, and control values should not be compared
+across architectures. Synchronous execution keeps sequencing and measurement
+boundaries fixed; the study does not determine an asynchronous schedule,
+physical-robot latency, or a hardware-independent optimum.
 
 We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
-We evaluate 12 configurations in 480 discovery attempts, then seven frozen
-settings in 1,120 held-out attempts on eight tasks excluded from selection.
-In this worked case, refinement comparisons are prespecified, whereas the
-available execution-prefix comparisons are amended descriptive analyses.
+Predicted chunk length remains fixed at $K=50$ and is not evaluated. We test 12
+configurations in 480 discovery attempts, then seven settings in 1,120 held-out
+attempts on eight tasks excluded from selection. Refinement comparisons were
+prespecified; the available execution-prefix comparisons were added later and
+remain descriptive.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a formulation that connects model-specific generation configuration,
+    \item a formulation connecting a model-specific refinement configuration,
     predicted chunk length, and execution prefix to nominal compute rate and
-    realized attempt expenditure;
-    \item an evaluation procedure that separates discovery, prespecified held-out
+    realized attempt cost;
+    \item an evaluation procedure separating discovery, prespecified held-out
     comparisons, and amended descriptive analyses; and
-    \item a SmolVLA case study showing a large fixed per-call cost, improved
-    held-out success for the primary lower-refinement setting, and unresolved
-    quality preservation for less frequent refresh.
+    \item a SmolVLA case study showing that a large per-call cost can be
+    independent of the refinement control, that lower refinement improves
+    held-out success in the primary comparison, and that quality preservation
+    under less frequent refresh remains unresolved.
 \end{itemize}
 
 \section{Related Work}
@@ -143,37 +144,37 @@ evaluation, and report both nominal compute rate and realized attempt cost.
 This design evaluates the axes available to an adaptive method; it does not test
 whether a fixed schedule is better than adaptation.
 
-\section{Allocating Compute Between Generation and Execution}
+\section{Allocating Deployment-Time Compute Between Refinement and Refresh}
 \label{sec:allocation}
 
-We represent a frozen chunked policy by its model-specific generation
-configuration $\mathbf g$, predicted chunk length $K$, and execution prefix $h$.
+We represent a frozen chunked policy by its model-specific refinement
+configuration $\mathbf r$, predicted chunk length $K$, and execution prefix $h$.
 The following quantities connect those controls to the two cost measures used in
 the evaluation.
 
-\subsection{Compute rate and attempt expenditure}
+\subsection{Nominal Rate and Realized Attempt Cost}
 
 At each policy query, $1\leq h\leq K$ actions are executed and the remaining
 $K-h$ are discarded before replanning. For fixed or reference-calibrated call
-cost, let $F_{\mathrm{gen}}(\mathbf g,K)$ be measured arithmetic under a stated
+cost, let $F_{\mathrm{gen}}(\mathbf r,K)$ be measured arithmetic under a stated
 boundary. The nominal compute rate per simulated control step is
 \[
- b(h,K,\mathbf g)=\frac{F_{\mathrm{gen}}(\mathbf g,K)}{h}.
+ b(h,K,\mathbf r)=\frac{F_{\mathrm{gen}}(\mathbf r,K)}{h}.
 \]
-Let $p_{\mathrm{success}}(h,K,\mathbf g)$ denote expected closed-loop success under the
+Let $p_{\mathrm{success}}(h,K,\mathbf r)$ denote expected closed-loop success under the
 specified task distribution.
 For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
 \begin{equation}
- (h^\star,K^\star,\mathbf g^\star)(B)\in
- \arg\max_{(h,K,\mathbf g)\in\mathcal C:\,b(h,K,\mathbf g)\le B}
- p_{\mathrm{success}}(h,K,\mathbf g).
+ (h^\star,K^\star,\mathbf r^\star)(B)\in
+ \arg\max_{(h,K,\mathbf r)\in\mathcal C:\,b(h,K,\mathbf r)\le B}
+ p_{\mathrm{success}}(h,K,\mathbf r).
  \label{eq:allocation}
 \end{equation}
 A configuration need not exhaust the ceiling. Equation~\ref{eq:allocation}
 defines a within-checkpoint deployment decision; paired rollouts estimate its
 unknown success term.
 
-In the SmolVLA instantiation, $K=50$ and $\mathbf g=(d)$, where $d$ is the
+In the SmolVLA instantiation, $K=50$ and $\mathbf r=(d)$, where $d$ is the
 denoising count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
 For compactness below, $F_{\mathrm{gen}}(d)$ denotes
 $F_{\mathrm{gen}}((d),50)$ and $b(h,d)$ denotes $b(h,50,(d))$.
@@ -183,17 +184,17 @@ $F_{\mathrm{gen}}((d),50)$ and $b(h,d)$ denotes $b(h,50,(d))$.
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
 \caption{Closed-loop execution in the SmolVLA case study. Each policy call
 predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
-the remainder, and replans from a new observation. Here $\mathbf g=(d)$ and
+the remainder, and replans from a new observation. Here $\mathbf r=(d)$ and
 $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
 We distinguish this rate from total arithmetic per attempt. If attempt $e$
 executes $T_e$ actions, let $N_e=\lceil T_e/h\rceil$ be its number of policy
-calls and let $F_{e,j}(\mathbf g,K)$ be the measured cost of call $j$. Attempt
+calls and let $F_{e,j}(\mathbf r,K)$ be the measured cost of call $j$. Attempt
 $e$'s generated-chunk expenditure is
 \begin{equation}
- C_e=\sum_{j=1}^{N_e}F_{e,j}(\mathbf g,K).
+ C_e=\sum_{j=1}^{N_e}F_{e,j}(\mathbf r,K).
  \label{eq:episode-cost}
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
@@ -300,8 +301,12 @@ Calibration uses a fixed input shape. A separate audit using the language length
 observed in the tasks leaves eligibility unchanged under the same absolute
 ceilings (Appendix~\ref{app:shape-audit}). The reference-input arithmetic used
 for selection remains distinct from task-specific arithmetic and elapsed time.
-On the fixed calibration input, reducing $d$ from 10 to 5 lowers measured host
-generation time by 40.5\% while counted arithmetic falls by 8.9\%
+A descriptive affine fit to the six fixed-input host-time means gives
+$T_{\mathrm{gen}}(d)\simeq112.3+52.2d$ ms. Its intercept is 17.7\% of fitted
+$d=10$ host time, compared with 82.1\% for counted arithmetic. The timing
+intercept is an empirical fit under one host boundary, not a component
+attribution. Consistently, reducing $d$ from 10 to 5 lowers measured host time by
+40.5\% while counted arithmetic falls by 8.9\%
 (Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a latency proxy. The
 cost model determines which settings satisfy a ceiling. The following experiments
 test their closed-loop outcomes.
@@ -487,26 +492,30 @@ cost savings; equivalent quality is unresolved.\\
 \FloatBarrier
 \section{Discussion and Conclusion}
 
-The experiments expose two limits on inference allocation. First, reducing a
+The experiments expose two limits on deployment-time compute allocation. First, reducing a
 model's adjustable refinement work may save little when most generation cost is
 fixed. Second, executing more actions from each chunk can reduce attempt cost
 substantially, but it also delays feedback and changes which predicted action
 positions reach the environment. Cost and closed-loop success must therefore be
 measured together rather than inferred from a single per-call setting.
 
-The SmolVLA findings instantiate both limits. Less denoising improved success in
-the primary fixed-prefix comparison, but the other prespecified comparisons did
-not establish a uniform benefit. Changing the execution prefix produced much
-larger cost differences, while the available data could not establish preserved
-quality. The fitted response model also offered no demonstrated selection
-advantage over the post hoc simpler rule that chose the same settings.
+In this SmolVLA case study, lower refinement improved held-out success in the
+primary fixed-prefix comparison: at $h=2$, $d=2$ achieved 139/160 successes and
+$d=5$ achieved 122/160. The other prespecified comparisons did not establish a
+uniform benefit. Executing five rather than two actions before refresh at $d=2$
+reduced arithmetic per attempt by 60.7\%, but the observed one-success difference
+did not establish equivalent quality. Arithmetic and host time also assign very
+different shares to the fitted refinement-independent intercept, so the chosen
+resource coordinate changes which settings appear feasible. The fitted response
+model offered no demonstrated selection advantage over the post hoc simpler rule
+that chose the same settings.
 
 The transferable contribution is an evaluation procedure, rather than a
-universal setting. Within each model, define its generation configuration and
+universal setting. Within each model, define its refinement configuration and
 predicted chunk length, measure every policy-call cost under an explicit
 boundary, vary the execution prefix,
 freeze comparisons before held-out evaluation, and report realized attempt
-expenditure with success. The generation configuration can include integration
+cost with success. A refinement configuration can include integration
 steps, autoregressive reasoning, candidate sampling, search, verification, or
 cache reuse, provided each component's cost is measured. When
 comparing architectures, the meaningful evidence is each model's within-model
