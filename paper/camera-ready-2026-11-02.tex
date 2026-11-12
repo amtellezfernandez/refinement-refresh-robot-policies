@@ -33,11 +33,13 @@ As vision--language--action policies become more computationally demanding,
 deployment under explicit resource constraints poses an allocation problem: how
 should generation be configured, how many actions should a chunk predict, and
 how long should it execute before prediction is refreshed from a new observation?
-We study a controlled slice of this question by holding predicted chunk length
-fixed and varying denoising count and execution prefix, measuring
-both closed-loop success and inference expenditure under a declared counting
-boundary, and distinguishing
-prespecified comparisons from amended descriptive analyses. We use
+We study a controlled slice of this question: predicted chunk length remains
+fixed at $K=50$ and is not evaluated, while denoising count and execution prefix
+vary. We measure closed-loop success and inference expenditure under a declared
+counting boundary, distinguishing comparisons fixed before confirmation outcomes
+from amended descriptive analyses. An execution-order amendment during collection
+left settings, identities, stopping rules, inclusion, and the primary analysis
+unchanged. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
 with denoising count as its refinement control. At a fixed two-action prefix, the
 prespecified comparison found 139/160 successes with two denoising steps versus
@@ -188,8 +190,8 @@ $K=50$.}
 
 We distinguish this rate from total arithmetic per attempt. If attempt $e$
 executes $T_e$ actions, let $N_e=\lceil T_e/h\rceil$ be its number of policy
-calls and let $F_{e,j}(\mathbf g,K)$ be the measured cost of call $j$. Its
-generated-chunk expenditure is
+calls and let $F_{e,j}(\mathbf g,K)$ be the measured cost of call $j$. Attempt
+$e$'s generated-chunk expenditure is
 \begin{equation}
  C_e=\sum_{j=1}^{N_e}F_{e,j}(\mathbf g,K).
  \label{eq:episode-cost}
@@ -234,7 +236,7 @@ We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
 Eligibility uses measured per-$d$ values, not the rounded affine expression.
 For example, $(1,2)$ costs 0.857 times native rate and is ineligible at half-native
 budget, whereas $(2,2)$ costs 0.429 times native. The denoising-independent work
-alone excludes $h=1$ at half-native budget and $h\leq2$ at quarter-native budget.
+alone excludes $h=1$ at half-native budget and $h\leq3$ at quarter-native budget.
 A tighter budget can therefore force a longer execution prefix before any
 quality-based choice is made. This is an implementation-specific arithmetic
 floor under the declared counting boundary, not a universal VLA scaling law.
@@ -283,6 +285,10 @@ to these tasks during unrelated development is not assessed. No equivalence
 margin was prespecified, so similar observed success cannot establish equivalent
 quality. Appendix~\ref{app:analysis-provenance} records which comparisons were
 frozen and which were added later as descriptive analyses.
+The settings, identities, stopping rules, inclusion criteria, and primary
+analysis were fixed before confirmation outcomes. During collection, after 114
+attempts per primary setting, an execution-order amendment changed only the
+remaining order; Appendix~\ref{app:analysis-provenance} gives the phase history.
 
 Conditions are paired by initial state and rollout seed. They also share policy
 noise while their queries occur at the same simulation step. Every denoising
@@ -351,10 +357,11 @@ candidate set, and diagnostics.
 \subsection{Held-out settings and evidence status}
 
 The held-out evaluation applies seven settings to the same 160
-task--state--seed identities, giving 1,120 attempts. Before observing these
-outcomes, we froze three comparisons of $d=2$ against $d=5$, each at a fixed
-$h\in\{1,2,5\}$. The comparison $(2,2)$ versus $(2,5)$ is primary. Comparisons
-that change $h$ were added after outcomes were visible and remain descriptive.
+task--state--seed identities, giving 1,120 attempts. Three comparisons of $d=2$
+against $d=5$, each at a fixed $h\in\{1,2,5\}$, were frozen before confirmation
+outcomes; $(2,2)$ versus $(2,5)$ is primary. Four comparisons were added later
+and remain descriptive: two isolate $h$, one isolates $d$ at $h=1$, and one
+changes both controls.
 Table~\ref{tab:confirmation-grid} reports the seven settings,
 Figure~\ref{fig:success-compute} connects success to compute, and
 Table~\ref{tab:evidence-status} states the interpretation supported by each
@@ -460,12 +467,13 @@ negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}).
 Refreshing every action with $(1,2)$ instead of every two actions gives two
 fewer successes, a difference of $-1.3$ points with 95\% interval
 $[-7.5,+5.0]$, at 83.3 versus 41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
-benefit in these SmolVLA contrasts. Native-relative comparisons, which also change
-denoising, are reported separately in Appendix~\ref{app:confirmation-details}.
+benefit in these SmolVLA contrasts. Two native-relative comparisons are reported
+separately in Appendix~\ref{app:confirmation-details}: one changes only
+denoising at $h=1$, and the other changes both denoising and prefix.
 
-Discovery point estimates favor shorter prefixes at $d=2$
-(Section~\ref{sec:discovery-quality}), but confirmation does not establish that
-advantage on the held-out tasks. Because the two phases use different task sets,
+At $d=2$, discovery gives equal success for $h=1$ and $h=2$, and both exceed
+$h=5$ (Section~\ref{sec:discovery-quality}); confirmation does not establish a
+general prefix advantage on the held-out tasks. Because the two phases use different task sets,
 their different prefix patterns cannot be attributed to task family without a
 shared-task test. The cost model determines feasibility, not the quality ranking
 on new tasks.
@@ -497,6 +505,10 @@ cache reuse, provided each component's cost is measured. When
 comparing architectures, the meaningful evidence is each model's within-model
 allocation result; unlike control values and counting boundaries should not be
 pooled directly.
+The present case study keeps $K=50$ throughout, so it provides no evidence about
+how predicted chunk length itself should be chosen. Because $h\in\{1,2,5\}$,
+90--98\% of each predicted chunk is discarded before the next query; varying
+$K$ is therefore a central untested allocation lever.
 
 \paragraph{Scope and interpretation.}
 Neither varied case-study control isolates a single mechanism. Changing denoising changes numerical
@@ -521,10 +533,18 @@ The first priority is independent replay of the retained primary trajectories.
 A predeclared quality-preservation study should then test the cheaper $(5,2)$
 setting. A controlled stale-input experiment is needed to separate observation
 freshness from action-position effects when $h$ changes. Finally, the same
-within-model design should be repeated across checkpoints, policy architectures,
+within-model design should vary predicted chunk length and be repeated across
+checkpoints, policy architectures,
 benchmark families, and asynchronous or physical-robot execution. Those studies
 can determine when additional generation work is worth paying for and when the
 budget is better spent producing a new chunk from fresher feedback.
+
+\paragraph{Data and code availability.}
+Maintained evaluation infrastructure and migrated analysis components are
+available in BenchStudio at
+\url{https://github.com/maatinstitute/BenchStudio}. The paper-specific records,
+frozen plans, and verification snapshot accompany this submission as supplementary
+material; checkpoint weights and simulator assets are not redistributed.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -764,9 +784,9 @@ half-budget choices are absent from the confirmation plan, so this evaluation
 cannot compare those decisions on held-out tasks.
 
 The selected allocation model has log loss 0.7048, compared with 0.7067 for the
-best compute-only model. This small difference provides no evidence of an added
-predictive advantage. Under the same mean natural-log binary cross-entropy,
-constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
+best compute-only model. It does not beat the trivial constant-$p=0.5$ baseline,
+which scores 0.6931 under the same mean natural-log binary cross-entropy; an
+intercept-only model fitted separately on
 each training fold scores 0.7170. The response-model probabilities should
 therefore not be read as calibrated held-out-task forecasts. The primary test
 evaluates a recommendation shared with simpler selectors, so it does not
@@ -781,7 +801,8 @@ establish an additional benefit from model-based ranking.
 \label{app:confirmation-details}
 
 This subsection first reports success for every held-out task and setting, then
-reports the four execution-prefix comparisons added after collection began.
+reports the four comparisons added after collection began. Of those four, two
+isolate the execution prefix, one isolates denoising, and one changes both.
 The held-out evaluation uses Goal and Object tasks 5--8, states 20--29, and
 rollout seeds 3000 and 3001. Its 80 task--state blocks each contain both seeds and
 all seven configurations.
@@ -839,13 +860,15 @@ retain all state and seed identities needed to reproduce the primary interval.
 at $h=2$, including all attempts. Intervals use the paired state bootstrap
 conditional on the eight tasks and were added after outcomes were observed.
 Timing intervals summarize sampling variation in the observed records; they do
-not account for possible runtime interference during monitoring gaps.}
+not account for possible runtime interference during monitoring gaps. Differences
+are computed from unrounded means, so they need not equal the subtraction of the
+displayed one-decimal means.}
 \label{tab:primary-costs}
 \input{../paper/generated/primary_resources.tex}
 \end{table}
 
 \paragraph{Runtime and environment.}
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\small
 \caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
 Module versions are the loaded versions reported at evaluation time. The
@@ -875,7 +898,6 @@ The retained provenance does not characterize numerical precision and attention
 execution for every model component. Table~\ref{tab:runtime} therefore supports
 the stated model configuration, but not component- or kernel-level claims.
 
-\FloatBarrier
 \subsection{Measurement verification}
 \label{app:verification}
 
@@ -885,7 +907,7 @@ in Table~\ref{tab:verification-summary} constrain recording and execution
 errors; they do not constitute an
 independent outcome replay in a separate simulator.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering\small
 \caption{Internal measurement-verification checklist.}
 \label{tab:verification-summary}
@@ -920,7 +942,7 @@ execution order after 114 attempts per primary setting had been recorded;
 settings, identities, stopping rules, and inclusion remained fixed. Later phases
 completed the original identities, and deduplication retained the earliest
 completed record under the documented phase precedence. The frozen analyses use seed
-20260912. Amended prefix contrasts and diagnostics use seed 20260913 and are
+20260912. Amended contrasts and diagnostics use seed 20260913 and are
 descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 
@@ -931,9 +953,6 @@ runtime provenance, and analysis code. Its bundled verification procedure
 reproduces the primary counts, interval, task table, and descriptive expenditure
 analysis. Documentation specifies the selector features, penalized objective,
 candidate set, and normalization. Checkpoint weights and simulator assets are
-not bundled. The repository additionally retains a completed confirmation
-snapshot and verification code that reproduce the seven-setting resource table,
-original and amended comparisons, and task-level counts. The submitted supplement
-is retained as a separate frozen artifact.
+not bundled. The submitted supplement is retained as a separate frozen artifact.
 
 \end{document}
