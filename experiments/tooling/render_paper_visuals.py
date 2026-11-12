@@ -777,9 +777,10 @@ def success_compute_figure(
     bx.set_xticklabels(["-10", "0", "+10", "+20"])
     bx.set_yticks([])
     bx.axvline(0, color="#555555", lw=0.75, zorder=1)
-    bx.set_title("B  Change in success between settings", loc="left", fontsize=font_size + 0.7,
+    bx.set_title("B  Success difference and attempt cost", loc="left", fontsize=font_size + 0.7,
                  fontweight="bold", pad=5)
-    bx.set_xlabel("Difference in successful attempts per 100\n$\\leftarrow$ fewer successes     no difference     more successes $\\rightarrow$",
+    bx.set_xlabel("Change in successful attempts per 100 (dot = estimate; line = 95% interval)\n"
+                  "$\\leftarrow$ fewer successes     no difference     more successes $\\rightarrow$",
                   fontsize=font_size)
 
     def effect(a, b, sign=1.0):
@@ -795,17 +796,20 @@ def success_compute_figure(
     # next to the refresh rows because they share (2, 2) as a setting.
     rows = [
         (7.35, *effect((5, 2), (5, 5)), "$h=5$",
-         "18.5 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
+         "18.5 $\\rightarrow$ 16.1", gray, False),
         (5.65, *effect((1, 2), (1, 5)), "$h=1$",
-         "89.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
+         "89.1 $\\rightarrow$ 83.3", gray, False),
         (3.95, *effect((2, 2), (2, 5)), "$h=2$",
-         "48.7 $\\rightarrow$ 41.1 TFLOPs/attempt", accent, True),
+         "48.7 $\\rightarrow$ 41.1", accent, True),
         (1.25, *effect((2, 2), (5, 2), sign=-1), "To $h=5$ (less frequent)",
-         "41.1 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
+         "41.1 $\\rightarrow$ 16.1", gray, False),
         (-0.40, *effect((1, 2), (2, 2)), "To $h=1$ (more frequent)",
-         "41.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
+         "41.1 $\\rightarrow$ 83.3", gray, False),
     ]
-    bx.text(-10, 8.85, "Fewer denoising steps: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
+    bx.text(-10, 9.25, "Cost below each row: before $\\rightarrow$ after (TFLOPs/attempt)",
+            fontsize=font_size, color=muted, va="center",
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
+    bx.text(-10, 8.65, "Fewer denoising steps: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
     bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
