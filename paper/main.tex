@@ -30,9 +30,10 @@ MAAT Institute\\
 \begin{abstract}
 As vision--language--action policies become more computationally demanding,
 deployment under explicit resource constraints poses an allocation problem: how
-much inference effort should construct each action chunk, and how long should it
-execute before prediction is refreshed from a new observation? We study this
-question by varying generation effort and execution prefix separately, measuring
+should generation be configured, how many actions should a chunk predict, and
+how long should it execute before prediction is refreshed from a new observation?
+We study a controlled slice of this question by holding predicted chunk length
+fixed and varying denoising count and execution prefix, measuring
 both closed-loop success and inference expenditure under a declared counting
 boundary, and distinguishing
 prespecified comparisons from amended descriptive analyses. We use
@@ -51,23 +52,25 @@ of each comparison must be considered together.
 
 \section{Introduction}
 
-Chunked robot policies make two coupled deployment choices. Each policy call
-constructs an action sequence, the robot executes only a prefix of that sequence,
-and the policy then predicts again from a newer observation. More computation
-inside a call may change the predicted actions. Executing a longer prefix reduces
-the number of calls, but it also delays feedback and commits the robot to later
-actions from an older prediction. The useful setting therefore depends on both
-closed-loop behavior and the total cost of prediction over an attempt.
+Chunked robot policies make three coupled deployment choices: how generation is
+configured, how many actions each call predicts, and how many of those actions
+are executed before the next call. More computation inside a call may change the
+predicted actions. Predicting and executing longer sequences can amortize policy
+calls, but executing a longer prefix delays feedback and commits the robot to
+later actions from an older prediction. The useful configuration therefore
+depends on closed-loop behavior and total prediction cost over an attempt.
 
 We call adjustable computation spent constructing one action chunk
 \emph{refinement}, and obtaining a new observation-conditioned prediction
 \emph{refresh}. The number of actions executed before replanning is the
-\emph{execution prefix}; it controls how often refresh occurs. We ask: \emph{under
-an inference budget, how much computation should construct each chunk, and how
-many actions should the robot execute before the policy refreshes it?}
+\emph{execution prefix}; it controls how often refresh occurs. Predicted chunk
+length determines how many candidate actions the call constructs. We ask:
+\emph{under an inference budget, how should generation be configured, how many
+actions should be predicted, and how many should execute before refresh?}
 
-Our evaluation varies the model-specific refinement setting and execution prefix
-separately. It counts arithmetic across each policy call under a stated boundary
+Our evaluation procedure separates a model-specific refinement configuration,
+predicted chunk length, and execution prefix. The present experiment holds chunk
+length fixed and varies denoising count and execution prefix. It counts arithmetic across each policy call under a stated boundary
 and the resulting expenditure over complete attempts. Discovery tasks are used
 to choose and freeze comparisons; different held-out tasks are then used to
 evaluate them. Any
@@ -102,8 +105,9 @@ tested budgets, so fitting has no demonstrated selection advantage here.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a formulation that connects model-specific generation effort and
-    execution prefix to nominal compute rate and realized attempt expenditure;
+    \item a formulation that connects model-specific generation configuration,
+    predicted chunk length, and execution prefix to nominal compute rate and
+    realized attempt expenditure;
     \item an evaluation procedure that separates discovery, prespecified held-out
     comparisons, and amended descriptive analyses; and
     \item a SmolVLA case study that demonstrates the procedure across 12
@@ -152,75 +156,62 @@ whether a fixed schedule is better than adaptation.
 \section{Allocating Compute Between Generation and Execution}
 \label{sec:allocation}
 
-We compare two deployment choices for a frozen chunked policy: the effort used to
-generate one action chunk and the number of actions executed before requesting a
-new prediction. We represent refinement by an architecture-specific effort
-control $r$ and refresh frequency by the execution prefix $h$. The evaluation
-procedure measures both nominal compute rate and
-realized attempt expenditure, selects comparisons on discovery tasks,
-prespecifies the held-out comparisons, and evaluates them on separate tasks. Success and
-cost are reported together. Later analyses remain explicitly descriptive, and
-arithmetic savings are kept distinct from latency. The SmolVLA case study
-instantiates generation effort with its denoising count.
+For a frozen chunked policy, let $\mathbf g$ denote its model-specific generation
+configuration, $K$ its predicted chunk length, and $h$ its execution prefix.
+The procedure measures nominal compute rate and realized attempt expenditure,
+selects and prespecifies comparisons on discovery tasks, and evaluates them on
+separate tasks. Success and cost are reported together, and arithmetic remains
+distinct from latency. SmolVLA instantiates $\mathbf g$ with denoising count.
 
 \subsection{Compute rate and attempt expenditure}
 
-Let $K$ be the predicted action-chunk length, $1\leq h\leq K$ the execution
-prefix, and
-$r$ the architecture-specific generation-effort control. At each policy query,
-the policy predicts $K$ actions, executes only the first $h$, discards the
-remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
-controls replanning frequency without changing $K$. We reserve $T_e$ for the
-number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
-measured arithmetic of one generation under a stated counting boundary.
-The study compares configurations $(h,r)$ within a policy; it does not assume
-that numerical values of $r$ are comparable across architectures. Ignoring a
-possibly partial final prefix, the nominal compute rate per simulated control
-step is
+At each policy query, $1\leq h\leq K$ actions are executed and the remaining
+$K-h$ are discarded before replanning. For fixed or reference-calibrated call
+cost, let $F_{\mathrm{gen}}(\mathbf g,K)$ be measured arithmetic under a stated
+boundary. The nominal compute rate per simulated control step is
 \[
- b(h,r)=\frac{F_{\mathrm{gen}}(r)}{h}.
+ b(h,K,\mathbf g)=\frac{F_{\mathrm{gen}}(\mathbf g,K)}{h}.
 \]
-Let $p_{\mathrm{success}}(h,r)$ denote expected closed-loop success under the
+Let $p_{\mathrm{success}}(h,K,\mathbf g)$ denote expected closed-loop success under the
 specified task distribution.
 For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
 \begin{equation}
- (h^\star,r^\star)(B)\in
- \arg\max_{(h,r)\in\mathcal C:\,b(h,r)\le B}
- p_{\mathrm{success}}(h,r).
+ (h^\star,K^\star,\mathbf g^\star)(B)\in
+ \arg\max_{(h,K,\mathbf g)\in\mathcal C:\,b(h,K,\mathbf g)\le B}
+ p_{\mathrm{success}}(h,K,\mathbf g).
  \label{eq:allocation}
 \end{equation}
-A configuration need not exhaust the ceiling. This is a deployment compute-rate
-constraint for a fixed checkpoint, rather than a training-plus-deployment
-objective. The equation defines the allocation decision; the experiments below
-estimate its unknown success term from paired rollouts.
+A configuration need not exhaust the ceiling. Equation~\ref{eq:allocation}
+defines a within-checkpoint deployment decision; paired rollouts estimate its
+unknown success term.
 
-In the SmolVLA instantiation, $K=50$ and $r=d$, where $d$ is the denoising
-count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
-Each policy call predicts a fixed-length chunk, executes only the first $h$
-actions, discards the remainder, and refreshes from the resulting observation.
-The denoising count controls generation effort inside the policy call, while $h$
-controls how frequently the policy receives a new observation.
+In the SmolVLA instantiation, $K=50$ and $\mathbf g=(d)$, where $d$ is the
+denoising count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
+For compactness below, $b(h,d)$ denotes $b(h,50,(d))$.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{figures/closed_loop_policy_diagram.png}
 \caption{Closed-loop execution in the SmolVLA case study. Each policy call
 predicts $K$ actions after $d$ denoising steps, executes the first $h$, discards
-the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
+the remainder, and replans from a new observation. Here $\mathbf g=(d)$ and
+$K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
-We distinguish this rate from total arithmetic per attempted episode. In the
-case study, generation cost is fixed for a given $r$. If attempt $e$ executes
-$T_e$ actions, its generated-chunk expenditure is
+We distinguish this rate from total arithmetic per attempt. If attempt $e$
+executes $T_e$ actions, let $N_e=\lceil T_e/h\rceil$ be its number of policy
+calls and let $F_{e,j}(\mathbf g,K)$ be the measured cost of call $j$. Its
+generated-chunk expenditure is
 \begin{equation}
- C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(r).
+ C_e=\sum_{j=1}^{N_e}F_{e,j}(\mathbf g,K).
  \label{eq:episode-cost}
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
-is used. If generation cost varies across calls, as it can for early-exit,
-sampling, search, or verification procedures, attempt expenditure must instead
-sum the measured cost of every call. All-attempt means include unsuccessful
+is used. For the case study, each call has fixed cost for a given $d$, so this
+reduces to $C_e=\lceil T_e/h\rceil F_{\mathrm{gen}}(d,50)$. The summed form also
+covers variable-cost early exit, sampling, search, verification, or language
+generation. All-attempt means include unsuccessful
 episodes. Different trajectories and termination times can therefore change
 expenditure at the same nominal rate. FLOPs, host elapsed time, and CUDA-stream
 time retain separate units and measurement boundaries.
@@ -513,17 +504,19 @@ fitted response model also selected the same settings as a simple cost-aware
 rule, so fitting has no demonstrated selection advantage here.
 
 The transferable contribution is an evaluation procedure, rather than a
-universal setting. Within each model, define its adjustable generation effort,
-measure policy-call cost under an explicit boundary, vary the execution prefix,
+universal setting. Within each model, define its generation configuration and
+predicted chunk length, measure every policy-call cost under an explicit
+boundary, vary the execution prefix,
 freeze comparisons before held-out evaluation, and report realized attempt
-expenditure with success. Generation effort can represent integration steps,
-candidate sampling, search, or verification, provided its cost is measured. When
+expenditure with success. The generation configuration can include integration
+steps, autoregressive reasoning, candidate sampling, search, verification, or
+cache reuse, provided each component's cost is measured. When
 comparing architectures, the meaningful evidence is each model's within-model
 allocation result; unlike control values and counting boundaries should not be
 pooled directly.
 
 \paragraph{Scope and interpretation.}
-Neither control isolates a single mechanism. Changing denoising changes numerical
+Neither varied case-study control isolates a single mechanism. Changing denoising changes numerical
 integration, while changing the prefix changes both observation age and executed
 action positions. The primary mechanism therefore remains unresolved. The study
 uses one checkpoint, twelve tasks, and synchronous simulation. Its intervals are
