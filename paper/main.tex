@@ -31,14 +31,14 @@ MAAT Institute\\
 \begin{abstract}
 Chunked vision--language--action policies expose three coupled deployment
 controls: generation configuration, predicted chunk length, and the number of
-actions executed before replanning. We provide an evaluation procedure covering
-all three and study a controlled two-axis case: predicted chunk length remains
+actions executed before replanning. We formulate this three-way allocation
+problem and instantiate a controlled two-axis evaluation: predicted chunk length remains
 fixed at $K=50$ and is not evaluated, while denoising count and execution prefix
 vary. We measure closed-loop success and inference expenditure under a declared
 counting boundary, distinguishing comparisons fixed before held-out outcomes
-from amended descriptive analyses. An execution-order amendment during collection
-left settings, identities, stopping rules, inclusion, and the primary analysis
-unchanged. We use
+from amended descriptive analyses. The primary comparisons were fixed before
+held-out outcomes; a later execution-order amendment did not change their settings
+or analysis. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
 with denoising count as its refinement control. At a fixed two-action prefix, the
 prespecified comparison found 139/160 successes with two denoising steps versus
@@ -90,6 +90,8 @@ a hardware-independent optimum.
 We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
 We evaluate 12 configurations in 480 discovery attempts, then seven frozen
 settings in 1,120 held-out attempts on eight tasks excluded from selection.
+In this worked case, refinement comparisons are prespecified, whereas the
+available execution-prefix comparisons are amended descriptive analyses.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
@@ -98,8 +100,9 @@ The contributions are:
     realized attempt expenditure;
     \item an evaluation procedure that separates discovery, prespecified held-out
     comparisons, and amended descriptive analyses; and
-    \item a SmolVLA case study that demonstrates the procedure across 12
-    discovery configurations and seven held-out settings.
+    \item a SmolVLA case study showing a large fixed per-call cost, improved
+    held-out success for the primary lower-refinement setting, and unresolved
+    quality preservation for less frequent refresh.
 \end{itemize}
 
 \section{Related Work}
@@ -203,52 +206,6 @@ episodes. Different trajectories and termination times can therefore change
 expenditure at the same nominal rate. FLOPs, host elapsed time, and CUDA-stream
 time retain separate units and measurement boundaries.
 
-\subsection{A fixed-cost floor in the SmolVLA implementation}
-\label{sec:fixed-cost-floor}
-
-For the case-study checkpoint and reference input, generation cost separates
-into a denoising-independent term and a term that grows linearly with $d$. To
-rounding, the measured arithmetic is
-\[
- F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
-\]
-at all six calibrated denoising settings. Native generation at $d=10$ costs
-641.675 GFLOPs, of which 82.1\% is independent of $d$. Halving denoising from
-ten to five saves 8.9\% of counted generation work; reducing it to two saves
-14.3\%. Equivalently, relative to native deployment $(h,d)=(1,10)$,
-\[
- \frac{b(h,d)}{b_{\mathrm{native}}}
- \simeq \frac{0.821+0.179(d/10)}{h}.
-\]
-Here $b_{\mathrm{native}}=b(1,10)$.
-
-Profiling counts matrix products, convolutions, and attention across vision,
-language prefill, and the action expert, using two FLOPs per multiply-add.
-Embedding lookups, normalization, activations, elementwise arithmetic, and
-external preprocessing are excluded. We therefore refer to \emph{dense neural
-arithmetic}, rather than every scalar operation. Calibration uses one real
-development observation and fixed tensor shapes; Appendix~\ref{app:generation-calibration}
-gives the procedure.
-
-We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
-Eligibility uses measured per-$d$ values, not the rounded affine expression.
-For example, $(1,2)$ costs 0.857 times native rate and is ineligible at half-native
-budget, whereas $(2,2)$ costs 0.429 times native. The denoising-independent work
-alone excludes $h=1$ at half-native budget and $h\leq3$ at quarter-native budget.
-A tighter budget can therefore force a longer execution prefix before any
-quality-based choice is made. This is an implementation-specific arithmetic
-floor under the declared counting boundary, not a universal VLA scaling law.
-
-Calibration uses a fixed input shape. A separate audit using the language lengths
-observed in the tasks leaves eligibility unchanged under the same absolute
-ceilings (Appendix~\ref{app:shape-audit}). The reference-input arithmetic used
-for selection remains distinct from task-specific arithmetic and elapsed time.
-On the fixed calibration input, reducing $d$ from 10 to 5 lowers measured host
-generation time by 40.5\% while counted arithmetic falls by 8.9\%
-(Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a latency proxy. The
-cost model determines which settings satisfy a ceiling. The following experiments
-test their closed-loop outcomes.
-
 \section{SmolVLA Case Study}
 \label{sec:method}
 
@@ -303,6 +260,52 @@ discovery tasks or eight confirmation tasks, and secondary intervals are not
 adjusted for multiple comparisons. Arithmetic includes every generated chunk,
 including failed attempts and partly consumed final prefixes. Appendix~\ref{app:fixed-timing}
 reports timing separately.
+
+\subsection{A fixed-cost floor in the SmolVLA implementation}
+\label{sec:fixed-cost-floor}
+
+For the case-study checkpoint and reference input, generation cost separates
+into a denoising-independent term and a term that grows linearly with $d$. To
+rounding, the measured arithmetic is
+\[
+ F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
+\]
+at all six calibrated denoising settings. Native generation at $d=10$ costs
+641.675 GFLOPs, of which 82.1\% is independent of $d$. Halving denoising from
+ten to five saves 8.9\% of counted generation work; reducing it to two saves
+14.3\%. Equivalently, relative to native deployment $(h,d)=(1,10)$,
+\[
+ \frac{b(h,d)}{b_{\mathrm{native}}}
+ \simeq \frac{0.821+0.179(d/10)}{h}.
+\]
+Here $b_{\mathrm{native}}=b(1,10)$.
+
+Profiling counts matrix products, convolutions, and attention across vision,
+language prefill, and the action expert, using two FLOPs per multiply-add.
+Embedding lookups, normalization, activations, elementwise arithmetic, and
+external preprocessing are excluded. We therefore refer to \emph{dense neural
+arithmetic}, rather than every scalar operation. Calibration uses one real
+development observation and fixed tensor shapes; Appendix~\ref{app:generation-calibration}
+gives the procedure.
+
+We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
+Eligibility uses measured per-$d$ values, not the rounded affine expression.
+For example, $(1,2)$ costs 0.857 times native rate and is ineligible at half-native
+budget, whereas $(2,2)$ costs 0.429 times native. The denoising-independent work
+alone excludes $h=1$ at half-native budget and $h\leq3$ at quarter-native budget.
+A tighter budget can therefore force a longer execution prefix before any
+quality-based choice is made. This is an implementation-specific arithmetic
+floor under the declared counting boundary, not a universal VLA scaling law.
+
+Calibration uses a fixed input shape. A separate audit using the language lengths
+observed in the tasks leaves eligibility unchanged under the same absolute
+ceilings (Appendix~\ref{app:shape-audit}). The reference-input arithmetic used
+for selection remains distinct from task-specific arithmetic and elapsed time.
+On the fixed calibration input, reducing $d$ from 10 to 5 lowers measured host
+generation time by 40.5\% while counted arithmetic falls by 8.9\%
+(Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a latency proxy. The
+cost model determines which settings satisfy a ceiling. The following experiments
+test their closed-loop outcomes.
 
 \subsection{Discovery: observed success is not monotonic in refinement}
 \label{sec:discovery-quality}
