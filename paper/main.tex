@@ -134,6 +134,8 @@ holds the checkpoint, hardware, and synchronous execution path fixed so that the
 effects of refinement and execution prefix can be compared within one system.
 
 \paragraph{Choosing when to refresh.}
+Action chunking predicts multi-action sequences and can also define the action
+space used for reinforcement learning \cite{qchunking}.
 Adaptive Action Chunking uses action entropy to choose how much of a predicted
 chunk to execute \cite{adaptivechunking}. DVAC uses variation observed during
 denoising to adapt the execution prefix \cite{dvac}. ElegantVLA schedules
