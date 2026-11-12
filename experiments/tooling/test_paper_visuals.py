@@ -179,7 +179,7 @@ class PaperVisualTests(unittest.TestCase):
         )
         np.testing.assert_allclose(setting_points, expected_settings)
         self.assertEqual(settings.get_ylim(), (72, 90))
-        self.assertIn("Mean TFLOPs per attempt", settings.get_xlabel())
+        self.assertIn("Mean TFLOPs/attempt", settings.get_xlabel())
         effect_points = np.vstack(
             [collection.get_offsets()[0] for collection in effects.collections]
         )

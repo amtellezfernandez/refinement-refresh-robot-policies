@@ -730,7 +730,7 @@ def success_compute_figure(
     ax.set_yticklabels(["75%", "80%", "85%", "90%"])
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
-    ax.set_xlabel("Mean TFLOPs per attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
+    ax.set_xlabel("Mean TFLOPs/attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
     ax.set_ylabel("")
     fig.text(0.012, 0.55, "Success (%)", rotation=90, fontsize=font_size,
              ha="left", va="center")
