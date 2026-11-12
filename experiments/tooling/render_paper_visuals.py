@@ -717,7 +717,7 @@ def success_compute_figure(
     fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
     grid = fig.add_gridspec(
         1, 2, width_ratios=[0.96, 1.14], wspace=0.23,
-        left=0.115, right=0.98, top=0.92, bottom=0.18,
+        left=0.075, right=0.98, top=0.92, bottom=0.18,
     )
 
     # Panel A: every held-out setting on realized mean attempt arithmetic.
@@ -731,7 +731,9 @@ def success_compute_figure(
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
     ax.set_xlabel("Mean TFLOPs per attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
-    ax.set_ylabel("Success (%)", fontsize=font_size, labelpad=2)
+    ax.set_ylabel("")
+    fig.text(0.012, 0.55, "Success (%)", rotation=90, fontsize=font_size,
+             ha="left", va="center")
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
