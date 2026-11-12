@@ -755,17 +755,18 @@ def success_compute_figure(
             linewidth=0.65, zorder=3,
         )
         dy = offsets[cell]
-        label_alignment = "right" if cell == (1, 10) else "center"
+        label_alignment = "left" if cell == (1, 10) else "center"
+        label_dx = 3 if cell == (1, 10) else 0
         label_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.05}
         ax.annotate(
             f"{rate:.0f}%", (attempt_cost, rate),
-            xytext=(0, dy + 10), textcoords="offset points",
+            xytext=(label_dx, dy + 10), textcoords="offset points",
             ha=label_alignment, va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
         ax.annotate(
             f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
-            xytext=(0, dy), textcoords="offset points",
+            xytext=(label_dx, dy), textcoords="offset points",
             ha=label_alignment, va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
