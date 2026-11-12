@@ -395,6 +395,7 @@ contrasts appear in Tables~\ref{tab:confirmation-grid}
 and~\ref{tab:confirmation-secondary}.}
 \label{fig:success-compute}
 \end{figure}
+\FloatBarrier
 
 \begin{minipage}{\linewidth}
 \paragraph{Primary result: lower refinement improves success while reducing compute.}
@@ -407,15 +408,11 @@ $h=2$, the additional denoising is both less successful and more expensive.
 \end{minipage}
 
 \paragraph{The primary effect is consistent across tasks, but not across prefixes.}
-The result is not driven by one task: seven tasks favor $d=2$ and one ties, and
-the paired identities contain 24 wins and seven losses. Nevertheless, it is not
-a general denoising trend. At $h=1$ and $h=5$, the point estimates also favor
-$d=2$, but their intervals cross zero. The response model predicted the primary
-direction but understated its magnitude ($+4.0$ predicted versus $+10.6$
-observed), so these data do not demonstrate calibrated forecasting.
-Appendix~\ref{app:primary-costs} reports task sensitivity, trajectory lengths,
-and expenditure intervals. Counted arithmetic should not be interpreted as
-physical latency.
+Seven tasks favor $d=2$, one ties, and the paired identities contain 24 wins and
+seven losses. The effect is not uniform across prefixes: at $h=1$ and $h=5$,
+the estimates favor $d=2$, but their intervals cross zero. The response model
+predicted the primary direction but understated its magnitude ($+4.0$ versus
+$+10.6$ points), so these data do not demonstrate calibrated forecasting.
 \paragraph{Longer execution prefixes save substantially more compute, with
 quality unresolved.}
 The descriptive prefix comparisons ask whether acting longer before replanning
