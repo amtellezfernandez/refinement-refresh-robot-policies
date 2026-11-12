@@ -756,11 +756,12 @@ def success_compute_figure(
         )
         dy = offsets[cell]
         label_alignment = "left" if cell == (1, 10) else "center"
-        label_dx = 3 if cell == (1, 10) else 0
+        label_dx = 1 if cell == (1, 10) else 0
+        percentage_dy = dy + (7 if cell == (1, 10) else 10)
         label_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.05}
         ax.annotate(
             f"{rate:.0f}%", (attempt_cost, rate),
-            xytext=(label_dx, dy + 10), textcoords="offset points",
+            xytext=(label_dx, percentage_dy), textcoords="offset points",
             ha=label_alignment, va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
