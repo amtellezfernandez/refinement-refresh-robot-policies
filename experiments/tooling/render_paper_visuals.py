@@ -794,15 +794,15 @@ def success_compute_figure(
     # same (h, d) transition notation.  The primary h=2 refinement row sits
     # next to the refresh rows because they share (2, 2) as a setting.
     rows = [
-        (7.35, *effect((5, 2), (5, 5)), "$h=5$: $(5,5) \\rightarrow (5,2)$",
+        (7.35, *effect((5, 2), (5, 5)), "$h=5$",
          "18.5 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
-        (5.65, *effect((1, 2), (1, 5)), "$h=1$: $(1,5) \\rightarrow (1,2)$",
+        (5.65, *effect((1, 2), (1, 5)), "$h=1$",
          "89.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
-        (3.95, *effect((2, 2), (2, 5)), "$h=2$: $(2,5) \\rightarrow (2,2)$",
+        (3.95, *effect((2, 2), (2, 5)), "$h=2$",
          "48.7 $\\rightarrow$ 41.1 TFLOPs/attempt", accent, True),
-        (1.25, *effect((2, 2), (5, 2), sign=-1), "Less frequent: $(2,2) \\rightarrow (5,2)$",
+        (1.25, *effect((2, 2), (5, 2), sign=-1), "To $h=5$ (less frequent)",
          "41.1 $\\rightarrow$ 16.1 TFLOPs/attempt", gray, False),
-        (-0.40, *effect((1, 2), (2, 2)), "More frequent: $(2,2) \\rightarrow (1,2)$",
+        (-0.40, *effect((1, 2), (2, 2)), "To $h=1$ (more frequent)",
          "41.1 $\\rightarrow$ 83.3 TFLOPs/attempt", gray, False),
     ]
     bx.text(-10, 8.85, "Fewer denoising steps: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
