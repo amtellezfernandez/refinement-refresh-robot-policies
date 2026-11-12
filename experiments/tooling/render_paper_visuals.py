@@ -809,11 +809,11 @@ def success_compute_figure(
         (-0.40, *effect((1, 2), (2, 2)), r"$(h=2\rightarrow1,d=2)$",
          "41.1$\\rightarrow$83.3", gray, False),
     ]
-    bx.text(-10, 9.15, "Denoising comparisons", fontsize=font_size + 0.4,
+    bx.text(-10, 9.15, "Reducing denoising steps", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
     bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
-    bx.text(-10, 2.75, "Refresh comparisons",
+    bx.text(-10, 2.75, "Changing refresh frequency",
             fontsize=font_size + 0.4, color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
 
