@@ -556,13 +556,13 @@ can determine when additional generation work is worth paying for and when the
 budget is better spent producing a new chunk from fresher feedback.
 
 \paragraph{Data and code availability.}
-Maintained evaluation infrastructure and migrated analysis components are
-available in BenchStudio at
-\url{https://github.com/maatinstitute/BenchStudio}. Paper-specific records,
-frozen plans, and the verification snapshot are available in the companion
-repository at
-\url{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}.
-Checkpoint weights and simulator assets are not redistributed.
+Maintained evaluation infrastructure, the camera-ready manuscript, and compact
+confirmation records sufficient to reproduce the held-out totals and paired
+primary comparison are available in the BenchStudio worked example at
+\url{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}.
+The example also records cryptographic identities for the retained historical
+archive. Action tensors, images, checkpoint weights, and simulator assets are
+not redistributed.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -869,8 +869,8 @@ There are 24 paired wins and seven
 losses. In a descriptive leave-one-task-out sensitivity analysis, the
 equally weighted difference over the remaining seven tasks stays positive,
 ranging from 9.3 to 12.1 percentage points. This post-outcome analysis does not
-extend inference to a new task population. The companion repository's paired records
-retain all state and seed identities needed to reproduce the primary interval.
+extend inference to a new task population. The BenchStudio example's paired episode-level records retain all state and seed
+identities needed to reproduce the primary counts and comparison.
 
 \begin{table}[htbp]
 \centering\small
@@ -907,7 +907,7 @@ Precision controls & Autocast and TF32 disabled; deterministic algorithms enable
 Attention and reuse & Eager language/action attention with float32 scores; within-generation KV cache enabled\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
-Evaluator provenance & Source revision and full digest retained in companion repository\\
+Evaluator provenance & Pinned source revision and retained source-tree digest\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -968,12 +968,13 @@ descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 
 \paragraph{Analysis artifact.}
-The companion repository contains the episode and action records, plans,
-calibrations, frozen predictions, runtime provenance, and analysis code. Its
-verification procedure reproduces the primary counts, interval, task table, and
-descriptive expenditure analysis; documentation specifies the selector features,
-objective, candidate set, and normalization. Checkpoint weights and simulator
-assets are omitted.
+The public BenchStudio example contains compact episode-level outcomes and a
+verification script that reproduces the held-out totals, paired identities, and
+primary success difference. The retained study archive additionally contains the
+detailed action records, plans, calibrations, frozen predictions, runtime
+provenance, and analysis inputs used for this manuscript. Its cryptographic
+identities are recorded in the public example. Checkpoint weights, action tensors,
+images, and simulator assets are omitted.
 }
 
 \end{document}

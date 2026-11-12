@@ -84,7 +84,7 @@ cite the paper and this version of its artifacts. A copyable entry is:
   title   = {Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies},
   year    = {2026},
   note    = {NeurIPS 2026 Workshop on Post-Training Adaptation of Robot Foundation Models},
-  url     = {https://github.com/amtellezfernandez/refinement-refresh-robot-policies}
+  url     = {https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}
 }
 ```
 
