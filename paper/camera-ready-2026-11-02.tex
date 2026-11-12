@@ -43,7 +43,7 @@ Denoising count is the refinement control and chunk length is fixed at $K=50$.
 We report closed-loop success alongside dense neural arithmetic and host time
 under explicit measurement boundaries. Three denoising comparisons
 were selected on discovery tasks before 1,120 held-out attempts; execution-prefix
-comparisons were defined after evaluation and are descriptive. Arithmetic and latency
+comparisons were defined after held-out outcomes were available and are descriptive. Arithmetic and latency
 characterize per-call cost differently: at $d=10$, 82.1\% of counted arithmetic
 is independent of denoising, whereas a descriptive affine fit to fixed-input host
 time assigns 17.7\% to its intercept. At $h=2$, $d=2$ succeeds on 139/160
@@ -220,13 +220,12 @@ time retain separate units and measurement boundaries.
 
 This section applies the allocation procedure to adapt the inference
 configuration of one frozen checkpoint. Discovery maps the candidate settings
-and freezes the comparisons; confirmation then tests those comparisons on tasks
-excluded from selection.
+and selects the comparisons; the held-out evaluation then tests those
+comparisons on tasks excluded from selection.
 
-\subsection{Discovery and confirmation design}
+\subsection{Discovery and held-out evaluation}
 
-We call evaluation on tasks excluded from selection \emph{held-out
-confirmation}.
+Tasks excluded from selection constitute the \emph{held-out evaluation}.
 
 We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
 chunk length is fixed at $K=50$, and the model's native deployment uses
@@ -243,7 +242,7 @@ selection rather than final evaluation.
 
 After discovery, we freeze three denoising comparisons, one at each compute
 ceiling. Their selected settings and comparators, plus native deployment, produce
-seven distinct settings. Confirmation evaluates all seven on eight Goal and
+seven distinct settings. The held-out evaluation applies all seven to eight Goal and
 Object tasks excluded from selection. Each task has ten initial states and two
 rollout seeds, giving 160 attempts per setting and 1,120 in total. Prior exposure
 to these tasks during unrelated development is not assessed. No equivalence
@@ -251,7 +250,7 @@ margin was prespecified, so similar observed success cannot establish equivalent
 quality. Appendix~\ref{app:analysis-status} distinguishes prespecified
 comparisons from analyses defined after outcomes were visible. The settings,
 identities, stopping rules, inclusion criteria, and primary analysis were fixed
-before confirmation outcomes. After 114 attempts per primary setting, only the
+before held-out outcomes. After 114 attempts per primary setting, only the
 execution order changed; the planned identities and analyses remained fixed.
 
 Conditions are paired by initial state and rollout seed. They also share policy
@@ -265,7 +264,7 @@ Success gives equal weight to each task; because every task has the same number
 of states and seeds, this equals the overall success fraction. Descriptive 95\%
 intervals use 20,000 bootstrap draws of states within the fixed tasks while
 retaining paired seeds and settings. The intervals condition on the four
-discovery tasks or eight confirmation tasks, and secondary intervals are not
+discovery tasks or eight held-out tasks, and secondary intervals are not
 adjusted for multiple comparisons. Arithmetic includes every generated chunk,
 including failed attempts and partly consumed final prefixes. Appendix~\ref{app:fixed-timing}
 reports timing separately.
@@ -346,7 +345,7 @@ resource-coordinate analysis.
 Discovery freezes $(5,2)$, $(2,2)$, and $(1,2)$ at the quarter-, half-, and
 full-native ceilings, with $(5,5)$, $(2,5)$, and $(1,5)$ as their respective
 comparators; $(2,2)$ versus $(2,5)$ is primary. Every selected setting is an
-observed grid point, so confirmation tests transfer to new tasks rather than
+observed grid point, so the held-out evaluation tests transfer to new tasks rather than
 extrapolation. Each pair varies denoising at a fixed prefix and compares two
 feasible settings; the pair does not divide an identical compute rate.
 
@@ -436,7 +435,7 @@ prefix comparisons show why cost and quality must be reported separately: the
 cost ranking is clear, whereas the quality ranking is not. Because these
 comparisons were defined after outcomes were visible, they motivate a future
 prespecified study rather than support a general recommendation about refresh
-frequency. They also cannot reconcile the different discovery and confirmation
+frequency. They also cannot reconcile the different discovery and held-out
 patterns, which were measured on different task sets.
 
 Appendix~\ref{app:confirmation-details} reports the comparison status and
@@ -456,7 +455,7 @@ and executed action positions. The study uses one checkpoint, twelve tasks, and
 synchronous simulation; its intervals are conditional on the sampled tasks, and
 no equivalence margin was prespecified. Counted arithmetic excludes some
 operation classes and is not a latency proxy. Recorded outcomes pass source-tracing
-and consistency checks, but the full confirmation trajectories were not
+and consistency checks, but the full held-out trajectories were not
 replayed in an independent, version-matched simulator. Appendix~\ref{app:verification}
 defines this validation boundary.
 
@@ -498,8 +497,8 @@ when compute should refine the current prediction and when it should produce a
 new prediction from fresher feedback.
 
 \section*{Data and Code Availability}
-Evaluation code and compact confirmation records sufficient to reproduce the
-held-out totals and paired primary comparison are available at
+Evaluation code and paired held-out outcomes sufficient to reproduce the totals
+and primary comparison are available at
 \url{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}.
 Checkpoint weights, simulator assets, action tensors, and images are not
 redistributed.
@@ -586,8 +585,8 @@ estimate when deployment amortizes this search cost.
 
 All measurements use an RTX 4060 Ti. Process samples taken approximately every
 five seconds show no unrelated sampled CUDA compute during calibration and
-discovery; display processes remain. Coverage is incomplete during confirmation,
-so aggregate confirmation rollout times are descriptive. Host and CUDA-stream
+discovery; display processes remain. Coverage is incomplete during the held-out
+evaluation, so its aggregate rollout times are descriptive. Host and CUDA-stream
 generation intervals are measured separately from the outer synchronous rollout
 interval, and warm-up is excluded.
 
@@ -659,7 +658,7 @@ of length 20. The checkpoint exposes seven-dimensional actions and generates a
 50-action chunk. Evaluation fixes batch size, image preprocessing, state/action
 dimensions, and predicted chunk length. The tokenizer pads language only to the
 longest sequence in a batch. Reconstructing the declared task strings with the pinned
-tokenizer gives 15--17 tokens for discovery and 5--12 for confirmation, versus 20
+tokenizer gives 15--17 tokens for discovery and 5--12 for held-out evaluation, versus 20
 in calibration. We profile every distinct evaluated length for
 $d\in\{2,5,10\}$, preserving all other shapes, and test eligibility against
 the prespecified absolute ceilings. Table~\ref{tab:shape-audit} reports the range
@@ -668,7 +667,7 @@ over evaluated lengths 5--17 against the original length-20 value.
 \begin{table}[htbp]
 \centering\small
 \caption{Dense generation arithmetic across evaluated language shapes. Budget
-tests retain the prespecified absolute ceilings; none of the reported confirmation
+tests retain the prespecified absolute ceilings; none of the reported held-out
 configurations changes eligibility.}
 \label{tab:shape-audit}
 \begin{tabular}{@{}crS[table-format=3.1]c@{}}
@@ -687,7 +686,7 @@ evaluated lengths; shorter inputs reduce rather than increase its counted work.
 The audit changes neither policy execution nor the frozen selections.
 
 \FloatBarrier
-\section{Frozen Selection and Diagnostic Analyses}
+\section{Selection and Diagnostic Analyses}
 \label{app:selectors}
 
 \subsection{Frozen selection procedure}
@@ -707,7 +706,7 @@ ceiling. Ties use compute and lexicographic order.
 \begin{table}[htbp]
 \centering\small
 \caption{Discovery-based selector choices.
-The learned choices and comparisons were frozen before confirmation; additional
+The learned choices and comparisons were fixed before held-out evaluation; additional
 selector baselines were documented after collection began.
 The empirical selector uses the measured grid; other selectors use the declared
 candidate set. The simple rule exactly matches the learned choices. The selected
@@ -734,9 +733,9 @@ descriptive, task-conditional, and unadjusted.}
 
 The simple rule defined in Section~\ref{sec:prediction} reproduces every learned
 recommendation (Table~\ref{tab:selectors});
-confirmation outcomes cannot distinguish these selectors at the tested budgets.
+held-out outcomes cannot distinguish these selectors at the tested budgets.
 The compute-only choices use the original ridge-10 fit. Its quarter- and
-half-budget choices are absent from the confirmation plan, so this evaluation
+half-budget choices are absent from the held-out plan, so this evaluation
 cannot compare those decisions on held-out tasks.
 
 The selected allocation model has log loss 0.7048, compared with 0.7067 for the
@@ -753,7 +752,7 @@ establish an additional benefit from model-based ranking.
 \section{Held-Out Outcomes and Verification}
 \label{app:held-out-details}
 
-\subsection{Complete confirmation outcomes}
+\subsection{Complete held-out outcomes}
 \label{app:confirmation-details}
 
 This subsection first reports success for every held-out task and setting, then
@@ -765,7 +764,7 @@ seeds. All seven configurations appear in every block.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Confirmation successes by task and configuration. Each task row has
+\caption{Held-out successes by task and configuration. Each task row has
 20 attempts: ten paired initial states, each with two rollout seeds. The total
 aggregates 160 attempts per configuration. The primary
 $(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
@@ -868,7 +867,7 @@ independent outcome replay in a separate simulator.
 \toprule
 Check & Evidence\\
 \midrule
-Canonical coverage & 1,120 confirmation attempts and 171,805 actions; the
+Canonical coverage & 1,120 held-out attempts and 171,805 actions; the
 primary subset remains 320 attempts and 50,451 actions.\\
 Pairing and dispatch & Planned identities, paired initial states and
 observations, generation counts, denoising counts, and applied actions reconcile.\\
@@ -890,7 +889,7 @@ inspection remain outside this audit.\\
 \label{app:analysis-status}
 
 The three refinement comparisons, paired identities, stopping rules, inclusion
-criteria, and primary analysis were fixed before confirmation outcomes. After
+criteria, and primary analysis were fixed before held-out outcomes. After
 114 attempts per primary setting, the remaining execution order changed, while
 the planned identities and analyses stayed fixed. The refinement analyses use
 seed 20260912. Contrasts and diagnostics defined after collection began use seed
