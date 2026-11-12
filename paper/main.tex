@@ -1,7 +1,9 @@
 \documentclass{article}
 \PassOptionsToPackage{numbers,sort&compress}{natbib}
-\usepackage[final,dblblindworkshop]{../shared/neurips_2026}
-\workshoptitle{Post-Training Adaptation of Robot Foundation Models}
+\usepackage[final,main]{../shared/neurips_2026}
+\makeatletter
+\renewcommand{\@notice}{}
+\makeatother
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{microtype}
@@ -41,7 +43,7 @@ Denoising count is the refinement control and chunk length is fixed at $K=50$.
 We report closed-loop success alongside dense neural arithmetic and host time
 under explicit measurement boundaries. Three denoising comparisons
 were selected on discovery tasks before 1,120 held-out attempts; execution-prefix
-comparisons were added later and are amended descriptive. Arithmetic and latency
+comparisons were defined after evaluation and are descriptive. Arithmetic and latency
 characterize per-call cost differently: at $d=10$, 82.1\% of counted arithmetic
 is independent of denoising, whereas a descriptive affine fit to fixed-input host
 time assigns 17.7\% to its intercept. At $h=2$, $d=2$ succeeds on 139/160
@@ -79,8 +81,8 @@ problem. Our evaluation procedure separates a model-specific refinement configur
 predicted chunk length, and execution prefix. It measures every policy call
 under a stated boundary, aggregates cost over complete attempts, uses discovery
 tasks to choose prespecified comparisons, and evaluates those comparisons on
-separate held-out tasks. Analyses added after outcomes were visible are labelled
-\emph{amended descriptive}. The procedure selects a deployment configuration
+separate held-out tasks. Analyses defined after outcomes were visible are
+reported as descriptive. The procedure selects a deployment configuration
 without policy training or online learning.
 
 The procedure is intended for chunked policies with a controllable refinement
@@ -104,8 +106,8 @@ The contributions are:
     predicted chunk length, and execution prefix to nominal compute rate and
     realized attempt cost;
     \item an evaluation procedure for post-training deployment adaptation that
-    separates discovery, prespecified held-out comparisons, and amended
-    descriptive analyses; and
+    separates discovery, prespecified held-out comparisons, and
+    post-outcome descriptive analyses; and
     \item a SmolVLA case study showing that a large per-call cost can be
     independent of the refinement control, that lower refinement improves
     held-out success in the primary comparison, and that quality preservation
@@ -246,17 +248,16 @@ Object tasks excluded from selection. Each task has ten initial states and two
 rollout seeds, giving 160 attempts per setting and 1,120 in total. Prior exposure
 to these tasks during unrelated development is not assessed. No equivalence
 margin was prespecified, so similar observed success cannot establish equivalent
-quality. Appendix~\ref{app:analysis-provenance} records which comparisons were
-frozen and which were added later as descriptive analyses.
-The settings, identities, stopping rules, inclusion criteria, and primary
-analysis were fixed before confirmation outcomes. During collection, after 114
-attempts per primary setting, an execution-order amendment changed only the
-remaining order; Appendix~\ref{app:analysis-provenance} gives the phase history.
+quality. Appendix~\ref{app:analysis-status} distinguishes prespecified
+comparisons from analyses defined after outcomes were visible. The settings,
+identities, stopping rules, inclusion criteria, and primary analysis were fixed
+before confirmation outcomes. After 114 attempts per primary setting, only the
+execution order changed; the planned identities and analyses remained fixed.
 
 Conditions are paired by initial state and rollout seed. They also share policy
 noise while their queries occur at the same simulation step. Every denoising
 setting traverses the same integration interval; changing $d$ changes only its
-discretization. Internal checks cover initial conditions, generated and executed
+discretization. Consistency checks cover initial conditions, generated and executed
 actions, and recorded outcomes. They do not provide an independent simulator
 replay; Appendix~\ref{app:verification} states the validation boundary.
 
@@ -438,7 +439,7 @@ prespecified study rather than support a general recommendation about refresh
 frequency. They also cannot reconcile the different discovery and confirmation
 patterns, which were measured on different task sets.
 
-Appendix~\ref{app:confirmation-details} records the comparison provenance and
+Appendix~\ref{app:confirmation-details} reports the comparison status and
 the two contrasts involving native $(1,10)$; Table~\ref{tab:confirmation-tasks}
 shows task-level variation.
 
@@ -454,8 +455,8 @@ numerical integration, while changing the prefix changes both observation age
 and executed action positions. The study uses one checkpoint, twelve tasks, and
 synchronous simulation; its intervals are conditional on the sampled tasks, and
 no equivalence margin was prespecified. Counted arithmetic excludes some
-operation classes and is not a latency proxy. Recorded outcomes pass internal
-source and consistency checks, but the full confirmation trajectories were not
+operation classes and is not a latency proxy. Recorded outcomes pass source-tracing
+and consistency checks, but the full confirmation trajectories were not
 replayed in an independent, version-matched simulator. Appendix~\ref{app:verification}
 defines this validation boundary.
 
@@ -563,7 +564,7 @@ performs 20 warm-up generations once per configuration.
 Host generation timing brackets prediction and completion synchronization;
 CUDA events measure the current-stream prediction interval. The outer rollout
 clock additionally includes observation processing, action handling,
-simulation/rendering, and record writing. Model loading, environment creation,
+simulation/rendering, and output handling. Model loading, environment creation,
 reset, and warm-up are measured separately. Process sampling occurs approximately
 every five seconds; the largest recorded gap during discovery is below
 5.03 seconds. Display processes remain on the measurement GPU.
@@ -584,11 +585,11 @@ expenditure is additional to subsequent deployments. The experiment does not
 estimate when deployment amortizes this search cost.
 
 All measurements use an RTX 4060 Ti. Process samples taken approximately every
-five seconds show no unrelated sampled CUDA compute during calibration,
-discovery, or the initially scheduled confirmation phase; display processes
-remain. Monitoring gaps in later phases make aggregate confirmation rollout
-times descriptive. Host and CUDA-stream generation intervals are measured
-separately from the outer synchronous rollout interval, and warm-up is excluded.
+five seconds show no unrelated sampled CUDA compute during calibration and
+discovery; display processes remain. Coverage is incomplete during confirmation,
+so aggregate confirmation rollout times are descriptive. Host and CUDA-stream
+generation intervals are measured separately from the outer synchronous rollout
+interval, and warm-up is excluded.
 
 \subsection{Fixed-input generation timing}
 \label{app:fixed-timing}
@@ -598,8 +599,7 @@ separately from the outer synchronous rollout interval, and warm-up is excluded.
 \caption{Fixed-input full-generation calibration. Each setting has 60 calls in
 three randomized blocks. Range gives the minimum and maximum host block means,
 not a confidence interval. Host time falls more steeply with $d$ than counted
-arithmetic. Host and CUDA columns average separate retained measurements of all
-60 calls; the extra decimals distinguish their means, not timing accuracy.}
+arithmetic. Host and CUDA columns average separate measurements of all 60 calls; the extra decimals distinguish their means, not timing accuracy.}
 \begin{tabular}{@{}cS[table-format=3.1]S[table-format=4.3]S[table-format=4.3]r@{}}
 \toprule
 $d$ & {GFLOPs} & {Host (ms)} & {CUDA (ms)} & Host block range (ms)\\
@@ -776,8 +776,8 @@ $(2,2)$ setting exceeds $(2,5)$ on seven tasks and ties on one.}
 
 \begin{table}[htbp]
 \centering\small
-\caption{Amended descriptive comparisons using all 160 attempts per setting.
-These contrasts were documented after collection began and are not originally
+\caption{Post-outcome descriptive comparisons using all 160 attempts per
+setting. These contrasts were defined after collection began and were not
 prespecified or fully outcome-blind. Intervals are task-conditional,
 unadjusted, and do not test whether two settings preserve quality within a
 prespecified margin.}
@@ -786,7 +786,7 @@ prespecified margin.}
 \end{table}
 \FloatBarrier
 
-The four amended comparisons are reported in their documented order, using
+The four post-outcome comparisons use
 20,000 paired state-bootstrap resamples and analysis seed 20260913.
 Table~\ref{tab:confirmation-secondary} reports their success differences and
 uncertainty intervals, while
@@ -807,16 +807,16 @@ There are 24 paired wins and seven
 losses. In a descriptive leave-one-task-out sensitivity analysis, the
 equally weighted difference over the remaining seven tasks stays positive,
 ranging from 9.3 to 12.1 percentage points. This post-outcome analysis does not
-extend inference to a new task population. The BenchStudio example's paired episode-level records retain all state and seed
-identities needed to reproduce the primary counts and comparison.
+extend inference to a new task population. The BenchStudio example provides the paired episode-level identities needed to
+reproduce the primary counts and comparison.
 
 \begin{table}[htbp]
 \centering\small
 \caption{Descriptive primary expenditure differences, selected minus comparator
 at $h=2$, including all attempts. Intervals use the paired state bootstrap
 conditional on the eight tasks and were added after outcomes were observed.
-Timing intervals summarize sampling variation in the observed records and omit
-possible runtime interference during monitoring gaps. Differences use unrounded
+Timing intervals summarize sampling variation in the observed data; incomplete
+process-monitoring coverage remains a limitation. Differences use unrounded
 means and may differ from subtraction of the displayed values.}
 \label{tab:primary-costs}
 \input{../paper/generated/primary_resources.tex}
@@ -825,8 +825,7 @@ means and may differ from subtraction of the displayed values.}
 \paragraph{Runtime and environment.}
 \begin{table}[H]
 \centering\small
-\caption{Runtime and evaluation conditions shared by all four confirmation
-execution phases. Module versions are those loaded at evaluation time.}
+\caption{Runtime and evaluation conditions for the held-out evaluation.}
 \label{tab:runtime}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
 \toprule
@@ -842,28 +841,28 @@ Precision controls & Autocast and TF32 disabled; deterministic algorithms enable
 Attention and reuse & Eager float32 attention; within-generation KV reuse\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
-Evaluator provenance & Pinned evaluator source revision\\
+Evaluator & Pinned evaluator revision\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The retained provenance does not characterize numerical precision and attention
-execution for every model component. Table~\ref{tab:runtime} therefore supports
+The available measurements do not characterize numerical precision and
+attention execution for every model component. Table~\ref{tab:runtime} supports
 the stated model configuration, but not component- or kernel-level claims.
 
 {\small
 \subsection{Measurement verification}
 \label{app:verification}
 
-The retained records support a complete internal reconciliation of planned
-identities, paired states, executed actions, and recorded outcomes. The checks
+The evaluation data reconcile planned identities, paired states, executed
+actions, and outcomes. The checks
 in Table~\ref{tab:verification-summary} constrain recording and execution
 errors; they do not constitute an
 independent outcome replay in a separate simulator.
 
 \begin{table}[H]
 \centering\small
-\caption{Internal measurement-verification checklist.}
+\caption{Measurement-verification checklist.}
 \label{tab:verification-summary}
 \begin{tabular}{@{}p{0.25\linewidth}p{0.67\linewidth}@{}}
 \toprule
@@ -873,12 +872,12 @@ Canonical coverage & 1,120 confirmation attempts and 171,805 actions; the
 primary subset remains 320 attempts and 50,451 actions.\\
 Pairing and dispatch & Planned identities, paired initial states and
 observations, generation counts, denoising counts, and applied actions reconcile.\\
-Excluded records & Two repeated completed attempts are checked and excluded;
+Excluded attempts & Two repeated completed attempts are checked and excluded;
 one interrupted ten-action record has no completed outcome and is excluded.\\
-Outcome path & All 1,122 raw completed records and 172,243 steps reconcile;
+Outcome path & All 1,122 completed attempts and 172,243 steps reconcile;
 generated actions match simulator actions and recorded outcome fields agree.\\
 Shared predicate & Reward and success both use LIBERO's task-goal evaluation,
-traced to BDDL predicates, so their agreement is an internal consistency check.\\
+traced to BDDL predicates, so their agreement is a consistency check.\\
 Native parity & One Spatial episode matches the upstream path in initial state,
 observation, 70-action sequence, length, and outcome.\\
 Remaining boundary & Independent, version-matched replay and direct terminal-state
@@ -887,20 +886,16 @@ inspection remain outside this audit.\\
 \end{tabular}
 \end{table}
 \FloatBarrier
-\subsection{Analysis provenance}
-\label{app:analysis-provenance}
+\subsection{Analysis status}
+\label{app:analysis-status}
 
-The three refinement comparisons, identities, and primary analysis were frozen
-before confirmation outcomes. The initial phase ended after 799 completions and
-one interrupted attempt. After 114 attempts per primary setting, a deadline-driven
-order amendment prioritized primary completion, adding 92 attempts; continuation
-phases added 6 and 225 to finish the original schedule, not new cohorts. Settings,
-stopping rules, and inclusion remained fixed. Monitoring covers the initial phase
-and later continuation, but not the priority phase or start of continuation.
-Deduplication retained the earliest completed record under this precedence. The frozen analyses use seed
-20260912. Amended contrasts and diagnostics use seed 20260913 and are
-descriptive because they were added after collection began. No response model
-was refitted on confirmation outcomes.
+The three refinement comparisons, paired identities, stopping rules, inclusion
+criteria, and primary analysis were fixed before confirmation outcomes. After
+114 attempts per primary setting, the remaining execution order changed, while
+the planned identities and analyses stayed fixed. The refinement analyses use
+seed 20260912. Contrasts and diagnostics defined after collection began use seed
+20260913 and are descriptive. The response model was not refitted on held-out
+outcomes.
 
 \paragraph{Reproducibility materials.}
 BenchStudio provides compact episode-level outcomes and analysis code that
