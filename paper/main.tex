@@ -755,7 +755,6 @@ and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
 the half-native row is primary.
 }
 \label{tab:selectors}
-\label{tab:predictions}
 \input{../paper/generated/selector_choices.tex}
 \end{table}
 
@@ -826,6 +825,8 @@ prespecified margin.}
 
 The four amended comparisons are reported in their documented order, using
 20,000 paired state-bootstrap resamples and analysis seed 20260913.
+Table~\ref{tab:confirmation-secondary} reports their success differences and
+uncertainty intervals, while
 Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
 In particular, the $(2,2)$ minus $(5,2)$ expenditure difference is
 $+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,+27.5]$.
@@ -857,6 +858,7 @@ not account for possible runtime interference during monitoring gaps.}
 \input{../paper/generated/primary_resources.tex}
 \end{table}
 
+\paragraph{Runtime and environment.}
 \begin{table}[htbp]
 \centering\small
 \caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
@@ -893,7 +895,8 @@ the stated model configuration, but not component- or kernel-level claims.
 
 The retained records support a complete internal reconciliation of planned
 identities, paired states, executed actions, and recorded outcomes. The checks
-below constrain recording and execution errors; they do not constitute an
+in Table~\ref{tab:verification-summary} constrain recording and execution
+errors; they do not constitute an
 independent outcome replay in a separate simulator.
 
 \begin{table}[htbp]
