@@ -179,14 +179,14 @@ class PaperVisualTests(unittest.TestCase):
         )
         np.testing.assert_allclose(setting_points, expected_settings)
         self.assertEqual(settings.get_ylim(), (72, 90))
-        self.assertIn("Mean arithmetic per attempt", settings.get_xlabel())
+        self.assertIn("Mean TFLOPs per attempt", settings.get_xlabel())
         effect_points = np.vstack(
             [collection.get_offsets()[0] for collection in effects.collections]
         )
         np.testing.assert_allclose(
             effect_points[:, 0], [3.125, 0.625, 10.625, -0.625, -1.25]
         )
-        self.assertIn("successful attempts per 100", effects.get_xlabel())
+        self.assertIn("Success change per 100 attempts", effects.get_xlabel())
         text = " ".join(item.get_text() for item in figure.findobj(Text))
         for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
             self.assertIn(f"$({cell[0]},{cell[1]})$", text)

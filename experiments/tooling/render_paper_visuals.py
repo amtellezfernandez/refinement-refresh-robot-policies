@@ -700,7 +700,7 @@ def cost_decomposition_figure(data, path):
 
 
 def success_compute_figure(
-    data, path, font_size=FIGURE_FONT_PT, figure_width=FIGURE_WIDTH, figure_height=5.8
+    data, path, font_size=FIGURE_FONT_PT, figure_width=FIGURE_WIDTH, figure_height=3.65
 ):
     """Render the held-out setting map and paired-effect forest plot."""
     import matplotlib.pyplot as plt
@@ -716,8 +716,8 @@ def success_compute_figure(
 
     fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
     grid = fig.add_gridspec(
-        2, 1, height_ratios=[0.88, 1.12], hspace=0.50,
-        left=0.11, right=0.96, top=0.96, bottom=0.10,
+        1, 2, width_ratios=[0.92, 1.18], wspace=0.32,
+        left=0.14, right=0.98, top=0.92, bottom=0.18,
     )
 
     # Panel A: every held-out setting on realized mean attempt arithmetic.
@@ -730,8 +730,8 @@ def success_compute_figure(
     ax.set_yticklabels(["75%", "80%", "85%", "90%"])
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
-    ax.set_xlabel("Mean arithmetic per attempt (TFLOPs)\n$\\leftarrow$ less compute     more compute $\\rightarrow$", fontsize=font_size)
-    ax.set_ylabel("Held-out success", fontsize=font_size)
+    ax.set_xlabel("Mean TFLOPs per attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
+    ax.set_ylabel("Success (%)", fontsize=font_size)
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
@@ -769,18 +769,18 @@ def success_compute_figure(
         )
 
     # Panel B: paired success differences. Each direction is destination minus start.
-    bx = fig.add_subplot(grid[1, 0])
+    bx = fig.add_subplot(grid[0, 1])
     bx.spines[["top", "right", "left"]].set_visible(False)
-    bx.set_xlim(-10, 20)
+    bx.set_xlim(-10, 35)
     bx.set_ylim(-1.3, 9.4)
     bx.set_xticks([-10, 0, 10, 20])
     bx.set_xticklabels(["-10", "0", "+10", "+20"])
     bx.set_yticks([])
     bx.axvline(0, color="#555555", lw=0.75, zorder=1)
-    bx.set_title("B  Success difference and attempt cost", loc="left", fontsize=font_size + 0.7,
+    bx.set_title("B  Comparisons", loc="left", fontsize=font_size + 0.7,
                  fontweight="bold", pad=5)
-    bx.set_xlabel("Change in successful attempts per 100 (dot = estimate; line = 95% interval)\n"
-                  "$\\leftarrow$ fewer successes     no difference     more successes $\\rightarrow$",
+    bx.set_xlabel("Success change per 100 attempts\n"
+                  "$\\leftarrow$ fewer successes     more successes $\\rightarrow$",
                   fontsize=font_size)
 
     def effect(a, b, sign=1.0):
@@ -806,14 +806,14 @@ def success_compute_figure(
         (-0.40, *effect((1, 2), (2, 2)), "To $h=1$ (more frequent)",
          "41.1 $\\rightarrow$ 83.3", gray, False),
     ]
-    bx.text(-10, 9.25, "Cost below each row: before $\\rightarrow$ after (TFLOPs/attempt)",
+    bx.text(-10, 9.25, "Cost: before $\\rightarrow$ after (TFLOPs/attempt)",
             fontsize=font_size, color=muted, va="center",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
-    bx.text(-10, 8.65, "Fewer denoising steps: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
+    bx.text(-10, 8.65, "Denoising: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
-    bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
-    bx.text(-10, 2.75, "Change refresh frequency from $h=2$ (at $d=2$)",
+    bx.plot([-10, 35], [2.75, 2.75], color=".78", lw=0.65)
+    bx.text(-10, 2.75, "Refresh from $h=2$ (at $d=2$)",
             fontsize=font_size + 0.4, color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
 
@@ -827,18 +827,13 @@ def success_compute_figure(
                 bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
         bx.text(-10, y + 0.36, cost, fontsize=font_size, color=muted,
                 va="center", bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
-        value_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.86, "pad": 0.04}
+        value_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.88, "pad": 0.04}
         bx.annotate(
-            number(estimate, signed=True), (estimate, y), xytext=(0, 6),
-            textcoords="offset points", fontsize=font_size, color=color,
-            va="bottom", ha="center", fontweight="bold" if bold else "normal",
+            f"{number(estimate, signed=True)} [{number(lo, signed=True)}, {number(hi, signed=True)}]",
+            (estimate, y), xytext=(4, 4), textcoords="offset points",
+            fontsize=font_size, color=color, va="bottom", ha="left",
+            fontweight="bold" if bold else "normal",
             bbox=value_box,
-        )
-        bx.annotate(
-            f"[{number(lo, signed=True)}, {number(hi, signed=True)}]", (estimate, y),
-            xytext=(0, -7), textcoords="offset points", fontsize=font_size,
-            color=color, va="top", ha="center",
-            fontweight="bold" if bold else "normal", bbox=value_box,
         )
 
     save_figure(fig, path)
@@ -879,7 +874,7 @@ def render(destination):
             destination / "success_compute_tradeoff_poster.pdf",
             font_size=10.5,
             figure_width=6.1,
-            figure_height=6.4,
+            figure_height=3.8,
         )
     names = [
         *contents,
