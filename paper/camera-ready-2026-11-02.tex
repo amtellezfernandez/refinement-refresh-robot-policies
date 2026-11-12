@@ -48,7 +48,7 @@ attempts versus 122/160 for $d=5$ ($+10.6$ percentage points; task-conditional
 step. Executing $h=5$ rather than $h=2$ at $d=2$ yields 138/160 versus 139/160
 successes and 60.7\% lower arithmetic per attempt; equivalence is not established.
 These checkpoint-specific results illustrate an evaluation procedure for
-allocation decisions; they do not define a universal setting.
+post-training deployment adaptation; they do not define a universal setting.
 \end{abstract}
 
 \section{Introduction}
@@ -146,16 +146,16 @@ vision--language recomputation, reuse, and action generation during execution
 \cite{elegantvla}. These methods change the schedule within an episode. We map
 fixed refinement and prefix settings first, separate selection from held-out
 evaluation, and report both nominal compute rate and realized attempt cost.
-This design evaluates the axes available to an adaptive method; it does not test
-whether a fixed schedule is better than adaptation.
+This design evaluates axes available to an adaptive method; it does not compare
+a fixed deployment configuration with an online, within-episode schedule.
 
 \section{Allocating Deployment-Time Compute Between Refinement and Refresh}
 \label{sec:allocation}
 
-We represent a frozen chunked policy by its model-specific refinement
-configuration $\mathbf r$, predicted chunk length $K$, and execution prefix $h$.
-The following quantities connect those controls to the two cost measures used in
-the evaluation.
+We represent the post-training deployment configuration of a frozen chunked
+policy by its model-specific refinement configuration $\mathbf r$, predicted
+chunk length $K$, and execution prefix $h$. The following quantities connect
+those controls to the two cost measures used in the evaluation.
 
 \subsection{Nominal Rate and Realized Attempt Cost}
 
@@ -214,9 +214,10 @@ time retain separate units and measurement boundaries.
 \section{SmolVLA Case Study}
 \label{sec:method}
 
-This section applies the allocation procedure to one frozen checkpoint. Discovery
-maps the candidate settings and freezes the comparisons; confirmation then tests
-those comparisons on tasks excluded from selection.
+This section applies the allocation procedure to adapt the inference
+configuration of one frozen checkpoint. Discovery maps the candidate settings
+and freezes the comparisons; confirmation then tests those comparisons on tasks
+excluded from selection.
 
 \subsection{Discovery and confirmation design}
 
@@ -486,9 +487,10 @@ equivalent success is not established.\\
 \FloatBarrier
 \section{Discussion and Conclusion}
 
-The experiments expose two limits on deployment-time compute allocation. First, reducing a
-model's adjustable refinement work may save little when most generation cost is
-fixed. Second, executing more actions from each chunk can reduce attempt cost
+The experiments expose two limits on adapting a frozen policy through its
+deployment-time compute configuration. First, reducing a model's adjustable
+refinement work may save little when most generation cost is fixed. Second,
+executing more actions from each chunk can reduce attempt cost
 substantially, but it also delays feedback and changes which predicted action
 positions reach the environment. Cost and closed-loop success must therefore be
 measured together rather than inferred from a single per-call setting.
@@ -545,9 +547,11 @@ A predeclared quality-preservation study should then test the cheaper $(5,2)$
 setting. A controlled stale-input experiment is needed to separate observation
 freshness from action-position effects when $h$ changes. Finally, the same
 within-model design should vary predicted chunk length and be repeated across
-checkpoints, policy architectures,
-benchmark families, and asynchronous or physical-robot execution. Those studies
-can determine when additional generation work is worth paying for and when the
+checkpoints, policy architectures, benchmark families, and asynchronous or
+physical-robot execution. It should also be applied before and after
+parameter-efficient or other weight-based post-training adaptations to test
+whether their preferred deployment configurations change. Those studies can
+determine when additional generation work is worth paying for and when the
 budget is better spent producing a new chunk from fresher feedback.
 
 \paragraph{Data and code availability.}
