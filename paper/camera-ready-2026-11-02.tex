@@ -362,26 +362,18 @@ settings. Appendix~\ref{app:selectors} contains the model specification,
 candidate set, and diagnostics.
 
 \FloatBarrier
-\section{Held-Out Results for the SmolVLA Case Study}
+\section{Held-Out Success and Compute}
 \label{sec:transfer}
 
-\subsection{Results at a glance}
-
-The held-out evaluation yields three conclusions with different evidential
-status. First, the prespecified primary comparison shows that reducing
-denoising at $h=2$ improves success while reducing counted arithmetic. Second,
-the other prespecified comparisons do not establish that this benefit holds at
-every execution prefix. Third, the later prefix comparisons reveal large cost
-differences but do not establish equivalent success. Table~\ref{tab:confirmation-grid}
-reports the seven settings, and Figure~\ref{fig:success-compute} shows the
-comparisons that support these conclusions.
-
-The evaluation applies each setting to the same 160 task--state--seed
-identities, for 1,120 planned attempts. Three fixed-$h$ comparisons of $d=2$
-against $d=5$ were prespecified; $(2,2)$ versus $(2,5)$ is primary. Four
-additional comparisons were defined after outcomes were visible and are
-descriptive. Appendix~\ref{app:verification} documents the removal of two
-duplicated log records without changing the planned totals.
+The held-out evaluation applies each of seven settings to the same 160
+task--state--seed identities, for 1,120 planned attempts. Table~\ref{tab:confirmation-grid}
+reports success, nominal compute rate, and realized arithmetic per attempt.
+Figure~\ref{fig:success-compute} then places success and compute on the same view
+and shows the paired comparisons. Three fixed-$h$ comparisons of $d=2$ against
+$d=5$ were prespecified; $(2,2)$ versus $(2,5)$ is primary. The prefix
+comparisons were defined after outcomes were visible and remain descriptive.
+Appendix~\ref{app:verification} documents the removal of two duplicated log
+records without changing the planned totals.
 
 \begin{table}[htbp]
 \centering\small
@@ -414,16 +406,16 @@ and~\ref{tab:confirmation-secondary}.}
 \FloatBarrier
 
 \begin{samepage}
-\subsection{What the prespecified comparisons establish}
-
+\paragraph{Primary result: lower refinement improves success while reducing compute.}
 The primary comparison holds $h=2$ fixed and changes only denoising. Moving
 from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
 $10.6$ percentage points with a task-conditional 95\% interval of
 $[+4.4,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
-15.6\% per attempt. Thus, for this checkpoint at $h=2$, the additional
-denoising is both less successful and more expensive.
+15.6\% per attempt, from 48.7 to 41.1 TFLOPs. Thus, for this checkpoint at
+$h=2$, the additional denoising is both less successful and more expensive.
 \par\end{samepage}
 
+\paragraph{The primary effect is consistent across tasks, but not across prefixes.}
 The result is not driven by one task: seven tasks favor $d=2$ and one ties, and
 the paired identities contain 24 wins and seven losses. Nevertheless, it is not
 a general denoising trend. At $h=1$ and $h=5$, the point estimates also favor
@@ -433,20 +425,19 @@ observed), so these data do not demonstrate calibrated forecasting.
 Appendix~\ref{app:primary-costs} reports task sensitivity, trajectory lengths,
 and expenditure intervals. Counted arithmetic should not be interpreted as
 physical latency.
-
-
-
-\FloatBarrier
-\subsection{What the later prefix comparisons suggest}
-
+\paragraph{Longer execution prefixes save substantially more compute, with
+quality unresolved.}
 The descriptive prefix comparisons ask whether acting longer before replanning
 can reduce cost without an obvious loss in observed success. At $d=2$, executing
 five rather than two actions per prediction reduces mean arithmetic per attempt
-by 60.7\%, while the observed totals differ by one success (138/160 versus
-139/160). The uncertainty interval spans practically meaningful differences in
-both directions, and task-level effects are mixed. The result therefore shows a
-large compute saving, but it does not establish equivalent quality.
+by 60.7\%, from 41.1 to 16.1 TFLOPs, while the observed totals differ by one
+success (138/160 versus 139/160). The uncertainty interval spans practically
+meaningful differences in both directions, and task-level effects are mixed.
+The result therefore shows a large compute saving, but it does not establish
+equivalent quality.
 
+\paragraph{More frequent refresh shows no measured success advantage in these
+contrasts.}
 Refreshing after every action is still more expensive and shows no measured
 success advantage over refreshing after two actions. Taken together, the
 prefix comparisons show why cost and quality must be reported separately: the
@@ -460,51 +451,35 @@ Appendix~\ref{app:confirmation-details} records the comparison provenance and
 the two contrasts involving native $(1,10)$; Table~\ref{tab:confirmation-tasks}
 shows task-level variation.
 
-\paragraph{Evidence summary.}
-Table~\ref{tab:evidence-status} separates what the case study establishes from
-what remains a descriptive observation.
+\paragraph{Evidence boundary.}
+The prespecified evidence establishes the primary result for this checkpoint at
+$h=2$; it does not establish a uniform refinement effect. The later prefix
+comparisons establish their arithmetic differences under the declared counting
+boundary, while their success differences remain descriptive and uncertain.
 
-\begin{table}[htbp]
-\centering\small
-\caption{Evidence status and permitted interpretation.}
-\label{tab:evidence-status}
-\begin{tabular}{@{}p{0.21\linewidth}p{0.19\linewidth}p{0.52\linewidth}@{}}
-\toprule
-Evidence & Status & Supported interpretation\\
-\midrule
-Primary $h=2$ comparison & Prespecified & Fewer denoising steps improve success
-while reducing counted arithmetic for this checkpoint and prefix.\\
-\addlinespace[2pt]
-Other fixed-$h$ comparisons & Prespecified & A uniform refinement effect is not
-established.\\
-\addlinespace[2pt]
-Prefix comparisons & Later descriptive & Acting longer reduces compute;
-equivalent success is not established.\\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{Scope and measurement limits.}
+Neither varied control isolates a single mechanism: changing denoising changes
+numerical integration, while changing the prefix changes both observation age
+and executed action positions. The study uses one checkpoint, twelve tasks, and
+synchronous simulation; its intervals are conditional on the sampled tasks, and
+no equivalence margin was prespecified. Counted arithmetic excludes some
+operation classes and is not a latency proxy. Recorded outcomes pass internal
+source and consistency checks, but the full confirmation trajectories were not
+replayed in an independent, version-matched simulator. Appendix~\ref{app:verification}
+defines this validation boundary.
 
 \FloatBarrier
 \section{Discussion and Conclusion}
 
-The experiments expose two limits on adapting a frozen policy through its
-deployment-time compute configuration. First, reducing a model's adjustable
-refinement work may save little when most generation cost is fixed. Second,
-executing more actions from each chunk can reduce attempt cost
-substantially, but it also delays feedback and changes which predicted action
-positions reach the environment. Cost and closed-loop success must therefore be
-measured together rather than inferred from a single per-call setting.
-
-In this SmolVLA case study, lower refinement improved held-out success in the
-primary fixed-prefix comparison: at $h=2$, $d=2$ achieved 139/160 successes and
-$d=5$ achieved 122/160. The other prespecified comparisons did not establish a
-uniform benefit. Executing five rather than two actions before refresh at $d=2$
-reduced arithmetic per attempt by 60.7\%, but the observed one-success difference
-did not establish equivalent quality. Arithmetic and host time also assign very
-different shares to the fitted refinement-independent intercept, so the chosen
-resource coordinate changes which settings appear feasible. The fitted response
-model offered no demonstrated selection advantage over the post hoc simpler rule
-that chose the same settings.
+Adapting a frozen policy through its deployment configuration can change both
+success and total compute. In the primary SmolVLA comparison, reducing
+denoising from five to two steps improves held-out success while reducing
+counted arithmetic by 5.9\% per control step and 15.6\% per attempt. The other
+prespecified prefixes do not establish a uniform refinement effect. Executing
+five rather than two actions before refresh produces the much larger compute
+saving---60.7\% per attempt---but the available descriptive comparison does not
+establish equivalent success. These results show why success, nominal rate, and
+complete attempt cost must be evaluated together.
 
 The transferable contribution is an evaluation procedure for post-training
 deployment adaptation, rather than a universal setting. Within each frozen
@@ -516,45 +491,21 @@ cost with success. A refinement configuration can include integration
 steps, autoregressive reasoning, candidate sampling, search, verification, or
 cache reuse, provided each component's cost is measured. When
 comparing architectures, the meaningful evidence is each model's within-model
-allocation result; unlike control values and counting boundaries should not be
-pooled directly.
-The present case study keeps $K=50$ throughout, so it provides no evidence about
-how predicted chunk length itself should be chosen. Because $h\in\{1,2,5\}$,
-90--98\% of each predicted chunk is discarded before the next query; varying
-$K$ is therefore a central untested allocation lever.
+allocation result. Control values and counting boundaries that differ across
+models should not be pooled directly.
 
-\paragraph{Scope and interpretation.}
-Neither varied case-study control isolates a single mechanism. Changing denoising changes numerical
-integration, while changing the prefix changes both observation age and executed
-action positions. The primary mechanism therefore remains unresolved. The study
-uses one checkpoint, twelve tasks, and synchronous simulation. Its intervals are
-conditional on the sampled tasks, secondary contrasts are unadjusted, and the
-four discovery tasks provide limited task-level validation. Prefix comparisons
-were added after outcomes were visible and remain descriptive. Two denoising
-steps is the lowest tested setting, and no equivalence margin was prespecified.
+The present study keeps $K=50$ throughout, leaving predicted chunk length as a
+central untested allocation lever; with the tested prefixes, 90--98\% of every
+prediction is discarded before the next query. The next study should
+prespecify a quality-preservation test of the cheaper $(5,2)$ setting, vary $K$,
+and separate observation freshness from action-position effects. Repeating the
+same within-model design across checkpoints and before and after weight-based
+post-training adaptation would determine whether those adaptations also change
+the preferred deployment configuration. This is the evidence needed to decide
+when compute should refine the current prediction and when it should produce a
+new prediction from fresher feedback.
 
-\paragraph{Measurement limits.}
-The arithmetic count excludes some operation classes and is not a latency proxy;
-synchronous simulator steps do not establish real-time robot performance. The
-recorded outcomes pass internal source and consistency checks, but the full
-confirmation trajectories were not replayed in an independent, version-matched
-simulator. The result is therefore supported by strong internal validation rather
-than independent outcome reproduction.
-
-\paragraph{Next experiments.}
-The first priority is independent replay of the retained primary trajectories.
-A predeclared quality-preservation study should then test the cheaper $(5,2)$
-setting. A controlled stale-input experiment is needed to separate observation
-freshness from action-position effects when $h$ changes. Finally, the same
-within-model design should vary predicted chunk length and be repeated across
-checkpoints, policy architectures, benchmark families, and asynchronous or
-physical-robot execution. It should also be applied before and after
-parameter-efficient or other weight-based post-training adaptations to test
-whether their preferred deployment configurations change. Those studies can
-determine when additional generation work is worth paying for and when the
-budget is better spent producing a new chunk from fresher feedback.
-
-\paragraph{Data and code availability.}
+\section*{Data and Code Availability}
 Maintained evaluation infrastructure, the camera-ready manuscript, and compact
 confirmation records sufficient to reproduce the held-out totals and paired
 primary comparison are available in the BenchStudio worked example at
