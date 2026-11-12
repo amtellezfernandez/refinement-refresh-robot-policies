@@ -191,9 +191,9 @@ class PaperVisualTests(unittest.TestCase):
         for cell in ((1, 2), (1, 5), (1, 10), (2, 2), (2, 5), (5, 2), (5, 5)):
             self.assertIn(f"$({cell[0]},{cell[1]})$", text)
         self.assertIn("+10.6", text)
-        self.assertIn("[+4.4, +16.9]", text)
+        self.assertIn("[4.4, 16.9]", text)
         self.assertIn("-0.6", text)
-        self.assertIn("[-6.9, +6.3]", text)
+        self.assertIn("[-6.9, 6.3]", text)
         self.assertNotIn("Prespecified before held-out outcomes", text)
         self.assertNotIn("Added later: amended descriptive", text)
 

@@ -716,14 +716,14 @@ def success_compute_figure(
 
     fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
     grid = fig.add_gridspec(
-        1, 2, width_ratios=[0.92, 1.18], wspace=0.32,
-        left=0.14, right=0.98, top=0.92, bottom=0.18,
+        1, 2, width_ratios=[0.78, 1.32], wspace=0.23,
+        left=0.115, right=0.98, top=0.92, bottom=0.18,
     )
 
     # Panel A: every held-out setting on realized mean attempt arithmetic.
     ax = fig.add_subplot(grid[0, 0])
     ax.spines[["top", "right"]].set_visible(False)
-    ax.set_xlim(0, 120)
+    ax.set_xlim(0, 100)
     ax.set_ylim(72, 90)
     ax.set_xticks([0, 25, 50, 75, 100])
     ax.set_yticks([75, 80, 85, 90])
@@ -754,24 +754,25 @@ def success_compute_figure(
             linewidth=0.65, zorder=3,
         )
         dy = offsets[cell]
+        label_alignment = "right" if cell == (1, 10) else "center"
         label_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.05}
         ax.annotate(
             f"{rate:.0f}%", (attempt_cost, rate),
             xytext=(0, dy + 10), textcoords="offset points",
-            ha="center", va="bottom", fontsize=font_size, color=color,
+            ha=label_alignment, va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
         ax.annotate(
             f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
             xytext=(0, dy), textcoords="offset points",
-            ha="center", va="bottom", fontsize=font_size + 2.0, color=color,
+            ha=label_alignment, va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
 
     # Panel B: paired success differences. Each direction is destination minus start.
     bx = fig.add_subplot(grid[0, 1])
     bx.spines[["top", "right", "left"]].set_visible(False)
-    bx.set_xlim(-10, 35)
+    bx.set_xlim(-10, 20)
     bx.set_ylim(-1.3, 9.4)
     bx.set_xticks([-10, 0, 10, 20])
     bx.set_xticklabels(["-10", "0", "+10", "+20"])
@@ -812,7 +813,7 @@ def success_compute_figure(
     bx.text(-10, 8.65, "Denoising: $d=5 \\rightarrow 2$", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
-    bx.plot([-10, 35], [2.75, 2.75], color=".78", lw=0.65)
+    bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
     bx.text(-10, 2.75, "Refresh from $h=2$ (at $d=2$)",
             fontsize=font_size + 0.4, color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
@@ -828,10 +829,13 @@ def success_compute_figure(
         bx.text(-10, y + 0.36, cost, fontsize=font_size, color=muted,
                 va="center", bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
         value_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.88, "pad": 0.04}
+        value_x = 19.7 if estimate > 8 else estimate
+        value_alignment = "right" if estimate > 8 else "left"
+        value_offset = (0, 4) if estimate > 8 else (2, 4)
         bx.annotate(
-            f"{number(estimate, signed=True)} [{number(lo, signed=True)}, {number(hi, signed=True)}]",
-            (estimate, y), xytext=(4, 4), textcoords="offset points",
-            fontsize=font_size, color=color, va="bottom", ha="left",
+            f"{number(estimate, signed=True)} [{number(lo)}, {number(hi)}]",
+            (value_x, y), xytext=value_offset, textcoords="offset points",
+            fontsize=font_size, color=color, va="bottom", ha=value_alignment,
             fontweight="bold" if bold else "normal",
             bbox=value_box,
         )
