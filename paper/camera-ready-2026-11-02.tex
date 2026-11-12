@@ -110,31 +110,36 @@ The contributions are:
 
 \section{Related Work}
 
-Resource-allocation studies motivate evaluating configurations across explicit
-budgets. Chinchilla studies model-size and training-data allocation
-\cite{chinchilla}; embodied scaling studies consider world modeling, behavior
-cloning, and closed-loop forecasting and planning
-\cite{pearcescaling,motionscaling}. Our comparison instead varies deployment
-refinement and execution prefix within a fixed policy. Work distinguishing
-FLOP-optimal from elapsed- or monetary-cost-optimal allocation
-\cite{beyondchinchilla} also motivates retaining separate resource coordinates.
+\paragraph{Compute allocation.}
+Compute-optimal scaling work allocates training resources across model size and
+data \cite{chinchilla}, and related embodied studies examine scaling for agent
+pretraining and world modeling \cite{pearcescaling}. Accounting for deployment
+demand can change the optimum when inference cost is included
+\cite{beyondchinchilla}. These studies motivate explicit budgets and cost
+boundaries. Our unit of comparison is different: deployment controls within one
+frozen policy, evaluated by closed-loop task success rather than training loss.
 
-VLA-Perf characterizes inference performance across denoising, chunk size,
-asynchronous execution, and hardware/runtime choices \cite{vlaperf}.
-SmolVLA studies asynchronous inference and robot behavior \cite{smolvla}.
-Here predicted chunk size remains fixed, while executed prefix changes; task
-success is measured alongside computation. RoboMonkey studies test-time sampling
-and action verification \cite{robomonkey}, an adjacent allocation axis that
-would require counting candidate generation and verification costs.
+\paragraph{Inference-time generation and systems.}
+RoboMonkey increases test-time action sampling and uses verification to select an
+action proposal \cite{robomonkey}; this is a generation-effort axis whose cost
+includes both candidates and verification. VLA-Perf models how architecture,
+asynchronous execution, deployment placement, hardware, and networks affect VLA
+inference performance \cite{vlaperf}. SmolVLA also studies asynchronous inference
+for robot control \cite{smolvla}. Our experiment holds the checkpoint, hardware,
+and synchronous execution stack fixed, then measures task success and arithmetic
+as generation effort and the executed prefix change.
 
-Adaptive VLA scheduling is directly related. DVAC uses denoising-derived action
-variance to choose an execution prefix before replanning \cite{dvac}.
-ElegantVLA schedules vision--language recomputation or reuse together with action
-denoising modes \cite{elegantvla}. Our study instead compares fixed configurations
-under explicit arithmetic ceilings and freezes separate-task denoising
-comparisons. It neither introduces an adaptive scheduler nor establishes an
-advantage over these methods; their reported speedups have different policies,
-hardware, and measurement boundaries.
+\paragraph{Adaptive execution and replanning.}
+Adaptive Action Chunking uses action entropy to select how much of a predicted
+chunk to execute \cite{adaptivechunking}. DVAC uses variation during denoising to
+adapt the execution prefix \cite{dvac}, while ElegantVLA jointly schedules
+vision--language recomputation, reuse, and action-denoising modes
+\cite{elegantvla}. These methods learn or derive a schedule that changes during an
+episode. Our study instead compares fixed settings, separates configuration
+selection from held-out evaluation, and reports generation and episode cost under
+one declared boundary. It supplies a controlled baseline for asking which axes an
+adaptive scheduler should vary; it does not establish an advantage over those
+methods.
 
 \section{Allocating Compute Between Generation and Execution}
 \label{sec:allocation}
