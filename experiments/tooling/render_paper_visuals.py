@@ -735,13 +735,13 @@ def success_compute_figure(
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
-        (5, 2): (2, 7, "left"),
-        (5, 5): (2, -20, "left"),
-        (2, 2): (2, 8, "left"),
-        (2, 5): (2, -20, "left"),
-        (1, 2): (0, 10, "center"),
-        (1, 5): (0, -21, "center"),
-        (1, 10): (-2, 7, "right"),
+        (5, 2): 2,
+        (5, 5): -20,
+        (2, 2): 2,
+        (2, 5): -20,
+        (1, 2): 2,
+        (1, 5): -20,
+        (1, 10): 2,
     }
     for cell, row in resources.items():
         successes = row["successes"]
@@ -753,18 +753,18 @@ def success_compute_figure(
             attempt_cost, rate, s=34, color=color, edgecolor="white",
             linewidth=0.65, zorder=3,
         )
-        dx, dy, ha = offsets[cell]
+        dy = offsets[cell]
         label_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.78, "pad": 0.05}
         ax.annotate(
             f"{rate:.0f}%", (attempt_cost, rate),
-            xytext=(dx, dy + 10), textcoords="offset points",
-            ha=ha, va="bottom", fontsize=font_size, color=color,
+            xytext=(0, dy + 10), textcoords="offset points",
+            ha="center", va="bottom", fontsize=font_size, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
         ax.annotate(
             f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
-            xytext=(dx, dy), textcoords="offset points",
-            ha=ha, va="bottom", fontsize=font_size + 2.0, color=color,
+            xytext=(0, dy), textcoords="offset points",
+            ha="center", va="bottom", fontsize=font_size + 2.0, color=color,
             fontweight="bold" if primary_pair else "normal", bbox=label_box,
         )
 
