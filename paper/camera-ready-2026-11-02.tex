@@ -35,10 +35,9 @@ actions executed before replanning. We formulate this three-way allocation
 problem and instantiate a controlled two-axis evaluation: predicted chunk length remains
 fixed at $K=50$ and is not evaluated, while denoising count and execution prefix
 vary. We measure closed-loop success and inference expenditure under a declared
-counting boundary, distinguishing comparisons fixed before held-out outcomes
-from amended descriptive analyses. The primary comparisons were fixed before
-held-out outcomes; a later execution-order amendment did not change their settings
-or analysis. We use
+counting boundary. The prespecified comparisons were fixed before held-out
+outcomes; later analyses are marked amended descriptive, and an execution-order
+amendment did not change the settings or analysis. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
 with denoising count as its refinement control. At a fixed two-action prefix, the
 prespecified comparison found 139/160 successes with two denoising steps versus
@@ -461,7 +460,7 @@ on new tasks.
 
 \paragraph{Evidence summary.}
 Table~\ref{tab:evidence-status} consolidates the status and permitted
-interpretation of the prespecified and amended comparisons.
+interpretation of the central prespecified and amended comparisons.
 
 \begin{table}[htbp]
 \centering\small
@@ -500,7 +499,7 @@ the primary fixed-prefix comparison, but the other prespecified comparisons did
 not establish a uniform benefit. Changing the execution prefix produced much
 larger cost differences, while the available data could not establish preserved
 quality. The fitted response model also offered no demonstrated selection
-advantage over the simpler rule that chose the same settings.
+advantage over the post hoc simpler rule that chose the same settings.
 
 The transferable contribution is an evaluation procedure, rather than a
 universal setting. Within each model, define its generation configuration and
@@ -550,9 +549,11 @@ budget is better spent producing a new chunk from fresher feedback.
 \paragraph{Data and code availability.}
 Maintained evaluation infrastructure and migrated analysis components are
 available in BenchStudio at
-\url{https://github.com/maatinstitute/BenchStudio}. The paper-specific records,
-frozen plans, and verification snapshot accompany this submission as supplementary
-material; checkpoint weights and simulator assets are not redistributed.
+\url{https://github.com/maatinstitute/BenchStudio}. Paper-specific records,
+frozen plans, and the verification snapshot are available in the companion
+repository at
+\url{https://github.com/amtellezfernandez/refinement-refresh-robot-policies}.
+Checkpoint weights and simulator assets are not redistributed.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -859,7 +860,7 @@ There are 24 paired wins and seven
 losses. In a descriptive leave-one-task-out sensitivity analysis, the
 equally weighted difference over the remaining seven tasks stays positive,
 ranging from 9.3 to 12.1 percentage points. This post-outcome analysis does not
-extend inference to a new task population. The supplementary paired records
+extend inference to a new task population. The companion repository's paired records
 retain all state and seed identities needed to reproduce the primary interval.
 
 \begin{table}[htbp]
@@ -879,8 +880,8 @@ displayed one-decimal means.}
 \begin{table}[H]
 \centering\small
 \caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
-Module versions are the loaded versions reported at evaluation time. The
-supplement retains source digests and distinguishes conflicting installed
+Module versions are the loaded versions reported at evaluation time. The frozen
+paper records retain source digests and distinguish conflicting installed
 distribution metadata from these loaded versions.}
 \label{tab:runtime}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
@@ -897,7 +898,7 @@ Precision controls & Autocast and TF32 disabled; deterministic algorithms enable
 Attention and reuse & Eager language/action attention with float32 scores; within-generation KV cache enabled\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
-Evaluator provenance & Source revision and full digest retained in supplement\\
+Evaluator provenance & Source revision and full digest retained in companion repository\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -946,23 +947,24 @@ inspection remain outside this audit.\\
 \label{app:analysis-provenance}
 
 The three refinement comparisons, identities, and primary analysis were frozen
-before confirmation outcomes. An amendment during collection changed only the
-execution order after 114 attempts per primary setting had been recorded;
-settings, identities, stopping rules, and inclusion remained fixed. Later phases
-completed the original identities, and deduplication retained the earliest
-completed record under the documented phase precedence. The frozen analyses use seed
+before confirmation outcomes. The initial phase ended after 799 completions and
+one interrupted attempt. After 114 attempts per primary setting, a deadline-driven
+order amendment prioritized primary completion, adding 92 attempts; continuation
+phases added 6 and 225 to finish the original schedule, not new cohorts. Settings,
+stopping rules, and inclusion remained fixed. Monitoring covers the initial phase
+and later continuation, but not the priority phase or start of continuation.
+Deduplication retained the earliest completed record under this precedence. The frozen analyses use seed
 20260912. Amended contrasts and diagnostics use seed 20260913 and are
 descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 
 \paragraph{Analysis artifact.}
-The accompanying supplement contains the primary episode and action records,
-planned identities, paired state values, calibrations, frozen predictions,
-runtime provenance, and analysis code. Its bundled verification procedure
-reproduces the primary counts, interval, task table, and descriptive expenditure
-analysis. Documentation specifies the selector features, penalized objective,
-candidate set, and normalization. The separately frozen supplement omits
-checkpoint weights and simulator assets.
+The companion repository contains the episode and action records, plans,
+calibrations, frozen predictions, runtime provenance, and analysis code. Its
+verification procedure reproduces the primary counts, interval, task table, and
+descriptive expenditure analysis; documentation specifies the selector features,
+objective, candidate set, and normalization. Checkpoint weights and simulator
+assets are omitted.
 }
 
 \end{document}
