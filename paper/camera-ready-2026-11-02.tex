@@ -341,39 +341,32 @@ resource-coordinate analysis.
 \label{sec:prediction}
 
 Discovery freezes $(5,2)$, $(2,2)$, and $(1,2)$ at the quarter-, half-, and
-full-native ceilings. Their comparators are $(5,5)$, $(2,5)$, and $(1,5)$,
-respectively; $(2,2)$ versus $(2,5)$ is the primary comparison. Every selected
-setting is an observed discovery-grid point, so confirmation tests performance
-on new tasks rather than extrapolation to an untested setting. Each pair changes
-denoising at a fixed prefix. The pairs share a compute ceiling but do not have
-equal compute rates, so they test the selected setting against a feasible
-alternative rather than directly dividing a fixed amount between refinement and
-refresh.
+full-native ceilings, with $(5,5)$, $(2,5)$, and $(1,5)$ as their respective
+comparators; $(2,2)$ versus $(2,5)$ is primary. Every selected setting is an
+observed grid point, so confirmation tests transfer to new tasks rather than
+extrapolation. Each pair varies denoising at a fixed prefix and compares two
+feasible settings; the pair does not divide an identical compute rate.
 
-At the primary ceiling, $(2,2)$ has the highest eligible discovery success. Its
-comparator $(2,5)$ ties with $(2,10)$ for the highest count among the remaining
-eligible settings and is chosen by the lower-cost tie-break. A logistic response
-model fitted only to discovery data produces all three frozen selections. A
-simpler rule---use the fewest denoising steps, then the shortest feasible
-prefix---produces the same selections. Because the simple rule was documented
-after data collection began, this agreement is descriptive. Confirmation cannot
-show that fitting improves selection when both procedures choose the same
-settings. Appendix~\ref{app:selectors} contains the model specification,
-candidate set, and diagnostics.
+At the primary ceiling, $(2,2)$ has the highest eligible discovery success.
+Among the remaining settings, $(2,5)$ ties $(2,10)$ and wins the lower-cost
+tie-break. A discovery-fitted logistic model and a simpler rule---fewest
+denoising steps, then shortest feasible prefix---produce the same three
+selections. Because the simpler rule was documented after data collection
+began, the agreement is descriptive and does not show an advantage from fitting.
+Appendix~\ref{app:selectors} gives the model, candidate set, and diagnostics.
 
 \FloatBarrier
 \section{Held-Out Success and Compute}
 \label{sec:transfer}
 
-The held-out evaluation applies each of seven settings to the same 160
+The held-out evaluation applies seven settings to the same 160
 task--state--seed identities, for 1,120 planned attempts. Table~\ref{tab:confirmation-grid}
-reports success, nominal compute rate, and realized arithmetic per attempt.
-Figure~\ref{fig:success-compute} then places success and compute on the same view
-and shows the paired comparisons. Three fixed-$h$ comparisons of $d=2$ against
-$d=5$ were prespecified; $(2,2)$ versus $(2,5)$ is primary. The prefix
-comparisons were defined after outcomes were visible and remain descriptive.
-Appendix~\ref{app:verification} documents the removal of two duplicated log
-records without changing the planned totals.
+reports success and both compute measures; Figure~\ref{fig:success-compute}
+places them in one view and shows the paired comparisons. Three fixed-$h$
+comparisons of $d=2$ against $d=5$ were prespecified, with $(2,2)$ versus
+$(2,5)$ as primary. Prefix comparisons were added after outcomes were visible
+and remain descriptive. Appendix~\ref{app:verification} documents two removed
+duplicate records without changing the planned totals.
 
 \begin{table}[htbp]
 \centering\small
