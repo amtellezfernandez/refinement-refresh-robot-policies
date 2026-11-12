@@ -370,7 +370,7 @@ $(2,5)$ as primary. Prefix comparisons were added after outcomes were visible
 and remain descriptive. Appendix~\ref{app:verification} documents two removed
 duplicate records without changing the planned totals.
 
-\begin{table}[htbp]
+\begin{table}[!t]
 \centering\small
 \caption{Held-out results for the seven SmolVLA settings. Each setting has 160
 attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
@@ -380,27 +380,23 @@ mean arithmetic per attempt charges every generated chunk.}
 \input{../paper/generated/confirmation_resources.tex}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}\par\vspace{-0.4em}
-\caption{Success and compute in the held-out evaluation. Panel A shows the
-seven settings ($h$: executed prefix; $d$: denoising steps). Horizontal position
-is mean reference-calibrated arithmetic per attempt, including failures; the
-success axis begins at 72\%. Blue marks the primary pair. Panel B reports the
-paired success change for each displayed move and its task-conditional 95\%
-interval. A positive value favors the destination setting, and an interval
-crossing zero does not separate the settings under this analysis. The
-$h=2\rightarrow5$ row therefore reverses the sign used for $(2,2)-(5,2)$ in
-Table~\ref{tab:confirmation-secondary}. Arithmetic per attempt is shown beneath
-each comparison. Selection ceilings instead use nominal arithmetic per control
-step (Section~\ref{sec:fixed-cost-floor}). Exact counts and two additional
-descriptive contrasts appear in Tables~\ref{tab:confirmation-grid}
+\caption{Held-out success and compute. Panel A shows all settings against mean
+arithmetic per attempt; the success axis begins at 72\%, and blue marks the
+primary pair. Panel B shows paired success changes and task-conditional 95\%
+intervals; positive values favor the displayed destination, while intervals
+crossing zero do not separate settings. The $h=2\rightarrow5$ row reverses the
+sign used in Table~\ref{tab:confirmation-secondary}. Labels below each row give
+arithmetic per attempt. Selection ceilings use nominal arithmetic per control
+step (Section~\ref{sec:fixed-cost-floor}); exact counts and two additional
+contrasts appear in Tables~\ref{tab:confirmation-grid}
 and~\ref{tab:confirmation-secondary}.}
 \label{fig:success-compute}
 \end{figure}
-\FloatBarrier
 
-\begin{samepage}
+\begin{minipage}{\linewidth}
 \paragraph{Primary result: lower refinement improves success while reducing compute.}
 The primary comparison holds $h=2$ fixed and changes only denoising. Moving
 from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
@@ -408,7 +404,7 @@ $10.6$ percentage points with a task-conditional 95\% interval of
 $[+4.4,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
 15.6\% per attempt, from 48.7 to 41.1 TFLOPs. Thus, for this checkpoint at
 $h=2$, the additional denoising is both less successful and more expensive.
-\par\end{samepage}
+\end{minipage}
 
 \paragraph{The primary effect is consistent across tasks, but not across prefixes.}
 The result is not driven by one task: seven tasks favor $d=2$ and one ties, and
@@ -501,13 +497,11 @@ when compute should refine the current prediction and when it should produce a
 new prediction from fresher feedback.
 
 \section*{Data and Code Availability}
-Maintained evaluation infrastructure, the camera-ready manuscript, and compact
-confirmation records sufficient to reproduce the held-out totals and paired
-primary comparison are available in the BenchStudio worked example at
+Evaluation code and compact confirmation records sufficient to reproduce the
+held-out totals and paired primary comparison are available at
 \url{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}.
-The example also records cryptographic identities for the retained historical
-archive. It excludes checkpoint weights, simulator assets, action tensors, and
-images.
+Checkpoint weights, simulator assets, action tensors, and images are not
+redistributed.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -831,10 +825,8 @@ means and may differ from subtraction of the displayed values.}
 \paragraph{Runtime and environment.}
 \begin{table}[H]
 \centering\small
-\caption{Runtime and evaluation conditions shared by all four confirmation execution phases.
-Module versions are the loaded versions reported at evaluation time. The frozen
-paper records retain source digests and distinguish conflicting installed
-distribution metadata from these loaded versions.}
+\caption{Runtime and evaluation conditions shared by all four confirmation
+execution phases. Module versions are those loaded at evaluation time.}
 \label{tab:runtime}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
 \toprule
@@ -850,7 +842,7 @@ Precision controls & Autocast and TF32 disabled; deterministic algorithms enable
 Attention and reuse & Eager float32 attention; within-generation KV reuse\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
-Evaluator provenance & Pinned source revision and retained source-tree digest\\
+Evaluator provenance & Pinned evaluator source revision\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -910,14 +902,11 @@ Deduplication retained the earliest completed record under this precedence. The 
 descriptive because they were added after collection began. No response model
 was refitted on confirmation outcomes.
 
-\paragraph{Analysis artifact.}
-The public BenchStudio example contains compact episode-level outcomes and a
-verification script that reproduces the held-out totals, paired identities, and
-primary success difference. The retained study archive additionally contains the
-detailed action records, plans, calibrations, frozen predictions, runtime
-provenance, and analysis inputs used for this manuscript. Its cryptographic
-identities are recorded in the public example. Checkpoint weights, action tensors,
-images, and simulator assets are omitted.
+\paragraph{Reproducibility materials.}
+BenchStudio provides compact episode-level outcomes and analysis code that
+reproduce the held-out totals, paired identities, and primary success
+difference. Detailed action records, checkpoint weights, images, and simulator
+assets are not redistributed.
 }
 
 \end{document}
