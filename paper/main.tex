@@ -22,8 +22,8 @@
 }
 \usepackage{placeins}
 \usepackage{float}
-\title{Refinement versus Refresh:\\
-Deployment-Time Compute Allocation for Chunked Robot Policies}
+\title{Refinement versus Refresh: Deployment-Time\\
+Compute Allocation for Chunked Robot Policies}
 \author{Alba Mar\'ia T\'ellez Fern\'andez\\
 MAAT Institute\\
 \texttt{alba.tellez@maatinstitute.com}}
@@ -80,8 +80,8 @@ predicted chunk length, and execution prefix. It measures every policy call
 under a stated boundary, aggregates cost over complete attempts, uses discovery
 tasks to choose prespecified comparisons, and evaluates those comparisons on
 separate held-out tasks. Analyses added after outcomes were visible are labelled
-\emph{amended descriptive}. This procedure supports choosing a deployment
-configuration; it does not train the policy or learn an online allocator.
+\emph{amended descriptive}. The procedure selects a deployment configuration
+without policy training or online learning.
 
 The procedure is intended for chunked policies with a controllable refinement
 setting. Depending on the architecture, that setting could control integration
@@ -223,21 +223,21 @@ excluded from selection.
 
 \subsection{Discovery and confirmation design}
 
-We call evaluation on tasks excluded from selection the \emph{held-out
-confirmation phase}, or confirmation for short.
+We call evaluation on tasks excluded from selection \emph{held-out
+confirmation}.
 
 We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
 chunk length is fixed at $K=50$, and the model's native deployment uses
-$(h,d)=(1,10)$. We hold the checkpoint, observations, preprocessing, action
-normalization, control period, and task-specific episode horizons fixed.
+$(h,d)=(1,10)$. We keep fixed the checkpoint, observations, preprocessing,
+action normalization, control period, and task-specific episode horizons.
 
 The discovery study varies $h\in\{1,2,5\}$ and
 $d\in\{2,5,10,20\}$ on four Spatial tasks. Each task has five initial states and
 two rollout seeds, giving 40 paired task--state--seed identities. Every identity
 receives all twelve settings in randomized order, for 480 attempts. Two discovery
 tasks overlap pre-study pilot work; the other two were chosen before their study
-outcomes were observed. This partial prior exposure is part of the reason that
-discovery is used for selection rather than final evaluation.
+outcomes were observed. This partial exposure is why discovery supports
+selection rather than final evaluation.
 
 After discovery, we freeze three denoising comparisons, one at each compute
 ceiling. Their selected settings and comparators, plus native deployment, produce
@@ -302,8 +302,8 @@ For example, $(1,2)$ costs 0.857 times native rate and is ineligible at half-nat
 budget, whereas $(2,2)$ costs 0.429 times native. The denoising-independent work
 alone excludes $h=1$ at half-native budget and $h\leq3$ at quarter-native budget.
 A tighter budget can therefore force a longer execution prefix before any
-quality-based choice is made. This is an implementation-specific arithmetic
-floor under the declared counting boundary, not a universal VLA scaling law.
+quality-based choice is made. This arithmetic floor is specific to the
+implementation and declared counting boundary; it is not a universal VLA law.
 
 Calibration uses a fixed input shape. A separate audit using the language lengths
 observed in the tasks leaves eligibility unchanged under the same absolute
@@ -506,8 +506,8 @@ confirmation records sufficient to reproduce the held-out totals and paired
 primary comparison are available in the BenchStudio worked example at
 \url{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}.
 The example also records cryptographic identities for the retained historical
-archive. Action tensors, images, checkpoint weights, and simulator assets are
-not redistributed.
+archive. It excludes checkpoint weights, simulator assets, action tensors, and
+images.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -520,8 +520,8 @@ not redistributed.
 Appendices A--C follow the study chronology. This section reports discovery
 outcomes, generation-cost calibration, fixed-input timing, sensitivity to the
 resource coordinate, and the language-shape audit. Appendix~\ref{app:selectors}
-then documents frozen selection, and Appendix~\ref{app:held-out-details} reports
-held-out outcomes and verification.
+documents frozen selection; Appendix~\ref{app:held-out-details} reports and
+verifies held-out outcomes.
 
 \subsection{Discovery outcomes}
 \label{app:discovery-outcomes}
@@ -587,7 +587,7 @@ successes at 42.9\% of the native nominal arithmetic rate.}
 Calibration requires approximately 291 seconds and discovery 31,245 seconds
 (8.68 hours) of host elapsed time, including setup and bookkeeping. This search
 expenditure is additional to subsequent deployments. The experiment does not
-estimate an amortization threshold or a training--deployment cost crossover.
+estimate when deployment amortizes this search cost.
 
 All measurements use an RTX 4060 Ti. Process samples taken approximately every
 five seconds show no unrelated sampled CUDA compute during calibration,
@@ -634,18 +634,17 @@ Arithmetic savings and elapsed savings differ. Mean rollout time is 111.9 second
 per attempt for native deployment, 61.8 seconds for $(1,5)$, and 21.8 seconds for
 $(2,2)$. Their mean generated-chunk expenditures are 109.6, 91.7, and 45.0 TFLOPs,
 respectively. These are observed all-attempt means under the same task allocation;
-they include different trajectories and outcomes. Table~\ref{tab:resources}
-reports all discovery configurations.
+they include different trajectories and outcomes. All discovery configurations
+appear in Table~\ref{tab:resources}.
 
 There is also an ordering reversal: $(1,5)$ uses more arithmetic per attempt
 than $(2,20)$ (91.7 versus 67.8 TFLOPs), but less rollout time (61.8 versus
 107.8 seconds). These means include different trajectories. On a fixed input,
 reducing $d$ from 10 to 5 lowers mean generation host time from 629.6 to
 374.3 ms (40.5\%), despite only 8.9\% less counted arithmetic. The calibration
-therefore also separates arithmetic savings from elapsed savings without
-trajectory differences. It does not resolve their component-level cause.
-A FLOP-constrained choice is not necessarily a latency- or throughput-optimal
-choice.
+therefore separates arithmetic savings from elapsed savings without trajectory
+differences, but it does not resolve their component-level cause. FLOP and
+latency constraints can therefore select different settings.
 
 As a descriptive sensitivity analysis, define calibrated host-time rate
 $b_T(h,d)=\overline{T}_{\mathrm{gen}}(d)/h$, the amortized fixed-input generation
@@ -709,7 +708,7 @@ while another repeat from the same task remains in training.
 The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
 the 12 discovery configurations and 12 untested configurations. Their calibrated costs determine
 eligibility; the fitted model selects the highest predicted success under each
-ceiling. Ties favor lower compute, then lexicographic order.
+ceiling. Ties use compute and lexicographic order.
 
 \begin{table}[htbp]
 \centering\small
@@ -767,8 +766,8 @@ This subsection first reports success for every held-out task and setting, then
 reports the four comparisons added after collection began. Of those four, two
 isolate the execution prefix, one isolates denoising, and one changes both.
 The held-out evaluation uses Goal and Object tasks 5--8, states 20--29, and
-rollout seeds 3000 and 3001. Its 80 task--state blocks each contain both seeds and
-all seven configurations.
+rollout seeds 3000 and 3001. Each of its 80 task--state blocks contains both
+seeds. All seven configurations appear in every block.
 
 \begin{table}[htbp]
 \centering\small
@@ -822,10 +821,9 @@ identities needed to reproduce the primary counts and comparison.
 \caption{Descriptive primary expenditure differences, selected minus comparator
 at $h=2$, including all attempts. Intervals use the paired state bootstrap
 conditional on the eight tasks and were added after outcomes were observed.
-Timing intervals summarize sampling variation in the observed records; they do
-not account for possible runtime interference during monitoring gaps. Differences
-are computed from unrounded means, so they need not equal the subtraction of the
-displayed one-decimal means.}
+Timing intervals summarize sampling variation in the observed records and omit
+possible runtime interference during monitoring gaps. Differences use unrounded
+means and may differ from subtraction of the displayed values.}
 \label{tab:primary-costs}
 \input{../paper/generated/primary_resources.tex}
 \end{table}
@@ -849,7 +847,7 @@ Evaluation & Batch 1; synchronous simulation; nominal 20 Hz (50 ms control perio
 Episode horizons & Spatial and Object: 280 control steps; Goal: 300\\
 \addlinespace[3pt]
 Precision controls & Autocast and TF32 disabled; deterministic algorithms enabled\\
-Attention and reuse & Eager language/action attention with float32 scores; within-generation KV cache enabled\\
+Attention and reuse & Eager float32 attention; within-generation KV reuse\\
 Compilation/warm-up & Model compilation disabled; 20 warm-up generations per condition\\
 \addlinespace[3pt]
 Evaluator provenance & Pinned source revision and retained source-tree digest\\
