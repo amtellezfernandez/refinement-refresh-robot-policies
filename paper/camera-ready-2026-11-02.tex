@@ -476,67 +476,62 @@ on new tasks.
 
 \section{Discussion and Conclusion}
 
-Allocating inference compute in a chunked policy requires three measurements:
-complete policy-call cost, held-out closed-loop outcomes, and realized expenditure
-over an attempt. It also requires separating prespecified comparisons from later
-analyses. Without these elements, a cheap setting can appear useful without
-behavioral evidence, or a successful setting can be reported without its cost.
+The experiments expose two limits on inference allocation. First, reducing a
+model's adjustable refinement work may save little when most generation cost is
+fixed. Second, executing more actions from each chunk can reduce episode cost
+substantially, but it also delays feedback and changes which predicted action
+positions reach the environment. Cost and closed-loop success must therefore be
+measured together rather than inferred from a single per-call setting.
 
-The SmolVLA results illustrate the resulting decision boundary. At $h=2$, reducing
-denoising improved observed success while modestly reducing counted work, but the
-other frozen prefixes did not establish a uniform benefit. Executing five actions
-instead of two reduced episode arithmetic much more strongly, while the available
-data did not establish equivalent quality. Most generation arithmetic was
-independent of denoising, and the fitted response model selected the same settings
-as a simple cost-aware rule.
+The SmolVLA case study demonstrates both points. At $h=2$, reducing denoising
+from five steps to two improved held-out success by 10.6 percentage points and
+reduced nominal counted arithmetic by 5.9\%. This result is specific to that
+prefix: the other two frozen comparisons did not establish a uniform benefit.
+Meanwhile, 82.1\% of native generation arithmetic was independent of denoising.
+Changing the execution prefix had a much larger cost effect: $(5,2)$ used 60.7\%
+less arithmetic per attempt than $(2,2)$ and produced 138 rather than 139
+successes, but the study was not designed to establish equivalent quality. The
+fitted response model also selected the same settings as a simple cost-aware
+rule, so fitting has no demonstrated selection advantage here.
 
-The transferable conclusion is therefore about evaluation rather than a universal
-setting: generation effort and execution prefix should be studied jointly within
-each model, using an explicit cost boundary and held-out outcomes. Generation
-effort may mean integration steps for diffusion or flow policies, or candidate,
-search, or verification effort for other policies, provided the control and its
-complete cost are defined in advance. The reported outcomes remain specific to
-one checkpoint and simulator stack; broader allocation claims require the same
-within-model comparison across other checkpoints, policy architectures, tasks,
-and execution stacks.
+The transferable contribution is an evaluation procedure, rather than a
+universal setting. Within each model, define its adjustable generation effort,
+measure policy-call cost under an explicit boundary, vary the execution prefix,
+freeze comparisons before held-out evaluation, and report realized episode
+expenditure with success. Generation effort can represent integration steps,
+candidate sampling, search, or verification, provided its cost is measured. When
+comparing architectures, the meaningful evidence is each model's within-model
+allocation result; unlike control values and counting boundaries should not be
+pooled directly.
 
-\paragraph{Interpretation and limits.}
-The two deployment controls are not isolated causal interventions on prediction
-quality and observation freshness. Changing denoising changes numerical
-integration; changing prefix changes both observation age and executed action
-positions. The mechanism behind the observed primary difference remains open.
-The study covers one checkpoint and twelve fixed tasks in simulation, with
-only four discovery task-level validation folds. Intervals are task-conditional,
-secondary contrasts are unadjusted, and no margin for declaring similar success
-was prespecified. The refresh-prefix contrasts were added after individual outcomes
-were visible and remain descriptive. Two steps is the minimum denoising tested;
-$d=1$ is untested.
-The arithmetic boundary excludes several operation classes; language lengths
-are audited but image shape is fixed. Sampled GPU checks have coverage gaps,
-and simulated control steps do not establish real-time responsiveness.
-The recorded outcomes trace to LIBERO's task-goal evaluation, and one
-native-setting parity episode reproduces the reference evaluator's initial state,
-action sequence, episode length, and outcome. However, the confirmation actions
-were not replayed in a separate, version-matched simulator. Outcome validity is
-therefore strongly supported internally but not fully independently established.
+\paragraph{Scope and interpretation.}
+Neither control isolates a single mechanism. Changing denoising changes numerical
+integration, while changing the prefix changes both observation age and executed
+action positions. The primary mechanism therefore remains unresolved. The study
+uses one checkpoint, twelve tasks, and synchronous simulation. Its intervals are
+conditional on the sampled tasks, secondary contrasts are unadjusted, and the
+four discovery tasks provide limited task-level validation. Prefix comparisons
+were added after outcomes were visible and remain descriptive. Two denoising
+steps is the lowest tested setting, and no equivalence margin was prespecified.
 
-\paragraph{Next steps.}
-A controlled stale-input diagnostic is needed to separate observation freshness
-from the action-position effects introduced by changing the executed prefix. A
-predeclared quality-preservation test should evaluate the cheaper $(5,2)$
-setting, and independent outcome replay should test the retained primary
-trajectories in a separate, version-matched simulator. The same study design can
-then be applied within other policies and execution
-stacks: define a controllable generation-effort axis and execution prefix,
-calibrate complete inference cost, freeze within-policy comparisons, and evaluate
-success and expenditure jointly. Cross-architecture evidence should compare the
-within-model allocation results rather than pool unlike control values or counting
-boundaries. Replication across checkpoints, benchmark families, and asynchronous
-or physical-robot execution is required to determine when additional generation
-work is worth paying for and when compute is better spent producing a new chunk
-from fresher feedback.
+\paragraph{Measurement limits.}
+The arithmetic count excludes some operation classes and is not a latency proxy;
+synchronous simulator steps do not establish real-time robot performance. The
+recorded outcomes pass internal source and consistency checks, but the full
+confirmation trajectories were not replayed in an independent, version-matched
+simulator. The result is therefore supported by strong internal validation rather
+than independent outcome reproduction.
 
-\clearpage
+\paragraph{Next experiments.}
+The first priority is independent replay of the retained primary trajectories.
+A predeclared quality-preservation study should then test the cheaper $(5,2)$
+setting. A controlled stale-input experiment is needed to separate observation
+freshness from action-position effects when $h$ changes. Finally, the same
+within-model design should be repeated across checkpoints, policy architectures,
+benchmark families, and asynchronous or physical-robot execution. Those studies
+can determine when additional generation work is worth paying for and when the
+budget is better spent producing a new chunk from fresher feedback.
+
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
 \clearpage
