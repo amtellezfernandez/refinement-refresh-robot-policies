@@ -264,84 +264,85 @@ closed-loop control.
 
 \subsection{Discovery and confirmation design}
 
-We evaluate the public \texttt{HuggingFaceVLA/smolvla\_libero} checkpoint on LIBERO
-\cite{libero}. The predicted chunk length remains fixed at $K=50$; native execution uses
-$(h,d)=(1,10)$. We hold weights, sensors, preprocessing, action normalization,
-control period, and task-specific episode horizons fixed.
+We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
+chunk length is fixed at $K=50$, and the model's native deployment uses
+$(h,d)=(1,10)$. We hold the checkpoint, observations, preprocessing, action
+normalization, control period, and task-specific episode horizons fixed.
 
-Discovery crosses $h\in\{1,2,5\}$ and $d\in\{2,5,10,20\}$ on Spatial tasks
-5--8, five initial states per task, and two policy seeds. Each of the 40 paired
-task--state--seed identities receives all twelve configurations, giving
-480 attempts. Tasks 5 and 6 overlap pre-study pilot runs; tasks 7 and 8 were selected
-before observing their outcomes in this study. Condition order is randomized
-within each paired identity.
+The discovery study varies $h\in\{1,2,5\}$ and
+$d\in\{2,5,10,20\}$ on four Spatial tasks. Each task has five initial states and
+two rollout seeds, giving 40 paired task--state--seed identities. Every identity
+receives all twelve settings in randomized order, for 480 attempts. Two discovery
+tasks overlap pre-study pilot work; the other two were chosen before their study
+outcomes were observed. This partial prior exposure is part of the reason that
+discovery is used for selection rather than final evaluation.
 
-Discovery is used to freeze three budget-specific denoising comparisons
-before confirmation. Their selected settings and comparators, together with
-native, give seven configurations. Confirmation evaluates all seven on Goal
-and Object tasks 5--8, ten states per task, and two seeds: 160 attempts per
-configuration, totaling 1,120. These eight tasks are excluded from configuration
-selection; prior exposure during unrelated development is not assessed.
-The sample allocation prioritizes task and state coverage; no margin for declaring
-two settings equivalently successful was prespecified. Appendix~\ref{app:analysis-provenance}
-distinguishes the original tests from the amended descriptive comparisons.
+After discovery, we freeze three denoising comparisons, one at each compute
+ceiling. Their selected settings and comparators, plus native deployment, produce
+seven distinct settings. Confirmation evaluates all seven on eight Goal and
+Object tasks excluded from selection. Each task has ten initial states and two
+rollout seeds, giving 160 attempts per setting and 1,120 in total. Prior exposure
+to these tasks during unrelated development is not assessed. No equivalence
+margin was prespecified, so similar observed success cannot establish equivalent
+quality. Appendix~\ref{app:analysis-provenance} records which comparisons were
+frozen and which were added later as descriptive analyses.
 
-Paired conditions share initial simulator states and keyed policy noise whenever
-they generate at the same simulation tick. Every denoising setting traverses the
-same integration interval; changing $d$ changes its discretization. Recorded
-initial conditions, generated and executed actions, and outcomes pass internal
-consistency checks. These checks do not constitute an independent simulator
-replay; Appendix~\ref{app:verification} gives the implementation trace and
-validation boundary.
+Conditions are paired by initial state and rollout seed. They also share policy
+noise while their queries occur at the same simulation step. Every denoising
+setting traverses the same integration interval; changing $d$ changes only its
+discretization. Internal checks cover initial conditions, generated and executed
+actions, and recorded outcomes. They do not provide an independent simulator
+replay; Appendix~\ref{app:verification} states the validation boundary.
 
-Success averages both seeds within each state, then states and tasks with equal
-task weights. Descriptive 95\% intervals use 20,000 bootstrap draws of states
-within the fixed tasks, retaining paired seeds and configurations. They condition
-on four discovery or eight confirmation tasks; secondary intervals are
-unadjusted. Arithmetic includes every generated chunk, including failures and
-partly consumed final prefixes. Timing measurements and their monitoring limits
-are reported separately in Appendix~\ref{app:fixed-timing}.
+Success gives equal weight to each task; because every task has the same number
+of states and seeds, this equals the overall success fraction. Descriptive 95\%
+intervals use 20,000 bootstrap draws of states within the fixed tasks while
+retaining paired seeds and settings. The intervals condition on the four
+discovery tasks or eight confirmation tasks, and secondary intervals are not
+adjusted for multiple comparisons. Arithmetic includes every generated chunk,
+including failed attempts and partly consumed final prefixes. Appendix~\ref{app:fixed-timing}
+reports timing separately.
 
-\subsection{Discovery: quality does not increase monotonically with refinement}
+\subsection{Discovery: observed success is not monotonic in refinement}
 \label{sec:discovery-quality}
 
-In discovery for the case-study checkpoint, native $(1,10)$ succeeds in 25/40 attempts. The highest observed count is 28/40
-for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$, successes
-are 21, 18, 16, and 14 out of 40 as $d$ increases from 2 to 20.
+Native $(1,10)$ succeeds in 25/40 discovery attempts. The highest observed count
+is 28/40 for $(1,5)$; $(1,2)$ and $(2,2)$ each succeed in 26/40. At $h=5$,
+success falls from 21/40 to 14/40 as $d$ increases from 2 to 20, with intermediate
+counts of 18/40 and 16/40.
 Appendix Figure~\ref{fig:frontier} shows every configuration.
 These point estimates do not justify imposing monotonic improvement with
 denoising. The small paired sample also does not certify equal quality for
 configurations with similar observed counts.
 
-The resource coordinate also matters: nominal rate differs from realized episode
-expenditure, and arithmetic savings differ from elapsed savings.
-Substituting a host-time constraint changes feasible refresh choices; the
-appendix reports this sensitivity analysis separately from the discovery
-success figure. It does not change the frozen arithmetic-based experiment.
-Full plots, task counts, and resource tables appear in
-Appendix~\ref{app:calibration}.
+Selection also depends on how cost is defined. Nominal arithmetic rate differs
+from realized episode expenditure, and arithmetic savings differ from elapsed
+time. Replacing the arithmetic ceiling with a host-time ceiling changes which
+prefixes are feasible. This sensitivity analysis does not alter the frozen
+arithmetic-based experiment and is reported with the full discovery plots and
+resource tables in Appendix~\ref{app:calibration}.
 
 \subsection{Frozen tests and the role of selection}
 \label{sec:prediction}
 
-For this case study, a logistic response model fitted only to discovery success
-selects $(5,2)$, $(2,2)$, and $(1,2)$
-at the quarter-, half-, and full-native ceilings. Their frozen comparators are
-$(5,5)$, $(2,5)$, and $(1,5)$, respectively; the half-native comparison is primary.
+Using discovery data only, the fitted logistic response model selects $(5,2)$,
+$(2,2)$, and $(1,2)$ at the quarter-, half-, and full-native ceilings. Their
+frozen comparators are $(5,5)$, $(2,5)$, and $(1,5)$, respectively. The
+half-native comparison, $(2,2)$ versus $(2,5)$, is primary.
 All selected settings are existing discovery grid points, so confirmation tests
 task transfer rather than extrapolation to an untested configuration. Each pair
 changes denoising at a fixed prefix. These are comparisons under common ceilings,
 not equal-rate tests of how to divide compute between refinement and refresh.
 
-Within this case study, $(2,2)$ has the highest eligible discovery success at the primary ceiling.
-Its comparator $(2,5)$ ties with $(2,10)$ for the highest count among distinct
-eligible alternatives and wins the lower-cost tie-break. A simple rule choosing
-minimum denoising and then the shortest feasible prefix makes the same choices
-as the fitted model at all three ceilings. This baseline was documented after
-collection began and is interpreted descriptively. Transfer outcomes cannot
-demonstrate a selection advantage between rules that make identical choices.
-Model fitting, the full candidate set, and selector diagnostics are retained
-in Appendix~\ref{app:selectors}.
+At the primary ceiling, $(2,2)$ has the highest eligible discovery success. Its
+comparator $(2,5)$ ties with $(2,10)$ for the highest count among the remaining
+eligible settings and is chosen by the lower-cost tie-break. A simpler rule---use
+the fewest denoising steps, then the shortest feasible prefix---selects the same
+three settings as the fitted model. Because this rule was documented after data
+collection began, the agreement is descriptive. Since both methods select the
+same settings, confirmation cannot show that fitting improves selection. The
+model specification, candidate set, and diagnostics remain in
+Appendix~\ref{app:selectors}.
 
 \FloatBarrier
 \section{Held-Out Results for the SmolVLA Case Study}
