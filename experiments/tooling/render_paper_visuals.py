@@ -827,11 +827,18 @@ def success_compute_figure(
                 bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
         bx.text(-10, y + 0.36, cost, fontsize=font_size, color=muted,
                 va="center", bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
-        bx.text(
-            20, y, f"{number(estimate, signed=True)}\n[{number(lo, signed=True)}, {number(hi, signed=True)}]",
-            fontsize=font_size, color=color, va="center", ha="right",
-            fontweight="bold" if bold else "normal", linespacing=1.0,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.82, "pad": 0.05},
+        value_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.86, "pad": 0.04}
+        bx.annotate(
+            number(estimate, signed=True), (estimate, y), xytext=(0, 6),
+            textcoords="offset points", fontsize=font_size, color=color,
+            va="bottom", ha="center", fontweight="bold" if bold else "normal",
+            bbox=value_box,
+        )
+        bx.annotate(
+            f"[{number(lo, signed=True)}, {number(hi, signed=True)}]", (estimate, y),
+            xytext=(0, -7), textcoords="offset points", fontsize=font_size,
+            color=color, va="top", ha="center",
+            fontweight="bold" if bold else "normal", bbox=value_box,
         )
 
     save_figure(fig, path)
