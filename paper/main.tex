@@ -33,7 +33,8 @@ deployment under explicit resource constraints poses an allocation problem: how
 much inference effort should construct each action chunk, and how long should it
 execute before prediction is refreshed from a new observation? We study this
 question by varying generation effort and execution prefix separately, measuring
-both closed-loop success and complete inference expenditure, and distinguishing
+both closed-loop success and inference expenditure under a declared counting
+boundary, and distinguishing
 prespecified comparisons from later descriptive analyses. We use
 one frozen SmolVLA checkpoint in synchronous LIBERO simulation as a worked case,
 with denoising count as its generation control. At a fixed two-action prefix, the
@@ -44,7 +45,7 @@ denoising. A later descriptive contrast
 found 138/160 versus 139/160 successes when executing five rather than two actions
 per prediction, with 60.7\% lower arithmetic per attempt; equivalence was not
 established. These checkpoint-specific results do not define a general allocation
-rule. They show why closed-loop behavior, complete inference cost, and the status
+rule. They show why closed-loop behavior, explicitly bounded inference cost, and the status
 of each comparison must be considered together.
 \end{abstract}
 
@@ -66,9 +67,10 @@ an inference budget, how much computation should construct each chunk, and how
 many actions should the robot execute before the policy refreshes it?}
 
 Our evaluation varies the model-specific refinement setting and execution prefix
-separately. It counts the arithmetic of each complete policy call under a stated
-boundary and the resulting expenditure over complete attempts. Discovery tasks are used to choose and freeze
-comparisons; different held-out tasks are then used to evaluate them. Any
+separately. It counts arithmetic across each policy call under a stated boundary
+and the resulting expenditure over complete attempts. Discovery tasks are used
+to choose and freeze comparisons; different held-out tasks are then used to
+evaluate them. Any
 comparison added after outcomes were visible is labelled \emph{amended
 descriptive}, so its interpretation remains separate from the prespecified tests.
 
@@ -101,7 +103,7 @@ tested budgets, so fitting has no demonstrated selection advantage here.
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
     \item a formulation that connects model-specific generation effort and
-    execution prefix to prediction rate and complete episode expenditure;
+    execution prefix to prediction rate and realized episode expenditure;
     \item an evaluation procedure that separates discovery, prespecified held-out
     comparisons, and later descriptive analyses; and
     \item a SmolVLA case study that demonstrates the procedure across 12
