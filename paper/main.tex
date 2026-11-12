@@ -546,13 +546,14 @@ budget is better spent producing a new chunk from fresher feedback.
 \clearpage
 \appendix
 
-\section{Detailed Outcomes and Resource Measurements}
+\section{Discovery and Resource Measurements}
 \label{app:calibration}
 
-This appendix follows the order of the empirical argument: discovery outcomes;
-generation-cost calibration and timing; sensitivity to the resource coordinate
-and input shape; complete held-out outcomes and primary expenditure; and finally measurement
-verification and analysis provenance.
+Appendices A--C follow the study chronology. This section reports discovery
+outcomes, generation-cost calibration, fixed-input timing, sensitivity to the
+resource coordinate, and the language-shape audit. Appendix~\ref{app:selectors}
+then documents frozen selection, and Appendix~\ref{app:held-out-details} reports
+held-out outcomes and verification.
 
 \subsection{Discovery outcomes}
 \label{app:discovery-outcomes}
@@ -724,6 +725,69 @@ In particular, $(2,10)$ remains within the original half-native ceiling for all
 evaluated lengths; shorter inputs reduce rather than increase its counted work.
 The audit changes neither policy execution nor the frozen selections.
 
+\FloatBarrier
+\section{Frozen Selection and Diagnostic Analyses}
+\label{app:selectors}
+
+We compare two logistic response-model families. A compute-only model uses a
+quadratic in log normalized rate. An allocation model uses $\log h$,
+$\log(d/10)$, both squared terms, and their interaction. Each family is fitted
+with ridge penalty 1 or 10. Leave-one-task-out log loss selects the model, which
+is then refitted on the discovery set. No individual seed repeat is held out
+while another repeat from the same task remains in training.
+
+The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
+the 12 discovery configurations and 12 untested configurations. Their calibrated costs determine
+eligibility; the fitted model selects the highest predicted success under each
+ceiling. Ties favor lower compute, then lexicographic order.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Discovery-based selector choices.
+The learned choices and comparisons were frozen before confirmation; additional
+selector baselines were documented after collection began.
+The empirical selector uses the measured grid; other selectors use the declared
+candidate set. The simple rule exactly matches the learned choices. Selected
+rate/native is the learned recommendation's arithmetic rate. Frozen comparators
+and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
+the half-native row is primary.
+}
+\label{tab:selectors}
+\label{tab:predictions}
+\input{../paper/generated/selector_choices.tex}
+\end{table}
+
+\begin{table}[htbp]
+\centering\small
+\caption{All original frozen denoising tests: selected minus comparator,
+holding $h$ fixed within each row. Predicted and observed gaps and intervals are
+percentage points. The half-native row is primary; secondary intervals are
+descriptive, task-conditional, and unadjusted.}
+\label{tab:confirmation-predictions}
+\input{../paper/generated/confirmation_predictions.tex}
+\end{table}
+
+The simple rule minimizes denoising count, then chooses the shortest feasible
+prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
+confirmation outcomes cannot distinguish these selectors at the tested budgets.
+The compute-only choices use the original ridge-10 fit. Its quarter- and
+half-budget choices are absent from the confirmation plan, so this evaluation
+cannot compare those decisions on held-out tasks.
+
+The selected allocation model has log loss 0.7048, compared with 0.7067 for the
+best compute-only model. This small difference provides no evidence of an added
+predictive advantage. Under the same mean natural-log binary cross-entropy,
+constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
+each training fold scores 0.7170. The response-model probabilities should
+therefore not be read as calibrated held-out-task forecasts. The primary test
+evaluates a recommendation shared with simpler selectors, so it does not
+establish an additional benefit from model-based ranking.
+
+
+\FloatBarrier
+\section{Held-Out Outcomes and Verification}
+\label{app:held-out-details}
+
 \subsection{Complete confirmation outcomes}
 \label{app:confirmation-details}
 
@@ -878,63 +942,5 @@ not bundled. The repository additionally retains a completed confirmation
 snapshot and verification code that reproduce the seven-setting resource table,
 original and amended comparisons, and task-level counts. The submitted supplement
 is retained as a separate frozen artifact.
-
-\FloatBarrier
-\section{Frozen Selection and Diagnostic Analyses}
-\label{app:selectors}
-
-We compare two logistic response-model families. A compute-only model uses a
-quadratic in log normalized rate. An allocation model uses $\log h$,
-$\log(d/10)$, both squared terms, and their interaction. Each family is fitted
-with ridge penalty 1 or 10. Leave-one-task-out log loss selects the model, which
-is then refitted on the discovery set. No individual seed repeat is held out
-while another repeat from the same task remains in training.
-
-The candidate set is $h\in\{1,2,3,5\}$ crossed with $d\in\{2,3,5,8,10,20\}$:
-the 12 discovery configurations and 12 untested configurations. Their calibrated costs determine
-eligibility; the fitted model selects the highest predicted success under each
-ceiling. Ties favor lower compute, then lexicographic order.
-
-\begin{table}[htbp]
-\centering\small
-\caption{Discovery-based selector choices.
-The learned choices and comparisons were frozen before confirmation; additional
-selector baselines were documented after collection began.
-The empirical selector uses the measured grid; other selectors use the declared
-candidate set. The simple rule exactly matches the learned choices. Selected
-rate/native is the learned recommendation's arithmetic rate. Frozen comparators
-and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
-the half-native row is primary.
-}
-\label{tab:selectors}
-\label{tab:predictions}
-\input{../paper/generated/selector_choices.tex}
-\end{table}
-
-\begin{table}[htbp]
-\centering\small
-\caption{All original frozen denoising tests: selected minus comparator,
-holding $h$ fixed within each row. Predicted and observed gaps and intervals are
-percentage points. The half-native row is primary; secondary intervals are
-descriptive, task-conditional, and unadjusted.}
-\label{tab:confirmation-predictions}
-\input{../paper/generated/confirmation_predictions.tex}
-\end{table}
-
-The simple rule minimizes denoising count, then chooses the shortest feasible
-prefix. It reproduces every learned recommendation (Table~\ref{tab:selectors});
-confirmation outcomes cannot distinguish these selectors at the tested budgets.
-The compute-only choices use the original ridge-10 fit. Its quarter- and
-half-budget choices are absent from the confirmation plan, so this evaluation
-cannot compare those decisions on held-out tasks.
-
-The selected allocation model has log loss 0.7048, compared with 0.7067 for the
-best compute-only model. This small difference provides no evidence of an added
-predictive advantage. Under the same mean natural-log binary cross-entropy,
-constant $p=0.5$ scores 0.6931 and an intercept-only model fitted separately on
-each training fold scores 0.7170. The response-model probabilities should
-therefore not be read as calibrated held-out-task forecasts. The primary test
-evaluates a recommendation shared with simpler selectors, so it does not
-establish an additional benefit from model-based ranking.
 
 \end{document}
