@@ -29,14 +29,13 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-As vision--language--action policies become more computationally demanding,
-deployment under explicit resource constraints poses an allocation problem: how
-should generation be configured, how many actions should a chunk predict, and
-how long should it execute before prediction is refreshed from a new observation?
-We study a controlled slice of this question: predicted chunk length remains
+Chunked vision--language--action policies expose three coupled deployment
+controls: generation configuration, predicted chunk length, and the number of
+actions executed before replanning. We provide an evaluation procedure covering
+all three and study a controlled two-axis case: predicted chunk length remains
 fixed at $K=50$ and is not evaluated, while denoising count and execution prefix
 vary. We measure closed-loop success and inference expenditure under a declared
-counting boundary, distinguishing comparisons fixed before confirmation outcomes
+counting boundary, distinguishing comparisons fixed before held-out outcomes
 from amended descriptive analyses. An execution-order amendment during collection
 left settings, identities, stopping rules, inclusion, and the primary analysis
 unchanged. We use
@@ -72,14 +71,15 @@ length determines how many candidate actions the call constructs. We ask:
 actions should be predicted, and how many should execute before refresh?}
 
 Our evaluation procedure separates a model-specific refinement configuration,
-predicted chunk length, and execution prefix. The present experiment holds chunk
-length fixed and varies denoising count and execution prefix. It counts each
+predicted chunk length, and execution prefix. In the present experiment,
+refinement is denoising count, chunk length is fixed, and the execution prefix
+controls how often the policy refreshes its prediction. The procedure counts each
 policy call under a stated arithmetic boundary and aggregates that cost over
 complete attempts. Discovery tasks determine the prespecified comparisons;
-separate tasks evaluate them. Analyses added after outcomes were visible are
-labelled \emph{amended descriptive}.
+separate tasks provide held-out confirmation. Analyses added after outcomes were
+visible are labelled \emph{amended descriptive}.
 
-This comparison is intended for chunked policies with a controllable generation
+This evaluation procedure is intended for chunked policies with a controllable generation
 effort. Depending on the architecture, that control could be integration steps,
 candidate generation, search, or verification effort. The present study tests
 only denoising count, and numerical control values should not be compared across
@@ -89,9 +89,7 @@ a hardware-independent optimum.
 
 We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
 We evaluate 12 configurations in 480 discovery attempts, then seven frozen
-settings in 1,120 held-out attempts on eight tasks excluded from selection. The
-case study shows why a deployment claim must combine closed-loop outcomes,
-complete attempt cost, and the status of the comparison producing it.
+settings in 1,120 held-out attempts on eight tasks excluded from selection.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
@@ -206,7 +204,7 @@ expenditure at the same nominal rate. FLOPs, host elapsed time, and CUDA-stream
 time retain separate units and measurement boundaries.
 
 \subsection{A fixed-cost floor in the SmolVLA implementation}
-\label{sec:results}
+\label{sec:fixed-cost-floor}
 
 For the case-study checkpoint and reference input, generation cost separates
 into a denoising-independent term and a term that grows linearly with $d$. To
@@ -364,8 +362,8 @@ and remain descriptive: two isolate $h$, one isolates $d$ at $h=1$, and one
 changes both controls.
 Table~\ref{tab:confirmation-grid} reports the seven settings,
 Figure~\ref{fig:success-compute} connects success to compute, and
-Table~\ref{tab:evidence-status} states the interpretation supported by each
-comparison. All totals use the 1,120 planned attempts; Appendix~\ref{app:verification}
+the following subsections explain the supported interpretation. All totals use
+the 1,120 planned attempts; Appendix~\ref{app:verification}
 documents the removal of two duplicated log records.
 
 \begin{table}[htbp]
@@ -424,27 +422,7 @@ observed $+10.6$-point effect is also larger than the response model's frozen
 $+4.0$-point prediction; agreement in direction does not establish calibrated
 effect-size prediction.
 
-\begin{table}[htbp]
-\centering\small
-\caption{Evidence status and permitted interpretation. Effects use A minus B.
-The table separates prespecified confirmation from amended descriptive analysis.}
-\label{tab:evidence-status}
-\begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
-\toprule
-Comparison & Status & Result & Supported claim\\
-\midrule
-$(2,2)-(2,5)$ & Prespecified primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
-At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
-\addlinespace[2pt]
-Other fixed-$h$ refinement tests & Prespecified & Positive point estimates;
-intervals span zero & A uniform benefit is not established for this checkpoint.\\
-\addlinespace[2pt]
-$(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
-$(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
-cost savings; equivalent quality is unresolved.\\
-\bottomrule
-\end{tabular}
-\end{table}
+
 
 \FloatBarrier
 \subsection{Amended descriptive execution-prefix comparisons}
@@ -478,6 +456,33 @@ their different prefix patterns cannot be attributed to task family without a
 shared-task test. The cost model determines feasibility, not the quality ranking
 on new tasks.
 
+\paragraph{Evidence summary.}
+Table~\ref{tab:evidence-status} consolidates the status and permitted
+interpretation of the prespecified and amended comparisons.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Evidence status and permitted interpretation. Effects use A minus B.
+The table separates prespecified confirmation from amended descriptive analysis.}
+\label{tab:evidence-status}
+\begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
+\toprule
+Comparison & Status & Result & Supported claim\\
+\midrule
+$(2,2)-(2,5)$ & Prespecified primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
+At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
+\addlinespace[2pt]
+Other fixed-$h$ refinement tests & Prespecified & Positive point estimates;
+intervals span zero & A uniform benefit is not established for this checkpoint.\\
+\addlinespace[2pt]
+$(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
+$(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
+cost savings; equivalent quality is unresolved.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\FloatBarrier
 \section{Discussion and Conclusion}
 
 The experiments expose two limits on inference allocation. First, reducing a
