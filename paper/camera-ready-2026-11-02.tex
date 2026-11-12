@@ -122,6 +122,8 @@ instead allocate deployment-time compute within one frozen policy and evaluate
 the choice by closed-loop task success.
 
 \paragraph{Computation used to generate an action.}
+Diffusion Policy generates action sequences through iterative conditional
+denoising \cite{diffusionpolicy}.
 RoboMonkey spends additional inference compute on action candidates and
 verification \cite{robomonkey}. This is one form of refinement: both proposal and
 verification cost belong to the policy call. SmolVLA provides the flow-matching
@@ -134,8 +136,9 @@ holds the checkpoint, hardware, and synchronous execution path fixed so that the
 effects of refinement and execution prefix can be compared within one system.
 
 \paragraph{Choosing when to refresh.}
-Action chunking predicts multi-action sequences and can also define the action
-space used for reinforcement learning \cite{qchunking}.
+ACT predicts action chunks to reduce the effective decision horizon
+\cite{act}; chunked action spaces have also been studied for reinforcement
+learning \cite{qchunking}.
 Adaptive Action Chunking uses action entropy to choose how much of a predicted
 chunk to execute \cite{adaptivechunking}. DVAC uses variation observed during
 denoising to adapt the execution prefix \cite{dvac}. ElegantVLA schedules
