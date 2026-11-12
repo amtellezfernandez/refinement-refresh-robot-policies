@@ -737,13 +737,13 @@ def success_compute_figure(
     ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
 
     offsets = {
-        (5, 2): 2,
-        (5, 5): -20,
-        (2, 2): 2,
-        (2, 5): -20,
-        (1, 2): 2,
-        (1, 5): -20,
-        (1, 10): 2,
+        (5, 2): 6,
+        (5, 5): -26,
+        (2, 2): 6,
+        (2, 5): -26,
+        (1, 2): 6,
+        (1, 5): -26,
+        (1, 10): 6,
     }
     for cell, row in resources.items():
         successes = row["successes"]

@@ -1,6 +1,6 @@
 {
   "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
-  "script_sha256": "9ab8cd2a7ebec72ee0c0314dcb1583a163fc43dc3eed623745a6a8d47b77d943",
+  "script_sha256": "613ac511986c2648820b12f3bc571d04dca8a44a460fc898034152325ae54a31",
   "input_sha256": {
     "experiments/runs/refinement_refresh_final_001/paper_analysis/discovery_audit.json": "0a4a26754151fe203f06637fcfaec85931f1f40218722f979dbdffd7fbcb4cec",
     "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "cd0e42cd418cb48604f7271c8f1000d0ccc00262eae6fbca9b359e6ed6d2657c",
@@ -29,7 +29,7 @@
     "confirmation_effects.pdf": "78ba981199b5ab5ef8de4e116c763bc7ca592f93867af3deee52f93ba4346d97",
     "study_design.pdf": "85eb1cb41d06744ee72150a25da3247f9ac09e333d3b2021bb55d249780bd970",
     "cost_decomposition.pdf": "2558bfc5b160bcde5474f03fdf309bccf173e426d48adb87943975201319ff78",
-    "success_compute_tradeoff.pdf": "b1532be114e9817e4a44967e52294491446f9471498444d34a63d603c2a56cf8",
-    "success_compute_tradeoff_poster.pdf": "b1544c8a01b2b198bc0b255a9ef12bb4cfba866b06865d98d8ad9d361ade41ac"
+    "success_compute_tradeoff.pdf": "1a971693f838c1250dacbff0b3e19a8c2676f71f133732e89a7461787216468f",
+    "success_compute_tradeoff_poster.pdf": "a8e9377e3a1faac54b81f70f8a344a3fa245cb2239477b59d22b01073b210348"
   }
 }
