@@ -110,36 +110,37 @@ The contributions are:
 
 \section{Related Work}
 
-\paragraph{Compute allocation.}
-Compute-optimal scaling work allocates training resources across model size and
-data \cite{chinchilla}, and related embodied studies examine scaling for agent
-pretraining and world modeling \cite{pearcescaling}. Accounting for deployment
-demand can change the optimum when inference cost is included
-\cite{beyondchinchilla}. These studies motivate explicit budgets and cost
-boundaries. Our unit of comparison is different: deployment controls within one
-frozen policy, evaluated by closed-loop task success rather than training loss.
+\paragraph{Allocation under a compute budget.}
+Compute-optimal scaling studies ask how a fixed training budget should be divided
+between model size and data \cite{chinchilla}; related embodied work studies
+scaling in agent pretraining and world models \cite{pearcescaling}. Including
+deployment demand can change the preferred allocation \cite{beyondchinchilla}.
+These studies establish the need to state the budget and counting boundary. We
+instead allocate deployment-time compute within one frozen policy and evaluate
+the choice by closed-loop task success.
 
-\paragraph{Inference-time generation and systems.}
-RoboMonkey increases test-time action sampling and uses verification to select an
-action proposal \cite{robomonkey}; this is a generation-effort axis whose cost
-includes both candidates and verification. VLA-Perf models how architecture,
-asynchronous execution, deployment placement, hardware, and networks affect VLA
-inference performance \cite{vlaperf}. SmolVLA also studies asynchronous inference
-for robot control \cite{smolvla}. Our experiment holds the checkpoint, hardware,
-and synchronous execution stack fixed, then measures task success and arithmetic
-as generation effort and the executed prefix change.
+\paragraph{Computation used to generate an action.}
+RoboMonkey spends additional inference compute on action candidates and
+verification \cite{robomonkey}. This is one form of refinement: both proposal and
+verification cost belong to the policy call. SmolVLA provides the flow-matching
+policy used in our case study and also studies asynchronous inference
+\cite{smolvla}. VLA-Perf examines how model
+architecture, hardware, placement, networking, and asynchronous execution affect
+VLA inference performance \cite{vlaperf}. These works show that arithmetic and
+elapsed time depend on both the model and its execution system. Our case study
+holds the checkpoint, hardware, and synchronous execution path fixed so that the
+effects of refinement and execution prefix can be compared within one system.
 
-\paragraph{Adaptive execution and replanning.}
-Adaptive Action Chunking uses action entropy to select how much of a predicted
-chunk to execute \cite{adaptivechunking}. DVAC uses variation during denoising to
-adapt the execution prefix \cite{dvac}, while ElegantVLA jointly schedules
-vision--language recomputation, reuse, and action-denoising modes
-\cite{elegantvla}. These methods learn or derive a schedule that changes during an
-episode. Our study instead compares fixed settings, separates configuration
-selection from held-out evaluation, and reports generation and episode cost under
-one declared boundary. It supplies a controlled baseline for asking which axes an
-adaptive scheduler should vary; it does not establish an advantage over those
-methods.
+\paragraph{Choosing when to refresh.}
+Adaptive Action Chunking uses action entropy to choose how much of a predicted
+chunk to execute \cite{adaptivechunking}. DVAC uses variation observed during
+denoising to adapt the execution prefix \cite{dvac}. ElegantVLA schedules
+vision--language recomputation, reuse, and action generation during execution
+\cite{elegantvla}. These methods change the schedule within an episode. We map
+fixed refinement and prefix settings first, separate selection from held-out
+evaluation, and report both nominal prediction rate and realized episode cost.
+This design evaluates the axes available to an adaptive method; it does not test
+whether a fixed schedule is better than adaptation.
 
 \section{Allocating Compute Between Generation and Execution}
 \label{sec:allocation}
