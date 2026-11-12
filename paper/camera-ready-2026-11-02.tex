@@ -29,14 +29,15 @@ MAAT Institute\\
 \maketitle
 
 \begin{abstract}
-Chunked robot policies make three coupled choices that determine deployment-time
-compute: how much computation is spent generating one action chunk
-(refinement), how many actions each chunk contains, and how many are executed
-before replanning from a new observation (refresh). We formulate this allocation
-problem and evaluate it using one frozen SmolVLA checkpoint in synchronous LIBERO
-simulation, with denoising count as the refinement control and chunk length fixed
-at $K=50$. We report closed-loop success alongside dense neural arithmetic and
-host time under explicit measurement boundaries. Three denoising comparisons
+After training, a chunked robot policy can still be adapted through its inference
+configuration: how much computation is spent generating one action chunk
+(refinement), how many actions the chunk contains, and how many are executed
+before replanning from a new observation (refresh). We formulate this
+deployment-time allocation problem and evaluate it without updating model
+weights, using one frozen SmolVLA checkpoint in synchronous LIBERO simulation.
+Denoising count is the refinement control and chunk length is fixed at $K=50$.
+We report closed-loop success alongside dense neural arithmetic and host time
+under explicit measurement boundaries. Three denoising comparisons
 were selected on discovery tasks before 1,120 held-out attempts; execution-prefix
 comparisons were added later and are amended descriptive. Arithmetic and latency
 characterize per-call cost differently: at $d=10$, 82.1\% of counted arithmetic
@@ -52,10 +53,12 @@ allocation decisions; they do not define a universal setting.
 
 \section{Introduction}
 
-Frozen chunked robot policies expose three coupled deployment-time choices: how
+Post-training adaptation need not modify a robot policy's weights. A frozen
+chunked policy can also be adapted through its deployment configuration: how
 much computation is spent generating one action chunk, how many actions the
 chunk contains, and how many are executed before the policy replans from a new
-observation. We call adjustable computation within one policy call
+observation. These controls change both deployment cost and closed-loop
+behavior. We call adjustable computation within one policy call
 \emph{refinement}. We call obtaining a new observation-conditioned prediction
 \emph{refresh}; the execution prefix controls how often it occurs. Predicted
 chunk length determines how many actions each call constructs.
@@ -69,13 +72,14 @@ best closed-loop behavior?} We do not trade a fixed budget continuously between
 refinement and refresh; we compare configurations that are feasible under common
 compute ceilings and report their nominal rates and realized attempt costs.
 
-Our evaluation procedure separates a model-specific refinement configuration,
+We study this form of post-training adaptation as a controlled allocation
+problem. Our evaluation procedure separates a model-specific refinement configuration,
 predicted chunk length, and execution prefix. It measures every policy call
 under a stated boundary, aggregates cost over complete attempts, uses discovery
 tasks to choose prespecified comparisons, and evaluates those comparisons on
 separate held-out tasks. Analyses added after outcomes were visible are labelled
-\emph{amended descriptive}. This is an evaluation and reporting procedure, not
-a learned allocator.
+\emph{amended descriptive}. This procedure supports choosing a deployment
+configuration; it does not train the policy or learn an online allocator.
 
 The procedure is intended for chunked policies with a controllable refinement
 setting. Depending on the architecture, that setting could control integration
@@ -97,8 +101,9 @@ The contributions are:
     \item a formulation connecting a model-specific refinement configuration,
     predicted chunk length, and execution prefix to nominal compute rate and
     realized attempt cost;
-    \item an evaluation procedure separating discovery, prespecified held-out
-    comparisons, and amended descriptive analyses; and
+    \item an evaluation procedure for post-training deployment adaptation that
+    separates discovery, prespecified held-out comparisons, and amended
+    descriptive analyses; and
     \item a SmolVLA case study showing that a large per-call cost can be
     independent of the refinement control, that lower refinement improves
     held-out success in the primary comparison, and that quality preservation
@@ -107,14 +112,14 @@ The contributions are:
 
 \section{Related Work}
 
-\paragraph{Allocation under a compute budget.}
+\paragraph{Post-training allocation under a compute budget.}
 Compute-optimal scaling studies ask how a fixed training budget should be divided
 between model size and data \cite{chinchilla}; related embodied work studies
 scaling in agent pretraining and world models \cite{pearcescaling}. Including
 deployment demand can change the preferred allocation \cite{beyondchinchilla}.
 These studies establish the need to state the budget and counting boundary. We
-instead allocate deployment-time compute within one frozen policy and evaluate
-the choice by closed-loop task success.
+instead adapt the inference configuration of one frozen policy and evaluate
+each deployment-time compute allocation by closed-loop task success.
 
 \paragraph{Computation used to generate an action.}
 Diffusion Policy generates action sequences through iterative conditional
@@ -499,8 +504,9 @@ resource coordinate changes which settings appear feasible. The fitted response
 model offered no demonstrated selection advantage over the post hoc simpler rule
 that chose the same settings.
 
-The transferable contribution is an evaluation procedure, rather than a
-universal setting. Within each model, define its refinement configuration and
+The transferable contribution is an evaluation procedure for post-training
+deployment adaptation, rather than a universal setting. Within each frozen
+model, define its refinement configuration and
 predicted chunk length, measure every policy-call cost under an explicit
 boundary, vary the execution prefix,
 freeze comparisons before held-out evaluation, and report realized attempt
