@@ -359,19 +359,23 @@ candidate set, and diagnostics.
 \section{Held-Out Results for the SmolVLA Case Study}
 \label{sec:transfer}
 
-\subsection{Held-out settings and evidence status}
+\subsection{Results at a glance}
 
-The held-out evaluation applies seven settings to the same 160
-task--state--seed identities, giving 1,120 attempts. Three comparisons of $d=2$
-against $d=5$, each at a fixed $h\in\{1,2,5\}$, were frozen before confirmation
-outcomes; $(2,2)$ versus $(2,5)$ is primary. Four comparisons were added later
-and remain descriptive: two isolate $h$, one isolates $d$ at $h=1$, and one
-changes both controls.
-Table~\ref{tab:confirmation-grid} reports the seven settings,
-Figure~\ref{fig:success-compute} connects success to compute, and
-the following subsections explain the supported interpretation. All totals use
-the 1,120 planned attempts; Appendix~\ref{app:verification}
-documents the removal of two duplicated log records.
+The held-out evaluation yields three conclusions with different evidential
+status. First, the prespecified primary comparison shows that reducing
+denoising at $h=2$ improves success while reducing counted arithmetic. Second,
+the other prespecified comparisons do not establish that this benefit holds at
+every execution prefix. Third, the later prefix comparisons reveal large cost
+differences but do not establish equivalent success. Table~\ref{tab:confirmation-grid}
+reports the seven settings, and Figure~\ref{fig:success-compute} shows the
+comparisons that support these conclusions.
+
+The evaluation applies each setting to the same 160 task--state--seed
+identities, for 1,120 planned attempts. Three fixed-$h$ comparisons of $d=2$
+against $d=5$ were prespecified; $(2,2)$ versus $(2,5)$ is primary. Four
+additional comparisons were defined after outcomes were visible and are
+descriptive. Appendix~\ref{app:verification} documents the removal of two
+duplicated log records without changing the planned totals.
 
 \begin{table}[htbp]
 \centering\small
@@ -386,113 +390,90 @@ mean arithmetic per attempt charges every generated chunk.}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}\par\vspace{-0.4em}
-\caption{Held-out settings and paired comparisons. Panel A shows all seven
-settings, where $h$ is the executed prefix and $d$ is the denoising count; each
-point is labelled with its setting and success rate. Exact success counts are
-reported in Table~\ref{tab:confirmation-grid}. Horizontal position is mean reference-calibrated arithmetic per
-attempt, including failures. This differs from the
-nominal arithmetic per control step used to define the selection ceilings in
-Section~\ref{sec:fixed-cost-floor}. The success axis begins at 72\%. Blue marks
-the prespecified primary pair. Panel B shows three prespecified refinement
-comparisons and two later, amended descriptive prefix comparisons. Each point is
-the paired difference in successful attempts per 100 evaluations for the
-displayed move (destination minus start); for example, $+10.6$ means about 11
-additional successes per 100 attempts. Each bar is its task-conditional 95\%
-interval; intervals crossing zero do not separate the settings under this
-analysis. Thus the $h=2\rightarrow5$ row is the
-negation of the $(2,2)-(5,2)$ convention in Table~\ref{tab:confirmation-secondary}.
-Two additional amended contrasts involving native $(1,10)$ are reported only in
-that table. Attempt arithmetic below each row is descriptive and does not imply
-latency improvement or equivalent success.}
+\caption{Success and compute in the held-out evaluation. Panel A shows the
+seven settings ($h$: executed prefix; $d$: denoising steps). Horizontal position
+is mean reference-calibrated arithmetic per attempt, including failures; the
+success axis begins at 72\%. Blue marks the primary pair. Panel B reports the
+paired success change for each displayed move and its task-conditional 95\%
+interval. A positive value favors the destination setting, and an interval
+crossing zero does not separate the settings under this analysis. The
+$h=2\rightarrow5$ row therefore reverses the sign used for $(2,2)-(5,2)$ in
+Table~\ref{tab:confirmation-secondary}. Arithmetic per attempt is shown beneath
+each comparison. Selection ceilings instead use nominal arithmetic per control
+step (Section~\ref{sec:fixed-cost-floor}). Exact counts and two additional
+descriptive contrasts appear in Tables~\ref{tab:confirmation-grid}
+and~\ref{tab:confirmation-secondary}.}
 \label{fig:success-compute}
 \end{figure}
 \FloatBarrier
 
 \begin{samepage}
-\subsection{Prespecified refinement comparisons}
+\subsection{What the prespecified comparisons establish}
 
-The primary comparison holds $h=2$ fixed. Reducing denoising from $d=5$ to
-$d=2$ raises observed success from 122/160 to 139/160.
-The paired difference is $+10.6$ percentage points, with a task-conditional 95\%
-interval of $[+4.4,+16.9]$. It also reduces nominal reference arithmetic per
-control step by 5.9\%, from 292.2 to 275.0 GFLOPs. For this checkpoint and prefix,
-less refinement therefore improves observed success while reducing counted work.
+The primary comparison holds $h=2$ fixed and changes only denoising. Moving
+from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
+$10.6$ percentage points with a task-conditional 95\% interval of
+$[+4.4,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
+15.6\% per attempt. Thus, for this checkpoint at $h=2$, the additional
+denoising is both less successful and more expensive.
 \par\end{samepage}
 
-Mean arithmetic per attempt falls by 15.6\%, from 48.7 to 41.1 TFLOPs. This
-attempt-level difference also reflects the changed trajectories: mean episode
-length is 149.0 control steps for $(2,2)$ and 166.3 for $(2,5)$. The effect is
-positive on seven tasks and tied on one. Across the 160 paired identities,
-$(2,2)$ has 24 wins, seven losses, and 129 ties.
-Appendix~\ref{app:primary-costs} reports task sensitivity and
-expenditure intervals. Counted arithmetic does not establish a physical-latency
-improvement.
-
-The other two prespecified comparisons are smaller and uncertain. At $h=5$,
-$d=2$ gives 138/160 successes and $d=5$ gives 133/160. At $h=1$, the counts are
-137/160 and 136/160. Both point estimates favor $d=2$, but both intervals include
-zero (Figure~\ref{fig:success-compute}). The evidence therefore supports the
-primary result at $h=2$, not a uniform benefit across execution prefixes. The
-observed $+10.6$-point effect is also larger than the response model's frozen
-$+4.0$-point prediction; agreement in direction does not establish calibrated
-effect-size prediction.
+The result is not driven by one task: seven tasks favor $d=2$ and one ties, and
+the paired identities contain 24 wins and seven losses. Nevertheless, it is not
+a general denoising trend. At $h=1$ and $h=5$, the point estimates also favor
+$d=2$, but their intervals cross zero. The response model predicted the primary
+direction but understated its magnitude ($+4.0$ predicted versus $+10.6$
+observed), so these data do not demonstrate calibrated forecasting.
+Appendix~\ref{app:primary-costs} reports task sensitivity, trajectory lengths,
+and expenditure intervals. Counted arithmetic should not be interpreted as
+physical latency.
 
 
 
 \FloatBarrier
-\subsection{Amended descriptive execution-prefix comparisons}
+\subsection{What the later prefix comparisons suggest}
 
-These comparisons hold denoising fixed and vary how many actions are executed
-before replanning. Because they were added after outcomes were visible, they
-describe observed trade-offs rather than test prespecified hypotheses.
-Appendix~\ref{app:confirmation-details} gives their provenance and two additional
-contrasts involving native $(1,10)$.
+The descriptive prefix comparisons ask whether acting longer before replanning
+can reduce cost without an obvious loss in observed success. At $d=2$, executing
+five rather than two actions per prediction reduces mean arithmetic per attempt
+by 60.7\%, while the observed totals differ by one success (138/160 versus
+139/160). The uncertainty interval spans practically meaningful differences in
+both directions, and task-level effects are mixed. The result therefore shows a
+large compute saving, but it does not establish equivalent quality.
 
-At $d=2$, $(2,2)$ exceeds $(5,2)$ by just one success: 139/160 versus 138/160,
-a paired difference of $+0.6$ percentage points with 95\% interval
-$[-6.3,+6.9]$. Executing five actions per prediction, $(5,2)$, uses 60\% less
-nominal arithmetic per control step and 60.7\% less mean arithmetic per attempt:
-16.1 versus 41.1 TFLOPs. The interval permits meaningful success differences in
-either direction, so the observed counts do not establish equivalent quality.
-The aggregate also hides variation: $(2,2)-(5,2)$ is positive on three tasks,
-negative on three, and tied on two (Table~\ref{tab:confirmation-tasks}).
+Refreshing after every action is still more expensive and shows no measured
+success advantage over refreshing after two actions. Taken together, the
+prefix comparisons show why cost and quality must be reported separately: the
+cost ranking is clear, whereas the quality ranking is not. Because these
+comparisons were defined after outcomes were visible, they motivate a future
+prespecified study rather than support a general recommendation about refresh
+frequency. They also cannot reconcile the different discovery and confirmation
+patterns, which were measured on different task sets.
 
-Refreshing every action with $(1,2)$ instead of every two actions gives two
-fewer successes, a difference of $-1.3$ points with 95\% interval
-$[-7.5,+5.0]$, at 83.3 versus 41.1 TFLOPs per attempt. More frequent refresh has no demonstrated quality
-benefit in these SmolVLA contrasts. Two native-relative comparisons are reported
-separately in Appendix~\ref{app:confirmation-details}: one changes only
-denoising at $h=1$, and the other changes both denoising and prefix.
-
-At $d=2$, discovery gives equal success for $h=1$ and $h=2$, and both exceed
-$h=5$ (Section~\ref{sec:discovery-quality}); confirmation does not establish a
-general prefix advantage on the held-out tasks. Because the two phases use different task sets,
-their different prefix patterns cannot be attributed to task family without a
-shared-task test. The cost model determines feasibility, not the quality ranking
-on new tasks.
+Appendix~\ref{app:confirmation-details} records the comparison provenance and
+the two contrasts involving native $(1,10)$; Table~\ref{tab:confirmation-tasks}
+shows task-level variation.
 
 \paragraph{Evidence summary.}
-Table~\ref{tab:evidence-status} consolidates the status and permitted
-interpretation of the central prespecified and amended comparisons.
+Table~\ref{tab:evidence-status} separates what the case study establishes from
+what remains a descriptive observation.
 
 \begin{table}[htbp]
 \centering\small
-\caption{Evidence status and permitted interpretation. Effects use A minus B.
-The table separates prespecified confirmation from amended descriptive analysis.}
+\caption{Evidence status and permitted interpretation.}
 \label{tab:evidence-status}
-\begin{tabular}{@{}p{0.18\linewidth}p{0.15\linewidth}p{0.26\linewidth}p{0.29\linewidth}@{}}
+\begin{tabular}{@{}p{0.21\linewidth}p{0.19\linewidth}p{0.52\linewidth}@{}}
 \toprule
-Comparison & Status & Result & Supported claim\\
+Evidence & Status & Supported interpretation\\
 \midrule
-$(2,2)-(2,5)$ & Prespecified primary & $+10.6$ pp; 95\% interval $[+4.4,+16.9]$ &
-At $h=2$, fewer denoising steps improved observed success for this checkpoint.\\
+Primary $h=2$ comparison & Prespecified & Fewer denoising steps improve success
+while reducing counted arithmetic for this checkpoint and prefix.\\
 \addlinespace[2pt]
-Other fixed-$h$ refinement tests & Prespecified & Positive point estimates;
-intervals span zero & A uniform benefit is not established for this checkpoint.\\
+Other fixed-$h$ comparisons & Prespecified & A uniform refinement effect is not
+established.\\
 \addlinespace[2pt]
-$(2,2)-(5,2)$ & \shortstack[l]{Amended\\descriptive} & $+0.6$ pp; 95\% interval $[-6.3,+6.9]$;
-$(5,2)$ uses 60.7\% less arithmetic per attempt & The case study shows large
-cost savings; equivalent quality is unresolved.\\
+Prefix comparisons & Later descriptive & Acting longer reduces compute;
+equivalent success is not established.\\
 \bottomrule
 \end{tabular}
 \end{table}
