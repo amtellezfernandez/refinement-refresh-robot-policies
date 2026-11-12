@@ -187,7 +187,8 @@ unknown success term.
 
 In the SmolVLA instantiation, $K=50$ and $\mathbf g=(d)$, where $d$ is the
 denoising count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
-For compactness below, $b(h,d)$ denotes $b(h,50,(d))$.
+For compactness below, $F_{\mathrm{gen}}(d)$ denotes
+$F_{\mathrm{gen}}((d),50)$ and $b(h,d)$ denotes $b(h,50,(d))$.
 
 \begin{figure}[H]
 \centering
@@ -209,7 +210,7 @@ generated-chunk expenditure is
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
 is used. For the case study, each call has fixed cost for a given $d$, so this
-reduces to $C_e=\lceil T_e/h\rceil F_{\mathrm{gen}}(d,50)$. The summed form also
+reduces to $C_e=\lceil T_e/h\rceil F_{\mathrm{gen}}(d)$. The summed form also
 covers variable-cost early exit, sampling, search, verification, or language
 generation. All-attempt means include unsuccessful
 episodes. Different trajectories and termination times can therefore change
@@ -389,9 +390,9 @@ mean arithmetic per attempt charges every generated chunk.}
 \includegraphics[width=\linewidth]{../paper/figures/fig_refinement_refresh_plot.png}\par\vspace{-0.4em}
 \caption{Held-out success and compute across the seven settings. Each point is
 labelled $(h,d)$ and aggregates 160 held-out attempts. Horizontal position is
-the nominal arithmetic per control step of native $(1,10)$; farther left is
-cheaper. The success axis begins at 75\%. Each arrow points from comparator B to
-setting A and reports the paired A-minus-B success difference with its
+nominal arithmetic per control step as a percentage of native $(1,10)$; farther
+left is cheaper. The success axis begins at 75\%. Each arrow points from
+comparator B to setting A and reports the paired A-minus-B success difference with its
 task-conditional 95\% interval. Blue identifies the prespecified primary
 comparison. Black arrows holding $h$ fixed are the other prespecified refinement
 tests; black arrows changing $h$ are amended descriptive prefix comparisons.
@@ -698,8 +699,8 @@ The profiled batch contains one sample, two $3\times360\times360$ image tensors,
 an eight-dimensional state tensor, and language-token and attention-mask tensors
 of length 20. The checkpoint exposes seven-dimensional actions and generates a
 50-action chunk. Evaluation fixes batch size, image preprocessing, state/action
-dimensions, and chunk size. The tokenizer pads language only to the longest
-sequence in a batch. Reconstructing the declared task strings with the pinned
+dimensions, and predicted chunk length. The tokenizer pads language only to the
+longest sequence in a batch. Reconstructing the declared task strings with the pinned
 tokenizer gives 15--17 tokens for discovery and 5--12 for confirmation, versus 20
 in calibration. We profile every distinct evaluated length for
 $d\in\{2,5,10\}$, preserving all other shapes, and test eligibility against
