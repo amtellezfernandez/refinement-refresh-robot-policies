@@ -144,9 +144,9 @@ def tables(data):
     result["confirmation_resources.tex"] = table(
         "ccrS[table-format=2.1]S[table-format=1.3]S[table-format=2.1]S[table-format=3.1]",
         [
-            r"\multicolumn{2}{c}{Allocation} & \multicolumn{2}{c}{Success} & {Nominal rate} & \multicolumn{2}{c}{Mean per attempt}\\",
+            r"\multicolumn{2}{c}{Allocation} & \multicolumn{2}{c}{Success} & {Nominal} & \multicolumn{2}{c}{Mean per attempt}\\",
             r"\cmidrule(lr){1-2}\cmidrule(lr){3-4}\cmidrule(l){5-5}\cmidrule(l){6-7}",
-            r"$h$ & $d$ & Count & {(\%)} & {/ native} & {TFLOPs} & {Steps}\\",
+            r"$h$ & $d$ & Count & {(\%)} & {rate ratio} & {TFLOPs} & {Steps}\\",
         ],
         [
             [
@@ -165,9 +165,9 @@ def tables(data):
     result["confirmation_predictions.tex"] = table(
         "lccS[table-format=+2.1]S[table-format=+2.1]l",
         [
-            r"Ceiling & \multicolumn{2}{c}{Setting $(h,d)$} & \multicolumn{3}{c}{Success difference (pp)}\\",
+            r" & \multicolumn{2}{c}{Setting $(h,d)$} & \multicolumn{3}{c}{Success difference (pp)}\\",
             r"\cmidrule(lr){2-3}\cmidrule(l){4-6}",
-            r"/ native & Selected & Comparator & {Predicted} & {Observed} & {95\% interval}\\",
+            r"Ceiling ratio & Selected & Comparator & {Predicted} & {Observed} & {95\% interval}\\",
         ],
         [
             [
@@ -219,9 +219,9 @@ def tables(data):
     result["discovery_tasks.tex"] = table(
         "cc" + "r" * 5 + "S[table-format=1.3]",
         [
-            r"\multicolumn{2}{c}{Allocation} & \multicolumn{4}{c}{Spatial task successes (each /10)} & & {Nominal rate}\\",
+            r"\multicolumn{2}{c}{Allocation} & \multicolumn{4}{c}{Spatial task successes (each /10)} & & {Nominal}\\",
             r"\cmidrule(lr){1-2}\cmidrule(lr){3-6}",
-            r"$h$ & $d$ & Task 5 & Task 6 & Task 7 & Task 8 & Total & {/ native}\\",
+            r"$h$ & $d$ & Task 5 & Task 6 & Task 7 & Task 8 & Total & {rate ratio}\\",
         ],
         [
             [
@@ -277,9 +277,9 @@ def tables(data):
     result["selector_choices.tex"] = table(
         "lccccS[table-format=1.3]",
         [
-            r" & \multicolumn{4}{c}{Selector choice $(h,d)$} & {Learned}\\",
+            r" & \multicolumn{4}{c}{Selector choice $(h,d)$} & {Learned selector}\\",
             r"\cmidrule(lr){2-5}",
-            r"Ceiling/native & Learned & Simple & Empirical & Compute-only & {rate/native}\\",
+            r"Ceiling ratio & Learned & Simple & Empirical & Compute-only & {Rate ratio}\\",
         ],
         [
             [

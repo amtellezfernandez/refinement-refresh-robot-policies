@@ -237,6 +237,7 @@ ten to five saves 8.9\% of counted generation work; reducing it to two saves
  \frac{b(h,d)}{b_{\mathrm{native}}}
  \simeq \frac{0.821+0.179(d/10)}{h}.
 \]
+Here $b_{\mathrm{native}}=b(1,10)$.
 
 Profiling counts matrix products, convolutions, and attention across vision,
 language prefill, and the action expert, using two FLOPs per multiply-add.
@@ -563,7 +564,7 @@ held-out outcomes and verification.
 
 {\raggedright
 The checkpoint is \texttt{HuggingFaceVLA/smolvla\_libero}, revision
-\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk size is 50;
+\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}. Predicted chunk length is 50;
 native execution uses $h=1,d=10$. Discovery uses Spatial tasks 5--8, initial
 states 10--14, and rollout seeds 2000 and 2001. The 20 task--state blocks
 contain both seeds and all 12 configurations. Discovery bootstrap resampling uses
@@ -572,7 +573,7 @@ contain both seeds and all 12 configurations. Discovery bootstrap resampling use
 \begin{table}[htbp]
 \centering\small
 \caption{Discovery successes on Spatial tasks 5--8. Each task contributes five
-states and two seeds per configuration. Rate/native is
+states and two seeds per configuration. The nominal rate ratio is
 $F_{\mathrm{gen}}(d)/(hF_{\mathrm{gen}}(10))$, not realized attempt cost.
 The best observed count is 28/40 at $(1,5)$; no monotonic denoising trend is
 assumed.}
@@ -752,8 +753,9 @@ ceiling. Ties favor lower compute, then lexicographic order.
 The learned choices and comparisons were frozen before confirmation; additional
 selector baselines were documented after collection began.
 The empirical selector uses the measured grid; other selectors use the declared
-candidate set. The simple rule exactly matches the learned choices. Selected
-rate/native is the learned recommendation's arithmetic rate. Prespecified comparators
+candidate set. The simple rule exactly matches the learned choices. The selected
+rate ratio is the learned recommendation's nominal arithmetic rate
+divided by the native rate. Prespecified comparators
 and predicted gaps appear in Table~\ref{tab:confirmation-predictions};
 the half-native row is primary.
 }
@@ -763,7 +765,7 @@ the half-native row is primary.
 
 \begin{table}[htbp]
 \centering\small
-\caption{All original frozen denoising tests: selected minus comparator,
+\caption{All prespecified denoising comparisons: selected minus comparator,
 holding $h$ fixed within each row. Predicted and observed gaps and intervals are
 percentage points. The half-native row is primary; secondary intervals are
 descriptive, task-conditional, and unadjusted.}
