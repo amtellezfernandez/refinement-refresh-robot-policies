@@ -266,6 +266,10 @@ test their closed-loop outcomes.
 \section{SmolVLA Case Study}
 \label{sec:method}
 
+This section applies the allocation procedure to one frozen checkpoint. Discovery
+maps the candidate settings and freezes the comparisons; confirmation then tests
+those comparisons on tasks excluded from selection.
+
 \subsection{Discovery and confirmation design}
 
 We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
@@ -327,27 +331,29 @@ arithmetic-based experiment. Appendix~\ref{app:discovery-outcomes} gives the
 full discovery results, and Appendix~\ref{app:timing-sensitivity} gives the
 resource-coordinate analysis.
 
-\subsection{Frozen tests and the role of selection}
+\subsection{Frozen comparisons and selection rules}
 \label{sec:prediction}
 
-Using discovery data only, the fitted logistic response model selects $(5,2)$,
-$(2,2)$, and $(1,2)$ at the quarter-, half-, and full-native ceilings. Their
-frozen comparators are $(5,5)$, $(2,5)$, and $(1,5)$, respectively. The
-half-native comparison, $(2,2)$ versus $(2,5)$, is primary.
-All selected settings are existing discovery grid points, so confirmation tests
-task transfer rather than extrapolation to an untested configuration. Each pair
-changes denoising at a fixed prefix. These are comparisons under common ceilings,
-not equal-rate tests of how to divide compute between refinement and refresh.
+Discovery freezes $(5,2)$, $(2,2)$, and $(1,2)$ at the quarter-, half-, and
+full-native ceilings. Their comparators are $(5,5)$, $(2,5)$, and $(1,5)$,
+respectively; $(2,2)$ versus $(2,5)$ is the primary comparison. Every selected
+setting is an observed discovery-grid point, so confirmation tests performance
+on new tasks rather than extrapolation to an untested setting. Each pair changes
+denoising at a fixed prefix. The pairs share a compute ceiling but do not have
+equal compute rates, so they test the selected setting against a feasible
+alternative rather than directly dividing a fixed amount between refinement and
+refresh.
 
 At the primary ceiling, $(2,2)$ has the highest eligible discovery success. Its
 comparator $(2,5)$ ties with $(2,10)$ for the highest count among the remaining
-eligible settings and is chosen by the lower-cost tie-break. A simpler rule---use
-the fewest denoising steps, then the shortest feasible prefix---selects the same
-three settings as the fitted model. Because this rule was documented after data
-collection began, the agreement is descriptive. Since both methods select the
-same settings, confirmation cannot show that fitting improves selection. The
-model specification, candidate set, and diagnostics remain in
-Appendix~\ref{app:selectors}.
+eligible settings and is chosen by the lower-cost tie-break. A logistic response
+model fitted only to discovery data produces all three frozen selections. A
+simpler rule---use the fewest denoising steps, then the shortest feasible
+prefix---produces the same selections. Because the simple rule was documented
+after data collection began, this agreement is descriptive. Confirmation cannot
+show that fitting improves selection when both procedures choose the same
+settings. Appendix~\ref{app:selectors} contains the model specification,
+candidate set, and diagnostics.
 
 \FloatBarrier
 \section{Held-Out Results for the SmolVLA Case Study}
