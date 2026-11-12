@@ -26,33 +26,33 @@
 \usepackage{float}
 \title{Refinement versus Refresh: Deployment-Time\\
 Compute Allocation for Chunked Robot Policies}
-\author{Alba Mar\'ia T\'ellez Fern\'andez\\
-MAAT Institute\\
+\author{\href{https://amtellezfernandez.com/}{Alba Mar\'ia T\'ellez Fern\'andez}\\
+\href{https://maatinstitute.com/}{MAAT Institute}\\
 \texttt{alba.tellez@maatinstitute.com}}
 \begin{document}
 \maketitle
 
 \begin{abstract}
-After training, a chunked robot policy can still be adapted through its inference
-configuration: how much computation is spent generating one action chunk
-(refinement), how many actions the chunk contains, and how many are executed
-before replanning from a new observation (refresh). We formulate this
-deployment-time allocation problem and evaluate it without updating model
-weights, using one frozen SmolVLA checkpoint in synchronous LIBERO simulation.
-Denoising count is the refinement control and chunk length is fixed at $K=50$.
-We report closed-loop success alongside dense neural arithmetic and host time
-under explicit measurement boundaries. Three denoising comparisons
-were selected on discovery tasks before 1,120 held-out attempts; execution-prefix
-comparisons were defined after held-out outcomes were available and are descriptive. Arithmetic and latency
-characterize per-call cost differently: at $d=10$, 82.1\% of counted arithmetic
-is independent of denoising, whereas a descriptive affine fit to fixed-input host
-time assigns 17.7\% to its intercept. At $h=2$, $d=2$ succeeds on 139/160
-attempts versus 122/160 for $d=5$ ($+10.6$ percentage points; task-conditional
-95\% interval: $+4.4$ to $+16.9$), while using 5.9\% less arithmetic per control
-step. Executing $h=5$ rather than $h=2$ at $d=2$ yields 138/160 versus 139/160
-successes and 60.7\% lower arithmetic per attempt; equivalence is not established.
-These checkpoint-specific results illustrate an evaluation procedure for
-post-training deployment adaptation; they do not define a universal setting.
+Frozen chunked robot policies retain deployment-time choices that can change
+both compute and closed-loop behavior: how much work generates each action
+chunk (refinement), how many actions it predicts, and how soon the policy
+replans from a new observation (refresh). We formulate this allocation problem
+without updating model weights. Our evaluation procedure reports success with
+both nominal compute rate and complete attempt cost, selects comparisons on
+discovery tasks, and tests prespecified comparisons on held-out tasks while
+identifying post-outcome analyses as descriptive. We demonstrate the procedure
+with one frozen SmolVLA checkpoint in synchronous LIBERO simulation, using
+denoising count as the refinement control and fixing chunk length at $K=50$.
+Arithmetic and latency characterize cost differently: at $d=10$, 82.1\% of
+counted arithmetic is independent of denoising, whereas a descriptive affine
+fit to fixed-input host time assigns 17.7\% to its intercept. At $h=2$, $d=2$
+succeeds on 139/160 attempts versus 122/160 for $d=5$ ($+10.6$ percentage
+points; task-conditional 95\% interval: $+4.4$ to $+16.9$), while using 5.9\%
+less arithmetic per control step. Executing $h=5$ rather than $h=2$ at $d=2$
+yields 138/160 versus 139/160 successes and 60.7\% lower arithmetic per attempt;
+equivalence is not established. The case study shows why deployment adaptation
+must evaluate generation effort and feedback frequency jointly; it does not
+define a universal setting.
 \end{abstract}
 
 \section{Introduction}
@@ -495,8 +495,8 @@ new prediction from fresher feedback.
 
 \section*{Data and Code Availability}
 Evaluation code and paired held-out outcomes sufficient to reproduce the totals
-and primary comparison are available at
-\url{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}.
+and primary comparison are available in the
+\href{https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh}{BenchStudio worked example}.
 Checkpoint weights, simulator assets, action tensors, and images are not
 redistributed.
 
