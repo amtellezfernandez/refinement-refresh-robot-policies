@@ -147,7 +147,9 @@ whether a fixed schedule is better than adaptation.
 
 We compare two deployment choices for a frozen chunked policy: the effort used to
 generate one action chunk and the number of actions executed before requesting a
-new prediction. The evaluation procedure measures both nominal compute rate and
+new prediction. We represent refinement by an architecture-specific effort
+control $r$ and refresh frequency by the execution prefix $h$. The evaluation
+procedure measures both nominal compute rate and
 realized episode expenditure, selects comparisons on discovery tasks, freezes
 the confirmatory comparisons, and evaluates them on separate tasks. Success and
 cost are reported together. Later analyses remain explicitly descriptive, and
@@ -165,8 +167,9 @@ controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
 measured arithmetic of one generation under a stated counting boundary.
 The study compares configurations $(h,r)$ within a policy; it does not assume
-that numerical values of $r$ are comparable across architectures. For complete
-execution prefixes, the nominal compute rate per simulated control step is
+that numerical values of $r$ are comparable across architectures. Ignoring a
+possibly partial final prefix, the nominal compute rate per simulated control
+step is
 \[
  b(h,r)=\frac{F_{\mathrm{gen}}(r)}{h}.
 \]
@@ -181,7 +184,8 @@ For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target i
 \end{equation}
 A configuration need not exhaust the ceiling. This is a deployment compute-rate
 constraint for a fixed checkpoint, rather than a training-plus-deployment
-objective.
+objective. The equation defines the allocation decision; the experiments below
+estimate its unknown success term from paired rollouts.
 
 In the SmolVLA instantiation, $K=50$ and $r=d$, where $d$ is the denoising
 count. Figure~\ref{fig:closed-loop-policy} shows this case-study execution loop.
@@ -249,15 +253,15 @@ A tighter budget can therefore force a longer execution prefix before any
 quality-based choice is made. This is an implementation-specific arithmetic
 floor under the declared counting boundary, not a universal VLA scaling law.
 
-Calibration uses a fixed input shape; a separate language-length audit leaves
-eligibility unchanged under the original absolute ceilings
-(Appendix~\ref{app:shape-audit}). Reference arithmetic remains distinct from
-task-shaped arithmetic and elapsed time. For the case-study implementation on a fixed input, reducing $d$ from 10
-to 5 lowers measured host generation time by 40.5\% while counted arithmetic
-falls by 8.9\% (Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a
-latency proxy. The cost model defines feasible
-schedules; the following experiments ask which feasible expenditures help
-closed-loop control.
+Calibration uses a fixed input shape. A separate audit using the language lengths
+observed in the tasks leaves eligibility unchanged under the same absolute
+ceilings (Appendix~\ref{app:shape-audit}). The reference-input arithmetic used
+for selection remains distinct from task-specific arithmetic and elapsed time.
+On the fixed calibration input, reducing $d$ from 10 to 5 lowers measured host
+generation time by 40.5\% while counted arithmetic falls by 8.9\%
+(Appendix~\ref{app:fixed-timing}); FLOPs are therefore not a latency proxy. The
+cost model determines which settings satisfy a ceiling. The following experiments
+test their closed-loop outcomes.
 
 \section{SmolVLA Case Study}
 \label{sec:method}
