@@ -50,76 +50,62 @@ of each comparison must be considered together.
 
 \section{Introduction}
 
-Deploying vision--language--action policies under a finite inference budget is
-an allocation problem. A chunked policy spends internal computation constructing
-an action sequence, executes some prefix of that sequence, and then pays for
-another prediction conditioned on a newer observation. More generation effort
-may change the predicted chunk; a longer execution prefix reduces prediction
-frequency but delays feedback and exposes later action positions. Comparing these
-controls therefore requires closed-loop outcomes and a common resource boundary,
-not generation cost alone.
+Chunked robot policies make two coupled deployment choices. Each policy call
+constructs an action sequence, the robot executes only a prefix of that sequence,
+and the policy then predicts again from a newer observation. More computation
+inside a call may change the predicted actions. Executing a longer prefix reduces
+the number of calls, but it also delays feedback and commits the robot to later
+actions from an older prediction. The useful setting therefore depends on both
+closed-loop behavior and the total cost of prediction over an attempt.
 
-We call computation spent constructing one chunk \emph{refinement}, and obtaining
-a new observation-conditioned prediction \emph{refresh}. Refinement is controlled
-by a model-specific generation-effort setting; refresh frequency is controlled by
-the number of actions executed before replanning, which we call the execution
-prefix.
+We call adjustable computation spent constructing one action chunk
+\emph{refinement}, and obtaining a new observation-conditioned prediction
+\emph{refresh}. The number of actions executed before replanning is the
+\emph{execution prefix}; it controls how often refresh occurs. We ask: \emph{under
+an inference budget, how much computation should construct each chunk, and how
+many actions should the robot execute before the policy refreshes it?}
 
-We ask: \emph{given a fixed inference budget, how should a chunked policy allocate
-compute between action generation and observation-conditioned execution?} To
-answer this without turning one architecture's control into a general rule, we
-compare the model-specific generation-effort setting and execution prefix
-separately. We measure complete prediction and realized episode expenditure,
-use discovery tasks only to choose comparisons, evaluate those frozen comparisons
-on separate held-out tasks, and mark later analyses as descriptive. We call a
-comparison added after outcomes were visible an \emph{amended descriptive}
-comparison. This
-combination of controlled comparison, complete cost accounting, and explicit
-evidence status is the primary transferable contribution.
+Our evaluation varies the model-specific refinement setting and execution prefix
+separately. It counts the arithmetic of each complete policy call under a stated
+boundary and the resulting expenditure over complete attempts. Discovery tasks are used to choose and freeze
+comparisons; different held-out tasks are then used to evaluate them. Any
+comparison added after outcomes were visible is labelled \emph{amended
+descriptive}, so its interpretation remains separate from the prespecified tests.
 
-The comparison is intended for chunked policies that expose a controllable
-generation effort. That control could be the number of integration steps in an
-iterative flow or diffusion policy, or the candidate, search, or verification
-effort in a policy that uses such mechanisms. Only denoising count is tested here,
-and the controls need not have comparable units across architectures.
-We use synchronous execution to hold sequencing and measurement boundaries fixed;
-the study does not identify an asynchronous scheduling optimum, real-robot
-latency, or a universal hardware winner.
+This comparison is intended for chunked policies with a controllable generation
+effort. Depending on the architecture, that control could be integration steps,
+candidate generation, search, or verification effort. The present study tests
+only denoising count, and numerical control values should not be compared across
+architectures. Synchronous execution keeps sequencing and cost boundaries fixed;
+the study does not determine an asynchronous schedule, physical-robot latency, or
+a hardware-independent optimum.
 
-SmolVLA provides the worked case study \cite{smolvla}. Its generation control is
-denoising count, and its execution control is the number of actions applied before
-replanning. We evaluate twelve configurations in a paired 480-attempt discovery
-study, then seven configurations in 1,120 held-out attempts on eight tasks excluded
-from selection. Three denoising comparisons were frozen before the held-out
-evaluation. The
-execution-prefix contrasts were added later and remain descriptive; they neither
-isolate observation freshness from action-position effects nor establish an
-optimal allocation rule.
+We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
+Denoising count controls refinement, and the execution prefix controls refresh.
+We evaluate 12 configurations in 480 discovery attempts, then seven frozen
+settings in 1,120 held-out attempts on eight tasks excluded from selection. Three
+denoising comparisons were fixed before the held-out evaluation. Comparisons that
+change the execution prefix were added later and remain descriptive because they
+change both observation age and the action positions executed from each chunk.
 
-For this checkpoint, the prespecified primary comparison yields 139/160 successes
-with two denoising steps versus 122/160 with five at the same two-action prefix,
-while using less counted arithmetic. Calibration shows that 82.1\% of generation
-arithmetic at the model's default ten-step setting is independent of denoising,
-so reducing refinement alone
-leaves substantial fixed work. At two denoising steps, executing five actions per
-prediction yields 138/160 successes and 60.7\% less arithmetic per attempt than
-executing two; equivalent quality is not established. A simple cost-aware rule
-also matches the fitted response model's choices at all three tested compute
-budgets, with no
-demonstrated selection advantage from fitting.
-
-These checkpoint-specific outcomes show both what the comparison can reveal and
-where its evidence limits the resulting claims.
+At a fixed two-action prefix, the prespecified primary comparison gives 139/160
+successes with two denoising steps and 122/160 with five, while using less counted
+arithmetic. At the model's default ten-step setting, 82.1\% of generation
+arithmetic is independent of denoising, which limits the savings available from
+refinement alone. With two denoising steps, executing five actions per prediction
+gives 138/160 successes and uses 60.7\% less arithmetic per attempt than executing
+two; the available data do not establish equivalent quality. A simple cost-aware
+rule also selects the same settings as the fitted response model at all three
+tested budgets, so fitting has no demonstrated selection advantage here.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a formulation that relates generation effort and execution prefix to
-    complete prediction and episode expenditure;
-    \item a controlled evaluation that distinguishes prespecified tests from
-    later descriptive contrasts and retains their uncertainty and provenance;
-    and
-    \item a paired SmolVLA case study, using denoising count as the generation
-    control, across twelve discovery configurations and seven held-out settings.
+    \item a formulation that connects model-specific generation effort and
+    execution prefix to prediction rate and complete episode expenditure;
+    \item an evaluation procedure that separates discovery, prespecified held-out
+    comparisons, and later descriptive analyses; and
+    \item a SmolVLA case study that demonstrates the procedure across 12
+    discovery configurations and seven held-out settings.
 \end{itemize}
 
 \section{Related Work}
