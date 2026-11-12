@@ -276,7 +276,7 @@ For the case-study checkpoint and reference input, generation cost separates
 into a denoising-independent term and a term that grows linearly with $d$. To
 rounding, the measured arithmetic is
 \[
- F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
+ F_{\mathrm{gen}}(d) \simeq 527.108 + 11.457\,d\quad\text{GFLOPs}
 \]
 at all six calibrated denoising settings. Native generation at $d=10$ costs
 641.675 GFLOPs, of which 82.1\% is independent of $d$. Halving denoising from
@@ -310,7 +310,7 @@ observed in the tasks leaves eligibility unchanged under the same absolute
 ceilings (Appendix~\ref{app:shape-audit}). The reference-input arithmetic used
 for selection remains distinct from task-specific arithmetic and elapsed time.
 A descriptive affine fit to the six fixed-input host-time means gives
-$T_{\mathrm{gen}}(d)\simeq112.3+52.2d$ ms. Its intercept is 17.7\% of fitted
+$T_{\mathrm{gen}}(d) \simeq 112.3 + 52.2\,d$ ms. Its intercept is 17.7\% of fitted
 $d=10$ host time, compared with 82.1\% for counted arithmetic. The timing
 intercept is an empirical fit under one host boundary, not a component
 attribution. Consistently, reducing $d$ from 10 to 5 lowers measured host time by
@@ -402,7 +402,7 @@ and~\ref{tab:confirmation-secondary}.}
 The primary comparison holds $h=2$ fixed and changes only denoising. Moving
 from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
 $10.6$ percentage points with a task-conditional 95\% interval of
-$[+4.4,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
+$[+4.4,\,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
 15.6\% per attempt, from 48.7 to 41.1 TFLOPs. Thus, for this checkpoint at
 $h=2$, the additional denoising is both less successful and more expensive.
 \end{minipage}
@@ -788,7 +788,7 @@ Table~\ref{tab:confirmation-secondary} reports their success differences and
 uncertainty intervals, while
 Table~\ref{tab:confirmation-grid} gives their all-attempt resource means.
 In particular, the $(2,2)$ minus $(5,2)$ expenditure difference is
-$+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,+27.5]$.
+$+25.0$ TFLOPs per attempt, with descriptive interval $[+22.8,\,+27.5]$.
 This interval describes generated-chunk arithmetic, including the different
 trajectory lengths; it is not an elapsed-time comparison or evidence of
 equivalent quality.
