@@ -712,7 +712,6 @@ def success_compute_figure(
     }
     accent = ACCENT
     gray = "#555555"
-    muted = "#444444"
 
     fig = plt.figure(figsize=(figure_width, figure_height), facecolor="white")
     grid = fig.add_gridspec(
@@ -799,21 +798,18 @@ def success_compute_figure(
     # same (h, d) transition notation.  The primary h=2 refinement row sits
     # next to the refresh rows because they share (2, 2) as a setting.
     rows = [
-        (7.35, *effect((5, 2), (5, 5)), r"$(h=5,\ d=5\rightarrow2)$",
-         "18.5 $\\rightarrow$ 16.1", gray, False),
-        (5.65, *effect((1, 2), (1, 5)), r"$(h=1,\ d=5\rightarrow2)$",
-         "89.1 $\\rightarrow$ 83.3", gray, False),
-        (3.95, *effect((2, 2), (2, 5)), r"$(h=2,\ d=5\rightarrow2)$",
-         "48.7 $\\rightarrow$ 41.1", accent, True),
-        (1.25, *effect((2, 2), (5, 2), sign=-1), r"$(h=2\rightarrow5,\ d=2)$",
-         "41.1 $\\rightarrow$ 16.1", gray, False),
-        (-0.40, *effect((1, 2), (2, 2)), r"$(h=2\rightarrow1,\ d=2)$",
-         "41.1 $\\rightarrow$ 83.3", gray, False),
+        (7.35, *effect((5, 2), (5, 5)), r"$(h=5,d=5\rightarrow2)$",
+         "18.5$\\rightarrow$16.1", gray, False),
+        (5.65, *effect((1, 2), (1, 5)), r"$(h=1,d=5\rightarrow2)$",
+         "89.1$\\rightarrow$83.3", gray, False),
+        (3.95, *effect((2, 2), (2, 5)), r"$(h=2,d=5\rightarrow2)$",
+         "48.7$\\rightarrow$41.1", accent, True),
+        (1.25, *effect((2, 2), (5, 2), sign=-1), r"$(h=2\rightarrow5,d=2)$",
+         "41.1$\\rightarrow$16.1", gray, False),
+        (-0.40, *effect((1, 2), (2, 2)), r"$(h=2\rightarrow1,d=2)$",
+         "41.1$\\rightarrow$83.3", gray, False),
     ]
-    bx.text(-10, 9.25, "Cost: before $\\rightarrow$ after (TFLOPs/attempt)",
-            fontsize=font_size, color=muted, va="center",
-            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
-    bx.text(-10, 8.65, "Denoising comparisons", fontsize=font_size + 0.4,
+    bx.text(-10, 9.15, "Denoising comparisons", fontsize=font_size + 0.4,
             color="#222222", va="center", fontweight="bold",
             bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.08})
     bx.plot([-10, 20], [2.75, 2.75], color=".78", lw=0.65)
@@ -826,11 +822,9 @@ def success_compute_figure(
                 solid_capstyle="butt", zorder=2)
         bx.scatter(estimate, y, s=30 if bold else 21, color=color,
                    edgecolor="white", linewidth=0.5, zorder=3)
-        bx.text(-10, y + 0.76, label, fontsize=font_size, color=color,
+        bx.text(-10, y + 0.98, f"{label}  {cost} TFLOPs/attempt", fontsize=font_size, color=color,
                 va="center", fontweight="bold" if bold else "normal",
                 bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
-        bx.text(-10, y + 0.36, cost, fontsize=font_size, color=muted,
-                va="center", bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.05})
         value_box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.88, "pad": 0.04}
         value_x = 19.7 if estimate > 8 else estimate
         value_alignment = "right" if estimate > 8 else "left"
@@ -869,17 +863,17 @@ def render(destination):
     success_compute_figure(data, destination / "success_compute_tradeoff.pdf")
     with matplotlib.rc_context(
         {
-            "font.size": 10.5,
-            "axes.labelsize": 10.5,
-            "axes.titlesize": 10.5,
-            "xtick.labelsize": 10.5,
-            "ytick.labelsize": 10.5,
+            "font.size": 9.5,
+            "axes.labelsize": 9.5,
+            "axes.titlesize": 9.5,
+            "xtick.labelsize": 9.5,
+            "ytick.labelsize": 9.5,
         }
     ):
         success_compute_figure(
             data,
             destination / "success_compute_tradeoff_poster.pdf",
-            font_size=10.5,
+            font_size=9.5,
             figure_width=6.1,
             figure_height=3.8,
         )
