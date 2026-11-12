@@ -144,18 +144,14 @@ methods.
 \section{Allocating Compute Between Generation and Execution}
 \label{sec:allocation}
 
-The evaluation has four stages. First, choose an architecture-specific generation
-effort control $r$ and an execution prefix $h$, while holding the checkpoint and
-paired rollout conditions fixed. Here $r$ denotes a controllable amount of
-internal inference work used to produce one chunk; its implementation depends on
-the policy. Second, measure complete generation cost and realized episode
-expenditure under an explicit counting boundary. Third, use a discovery task set
-to select and freeze comparisons, then evaluate them on a separate held-out task
-set. Fourth,
-report success and expenditure together, label later contrasts as descriptive,
-and avoid interpreting arithmetic savings as latency improvement or similar
-observed success as equivalent quality. The following subsections instantiate
-each stage with $r=d$, the denoising count of SmolVLA.
+We compare two deployment choices for a frozen chunked policy: the effort used to
+generate one action chunk and the number of actions executed before requesting a
+new prediction. The evaluation procedure measures both nominal compute rate and
+realized episode expenditure, selects comparisons on discovery tasks, freezes
+the confirmatory comparisons, and evaluates them on separate tasks. Success and
+cost are reported together. Later analyses remain explicitly descriptive, and
+arithmetic savings are kept distinct from latency. The SmolVLA case study
+instantiates generation effort with its denoising count.
 
 \subsection{Compute rate and episode expenditure}
 
@@ -166,14 +162,15 @@ the policy predicts $K$ actions, executes only the first $h$, discards the
 remaining $K-h$, and generates a new chunk from a new observation. Thus $h$
 controls replanning frequency without changing $K$. We reserve $T_e$ for the
 number of actions executed in attempt $e$, and write $F_{\mathrm{gen}}(r)$ for the
-complete measured arithmetic of one generation under a stated counting boundary.
+measured arithmetic of one generation under a stated counting boundary.
 The study compares configurations $(h,r)$ within a policy; it does not assume
 that numerical values of $r$ are comparable across architectures. For complete
 execution prefixes, the nominal compute rate per simulated control step is
 \[
  b(h,r)=\frac{F_{\mathrm{gen}}(r)}{h}.
 \]
-Let $p_{\mathrm{success}}(h,r)$ denote closed-loop success for a configuration.
+Let $p_{\mathrm{success}}(h,r)$ denote expected closed-loop success under the
+specified task distribution.
 For a candidate set $\mathcal C$ and budget ceiling $B$, the allocation target is
 \begin{equation}
  (h^\star,r^\star)(B)\in
@@ -201,30 +198,27 @@ the remainder, and replans from a new observation. Here $r=d$ and $K=50$.}
 \label{fig:closed-loop-policy}
 \end{figure}
 
-We distinguish this rate from total arithmetic per attempted episode. If attempt
-$e$ executes $T_e$ actions, its generated-chunk expenditure is
+We distinguish this rate from total arithmetic per attempted episode. In the
+case study, generation cost is fixed for a given $r$. If attempt $e$ executes
+$T_e$ actions, its generated-chunk expenditure is
 \begin{equation}
  C_e=\left\lceil T_e/h\right\rceil F_{\mathrm{gen}}(r).
  \label{eq:episode-cost}
 \end{equation}
 The final generated chunk is charged even if only part of its execution prefix
-is used. All-attempt means include unsuccessful episodes. Different trajectories
-and termination times can therefore change expenditure at the same nominal rate.
-FLOPs, host elapsed time, and CUDA-stream time retain separate units and
-measurement boundaries.
+is used. If generation cost varies across calls, as it can for early-exit,
+sampling, search, or verification procedures, episode expenditure must instead
+sum the measured cost of every call. All-attempt means include unsuccessful
+episodes. Different trajectories and termination times can therefore change
+expenditure at the same nominal rate. FLOPs, host elapsed time, and CUDA-stream
+time retain separate units and measurement boundaries.
 
-\subsection{The fixed cost of a fresh prediction}
+\subsection{A fixed-cost floor in the SmolVLA implementation}
 \label{sec:results}
 
-Complete-generation profiling counts matrix products, convolutions, and
-attention across vision, language prefill, and the action expert, using two
-FLOPs per multiply-add. Embedding lookups, normalization, activations,
-elementwise arithmetic, and external preprocessing are excluded. We therefore
-refer to \emph{dense neural arithmetic}, not an exact count of every scalar
-operation. Calibration uses one real development observation and fixed tensor
-shapes; its procedure is detailed in Appendix~\ref{app:generation-calibration}.
-
-For the case-study checkpoint and reference input, the measured arithmetic satisfies, to rounding,
+For the case-study checkpoint and reference input, generation cost separates
+into a denoising-independent term and a term that grows linearly with $d$. To
+rounding, the measured arithmetic is
 \[
  F_{\mathrm{gen}}(d)\simeq 527.108+11.457d\quad\text{GFLOPs}
 \]
@@ -236,6 +230,14 @@ ten to five saves 8.9\% of counted generation work; reducing it to two saves
  \frac{b(h,d)}{b_{\mathrm{native}}}
  \simeq \frac{0.821+0.179(d/10)}{h}.
 \]
+
+Profiling counts matrix products, convolutions, and attention across vision,
+language prefill, and the action expert, using two FLOPs per multiply-add.
+Embedding lookups, normalization, activations, elementwise arithmetic, and
+external preprocessing are excluded. We therefore refer to \emph{dense neural
+arithmetic}, rather than every scalar operation. Calibration uses one real
+development observation and fixed tensor shapes; Appendix~\ref{app:generation-calibration}
+gives the procedure.
 
 We prespecify compute-rate ceilings of $0.25$, $0.50$, and $1.00$ times native.
 Eligibility uses measured per-$d$ values, not the rounded affine expression.
