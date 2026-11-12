@@ -732,9 +732,8 @@ def success_compute_figure(
     ax.set_axisbelow(True)
     ax.set_xlabel("Mean TFLOPs/attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$", fontsize=font_size)
     ax.set_ylabel("")
-    fig.text(0.012, 0.55, "Success (%)", rotation=90, fontsize=font_size,
-             ha="left", va="center")
-    ax.set_title("A  Settings", loc="left", fontsize=font_size + 0.7, fontweight="bold", pad=5)
+    ax.set_title("A  Settings · Success (%)", loc="left", fontsize=font_size + 0.7,
+                 fontweight="bold", pad=5)
 
     offsets = {
         (5, 2): 6,
