@@ -513,7 +513,7 @@ def confirmation_figure(data, path):
     from matplotlib.lines import Line2D
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
-    ax = fig.add_axes([0.29, 0.21, 0.68, 0.69])
+    ax = fig.add_axes([0.33, 0.21, 0.64, 0.69])
     order = [0, 1, 2, 4, 5, 3, 6]
     labels = (
         "$(5,2)-(5,5)$",
@@ -560,7 +560,7 @@ def confirmation_figure(data, path):
             zorder=3,
         )
         ax.text(
-            -0.34, label_y, label, transform=label_transform,
+            -0.42, label_y, label, transform=label_transform,
             ha="left", va="center",
             fontweight="bold" if primary else "normal",
             color=color,
