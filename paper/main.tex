@@ -91,9 +91,7 @@ problem. Our evaluation procedure separates a model-specific refinement configur
 predicted chunk length, and execution prefix. It measures every policy call
 under a stated boundary, aggregates cost over complete attempts, uses discovery
 tasks to choose prespecified comparisons, and evaluates those comparisons on
-separate held-out tasks. Comparisons chosen after inspecting those results can
-describe observed patterns, but they do not test prespecified hypotheses. The
-procedure selects a deployment configuration
+separate held-out tasks. The procedure selects a deployment configuration
 without policy training or online learning.
 
 The procedure is intended for chunked policies with a controllable refinement
