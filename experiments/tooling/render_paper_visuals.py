@@ -537,8 +537,8 @@ def discovery_figure(data, path):
 
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
     from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
-    from matplotlib.patches import Patch
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
     ax = fig.add_axes([0.33, 0.21, 0.64, 0.69])
@@ -616,9 +616,10 @@ def confirmation_figure(data, path):
         "Compute change (TFLOPs/attempt)\n"
         "$\\downarrow$ less for A   more for A $\\uparrow$"
     )
-    legend = tuple(
-        Patch(facecolor=color, edgecolor=color, label=f"$h_A={h}$")
-        for h, color in PREFIX_COLORS.items()
+    legend = (
+        Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
+        Line2D([], [], color=INK, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
+        Line2D([], [], color=INK, marker="^", mfc="white", ls="none", label="Against $(h=1,d=10)$"),
     )
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
               handletextpad=0.35, labelspacing=0.25)
