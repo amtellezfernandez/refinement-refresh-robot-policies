@@ -567,8 +567,8 @@ def confirmation_figure(data, path):
             fontweight="bold" if primary else "normal",
         )
     for y, title in (
-        (8.42, "Denoising comparisons chosen before held-out evaluation"),
-        (4.43, "Additional comparisons chosen after inspecting results"),
+        (8.42, "Fixed-$h$ denoising comparisons"),
+        (4.43, "Additional configuration comparisons"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
