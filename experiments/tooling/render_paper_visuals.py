@@ -513,7 +513,7 @@ def confirmation_figure(data, path):
     from matplotlib.lines import Line2D
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
-    ax = fig.add_axes([0.29, 0.17, 0.68, 0.73])
+    ax = fig.add_axes([0.29, 0.21, 0.68, 0.69])
     order = [0, 1, 2, 4, 5, 3, 6]
     labels = (
         "$(5,2)-(5,5)$",
@@ -572,7 +572,7 @@ def confirmation_figure(data, path):
                 annotation_clip=False,
             )
     ax.set_xlabel(
-        "Paired success change (percentage points): "
+        "Paired success change (percentage points)\n"
         "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
     ax.set_ylabel(
