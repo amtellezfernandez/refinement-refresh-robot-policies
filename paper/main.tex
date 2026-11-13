@@ -38,7 +38,7 @@
 \maketitle
 
 \begin{abstract}
-A frozen chunked robot policy can spend deployment compute in two coupled ways:
+A frozen chunked robot policy can spend deployment-time inference compute in two coupled ways:
 more work within each policy call to refine a predicted action chunk, or more
 frequent policy calls to replan from fresh observations. We study this allocation
 without updating model weights. Our evaluation procedure reports success with
@@ -130,7 +130,7 @@ scaling in agent pretraining and world models \cite{pearcescaling}. Including
 deployment demand can change the preferred allocation \cite{beyondchinchilla}.
 These studies establish the need to state the budget and counting boundary. We
 instead adapt the inference configuration of one frozen policy and evaluate
-each deployment-time compute allocation by closed-loop task success.
+each allocation of deployment-time inference compute by closed-loop task success.
 
 \paragraph{Computation used to generate an action.}
 Diffusion Policy generates action sequences through iterative conditional
@@ -160,7 +160,7 @@ evaluation, and report both nominal compute rate and realized attempt cost.
 This design evaluates axes available to an adaptive method; it does not compare
 a fixed deployment configuration with an online, within-episode schedule.
 
-\section{Allocating Deployment-Time Compute Between Refinement and Replanning}
+\section{Allocating Inference Compute Between Refinement and Replanning}
 \label{sec:allocation}
 
 We represent the post-training deployment configuration of a frozen chunked
@@ -229,8 +229,6 @@ and selects the comparisons; the held-out evaluation then tests those
 comparisons on tasks excluded from selection.
 
 \subsection{Discovery and held-out evaluation}
-
-Tasks excluded from selection constitute the \emph{held-out evaluation}.
 
 We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
 chunk length is fixed at $K=50$, and the model's native deployment uses
