@@ -44,8 +44,9 @@ chunk (refinement), how many actions it predicts, and how soon the policy
 replans from a new observation (replanning). We formulate this allocation problem
 without updating model weights. Our evaluation procedure reports success with
 both nominal compute rate and complete attempt cost, selects comparisons on
-discovery tasks, and tests prespecified comparisons on held-out tasks while
-identifying post-outcome analyses as descriptive. We demonstrate the procedure
+discovery tasks, and tests prespecified comparisons on held-out tasks. Comparisons
+added after inspecting the held-out results only summarize observed patterns. We
+demonstrate the procedure
 with one frozen SmolVLA checkpoint in synchronous LIBERO simulation, using
 denoising count as the refinement control and fixing chunk length at $K=50$.
 Arithmetic and latency characterize cost differently: at $d=10$, 82.1\% of
@@ -90,8 +91,9 @@ problem. Our evaluation procedure separates a model-specific refinement configur
 predicted chunk length, and execution prefix. It measures every policy call
 under a stated boundary, aggregates cost over complete attempts, uses discovery
 tasks to choose prespecified comparisons, and evaluates those comparisons on
-separate held-out tasks. Analyses defined after outcomes were visible are
-reported as descriptive. The procedure selects a deployment configuration
+separate held-out tasks. Comparisons chosen after inspecting those results can
+describe observed patterns, but they do not test prespecified hypotheses. The
+procedure selects a deployment configuration
 without policy training or online learning.
 
 The procedure is intended for chunked policies with a controllable refinement
@@ -257,7 +259,7 @@ rollout seeds, giving 160 attempts per setting and 1,120 in total. Prior exposur
 to these tasks during unrelated development is not assessed. No equivalence
 margin was prespecified, so similar observed success cannot establish equivalent
 quality. Appendix~\ref{app:analysis-status} distinguishes prespecified
-comparisons from analyses defined after outcomes were visible. The settings,
+comparisons from comparisons added after inspecting the results. The settings,
 identities, stopping rules, inclusion criteria, and primary analysis were fixed
 before held-out outcomes. After 114 attempts per primary setting, only the
 execution order changed; the planned identities and analyses remained fixed.
@@ -375,8 +377,9 @@ task--state--seed identities, for 1,120 planned attempts. Table~\ref{tab:confirm
 reports success and both compute measures; Figure~\ref{fig:success-compute}
 places them in one view and shows the paired comparisons. Three fixed-$h$
 comparisons of $d=2$ against $d=5$ were prespecified, with $(2,2)$ versus
-$(2,5)$ as primary. Prefix comparisons were added after outcomes were visible
-and remain descriptive. Appendix~\ref{app:verification} documents two removed
+$(2,5)$ as primary. We added the prefix comparisons after inspecting the
+held-out results, so they only summarize observed patterns.
+Appendix~\ref{app:verification} documents two removed
 duplicate records without changing the planned totals.
 
 \begin{table}[!t]
@@ -439,7 +442,7 @@ Replanning after every action is still more expensive and shows no measured
 success advantage over replanning after two actions. Taken together, the
 prefix comparisons show why cost and quality must be reported separately: the
 cost ranking is clear, whereas the quality ranking is not. Because these
-comparisons were defined after outcomes were visible, they motivate a future
+comparisons were chosen after inspecting the results, they motivate a future
 prespecified study rather than support a general recommendation about replanning
 frequency. They also cannot reconcile the different discovery and held-out
 patterns, which were measured on different task sets.
