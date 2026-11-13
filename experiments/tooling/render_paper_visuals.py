@@ -542,8 +542,8 @@ def confirmation_figure(data, path):
     from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
     from matplotlib.patches import Patch
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.45))
-    ax = fig.add_axes([0.33, 0.20, 0.64, 0.53])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.80))
+    ax = fig.add_axes([0.33, 0.32, 0.64, 0.57])
     order = [0, 1, 2, 4, 5, 3, 6]
     # Four compute effects cluster tightly near zero. Keep one aligned label
     # column and separate only those labels, with quiet connectors to the exact
@@ -629,8 +629,8 @@ def confirmation_figure(data, path):
     )
     fig.legend(
         handles=marker_legend,
-        loc="upper center",
-        bbox_to_anchor=(0.66, 0.93),
+        loc="lower center",
+        bbox_to_anchor=(0.50, 0.095),
         ncol=3,
         frameon=False,
         handletextpad=0.25,
@@ -638,8 +638,8 @@ def confirmation_figure(data, path):
     )
     fig.legend(
         handles=color_legend,
-        loc="upper center",
-        bbox_to_anchor=(0.66, 0.85),
+        loc="lower center",
+        bbox_to_anchor=(0.50, 0.020),
         ncol=3,
         frameon=False,
         handletextpad=0.25,
