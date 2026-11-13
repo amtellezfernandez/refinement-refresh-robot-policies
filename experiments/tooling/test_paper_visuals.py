@@ -130,9 +130,19 @@ class PaperVisualTests(unittest.TestCase):
             np.testing.assert_allclose(
                 segment[:, 0], 100 * np.array(comparison["interval95"][0])
             )
+            np.testing.assert_allclose(
+                segment[:, 1], [comparison["mean_difference"][1]] * 2
+            )
+            vertical = container.lines[2][1].get_segments()[0]
+            np.testing.assert_allclose(
+                vertical[:, 1], np.array(comparison["interval95"][1])
+            )
+            np.testing.assert_allclose(
+                vertical[:, 0], [100 * comparison["mean_difference"][0]] * 2
+            )
             self.assertEqual(
                 container.lines[0].get_marker(),
-                "D" if source_index == 1 else ("o" if row < 3 else "s"),
+                "D" if source_index == 1 else ("o" if row < 3 else ("s" if row < 5 else "^")),
             )
 
     def test_shared_cost_figure_uses_the_retained_affine_decomposition(self):

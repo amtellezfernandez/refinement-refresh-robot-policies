@@ -510,39 +510,43 @@ def discovery_figure(data, path):
 
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.05))
-    ax = fig.add_axes([0.36, 0.20, 0.32, 0.70])
-    ys = [9.0, 8.0, 7.0, 4.8, 3.8, 1.6, 0.6]
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.35))
+    ax = fig.add_axes([0.16, 0.22, 0.79, 0.72])
     order = [0, 1, 2, 4, 5, 3, 6]
     labels = (
-        "$(5,2) - (5,5)$",
-        "$(2,2) - (2,5)$",
-        "$(1,2) - (1,5)$",
-        "$(2,2) - (5,2)$",
-        "$(1,2) - (2,2)$",
-        "$(2,2) - (1,10)$",
-        "$(1,2) - (1,10)$",
+        "$(5,2)-(5,5)$",
+        "$(2,2)-(2,5)$",
+        "$(1,2)-(1,5)$",
+        "$(2,2)-(5,2)$",
+        "$(1,2)-(2,2)$",
+        "$(2,2)-(1,10)$",
+        "$(1,2)-(1,10)$",
     )
-    ax.set(xlim=(-10, 20), ylim=(-0.1, 10.1), xticks=[-10, 0, 10, 20], yticks=[])
-    ax.spines[["left", "top", "right"]].set_visible(False)
-    ax.tick_params(axis="y", length=0)
+    offsets = ((6, 8), (6, -13), (-63, -13), (6, 8), (6, 8), (6, 8), (-72, -13))
+    ax.set(
+        xlim=(-11, 20), ylim=(-72, 52),
+        xticks=[-10, 0, 10, 20], yticks=[-60, -40, -20, 0, 20, 40],
+    )
+    ax.spines[["top", "right"]].set_visible(False)
     ax.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
-    ax.axhline(6.05, color=".86", lw=0.7, zorder=0)
-    ax.axhline(2.75, color=".86", lw=0.7, zorder=0)
-    transform = ax.get_yaxis_transform()
+    ax.axhline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     comparisons = data["confirmation"]["comparisons"]
-    for row, (y, source_index, label) in enumerate(zip(ys, order, labels)):
+    for row, (source_index, label, offset) in enumerate(zip(order, labels, offsets)):
         c = comparisons[source_index]
-        effect = 100 * c["mean_difference"][0]
-        lo, hi = [100 * v for v in c["interval95"][0]]
+        success = 100 * c["mean_difference"][0]
+        success_lo, success_hi = [100 * v for v in c["interval95"][0]]
+        compute = c["mean_difference"][1]
+        compute_lo, compute_hi = c["interval95"][1]
         primary = c["kind"] == "original primary"
         color = ACCENT if primary else (INK if row < 3 else MID)
-        marker = "D" if primary else ("o" if row < 3 else "s")
+        marker = "D" if primary else ("o" if row < 3 else ("s" if row < 5 else "^"))
         ax.errorbar(
-            effect,
-            y,
-            xerr=[[effect - lo], [hi - effect]],
+            success,
+            compute,
+            xerr=[[success - success_lo], [success_hi - success]],
+            yerr=[[compute - compute_lo], [compute_hi - compute]],
             color=color,
             fmt=marker,
             mfc=ACCENT if primary else "white",
@@ -551,35 +555,29 @@ def confirmation_figure(data, path):
             elinewidth=1.1,
             zorder=3,
         )
-        ax.text(
-            -0.06,
-            y,
-            label,
-            transform=transform,
-            ha="right",
-            va="center",
+        ax.annotate(
+            label, (success, compute), xytext=offset, textcoords="offset points",
+            ha="left" if offset[0] > 0 else "right",
+            va="bottom" if offset[1] > 0 else "top",
             fontweight="bold" if primary else "normal",
+            color=color,
         )
-        ax.text(
-            1.43,
-            y,
-            f"{number(effect, True)} [{number(lo, True)}, {number(hi, True)}]",
-            transform=transform,
-            ha="center",
-            va="center",
-            fontweight="bold" if primary else "normal",
-        )
-    for y, title in (
-        (9.92, "Fixed-$h$ denoising comparisons"),
-        (5.72, "Fixed-$d=2$ replanning comparisons"),
-        (2.42, "Comparisons against $(h=1,d=10)$"),
-    ):
-        ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
-    fig.text(
-        0.5, 0.025, "Paired change in success rate (percentage points)", ha="center"
+    ax.set_xlabel(
+        "Paired change in success rate (percentage points)\n"
+        "$\\leftarrow$ lower success for A     higher success for A $\\rightarrow$"
     )
-    fig.text(0.33, 0.97, "Configuration A - B", ha="right", va="top")
-    fig.text(0.87, 0.97, "Effect [95% interval]", ha="center", va="top")
+    ax.set_ylabel(
+        "Change in mean TFLOPs/attempt, A - B\n"
+        "$\\leftarrow$ less compute for A     more compute for A $\\rightarrow$"
+    )
+    legend = (
+        Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
+        Line2D([], [], color=MID, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
+        Line2D([], [], color=MID, marker="^", mfc="white", ls="none", label="Against $(h=1,d=10)$"),
+        Line2D([], [], color=ACCENT, marker="D", ls="none", label="Primary comparison"),
+    )
+    ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
+              handletextpad=0.35, labelspacing=0.25)
     save_figure(fig, path)
     plt.close(fig)
 
