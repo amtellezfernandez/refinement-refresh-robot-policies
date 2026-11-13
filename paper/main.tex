@@ -230,13 +230,16 @@ comparisons on tasks excluded from selection.
 
 \subsection{Discovery and held-out evaluation}
 
-We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}. The predicted
-chunk length is fixed at $K=50$, and the model's native deployment uses
-$(h,d)=(1,10)$. We keep fixed the checkpoint, observations, preprocessing,
+We evaluate a public SmolVLA checkpoint on LIBERO \cite{libero}, with
+\[
+ h\in\{1,2,5\}, \qquad d\in\{2,5,10,20\}.
+\]
+The predicted chunk length is fixed at $K=50$, and the model's native deployment
+uses $(h,d)=(1,10)$. We keep fixed the checkpoint, observations, preprocessing,
 action normalization, control period, and task-specific episode horizons.
 
-The discovery study varies $h\in\{1,2,5\}$ and
-$d\in\{2,5,10,20\}$ on four Spatial tasks. Each task has five initial states and
+The discovery study evaluates these 12 settings on four Spatial tasks. Each
+task has five initial states and
 two rollout seeds, giving 40 paired task--state--seed identities. Every identity
 receives all twelve settings in randomized order, for 480 attempts. Two discovery
 tasks overlap pre-study pilot work; the other two were chosen before their study
