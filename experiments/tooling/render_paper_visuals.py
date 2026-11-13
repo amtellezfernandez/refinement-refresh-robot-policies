@@ -539,16 +539,14 @@ def discovery_figure(data, path):
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
-    from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
     from matplotlib.patches import Patch
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 3.80))
-    ax = fig.add_axes([0.33, 0.32, 0.64, 0.57])
+    ax = fig.add_axes([0.40, 0.32, 0.50, 0.57])
     order = [0, 1, 2, 4, 5, 3, 6]
-    # Four compute effects cluster tightly near zero. Keep one aligned label
-    # column and separate only those labels, with quiet connectors to the exact
-    # ordinate. The other labels remain at their marker height.
-    label_ys = (2.0, -7.5, -17.0, 25.0, 42.2, -57.3, -27.0)
+    # Labels share the exact ordinate of their marker. The four effects near
+    # zero use three horizontal slots so their text does not overlap.
+    label_xs = (0.30, 0.10, 0.20, 0.30, 0.30, 0.30, 0.30)
     ax.set(
         xlim=(-11, 20), ylim=(-72, 52),
         xticks=[-10, 0, 10, 20], yticks=[-60, -40, -20, 0, 20, 40],
@@ -557,8 +555,7 @@ def confirmation_figure(data, path):
     ax.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     ax.axhline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     comparisons = data["confirmation"]["comparisons"]
-    label_transform = ax.get_yaxis_transform()
-    for row, (source_index, label_y) in enumerate(zip(order, label_ys)):
+    for row, (source_index, label_x) in enumerate(zip(order, label_xs)):
         c = comparisons[source_index]
         success = 100 * c["mean_difference"][0]
         success_lo, success_hi = [100 * v for v in c["interval95"][0]]
@@ -581,47 +578,40 @@ def confirmation_figure(data, path):
         )
         a_h, a_d = c["a"]
         b_h, b_d = c["b"]
-        label = HPacker(
-            children=(
-                TextArea("(", textprops={"color": INK}),
-                TextArea(str(a_h), textprops={"color": PREFIX_COLORS[a_h]}),
-                TextArea(f",{a_d})-(", textprops={"color": INK}),
-                TextArea(str(b_h), textprops={"color": PREFIX_COLORS[b_h]}),
-                TextArea(f",{b_d})", textprops={"color": INK}),
-            ),
-            align="baseline",
-            pad=0,
-            sep=0,
+        segments = (
+            ("(", INK),
+            (str(a_h), PREFIX_COLORS[a_h]),
+            (f",{a_d})-(", INK),
+            (str(b_h), PREFIX_COLORS[b_h]),
+            (f",{b_d})", INK),
         )
-        ax.add_artist(
-            AnnotationBbox(
-                label,
-                (-0.42, label_y),
-                xycoords=label_transform,
-                box_alignment=(0, 0.5),
-                frameon=False,
-                pad=0,
-                annotation_clip=False,
-            )
-        )
-        if not math.isclose(label_y, compute, abs_tol=0.2):
-            ax.annotate(
-                "", xy=(-10.75, compute), xytext=(-10.75, label_y),
-                arrowprops={"arrowstyle": "-", "color": ".75", "lw": 0.55},
-                annotation_clip=False,
-            )
+        y_display = ax.transData.transform((0, compute))[1]
+        y_figure = fig.transFigure.inverted().transform((0, y_display))[1]
+        artists = [
+            fig.text(0, y_figure, text, color=text_color, ha="left", va="center")
+            for text, text_color in segments
+        ]
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        widths = [artist.get_window_extent(renderer).width / fig.bbox.width for artist in artists]
+        cursor = label_x - sum(widths)
+        for artist, width in zip(artists, widths):
+            artist.set_x(cursor)
+            cursor += width
     ax.set_xlabel(
         "Paired success change (percentage points)\n"
         "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
     ax.set_ylabel(
         "Compute change (TFLOPs/attempt)\n"
-        "$\\downarrow$ less for A   more for A $\\uparrow$"
+        "$\\downarrow$ less for A   more for A $\\uparrow$",
+        labelpad=10,
     )
+    ax.yaxis.set_label_position("right")
     marker_legend = (
         Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed $h$: vary $d$"),
         Line2D([], [], color=INK, marker="s", mfc="white", ls="none", label="Fixed $d=2$: vary $h$"),
-        Line2D([], [], color=INK, marker="^", mfc="white", ls="none", label="Native reference"),
+        Line2D([], [], color=INK, marker="^", mfc="white", ls="none", label=r"$B=(h=1,d=10)$"),
     )
     color_legend = tuple(
         Patch(facecolor=color, edgecolor=color, label=f"$h={h}$")
@@ -645,7 +635,7 @@ def confirmation_figure(data, path):
         handletextpad=0.25,
         columnspacing=0.8,
     )
-    fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
+    fig.text(0.15, 0.985, "Configuration A - B", ha="center", va="top")
     fig.text(0.65, 0.985, "Held-out success and compute effects", ha="center", va="top")
     save_figure(fig, path)
     plt.close(fig)
