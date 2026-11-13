@@ -545,7 +545,7 @@ def confirmation_figure(data, path):
         compute_lo, compute_hi = c["interval95"][1]
         primary = c["kind"] == "original primary"
         color = ACCENT if primary else (INK if row < 3 else MID)
-        marker = "D" if primary else ("o" if row < 3 else ("s" if row < 5 else "^"))
+        marker = "o" if row < 3 else ("s" if row < 5 else "^")
         ax.errorbar(
             success,
             compute,

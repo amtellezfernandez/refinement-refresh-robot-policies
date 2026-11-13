@@ -142,7 +142,7 @@ class PaperVisualTests(unittest.TestCase):
             )
             self.assertEqual(
                 container.lines[0].get_marker(),
-                "D" if source_index == 1 else ("o" if row < 3 else ("s" if row < 5 else "^")),
+                "o" if row < 3 else ("s" if row < 5 else "^"),
             )
 
     def test_shared_cost_figure_uses_the_retained_affine_decomposition(self):
