@@ -295,6 +295,32 @@ def tables(data):
             )
         ],
     )
+    timing_means = {
+        int(d): sum(call["host_s"] for call in calls) / len(calls)
+        for d, calls in data["calibration"]["timings"].items()
+    }
+    generation_flops = {
+        int(d): value for d, value in data["calibration"]["generation_flops"].items()
+    }
+    candidate_prefixes = (1, 2, 3, 5)
+    resource_rows = []
+    for ceiling in (0.25, 0.50, 1.00):
+        arithmetic_h = min(
+            h
+            for h in candidate_prefixes
+            if generation_flops[2] / h <= ceiling * generation_flops[10] * (1 + 1e-12)
+        )
+        host_h = min(
+            h
+            for h in candidate_prefixes
+            if timing_means[2] / h <= ceiling * timing_means[10] * (1 + 1e-12)
+        )
+        resource_rows.append([f"{ceiling:.2f}", pair((arithmetic_h, 2)), pair((host_h, 2))])
+    result["resource_coordinate_choices.tex"] = table(
+        "lcc",
+        [r"Ceiling relative to native & Arithmetic constraint & Host-time constraint\\"],
+        resource_rows,
+    )
     return result
 
 
@@ -599,8 +625,8 @@ def heldout_settings_figure(data, path):
     resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
     accent = ACCENT
     gray = "#555555"
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.35), facecolor="white")
-    ax = fig.add_axes([0.12, 0.29, 0.85, 0.59])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.10), facecolor="white")
+    ax = fig.add_axes([0.12, 0.31, 0.85, 0.56])
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_xlim(0, 100)
     ax.set_ylim(70, 92)

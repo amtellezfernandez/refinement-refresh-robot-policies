@@ -361,6 +361,7 @@ began, the agreement is descriptive and does not show an advantage from fitting.
 Appendix~\ref{app:selectors} gives the model, candidate set, and diagnostics.
 
 \FloatBarrier
+\raggedbottom
 \section{Held-Out Success and Compute}
 \label{sec:transfer}
 
@@ -373,6 +374,27 @@ shows the overall success--cost landscape; Table~\ref{tab:confirmation-grid}
 gives the exact values. Appendix~\ref{app:verification} documents two removed
 duplicate records without changing the planned totals.
 
+\paragraph{Primary result: lower refinement improves success while reducing compute.}
+The primary comparison is designed to isolate refinement: both settings predict
+$K=50$ actions, execute two actions, and then replan from a new observation; only
+the denoising count changes. Moving from $d=5$ to $d=2$ raises success from
+122/160 to 139/160. Because both settings use the same task--state--seed
+identities, the $10.6$-percentage-point increase is a within-identity difference,
+not a comparison between different rollout samples. The paired outcomes contain
+24 cases where only $d=2$ succeeds, seven where only $d=5$ succeeds, and 129
+ties, giving the observed net gain of 17 successes. The task-conditional 95\%
+interval, $[+4.4,\,+16.9]$, excludes zero for these eight tasks.
+
+\begin{table}[H]
+\centering\small
+\caption{Held-out results for the seven SmolVLA settings. Each setting has 160
+attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
+Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
+mean arithmetic per attempt charges every generated chunk.}
+\label{tab:confirmation-grid}
+\input{../paper/generated/confirmation_resources.tex}
+\end{table}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../paper/generated/heldout_settings.pdf}\par\vspace{-0.65em}
@@ -384,28 +406,9 @@ attempt cost on this axis (Section~\ref{sec:fixed-cost-floor}); exact values
 appear in Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
-
-\begin{table}[H]
-\centering\small
-\caption{Held-out results for the seven SmolVLA settings. Each setting has 160
-attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
-Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
-mean arithmetic per attempt charges every generated chunk.}
-\label{tab:confirmation-grid}
-\input{../paper/generated/confirmation_resources.tex}
-\end{table}
 \FloatBarrier
 
-\paragraph{Primary result: lower refinement improves success while reducing compute.}
-The primary comparison is designed to isolate refinement: both settings predict
-$K=50$ actions, execute two actions, and then replan from a new observation; only
-the denoising count changes. Moving from $d=5$ to $d=2$ raises success from
-122/160 to 139/160. Because both settings use the same task--state--seed
-identities, the $10.6$-percentage-point increase is a within-identity difference,
-not a comparison between different rollout samples. The paired outcomes contain
-24 cases where only $d=2$ succeeds, seven where only $d=5$ succeeds, and 129
-ties, giving the observed net gain of 17 successes. The task-conditional 95\%
-interval, $[+4.4,\,+16.9]$, excludes zero for these eight tasks.
+
 
 The compute reduction has two scales. Lowering $d$ reduces nominal arithmetic
 per control step by 5.9\%. Mean arithmetic per complete attempt falls by more,
@@ -467,6 +470,7 @@ lower refinement at $h=2$ and establishes the compute---but not quality---effect
 of longer execution prefixes.
 
 \FloatBarrier
+\flushbottom
 \section{Conclusion}
 
 Adapting a frozen policy through its deployment configuration can change both
@@ -659,6 +663,16 @@ and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
 ceiling but eligible at a separately normalized half-native host-time ceiling.
 These resource constraints admit different replanning schedules; the choices do
 not establish quality optima. The frozen experiment remains arithmetic-based.
+
+
+\begin{table}[htbp]
+\centering\small
+\caption{Smallest execution prefix feasible for $d=2$ under separately
+normalized arithmetic and fixed-input host-time ceilings. The resource
+coordinate changes feasibility; these choices do not compare outcome quality.}
+\label{tab:resource-coordinate-choices}
+\input{../paper/generated/resource_coordinate_choices.tex}
+\end{table}
 
 \subsection{Language-shape transport audit}
 \label{app:shape-audit}
