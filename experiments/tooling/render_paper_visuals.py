@@ -582,8 +582,9 @@ def confirmation_figure(data, path):
     )
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
               handletextpad=0.35, labelspacing=0.25)
+    fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
     fig.text(
-        0.61, 0.985,
+        0.64, 0.985,
         "Compute change, A - B (TFLOPs/attempt): "
         "$\\downarrow$ less for A   more for A $\\uparrow$",
         ha="center", va="top",
