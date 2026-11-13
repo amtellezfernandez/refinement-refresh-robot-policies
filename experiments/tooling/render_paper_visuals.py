@@ -539,13 +539,13 @@ def confirmation_figure(data, path):
             zorder=3,
         )
         labels = (
-            "Refresh 5: refine 2 vs 5",
-            "Refresh 2: refine 2 vs 5",
-            "Refresh 1: refine 2 vs 5",
-            "Refresh 2, refine 2 vs\nrefresh 1, refine 10",
-            "Refine 2: refresh 2 vs 5",
-            "Refine 2: refresh 1 vs 2",
-            "Refresh 1: refine 2 vs 10",
+            "$(5,2) - (5,5)$",
+            "$(2,2) - (2,5)$",
+            "$(1,2) - (1,5)$",
+            "$(2,2) - (1,10)$",
+            "$(2,2) - (5,2)$",
+            "$(1,2) - (2,2)$",
+            "$(1,2) - (1,10)$",
         )
         label = labels[i]
         ax.text(
@@ -560,22 +560,82 @@ def confirmation_figure(data, path):
         ax.text(
             1.43,
             y,
-            f"{number(effect, True)} pp; {number(lo, True)} to {number(hi, True)}",
+            f"{number(effect, True)} [{number(lo, True)}, {number(hi, True)}]",
             transform=transform,
             ha="center",
             va="center",
             fontweight="bold" if primary else "normal",
         )
     for y, title in (
-        (8.42, "Frozen refinement tests at fixed refresh frequency"),
-        (4.43, "Amended descriptive comparisons"),
+        (8.42, "Denoising comparisons chosen before held-out evaluation"),
+        (4.43, "Additional comparisons chosen after inspecting results"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
         0.5, 0.025, "Paired change in success rate (percentage points)", ha="center"
     )
-    fig.text(0.33, 0.97, "Comparison", ha="right", va="top")
-    fig.text(0.87, 0.97, "Change and 95% interval", ha="center", va="top")
+    fig.text(0.33, 0.97, "Configuration A - B", ha="right", va="top")
+    fig.text(0.87, 0.97, "Effect [95% interval]", ha="center", va="top")
+    save_figure(fig, path)
+    plt.close(fig)
+
+
+def heldout_settings_figure(data, path):
+    """Render held-out success against realized mean arithmetic per attempt."""
+    import matplotlib.pyplot as plt
+
+    resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
+    accent = ACCENT
+    gray = "#555555"
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.05), facecolor="white")
+    ax = fig.add_axes([0.12, 0.19, 0.85, 0.76])
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.set_xlim(0, 100)
+    ax.set_ylim(72, 90)
+    ax.set_xticks([0, 25, 50, 75, 100])
+    ax.set_yticks([75, 80, 85, 90])
+    ax.set_yticklabels(["75%", "80%", "85%", "90%"])
+    ax.grid(axis="y", color=".90", lw=0.55)
+    ax.set_axisbelow(True)
+    ax.set_xlabel(
+        "Mean TFLOPs/attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$"
+    )
+    ax.set_ylabel("Observed success")
+
+    offsets = {
+        (5, 2): 6,
+        (5, 5): -26,
+        (2, 2): 6,
+        (2, 5): -26,
+        (1, 2): 6,
+        (1, 5): -26,
+        (1, 10): 6,
+    }
+    for cell, row in resources.items():
+        rate = 100 * row["success_rate"]
+        attempt_cost = row["mean_reference_tflops"]
+        primary_pair = cell in {(2, 2), (2, 5)}
+        color = accent if primary_pair else gray
+        ax.scatter(
+            attempt_cost, rate, s=38, color=color, edgecolor="white",
+            linewidth=0.65, zorder=3,
+        )
+        dy = offsets[cell]
+        alignment = "right" if cell == (1, 10) else "center"
+        dx = -2 if cell == (1, 10) else 0
+        box = {"facecolor": "white", "edgecolor": "none", "alpha": 0.80, "pad": 0.05}
+        ax.annotate(
+            f"{rate:.0f}%", (attempt_cost, rate),
+            xytext=(dx, dy + 10), textcoords="offset points",
+            ha=alignment, va="bottom", color=color,
+            fontweight="bold" if primary_pair else "normal", bbox=box,
+        )
+        ax.annotate(
+            f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
+            xytext=(dx, dy), textcoords="offset points",
+            ha=alignment, va="bottom", color=color,
+            fontweight="bold" if primary_pair else "normal", bbox=box,
+        )
     save_figure(fig, path)
     plt.close(fig)
 
@@ -861,34 +921,17 @@ def render(destination):
     discovery_figure(data, destination / "discovery_allocation.pdf")
     discovery_success_figure(data, destination / "discovery_success.pdf")
     confirmation_figure(data, destination / "confirmation_effects.pdf")
+    heldout_settings_figure(data, destination / "heldout_settings.pdf")
     study_design_figure(data, destination / "study_design.pdf")
     cost_decomposition_figure(data, destination / "cost_decomposition.pdf")
-    success_compute_figure(data, destination / "success_compute_tradeoff.pdf")
-    with matplotlib.rc_context(
-        {
-            "font.size": 9.5,
-            "axes.labelsize": 9.5,
-            "axes.titlesize": 9.5,
-            "xtick.labelsize": 9.5,
-            "ytick.labelsize": 9.5,
-        }
-    ):
-        success_compute_figure(
-            data,
-            destination / "success_compute_tradeoff_poster.pdf",
-            font_size=9.5,
-            figure_width=6.1,
-            figure_height=3.8,
-        )
     names = [
         *contents,
         "discovery_allocation.pdf",
         "discovery_success.pdf",
         "confirmation_effects.pdf",
+        "heldout_settings.pdf",
         "study_design.pdf",
         "cost_decomposition.pdf",
-        "success_compute_tradeoff.pdf",
-        "success_compute_tradeoff_poster.pdf",
     ]
     manifest = {
         "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",

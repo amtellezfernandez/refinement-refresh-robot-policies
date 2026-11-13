@@ -369,7 +369,8 @@ Appendix~\ref{app:selectors} gives the model, candidate set, and diagnostics.
 The held-out evaluation applies seven settings to the same 160
 task--state--seed identities, for 1,120 planned attempts. Table~\ref{tab:confirmation-grid}
 reports success and both compute measures; Figure~\ref{fig:success-compute}
-places them in one view and shows the paired comparisons. Three fixed-$h$
+places them in one view, while Figure~\ref{fig:confirmation-effects} shows the
+paired comparisons. Three fixed-$h$
 comparisons of $d=2$ against $d=5$ were prespecified, with $(2,2)$ versus
 $(2,5)$ as primary. We added the prefix comparisons after inspecting the
 held-out results, so they only summarize observed patterns.
@@ -388,18 +389,28 @@ mean arithmetic per attempt charges every generated chunk.}
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\linewidth]{../paper/generated/success_compute_tradeoff.pdf}\par\vspace{-0.4em}
-\caption{Held-out success and compute. Panel A shows all settings against mean
-arithmetic per attempt; the success axis begins at 72\%, and blue marks the
-primary pair. Panel B shows paired success changes and task-conditional 95\%
-intervals; positive values favor the displayed destination, while intervals
-crossing zero do not separate settings. The $h=2\rightarrow5$ row reverses the
-sign used in Table~\ref{tab:confirmation-secondary}. Labels below each row give
-arithmetic per attempt. Selection ceilings use nominal arithmetic per control
-step (Section~\ref{sec:fixed-cost-floor}); exact counts and two additional
-contrasts appear in Tables~\ref{tab:confirmation-grid}
-and~\ref{tab:confirmation-secondary}.}
+\includegraphics[width=\linewidth]{../paper/generated/heldout_settings.pdf}
+\caption{Held-out success against mean arithmetic per attempt for all seven
+settings. Every setting has 160 attempts; labels give $(h,d)$ and observed
+success. Blue marks the primary pair. The success axis begins at 72\%.
+Selection ceilings use nominal arithmetic per control step rather than the
+attempt cost on this axis (Section~\ref{sec:fixed-cost-floor}); exact values
+appear in Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
+\caption{Paired success differences for the seven held-out comparisons. Each
+row reports configuration A minus B in percentage points with its
+task-conditional 95\% interval. Positive values favor A. We chose the three
+fixed-$h$ denoising comparisons before held-out evaluation; we chose the four
+additional comparisons after inspecting the results. Blue marks the primary
+comparison. Exact definitions and counts appear in
+Table~\ref{tab:confirmation-secondary}.}
+\label{fig:confirmation-effects}
 \end{figure}
 \FloatBarrier
 
