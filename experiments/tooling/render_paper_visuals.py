@@ -413,7 +413,8 @@ def discovery_success_figure(data, path):
 
     fig, axes = plt.subplots(1, 3, figsize=(FIGURE_WIDTH, 1.78), sharey=True)
     fig.subplots_adjust(left=0.10, right=0.985, bottom=0.28, top=0.79, wspace=0.16)
-    for ax, h, color, marker in zip(axes, (1, 2, 5), COLORS, MARKERS):
+    for ax, h in zip(axes, (1, 2, 5)):
+        color = PREFIX_COLORS[h]
         rows = [r for r in data["discovery"]["cells"] if r["h"] == h]
         means = np.array([r["success"] for r in rows]) * 100
         bounds = np.array([r["descriptive_95_interval"] for r in rows]) * 100
@@ -422,7 +423,7 @@ def discovery_success_figure(data, path):
             means,
             yerr=np.array([means - bounds[:, 0], bounds[:, 1] - means]),
             color=color,
-            marker=marker,
+            marker="o",
             ls="-",
             lw=0.9,
             capsize=2,
@@ -635,8 +636,8 @@ def heldout_settings_figure(data, path):
     from matplotlib.lines import Line2D
 
     resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.10), facecolor="white")
-    ax = fig.add_axes([0.12, 0.31, 0.85, 0.56])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.32), facecolor="white")
+    ax = fig.add_axes([0.12, 0.29, 0.85, 0.61])
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_xlim(0, 100)
     ax.set_ylim(70, 92)
@@ -697,11 +698,11 @@ def heldout_settings_figure(data, path):
     )
     ax.legend(
         handles=legend,
-        loc="lower left",
+        loc="lower right",
         ncol=3,
         frameon=False,
         handletextpad=0.2,
-        columnspacing=0.7,
+        columnspacing=0.55,
         borderaxespad=0.35,
     )
     save_figure(fig, path)
