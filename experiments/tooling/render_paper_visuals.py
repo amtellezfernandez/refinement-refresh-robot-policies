@@ -600,7 +600,7 @@ def heldout_settings_figure(data, path):
     accent = ACCENT
     gray = "#555555"
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.35), facecolor="white")
-    ax = fig.add_axes([0.12, 0.29, 0.85, 0.65])
+    ax = fig.add_axes([0.12, 0.29, 0.85, 0.59])
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_xlim(0, 100)
     ax.set_ylim(70, 92)
@@ -613,6 +613,14 @@ def heldout_settings_figure(data, path):
         "Mean TFLOPs/attempt\n$\\leftarrow$ less compute   more compute $\\rightarrow$"
     )
     ax.set_ylabel("Observed success")
+    fig.text(
+        0.545,
+        0.975,
+        "Held-out success and arithmetic cost",
+        ha="center",
+        va="top",
+        fontweight="bold",
+    )
 
     offsets = {
         (5, 2): 6,
