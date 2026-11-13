@@ -78,10 +78,12 @@ the predicted actions. A longer execution prefix amortizes a policy call, but it
 delays feedback and exposes later actions from an older prediction to the
 environment. We therefore ask one allocation question: \emph{under an explicit
 compute ceiling, which settings for refinement, chunk length, and execution
-prefix give the best closed-loop behavior?} We do not trade a fixed budget
-continuously between refinement and replanning; we compare configurations that
-are feasible under common compute ceilings and report their nominal rates and
-realized attempt costs.
+prefix maximize closed-loop task success?} Here, ``best'' means the highest
+empirical success rate among configurations that satisfy the stated compute
+ceiling. Counted arithmetic determines feasibility; we report nominal compute
+rates and realized attempt costs separately, with host latency as descriptive
+systems evidence. We do not combine success and cost into one score or measure
+memory use.
 
 We study this form of post-training adaptation as a controlled allocation
 problem. Our evaluation procedure separates a model-specific refinement configuration,
