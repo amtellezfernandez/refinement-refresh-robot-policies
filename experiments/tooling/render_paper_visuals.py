@@ -568,7 +568,7 @@ def confirmation_figure(data, path):
         )
     for y, title in (
         (8.42, "Fixed-$h$ denoising comparisons"),
-        (4.43, "Variable-$h$ and native-reference comparisons"),
+        (4.43, "Variable-$h$ or $d=10$ comparisons"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
