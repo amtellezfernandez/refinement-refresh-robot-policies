@@ -99,10 +99,20 @@ setting. Depending on the architecture, that setting could control integration
 steps, candidate generation, search, or verification effort. This paper
 instantiates only denoising count, and control values should not be compared
 across architectures. Synchronous execution keeps sequencing and measurement
-boundaries fixed; the study does not determine an asynchronous schedule,
-physical-robot latency, or a hardware-independent optimum.
+boundaries fixed; the study does not determine physical-robot latency or a
+hardware-independent optimum.
 
 We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
+SmolVLA also provides an asynchronous inference mode that overlaps action
+generation with action execution. We do not use that mode. In our synchronous
+evaluation, the policy finishes generating all $K$ actions before the
+environment executes the first $h$; the policy then receives a new observation
+and replans. Fixing this order lets us compare refinement and replanning without
+the additional effects of concurrent execution, observation staleness, or
+buffering. The results provide a controlled baseline for a later asynchronous
+study, but they do not identify the best asynchronous schedule or its
+wall-clock throughput.
+
 Predicted chunk length remains fixed at $K=50$ and is not evaluated. We test 12
 configurations in 480 discovery attempts, then seven settings in 1,120 held-out
 attempts on eight tasks excluded from selection. Refinement comparisons were
