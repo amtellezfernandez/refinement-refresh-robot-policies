@@ -576,7 +576,8 @@ def confirmation_figure(data, path):
         "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
     ax.set_ylabel(
-        "$\\downarrow$ less compute for A     more compute for A $\\uparrow$"
+        "Compute change (TFLOPs/attempt)\n"
+        "$\\downarrow$ less for A   more for A $\\uparrow$"
     )
     legend = (
         Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
@@ -586,7 +587,7 @@ def confirmation_figure(data, path):
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
               handletextpad=0.35, labelspacing=0.25)
     fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
-    fig.text(0.64, 0.985, "Compute change (TFLOPs/attempt)", ha="center", va="top")
+    fig.text(0.65, 0.985, "Held-out success and compute effects", ha="center", va="top")
     save_figure(fig, path)
     plt.close(fig)
 
