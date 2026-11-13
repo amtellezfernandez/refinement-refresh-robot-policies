@@ -512,8 +512,8 @@ def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.35))
-    ax = fig.add_axes([0.16, 0.22, 0.79, 0.72])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
+    ax = fig.add_axes([0.25, 0.17, 0.72, 0.73])
     order = [0, 1, 2, 4, 5, 3, 6]
     labels = (
         "$(5,2)-(5,5)$",
@@ -524,7 +524,10 @@ def confirmation_figure(data, path):
         "$(2,2)-(1,10)$",
         "$(1,2)-(1,10)$",
     )
-    offsets = ((6, 8), (6, -13), (-63, -13), (6, 8), (6, 8), (6, 8), (-72, -13))
+    # Four compute effects cluster tightly near zero. Keep one aligned label
+    # column and separate only those labels, with quiet connectors to the exact
+    # ordinate. The other labels remain at their marker height.
+    label_ys = (2.0, -7.5, -17.0, 25.0, 42.2, -57.3, -27.0)
     ax.set(
         xlim=(-11, 20), ylim=(-72, 52),
         xticks=[-10, 0, 10, 20], yticks=[-60, -40, -20, 0, 20, 40],
@@ -533,7 +536,8 @@ def confirmation_figure(data, path):
     ax.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     ax.axhline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     comparisons = data["confirmation"]["comparisons"]
-    for row, (source_index, label, offset) in enumerate(zip(order, labels, offsets)):
+    label_transform = ax.get_yaxis_transform()
+    for row, (source_index, label, label_y) in enumerate(zip(order, labels, label_ys)):
         c = comparisons[source_index]
         success = 100 * c["mean_difference"][0]
         success_lo, success_hi = [100 * v for v in c["interval95"][0]]
@@ -555,29 +559,35 @@ def confirmation_figure(data, path):
             elinewidth=1.1,
             zorder=3,
         )
-        ax.annotate(
-            label, (success, compute), xytext=offset, textcoords="offset points",
-            ha="left" if offset[0] > 0 else "right",
-            va="bottom" if offset[1] > 0 else "top",
+        ax.text(
+            -0.34, label_y, label, transform=label_transform,
+            ha="left", va="center",
             fontweight="bold" if primary else "normal",
             color=color,
         )
+        if not math.isclose(label_y, compute, abs_tol=0.2):
+            ax.annotate(
+                "", xy=(-10.75, compute), xytext=(-10.75, label_y),
+                arrowprops={"arrowstyle": "-", "color": ".75", "lw": 0.55},
+                annotation_clip=False,
+            )
     ax.set_xlabel(
-        "Paired change in success rate (percentage points)\n"
-        "$\\leftarrow$ lower success for A     higher success for A $\\rightarrow$"
-    )
-    ax.set_ylabel(
-        "Change in mean TFLOPs/attempt, A - B\n"
-        "$\\leftarrow$ less compute for A     more compute for A $\\rightarrow$"
+        "Paired success change (percentage points): "
+        "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
     legend = (
         Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
         Line2D([], [], color=MID, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
         Line2D([], [], color=MID, marker="^", mfc="white", ls="none", label="Against $(h=1,d=10)$"),
-        Line2D([], [], color=ACCENT, marker="D", ls="none", label="Primary comparison"),
     )
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
               handletextpad=0.35, labelspacing=0.25)
+    fig.text(
+        0.61, 0.985,
+        "Compute change, A - B (TFLOPs/attempt): "
+        "$\\downarrow$ less for A   more for A $\\uparrow$",
+        ha="center", va="top",
+    )
     save_figure(fig, path)
     plt.close(fig)
 
