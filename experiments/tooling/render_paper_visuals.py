@@ -511,21 +511,34 @@ def discovery_figure(data, path):
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.72))
-    ax = fig.add_axes([0.36, 0.22, 0.32, 0.66])
-    ys = [7.6, 6.6, 5.6, 3.6, 2.6, 1.6, 0.6]
-    ax.set(xlim=(-10, 20), ylim=(-0.1, 8.5), xticks=[-10, 0, 10, 20], yticks=[])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.05))
+    ax = fig.add_axes([0.36, 0.20, 0.32, 0.70])
+    ys = [9.0, 8.0, 7.0, 4.8, 3.8, 1.6, 0.6]
+    order = [0, 1, 2, 4, 5, 3, 6]
+    labels = (
+        "$(5,2) - (5,5)$",
+        "$(2,2) - (2,5)$",
+        "$(1,2) - (1,5)$",
+        "$(2,2) - (5,2)$",
+        "$(1,2) - (2,2)$",
+        "$(2,2) - (1,10)$",
+        "$(1,2) - (1,10)$",
+    )
+    ax.set(xlim=(-10, 20), ylim=(-0.1, 10.1), xticks=[-10, 0, 10, 20], yticks=[])
     ax.spines[["left", "top", "right"]].set_visible(False)
     ax.tick_params(axis="y", length=0)
     ax.axvline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
-    ax.axhline(4.55, color=".86", lw=0.7, zorder=0)
+    ax.axhline(6.05, color=".86", lw=0.7, zorder=0)
+    ax.axhline(2.75, color=".86", lw=0.7, zorder=0)
     transform = ax.get_yaxis_transform()
-    for i, (y, c) in enumerate(zip(ys, data["confirmation"]["comparisons"])):
+    comparisons = data["confirmation"]["comparisons"]
+    for row, (y, source_index, label) in enumerate(zip(ys, order, labels)):
+        c = comparisons[source_index]
         effect = 100 * c["mean_difference"][0]
         lo, hi = [100 * v for v in c["interval95"][0]]
         primary = c["kind"] == "original primary"
-        color = ACCENT if primary else (INK if i < 3 else MID)
-        marker = "D" if primary else ("o" if i < 3 else "s")
+        color = ACCENT if primary else (INK if row < 3 else MID)
+        marker = "D" if primary else ("o" if row < 3 else "s")
         ax.errorbar(
             effect,
             y,
@@ -538,16 +551,6 @@ def confirmation_figure(data, path):
             elinewidth=1.1,
             zorder=3,
         )
-        labels = (
-            "$(5,2) - (5,5)$",
-            "$(2,2) - (2,5)$",
-            "$(1,2) - (1,5)$",
-            "$(2,2) - (1,10)$",
-            "$(2,2) - (5,2)$",
-            "$(1,2) - (2,2)$",
-            "$(1,2) - (1,10)$",
-        )
-        label = labels[i]
         ax.text(
             -0.06,
             y,
@@ -567,8 +570,9 @@ def confirmation_figure(data, path):
             fontweight="bold" if primary else "normal",
         )
     for y, title in (
-        (8.42, "Fixed-$h$ denoising comparisons"),
-        (4.43, "Variable-$h$ or $d=10$ comparisons"),
+        (9.92, "Fixed-$h$ denoising comparisons"),
+        (5.72, "Fixed-$d=2$ replanning comparisons"),
+        (2.42, "Comparisons against $(h=1,d=10)$"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(

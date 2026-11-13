@@ -116,9 +116,12 @@ class PaperVisualTests(unittest.TestCase):
             visuals.confirmation_figure(self.data, Path("unused.pdf"))
         axis = save.call_args.args[0].axes[0]
         self.assertEqual(len(axis.containers), 7)
-        for i, (comparison, container) in enumerate(
-            zip(self.data["confirmation"]["comparisons"], axis.containers)
+        display_order = [0, 1, 2, 4, 5, 3, 6]
+        comparisons = self.data["confirmation"]["comparisons"]
+        for row, (source_index, container) in enumerate(
+            zip(display_order, axis.containers)
         ):
+            comparison = comparisons[source_index]
             np.testing.assert_allclose(
                 np.asarray(container.lines[0].get_xdata(), dtype=float),
                 [100 * comparison["mean_difference"][0]],
@@ -129,7 +132,7 @@ class PaperVisualTests(unittest.TestCase):
             )
             self.assertEqual(
                 container.lines[0].get_marker(),
-                "D" if i == 1 else ("o" if i < 3 else "s"),
+                "D" if source_index == 1 else ("o" if row < 3 else "s"),
             )
 
     def test_shared_cost_figure_uses_the_retained_affine_decomposition(self):
