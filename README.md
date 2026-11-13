@@ -6,16 +6,16 @@ refine an action prediction, and when should it obtain a fresh prediction?
 [Accepted camera-ready](output/pdf/camera-ready-submission-2026-11-02.pdf) ·
 [Original submitted version](release/submitted.pdf) ·
 [Poster](output/pdf/refinement-refresh-zurich-poster.pdf) ·
-[BenchStudio worked example](https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh) ·
+[IVal worked example](https://github.com/maatinstitute/IVal/tree/main/examples/refinement_refresh) ·
 [ICLR roadmap](ROADMAP.md) ·
 [Camera-ready source](paper/camera-ready-2026-11-02.tex)
 
 This repository is the publication and retained-evidence record for the study.
 The maintained evaluation infrastructure and compact reproduction of the
 published held-out totals now live in the
-[BenchStudio worked example](https://github.com/maatinstitute/BenchStudio/tree/main/examples/refinement_refresh).
+[IVal worked example](https://github.com/maatinstitute/IVal/tree/main/examples/refinement_refresh).
 Historical runners and evidence remain here to preserve provenance; they are not
-maintained separately from BenchStudio.
+maintained separately from IVal.
 
 Next target: **ICLR 2027 main conference**. Priorities are targeted second-policy
 evidence and the existing observation-age diagnostic. These are planned
@@ -81,15 +81,15 @@ cite the paper and this version of its artifacts. A copyable entry is:
 ```bibtex
 @article{tellezfernandez2026refinement,
   author  = {Tellez Fernandez, Alba Maria},
-  title   = {Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies},
+  title   = {Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies},
   year    = {2026},
   note    = {NeurIPS 2026 Workshop on Post-Training Adaptation of Robot Foundation Models},
-  url     = {https://github.com/amtellezfernandez/refinement-refresh-robot-policies}
+  url     = {https://github.com/maatinstitute/IVal/tree/main/examples/refinement_refresh}
 }
 ```
 
 The paper provides the scientific case study and retained evidence.
-[BenchStudio](https://github.com/maatinstitute/BenchStudio) provides the maintained,
+[IVal](https://github.com/maatinstitute/IVal) provides the maintained,
 source-available evaluation infrastructure and the paper's worked reproduction.
 Cite both when both the study and software support your work. See
 [`LICENSE.md`](LICENSE.md) for code, manuscript, figure, and third-party

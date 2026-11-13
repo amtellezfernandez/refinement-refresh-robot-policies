@@ -1,14 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this study, protocol, code, or retained evidence, please cite the paper."
-title: "Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies"
+title: "Refinement versus Refresh: Deployment-Time Compute Allocation for Chunked Robot Policies"
 type: article
 version: 1.0.1
 date-released: 2026-11-11
 authors:
   - family-names: "Tellez Fernandez"
     given-names: "Alba Maria"
-repository-code: "https://github.com/amtellezfernandez/refinement-refresh-robot-policies"
-url: "https://github.com/amtellezfernandez/refinement-refresh-robot-policies/releases/tag/v1.0.1"
+repository-code: "https://github.com/maatinstitute/IVal"
+url: "https://github.com/maatinstitute/IVal/tree/main/examples/refinement_refresh"
 keywords:
   - robot learning
   - vision-language-action models

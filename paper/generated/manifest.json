@@ -1,6 +1,6 @@
 {
   "purpose": "Presentation only; no refitting, resampling, or evidence mutation.",
-  "script_sha256": "feb50c0fd73edf805799c965185b795b5cf5af5d9a1c568636e30b49765d2b4e",
+  "script_sha256": "b8b1e38948b83f44012d8ffd6bfa93930a8aaea20250714757bae145d67a332d",
   "input_sha256": {
     "experiments/runs/refinement_refresh_final_001/paper_analysis/discovery_audit.json": "0a4a26754151fe203f06637fcfaec85931f1f40218722f979dbdffd7fbcb4cec",
     "experiments/runs/refinement_refresh_final_001/paper_analysis/confirmation_report.json": "cd0e42cd418cb48604f7271c8f1000d0ccc00262eae6fbca9b359e6ed6d2657c",
@@ -16,20 +16,20 @@
   "figure_width_inches": 5.5,
   "minimum_figure_font_pt": 8.5,
   "output_sha256": {
-    "confirmation_resources.tex": "c44ca8583a865bbc85bcd77580a5e0adba7e19dc39b1612ec6d4b9ae3d228787",
-    "confirmation_predictions.tex": "b1e4d7ab078792a95913b2af49aba0b67e4a0f1c2df14a366d74fe5baa6b53a0",
+    "confirmation_resources.tex": "193c953e0c8ba50d2be58dde9a84167974663357fb142b5697bdd2167947fa52",
+    "confirmation_predictions.tex": "4872c8d82ef35fec67a25e46e665eb829d3c4b0d7643fa3bae54788911226286",
     "confirmation_secondary.tex": "9e290d73c8710750c2a1efb9ac1b822c3f3d79d94ec52294871963d3f08a1aa8",
     "confirmation_tasks.tex": "838a63c60abe3719649e2b2f4d8fc10bd4c2938cebbe835a21c9a4a36be083d9",
-    "discovery_tasks.tex": "f59adbbe219084123f013c527a569eb5ce3609b20d6cdd8abba32cef7c6078b2",
+    "discovery_tasks.tex": "cbaa4911f0dff52bd6e62eff277d3197b5ccbfb8732824514acce6b00b95bbe0",
     "discovery_resources.tex": "c084af335f8b123ab76ec1f5323faf8496e552562b9e0967fe4fddc3d59d5fa9",
     "primary_resources.tex": "8521e48f8ea5defa3d522fe80eee66baf62e49fa07031a199f0c89b0d0874931",
-    "selector_choices.tex": "7c0332da5d2b31555ef24753964ea8c370d538ae05e8f1723352785223936ed8",
+    "selector_choices.tex": "b40070e8c2503f32a0d5f32f7ca381f4a32086f4db645e7115be9c70cf74ca5e",
     "discovery_allocation.pdf": "743f7ba1b5a8599f57e65cef5c79048ee39c6af19b7905bcfa501cc37e49fba0",
     "discovery_success.pdf": "6f3981b21513a3ebb17acfaa61600d92750062ed3d6b6d4e60b2118fe9510cc0",
     "confirmation_effects.pdf": "78ba981199b5ab5ef8de4e116c763bc7ca592f93867af3deee52f93ba4346d97",
     "study_design.pdf": "85eb1cb41d06744ee72150a25da3247f9ac09e333d3b2021bb55d249780bd970",
     "cost_decomposition.pdf": "2558bfc5b160bcde5474f03fdf309bccf173e426d48adb87943975201319ff78",
-    "success_compute_tradeoff.pdf": "9a80d49b05c9a60a729ff330982adaa7613d90dbf06a55749cba58fb7ccfe520",
-    "success_compute_tradeoff_poster.pdf": "0c7613c90884426904616e6c356516fb23cad9e1fb25fb68af44dae76cab6748"
+    "success_compute_tradeoff.pdf": "e01e611c98278e7a4502d472ac33488a724db021e1101433fa6510988dfc36c4",
+    "success_compute_tradeoff_poster.pdf": "69ff9ce93b68891015452345e934db79ea2a0922d942c359be353f8f0aa83aa0"
   }
 }
