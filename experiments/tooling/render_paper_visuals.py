@@ -513,7 +513,7 @@ def confirmation_figure(data, path):
     from matplotlib.lines import Line2D
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
-    ax = fig.add_axes([0.25, 0.17, 0.72, 0.73])
+    ax = fig.add_axes([0.29, 0.17, 0.68, 0.73])
     order = [0, 1, 2, 4, 5, 3, 6]
     labels = (
         "$(5,2)-(5,5)$",
@@ -575,9 +575,6 @@ def confirmation_figure(data, path):
         "Paired success change (percentage points): "
         "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
-    ax.set_ylabel(
-        "$\\downarrow$ less compute for A     more compute for A $\\uparrow$"
-    )
     legend = (
         Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
         Line2D([], [], color=MID, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
@@ -587,9 +584,11 @@ def confirmation_figure(data, path):
               handletextpad=0.35, labelspacing=0.25)
     fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
     fig.text(
-        0.64, 0.985,
-        "Compute change (TFLOPs/attempt)",
-        ha="center", va="top",
+        0.205, 0.535,
+        "$\\downarrow$ less compute for A\n"
+        "Compute change (TFLOPs/attempt)\n"
+        "more compute for A $\\uparrow$",
+        ha="center", va="center", rotation=90,
     )
     save_figure(fig, path)
     plt.close(fig)
