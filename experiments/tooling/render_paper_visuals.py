@@ -575,6 +575,9 @@ def confirmation_figure(data, path):
         "Paired success change (percentage points): "
         "$\\leftarrow$ lower for A   higher for A $\\rightarrow$"
     )
+    ax.set_ylabel(
+        "$\\downarrow$ less compute for A     more compute for A $\\uparrow$"
+    )
     legend = (
         Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
         Line2D([], [], color=MID, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
@@ -585,8 +588,7 @@ def confirmation_figure(data, path):
     fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
     fig.text(
         0.64, 0.985,
-        "Compute change, A - B (TFLOPs/attempt): "
-        "$\\downarrow$ less for A   more for A $\\uparrow$",
+        "Compute change (TFLOPs/attempt)",
         ha="center", va="top",
     )
     save_figure(fig, path)
