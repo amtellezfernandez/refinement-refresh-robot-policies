@@ -7,8 +7,8 @@ date-released: 2026-11-11
 authors:
   - family-names: "Tellez Fernandez"
     given-names: "Alba Maria"
-repository-code: "https://github.com/maatinstitute/REVA"
-url: "https://github.com/maatinstitute/REVA/tree/main/examples/refinement_refresh"
+repository-code: "https://github.com/maatinstitute/ReVa"
+url: "https://github.com/maatinstitute/ReVa/tree/main/examples/refinement_refresh"
 keywords:
   - robot learning
   - vision-language-action models
