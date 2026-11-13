@@ -540,9 +540,10 @@ def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
     from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
+    from matplotlib.patches import Patch
 
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
-    ax = fig.add_axes([0.33, 0.21, 0.64, 0.69])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.45))
+    ax = fig.add_axes([0.33, 0.20, 0.64, 0.53])
     order = [0, 1, 2, 4, 5, 3, 6]
     # Four compute effects cluster tightly near zero. Keep one aligned label
     # column and separate only those labels, with quiet connectors to the exact
@@ -617,13 +618,33 @@ def confirmation_figure(data, path):
         "Compute change (TFLOPs/attempt)\n"
         "$\\downarrow$ less for A   more for A $\\uparrow$"
     )
-    legend = (
-        Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
-        Line2D([], [], color=INK, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
-        Line2D([], [], color=INK, marker="^", mfc="white", ls="none", label="Against $(h=1,d=10)$"),
+    marker_legend = (
+        Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed $h$: vary $d$"),
+        Line2D([], [], color=INK, marker="s", mfc="white", ls="none", label="Fixed $d=2$: vary $h$"),
+        Line2D([], [], color=INK, marker="^", mfc="white", ls="none", label="Native reference"),
     )
-    ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
-              handletextpad=0.35, labelspacing=0.25)
+    color_legend = tuple(
+        Patch(facecolor=color, edgecolor=color, label=f"$h={h}$")
+        for h, color in PREFIX_COLORS.items()
+    )
+    fig.legend(
+        handles=marker_legend,
+        loc="upper center",
+        bbox_to_anchor=(0.66, 0.93),
+        ncol=3,
+        frameon=False,
+        handletextpad=0.25,
+        columnspacing=0.55,
+    )
+    fig.legend(
+        handles=color_legend,
+        loc="upper center",
+        bbox_to_anchor=(0.66, 0.85),
+        ncol=3,
+        frameon=False,
+        handletextpad=0.25,
+        columnspacing=0.8,
+    )
     fig.text(0.12, 0.985, "Configuration A - B", ha="center", va="top")
     fig.text(0.65, 0.985, "Held-out success and compute effects", ha="center", va="top")
     save_figure(fig, path)

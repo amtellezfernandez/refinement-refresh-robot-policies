@@ -439,14 +439,15 @@ forecasting.
 \includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
 \vspace{-8pt}
 \caption{Joint success and compute effects for the seven held-out comparisons.
-Each marker reports configuration A minus B. Horizontal arms are the
-task-conditional 95\% intervals for success-rate change; vertical arms are the
-paired 95\% intervals for change in mean TFLOPs per attempt. The dashed axes
-mark no change, so the lower-right quadrant favors A on both measures. Color
-denotes $h$ for configuration A, matching Figure~\ref{fig:success-compute};
-circles denote fixed-$h$ denoising comparisons, squares fixed-$d=2$ replanning
-comparisons, and triangles comparisons against native $(1,10)$. Exact
-definitions and counts appear in
+In each label, the first setting is A and the second is B. The marker shows how
+A changes relative to B: moving right means that A succeeds more often, moving
+left means that it succeeds less often, moving down means that A uses less
+arithmetic per attempt, and moving up means that it uses more. The lower-right
+quadrant therefore favors A on both measures. Horizontal arms are the
+task-conditional 95\% intervals for success change; vertical arms are the paired
+95\% intervals for compute change. Color denotes $h$ for configuration A,
+matching Figure~\ref{fig:success-compute}; marker shapes identify the comparison
+type, as shown above the plot. Exact definitions and counts appear in
 Table~\ref{tab:confirmation-secondary}.}
 \label{fig:confirmation-effects}
 \end{figure}
