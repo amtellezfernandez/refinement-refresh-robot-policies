@@ -568,7 +568,7 @@ def confirmation_figure(data, path):
         )
     for y, title in (
         (8.42, "Fixed-$h$ denoising comparisons"),
-        (4.43, "Additional configuration comparisons"),
+        (4.43, "Replanning and native-reference comparisons"),
     ):
         ax.text(-0.82, y, title, transform=transform, fontweight="bold", va="center", color=INK)
     fig.text(
@@ -587,8 +587,8 @@ def heldout_settings_figure(data, path):
     resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
     accent = ACCENT
     gray = "#555555"
-    fig = plt.figure(figsize=(FIGURE_WIDTH, 3.05), facecolor="white")
-    ax = fig.add_axes([0.12, 0.19, 0.85, 0.76])
+    fig = plt.figure(figsize=(FIGURE_WIDTH, 2.35), facecolor="white")
+    ax = fig.add_axes([0.12, 0.29, 0.85, 0.65])
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_xlim(0, 100)
     ax.set_ylim(72, 90)
