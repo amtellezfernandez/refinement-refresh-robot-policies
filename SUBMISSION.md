@@ -1,7 +1,6 @@
 # Submission and public-version notes
 
-Title: **Refinement versus Refresh: Compute Allocation for Closed-Loop Robot
-Policies**.
+Title: **Refinement vs. Replanning: Inference Compute Allocation in Robot Policies**.
 
 ## Version policy
 

@@ -9,7 +9,7 @@ the file to upload when LaTeX source is available.
 
 Suggested metadata:
 
-- Title: *Refinement versus Refresh: Compute Allocation for Closed-Loop Robot Policies*
+- Title: *Refinement vs. Replanning: Inference Compute Allocation in Robot Policies*
 - Author: Alba Maria Tellez Fernandez
 - Primary category: `cs.RO`
 - Possible cross-lists: `cs.AI`, `cs.LG`
