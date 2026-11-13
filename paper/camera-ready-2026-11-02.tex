@@ -524,16 +524,11 @@ when compute should refine the current prediction and when it should produce a
 new prediction from fresher feedback.
 
 \section*{Data and Code Availability}
-The \href{https://github.com/maatinstitute/ReVa}{\texttt{maatinstitute/ReVa}} repository
-contains the maintained evaluation software. Its
-\href{https://github.com/maatinstitute/ReVa/tree/main/examples/refinement_refresh}{paper-specific worked example}
-provides the compact held-out outcomes, expected summary, verification script,
-and reproduction instructions. Rerunning the simulator evaluation requires the
-public \href{https://huggingface.co/HuggingFaceVLA/smolvla_libero}{SmolVLA checkpoint},
-the pinned
-\href{https://github.com/huggingface/lerobot/tree/b6ec0060779550c0a157ae34feb89e0cf86012a8}{LeRobot evaluator},
-and compatible LIBERO dependencies. Checkpoint weights, simulator assets,
-action tensors, images, and detailed runtime records are not redistributed.
+Code, compact outcomes, and runnable examples can be found in the
+\href{https://github.com/maatinstitute/ReVa}{\texttt{maatinstitute/ReVa}}
+repository. The examples reproduce the reported study and illustrate how to
+adapt the same evaluation to other models and checkpoints. Full simulator
+rollouts, model weights, and private runtime artifacts are not redistributed.
 
 \bibliographystyle{unsrtnat}
 {\raggedright\bibliography{references}}
@@ -939,27 +934,12 @@ seed 20260912. Contrasts and diagnostics defined after collection began use seed
 outcomes.
 
 \paragraph{Reproducibility materials.}
-The \href{https://github.com/maatinstitute/ReVa}{\texttt{maatinstitute/ReVa}} repository
-provides the maintained evaluation infrastructure. The
-\href{https://github.com/maatinstitute/ReVa/tree/main/examples/refinement_refresh}{paper-specific worked example}
-contains 1,120 compact canonical held-out outcomes, their expected summary, and
-a verification script.
-
-\textbf{Reproducing the reported results.}
-From a ReVa checkout, run \texttt{uv sync --locked}, followed by
-\texttt{uv run --locked python examples/refinement\_refresh/verify.py}. The
-script reconstructs all seven setting totals, 171,805 recorded actions, the
-139/160-versus-122/160 primary result, and the paired identity of 24 wins,
-7 losses, and 129 ties. It also explains why its independently computed
-discordance interval differs from the paper's task-conditional bootstrap
-interval.
-
-\textbf{Rerunning the simulator evaluation.}
-Episode execution requires the public SmolVLA checkpoint at revision
-\texttt{6721902bc4d61e50a3bfdb11dfb4cb626f05d102}, the LeRobot evaluator at
-revision \texttt{b6ec0060779550c0a157ae34feb89e0cf86012a8}, and a compatible
-LIBERO environment. Detailed action records, checkpoint weights, images,
-simulator assets, and runtime logs are not redistributed.
+The \href{https://github.com/maatinstitute/ReVa}{\texttt{maatinstitute/ReVa}}
+repository contains the reproducibility materials and runnable examples. They
+show how to reconstruct the reported aggregate results and how to extend the
+evaluation to other models, checkpoints, and simulator settings. The original
+study's full action records, model weights, images, and runtime artifacts are
+not redistributed.
 }
 
 \end{document}
