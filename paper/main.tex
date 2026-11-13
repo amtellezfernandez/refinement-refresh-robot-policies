@@ -62,10 +62,10 @@ define a universal setting.
 
 \section{Introduction}
 
-Post-training adaptation need not modify a robot policy's weights. A frozen
-chunked policy can also be adapted through its deployment configuration: how
-much computation is spent generating one action chunk, how many actions the
-chunk contains, and how many are executed before the policy replans from a new
+We can adapt a robot policy after training without changing its weights. For a
+frozen chunked policy, we can instead adjust its deployment configuration: how
+much computation generates one action chunk, how many actions the chunk
+contains, and how many the policy executes before replanning from a new
 observation. These controls change both deployment cost and closed-loop
 behavior. We use \emph{refinement} for adjustable computation spent generating
 one action chunk. \emph{Replanning} means generating a new action chunk from a
