@@ -367,27 +367,15 @@ Appendix~\ref{app:selectors} gives the model, candidate set, and diagnostics.
 \label{sec:transfer}
 
 The held-out evaluation applies seven settings to the same 160
-task--state--seed identities, for 1,120 planned attempts. Table~\ref{tab:confirmation-grid}
-reports success and both compute measures; Figure~\ref{fig:success-compute}
-places them in one view, while Figure~\ref{fig:confirmation-effects} shows the
-paired comparisons. Three fixed-$h$
+task--state--seed identities, for 1,120 planned attempts. Three fixed-$h$
 comparisons of $d=2$ against $d=5$ were prespecified, with $(2,2)$ versus
-$(2,5)$ as primary. We added the prefix comparisons after inspecting the
-held-out results, so they only summarize observed patterns.
-Appendix~\ref{app:verification} documents two removed
+$(2,5)$ as primary. The replanning comparisons were added after the held-out
+results were inspected and are interpreted as observed patterns. Figure~\ref{fig:success-compute}
+shows the overall success--cost landscape; Table~\ref{tab:confirmation-grid}
+gives the exact values. Appendix~\ref{app:verification} documents two removed
 duplicate records without changing the planned totals.
 
-\begin{table}[!t]
-\centering\small
-\caption{Held-out results for the seven SmolVLA settings. Each setting has 160
-attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
-Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
-mean arithmetic per attempt charges every generated chunk.}
-\label{tab:confirmation-grid}
-\input{../paper/generated/confirmation_resources.tex}
-\end{table}
-
-\begin{figure}[!t]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\linewidth]{../paper/generated/heldout_settings.pdf}\par\vspace{-0.65em}
 \caption{Held-out success against mean arithmetic per attempt for all seven
@@ -399,7 +387,17 @@ appear in Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
 
-\begin{minipage}{\linewidth}
+\begin{table}[H]
+\centering\small
+\caption{Held-out results for the seven SmolVLA settings. Each setting has 160
+attempts across eight tasks. The predicted chunk length is fixed at $K=50$.
+Nominal rate is counted arithmetic per control step relative to native $(1,10)$;
+mean arithmetic per attempt charges every generated chunk.}
+\label{tab:confirmation-grid}
+\input{../paper/generated/confirmation_resources.tex}
+\end{table}
+\FloatBarrier
+
 \paragraph{Primary result: lower refinement improves success while reducing compute.}
 The primary comparison holds $h=2$ fixed and changes only denoising. Moving
 from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
@@ -407,14 +405,12 @@ $10.6$ percentage points with a task-conditional 95\% interval of
 $[+4.4,\,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
 15.6\% per attempt, from 48.7 to 41.1 TFLOPs. Thus, for this checkpoint at
 $h=2$, the additional denoising is both less successful and more expensive.
-\end{minipage}
-
-\paragraph{The primary effect is consistent across tasks, but not across prefixes.}
 Seven tasks favor $d=2$, one ties, and the paired identities contain 24 wins and
-seven losses. The effect is not uniform across prefixes: at $h=1$ and $h=5$,
-the estimates favor $d=2$, but their intervals cross zero. The response model
-predicted the primary direction but understated its magnitude ($+4.0$ versus
-$+10.6$ points), so these data do not demonstrate calibrated forecasting.
+seven losses. At $h=1$ and $h=5$, the estimates also favor $d=2$, but their
+intervals cross zero; the evidence therefore does not establish a uniform
+refinement effect across prefixes. The response model predicted the primary
+direction but understated its magnitude ($+4.0$ versus $+10.6$ points), so
+these data do not demonstrate calibrated forecasting.
 
 \begin{figure}[H]
 \centering
@@ -430,48 +426,34 @@ Table~\ref{tab:confirmation-secondary}.}
 \label{fig:confirmation-effects}
 \end{figure}
 \FloatBarrier
-\paragraph{Longer execution prefixes save substantially more compute, with
-quality unresolved.}
-The descriptive prefix comparisons ask whether acting longer before replanning
-can reduce cost without an obvious loss in observed success. At $d=2$, executing
-five rather than two actions per prediction reduces mean arithmetic per attempt
-by 60.7\%, from 41.1 to 16.1 TFLOPs, while the observed totals differ by one
-success (138/160 versus 139/160). The uncertainty interval spans practically
-meaningful differences in both directions, and task-level effects are mixed.
-The result therefore shows a large compute saving, but it does not establish
-equivalent quality.
+\paragraph{Replanning changes cost much more than observed success.}
+At $d=2$, executing five rather than two actions per prediction reduces mean
+arithmetic per attempt by 60.7\%, from 41.1 to 16.1 TFLOPs. Observed success
+changes from 139/160 to 138/160, but the paired interval includes practically
+meaningful effects in both directions and task-level directions are mixed.
+Replanning after every action is also more expensive and shows no measured
+success advantage over replanning after two actions. These comparisons establish
+the cost differences under the declared counting boundary; they do not establish
+equivalent quality or a general recommendation about replanning frequency.
+Appendix~\ref{app:confirmation-details} gives their analysis status and the two
+contrasts involving native $(1,10)$; Table~\ref{tab:confirmation-tasks} shows
+task-level variation.
 
-\paragraph{More frequent replanning shows no measured success advantage in these
-contrasts.}
-Replanning after every action is still more expensive and shows no measured
-success advantage over replanning after two actions. Taken together, the
-prefix comparisons show why cost and quality must be reported separately: the
-cost ranking is clear, whereas the quality ranking is not. Because these
-comparisons were chosen after inspecting the results, they motivate a future
-prespecified study rather than support a general recommendation about replanning
-frequency. They also cannot reconcile the different discovery and held-out
-patterns, which were measured on different task sets.
-
-Appendix~\ref{app:confirmation-details} reports the comparison status and
-the two contrasts involving native $(1,10)$; Table~\ref{tab:confirmation-tasks}
-shows task-level variation.
-
-\paragraph{Evidence boundary.}
+\paragraph{Evidence and scope.}
 The prespecified evidence establishes the primary result for this checkpoint at
-$h=2$; it does not establish a uniform refinement effect. The later prefix
-comparisons establish their arithmetic differences under the declared counting
-boundary, while their success differences remain descriptive and uncertain.
-
-\paragraph{Scope and measurement limits.}
-Neither varied control isolates a single mechanism: changing denoising changes
-numerical integration, while changing the prefix changes both observation age
-and executed action positions. The study uses one checkpoint, twelve tasks, and
-synchronous simulation; its intervals are conditional on the sampled tasks, and
-no equivalence margin was prespecified. Counted arithmetic excludes some
-operation classes and is not a latency proxy. Recorded outcomes pass source-tracing
-and consistency checks, but the full held-out trajectories were not
-replayed in an independent, version-matched simulator. Appendix~\ref{app:verification}
-defines this validation boundary.
+$h=2$. The replanning comparisons were selected after inspecting the results,
+so their success differences require a future prespecified study. Neither varied
+control isolates a single mechanism: changing denoising changes numerical
+integration, while changing the prefix changes both observation age and executed
+action positions. The study uses one checkpoint, twelve tasks, and synchronous
+simulation; its intervals are conditional on the sampled tasks, and no
+equivalence margin was prespecified. Counted arithmetic excludes some operation
+classes and is not a latency proxy. Recorded outcomes pass source-tracing and
+consistency checks, but the full held-out trajectories were not replayed in an
+independent, version-matched simulator. Appendix~\ref{app:verification} defines
+this validation boundary. Within these limits, the held-out evidence supports
+lower refinement at $h=2$ and establishes the compute---but not quality---effects
+of longer execution prefixes.
 
 \FloatBarrier
 \section{Discussion and Conclusion}
