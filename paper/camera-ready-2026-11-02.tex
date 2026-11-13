@@ -399,21 +399,6 @@ appear in Table~\ref{tab:confirmation-grid}.}
 \label{fig:success-compute}
 \end{figure}
 
-\clearpage
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
-\caption{Paired success differences for the seven held-out comparisons. Each
-row reports configuration A minus B in percentage points with its
-task-conditional 95\% interval. Positive values favor A. We chose the three
-fixed-$h$ denoising comparisons before held-out evaluation; we chose the four
-additional comparisons after inspecting the results. Blue marks the primary
-comparison. Exact definitions and counts appear in
-Table~\ref{tab:confirmation-secondary}.}
-\label{fig:confirmation-effects}
-\end{figure}
-\FloatBarrier
-
 \begin{minipage}{\linewidth}
 \paragraph{Primary result: lower refinement improves success while reducing compute.}
 The primary comparison holds $h=2$ fixed and changes only denoising. Moving
@@ -430,6 +415,20 @@ seven losses. The effect is not uniform across prefixes: at $h=1$ and $h=5$,
 the estimates favor $d=2$, but their intervals cross zero. The response model
 predicted the primary direction but understated its magnitude ($+4.0$ versus
 $+10.6$ points), so these data do not demonstrate calibrated forecasting.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{../paper/generated/confirmation_effects.pdf}
+\caption{Paired success differences for the seven held-out comparisons. Each
+row reports configuration A minus B in percentage points with its
+task-conditional 95\% interval. Positive values favor A. We chose the three
+fixed-$h$ denoising comparisons before held-out evaluation; we chose the four
+additional comparisons after inspecting the results. Blue marks the primary
+comparison. Exact definitions and counts appear in
+Table~\ref{tab:confirmation-secondary}.}
+\label{fig:confirmation-effects}
+\end{figure}
+\FloatBarrier
 \paragraph{Longer execution prefixes save substantially more compute, with
 quality unresolved.}
 The descriptive prefix comparisons ask whether acting longer before replanning
