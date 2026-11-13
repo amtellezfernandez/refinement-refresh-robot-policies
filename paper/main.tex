@@ -397,18 +397,31 @@ mean arithmetic per attempt charges every generated chunk.}
 \FloatBarrier
 
 \paragraph{Primary result: lower refinement improves success while reducing compute.}
-The primary comparison holds $h=2$ fixed and changes only denoising. Moving
-from $d=5$ to $d=2$ raises success from 122/160 to 139/160, a paired increase of
-$10.6$ percentage points with a task-conditional 95\% interval of
-$[+4.4,\,+16.9]$. Counted arithmetic also decreases: by 5.9\% per control step and
-15.6\% per attempt, from 48.7 to 41.1 TFLOPs. Thus, for this checkpoint at
-$h=2$, the additional denoising is both less successful and more expensive.
-Seven tasks favor $d=2$, one ties, and the paired identities contain 24 wins and
-seven losses. At $h=1$ and $h=5$, the estimates also favor $d=2$, but their
-intervals cross zero; the evidence therefore does not establish a uniform
-refinement effect across prefixes. The response model predicted the primary
-direction but understated its magnitude ($+4.0$ versus $+10.6$ points), so
-these data do not demonstrate calibrated forecasting.
+The primary comparison is designed to isolate refinement: both settings predict
+$K=50$ actions, execute two actions, and then replan from a new observation; only
+the denoising count changes. Moving from $d=5$ to $d=2$ raises success from
+122/160 to 139/160. Because both settings use the same task--state--seed
+identities, the $10.6$-percentage-point increase is a within-identity difference,
+not a comparison between different rollout samples. The paired outcomes contain
+24 cases where only $d=2$ succeeds, seven where only $d=5$ succeeds, and 129
+ties, giving the observed net gain of 17 successes. The task-conditional 95\%
+interval, $[+4.4,\,+16.9]$, excludes zero for these eight tasks.
+
+The compute reduction has two scales. Lowering $d$ reduces nominal arithmetic
+per control step by 5.9\%. Mean arithmetic per complete attempt falls by more,
+15.6\%, from 48.7 to 41.1 TFLOPs, because attempt expenditure also depends on
+how many actions are executed and therefore how many policy calls are made. The
+$d=5$ setting averages 166.3 executed steps, compared with 149.0 for $d=2$.
+Thus, for this checkpoint at $h=2$, additional denoising is both less successful
+and more expensive under the declared arithmetic boundary.
+
+The result is consistent across the sampled tasks---seven favor $d=2$ and one
+ties---but it is not a general denoising trend. At $h=1$ and $h=5$, the point
+estimates also favor $d=2$, yet their intervals cross zero. The advantage may
+therefore depend on how refinement interacts with replanning frequency. The
+response model predicted the primary direction but understated its magnitude
+($+4.0$ versus $+10.6$ points), so these data also do not demonstrate calibrated
+forecasting.
 
 \begin{figure}[H]
 \centering
