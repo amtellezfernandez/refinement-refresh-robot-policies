@@ -34,6 +34,7 @@ MID = "#666666"
 LIGHT = "#A0A0A0"
 COLORS = (INK, ACCENT, MID)
 MARKERS = ("o", "s", "^")
+PREFIX_COLORS = {1: "#0072B2", 2: "#D55E00", 5: "#009E73"}
 FIGURE_WIDTH = 5.5  # Inches: the template's actual text width, not a scaled canvas.
 FIGURE_FONT_PT = 8.5  # Slightly smaller than the manuscript's 10 pt body text.
 
@@ -569,8 +570,7 @@ def confirmation_figure(data, path):
         success_lo, success_hi = [100 * v for v in c["interval95"][0]]
         compute = c["mean_difference"][1]
         compute_lo, compute_hi = c["interval95"][1]
-        primary = c["kind"] == "original primary"
-        color = ACCENT if primary else (INK if row < 3 else MID)
+        color = PREFIX_COLORS[c["a"][0]]
         marker = "o" if row < 3 else ("s" if row < 5 else "^")
         ax.errorbar(
             success,
@@ -579,7 +579,7 @@ def confirmation_figure(data, path):
             yerr=[[compute - compute_lo], [compute_hi - compute]],
             color=color,
             fmt=marker,
-            mfc=ACCENT if primary else "white",
+            mfc="white",
             ms=5,
             capsize=2.5,
             elinewidth=1.1,
@@ -588,7 +588,6 @@ def confirmation_figure(data, path):
         ax.text(
             -0.42, label_y, label, transform=label_transform,
             ha="left", va="center",
-            fontweight="bold" if primary else "normal",
             color=color,
         )
         if not math.isclose(label_y, compute, abs_tol=0.2):
@@ -605,10 +604,9 @@ def confirmation_figure(data, path):
         "Compute change (TFLOPs/attempt)\n"
         "$\\downarrow$ less for A   more for A $\\uparrow$"
     )
-    legend = (
-        Line2D([], [], color=INK, marker="o", mfc="white", ls="none", label="Fixed-$h$ denoising"),
-        Line2D([], [], color=MID, marker="s", mfc="white", ls="none", label="Fixed-$d=2$ replanning"),
-        Line2D([], [], color=MID, marker="^", mfc="white", ls="none", label="Against $(h=1,d=10)$"),
+    legend = tuple(
+        Line2D([], [], color=color, marker="o", mfc="white", ls="none", label=f"$h_A={h}$")
+        for h, color in PREFIX_COLORS.items()
     )
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
               handletextpad=0.35, labelspacing=0.25)
@@ -621,10 +619,9 @@ def confirmation_figure(data, path):
 def heldout_settings_figure(data, path):
     """Render held-out success against realized mean arithmetic per attempt."""
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
 
     resources = {(r["h"], r["d"]): r for r in data["confirmation"]["resources"]}
-    accent = ACCENT
-    gray = "#555555"
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.10), facecolor="white")
     ax = fig.add_axes([0.12, 0.31, 0.85, 0.56])
     ax.spines[["top", "right"]].set_visible(False)
@@ -660,8 +657,7 @@ def heldout_settings_figure(data, path):
     for cell, row in resources.items():
         rate = 100 * row["success_rate"]
         attempt_cost = row["mean_reference_tflops"]
-        primary_pair = cell in {(2, 2), (2, 5)}
-        color = accent if primary_pair else gray
+        color = PREFIX_COLORS[cell[0]]
         ax.scatter(
             attempt_cost, rate, s=38, color=color, edgecolor="white",
             linewidth=0.65, zorder=3,
@@ -674,14 +670,27 @@ def heldout_settings_figure(data, path):
             f"{rate:.0f}%", (attempt_cost, rate),
             xytext=(dx, dy + 10), textcoords="offset points",
             ha=alignment, va="bottom", color=color,
-            fontweight="bold" if primary_pair else "normal", bbox=box,
+            bbox=box,
         )
         ax.annotate(
             f"$({cell[0]},{cell[1]})$", (attempt_cost, rate),
             xytext=(dx, dy), textcoords="offset points",
             ha=alignment, va="bottom", color=color,
-            fontweight="bold" if primary_pair else "normal", bbox=box,
+            bbox=box,
         )
+    legend = tuple(
+        Line2D([], [], color=color, marker="o", ls="none", label=f"$h={h}$")
+        for h, color in PREFIX_COLORS.items()
+    )
+    ax.legend(
+        handles=legend,
+        loc="lower left",
+        ncol=3,
+        frameon=False,
+        handletextpad=0.2,
+        columnspacing=0.7,
+        borderaxespad=0.35,
+    )
     save_figure(fig, path)
     plt.close(fig)
 
