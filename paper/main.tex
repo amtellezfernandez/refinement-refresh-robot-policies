@@ -486,18 +486,22 @@ saving---60.7\% per attempt---but the available descriptive comparison does not
 establish equivalent success. These results show why success, nominal rate, and
 complete attempt cost must be evaluated together.
 
-The transferable contribution is an evaluation procedure for post-training
-deployment adaptation, rather than a universal setting. Within each frozen
-model, define its refinement configuration and
-predicted chunk length, measure every policy-call cost under an explicit
-boundary, vary the execution prefix,
-freeze comparisons before held-out evaluation, and report realized attempt
-cost with success. A refinement configuration can include integration
-steps, autoregressive reasoning, candidate sampling, search, verification, or
-cache reuse, provided each component's cost is measured. When
-comparing architectures, the meaningful evidence is each model's within-model
-allocation result. Control values and counting boundaries that differ across
-models should not be pooled directly.
+Why might fewer denoising steps also improve success? One plausible explanation
+is that additional denoising does more than improve numerical precision: every
+step applies a learned update, so approximation or calibration errors can
+accumulate and move the first actions away from a more successful prediction.
+At $h=2$, the policy executes only two of the $K=50$ predicted actions before
+using a new observation, which may limit the value of further refining the full
+chunk. This mechanism is consistent with the primary result, but the experiment
+does not identify its cause. Testing it requires action-level comparisons across
+denoising counts and trajectory analysis around the states where outcomes
+diverge.
+
+The contribution is a controlled way to study this allocation for a frozen
+SmolVLA checkpoint: vary denoising work and policy-call frequency, measure every
+call under an explicit boundary, choose comparisons before held-out evaluation,
+and report success with realized attempt cost. The selected setting is specific
+to this checkpoint and counting boundary.
 
 The present study keeps $K=50$ throughout, leaving predicted chunk length as a
 central untested allocation lever; with the tested prefixes, 90--98\% of every
