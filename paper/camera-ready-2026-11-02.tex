@@ -77,32 +77,25 @@ actions each policy call produces.
 These choices couple computation and feedback. Additional refinement can alter
 the predicted actions. A longer execution prefix amortizes a policy call, but it
 delays feedback and exposes later actions from an older prediction to the
-environment. We therefore ask one allocation question: \emph{under an explicit
-compute ceiling, which settings for refinement, chunk length, and execution
-prefix maximize closed-loop task success?} Here, ``best'' means the highest
+environment. Holding predicted chunk length fixed, we ask one allocation
+question: \emph{under an explicit compute ceiling, how should SmolVLA divide
+compute between denoising refinement and replanning frequency to maximize
+closed-loop task success?} Here, ``best'' means the highest
 empirical success rate among configurations that satisfy the stated compute
 ceiling. Counted arithmetic determines feasibility; we report nominal compute
-rates and realized attempt costs separately, with host latency as descriptive
-systems evidence. We do not combine success and cost into one score or measure
-memory use.
+rates and realized attempt costs separately. We also report measured host
+latency, but it does not determine feasibility. We do not combine success and
+cost into one score or measure memory use.
 
-We study this form of post-training adaptation as a controlled allocation
-problem. Our evaluation procedure separates a model-specific refinement configuration,
-predicted chunk length, and execution prefix. It measures every policy call
-under a stated boundary, aggregates cost over complete attempts, uses discovery
-tasks to choose prespecified comparisons, and evaluates those comparisons on
-separate held-out tasks. The procedure selects a deployment configuration
-without policy training or online learning.
+We study one frozen SmolVLA checkpoint \cite{smolvla}, rather than multiple
+policy architectures. For this model, the denoising count $d$ controls compute
+spent refining each predicted action chunk, and the execution prefix $h$
+controls how many actions run before the policy replans from a fresh
+observation. We fix predicted chunk length at $K=50$. Our contribution is a
+controlled study of this allocation and its effect on task success and complete
+attempt cost. We do not propose a new policy architecture or claim that the
+selected allocation transfers to other checkpoints.
 
-The procedure is intended for chunked policies with a controllable refinement
-setting. Depending on the architecture, that setting could control integration
-steps, candidate generation, search, or verification effort. This paper
-instantiates only denoising count, and control values should not be compared
-across architectures. Synchronous execution keeps sequencing and measurement
-boundaries fixed; the study does not determine physical-robot latency or a
-hardware-independent optimum.
-
-We use one frozen SmolVLA checkpoint as a worked case study \cite{smolvla}.
 SmolVLA also provides an asynchronous inference mode that overlaps action
 generation with action execution. We do not use that mode. In our synchronous
 evaluation, the policy finishes generating all $K$ actions before the
@@ -111,26 +104,25 @@ and replans. Fixing this order lets us compare refinement and replanning without
 the additional effects of concurrent execution, observation staleness, or
 buffering. The results provide a controlled baseline for a later asynchronous
 study, but they do not identify the best asynchronous schedule or its
-wall-clock throughput.
+performance. We do not measure asynchronous throughput or physical-robot
+latency.
 
-Predicted chunk length remains fixed at $K=50$ and is not evaluated. We test 12
-configurations in 480 discovery attempts, then seven settings in 1,120 held-out
-attempts on eight tasks excluded from selection. Refinement comparisons were
-prespecified; the available execution-prefix comparisons were added later and
-remain descriptive.
+We test 12 configurations in 480 discovery attempts, then seven settings in
+1,120 held-out attempts on eight tasks excluded from selection. We chose the
+refinement comparisons before the held-out evaluation. We added the
+execution-prefix comparisons after inspecting those results, so they motivate
+future tests rather than support a confirmed claim.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a formulation connecting a model-specific refinement configuration,
-    predicted chunk length, and execution prefix to nominal compute rate and
-    realized attempt cost;
-    \item an evaluation procedure for post-training deployment adaptation that
-    separates discovery, prespecified held-out comparisons, and
-    post-outcome descriptive analyses; and
-    \item a SmolVLA case study showing that a large per-call cost can be
-    independent of the refinement control, that lower refinement improves
-    held-out success in the primary comparison, and that quality preservation
-    under less frequent replanning remains unresolved.
+    \item a compute-accounting formulation for SmolVLA's denoising count and
+    execution prefix at fixed predicted chunk length;
+    \item a controlled discovery and held-out evaluation that measures task
+    success together with nominal compute rate and complete attempt cost; and
+    \item evidence that most counted per-call arithmetic is independent of
+    denoising, that fewer denoising steps improve held-out success in the
+    primary comparison, and that success under less frequent replanning remains
+    unresolved.
 \end{itemize}
 
 \section{Related Work}
