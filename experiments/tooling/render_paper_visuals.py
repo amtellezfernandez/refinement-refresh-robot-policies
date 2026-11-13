@@ -591,10 +591,10 @@ def heldout_settings_figure(data, path):
     ax = fig.add_axes([0.12, 0.29, 0.85, 0.65])
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_xlim(0, 100)
-    ax.set_ylim(72, 90)
+    ax.set_ylim(70, 92)
     ax.set_xticks([0, 25, 50, 75, 100])
-    ax.set_yticks([75, 80, 85, 90])
-    ax.set_yticklabels(["75%", "80%", "85%", "90%"])
+    ax.set_yticks([70, 75, 80, 85, 90])
+    ax.set_yticklabels(["70%", "75%", "80%", "85%", "90%"])
     ax.grid(axis="y", color=".90", lw=0.55)
     ax.set_axisbelow(True)
     ax.set_xlabel(
