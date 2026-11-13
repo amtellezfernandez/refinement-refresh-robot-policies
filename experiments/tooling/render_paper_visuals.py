@@ -537,20 +537,12 @@ def discovery_figure(data, path):
 
 def confirmation_figure(data, path):
     import matplotlib.pyplot as plt
-    from matplotlib.lines import Line2D
+    from matplotlib.offsetbox import AnnotationBbox, HPacker, TextArea
+    from matplotlib.patches import Patch
 
     fig = plt.figure(figsize=(FIGURE_WIDTH, 2.90))
     ax = fig.add_axes([0.33, 0.21, 0.64, 0.69])
     order = [0, 1, 2, 4, 5, 3, 6]
-    labels = (
-        "$(5,2)-(5,5)$",
-        "$(2,2)-(2,5)$",
-        "$(1,2)-(1,5)$",
-        "$(2,2)-(5,2)$",
-        "$(1,2)-(2,2)$",
-        "$(2,2)-(1,10)$",
-        "$(1,2)-(1,10)$",
-    )
     # Four compute effects cluster tightly near zero. Keep one aligned label
     # column and separate only those labels, with quiet connectors to the exact
     # ordinate. The other labels remain at their marker height.
@@ -564,7 +556,7 @@ def confirmation_figure(data, path):
     ax.axhline(0, color=".55", ls=(0, (3, 3)), lw=0.8, zorder=0)
     comparisons = data["confirmation"]["comparisons"]
     label_transform = ax.get_yaxis_transform()
-    for row, (source_index, label, label_y) in enumerate(zip(order, labels, label_ys)):
+    for row, (source_index, label_y) in enumerate(zip(order, label_ys)):
         c = comparisons[source_index]
         success = 100 * c["mean_difference"][0]
         success_lo, success_hi = [100 * v for v in c["interval95"][0]]
@@ -585,10 +577,30 @@ def confirmation_figure(data, path):
             elinewidth=1.1,
             zorder=3,
         )
-        ax.text(
-            -0.42, label_y, label, transform=label_transform,
-            ha="left", va="center",
-            color=color,
+        a_h, a_d = c["a"]
+        b_h, b_d = c["b"]
+        label = HPacker(
+            children=(
+                TextArea("(", textprops={"color": INK}),
+                TextArea(str(a_h), textprops={"color": PREFIX_COLORS[a_h]}),
+                TextArea(f",{a_d})-(", textprops={"color": INK}),
+                TextArea(str(b_h), textprops={"color": PREFIX_COLORS[b_h]}),
+                TextArea(f",{b_d})", textprops={"color": INK}),
+            ),
+            align="baseline",
+            pad=0,
+            sep=0,
+        )
+        ax.add_artist(
+            AnnotationBbox(
+                label,
+                (-0.42, label_y),
+                xycoords=label_transform,
+                box_alignment=(0, 0.5),
+                frameon=False,
+                pad=0,
+                annotation_clip=False,
+            )
         )
         if not math.isclose(label_y, compute, abs_tol=0.2):
             ax.annotate(
@@ -605,7 +617,7 @@ def confirmation_figure(data, path):
         "$\\downarrow$ less for A   more for A $\\uparrow$"
     )
     legend = tuple(
-        Line2D([], [], color=color, marker="o", mfc="white", ls="none", label=f"$h_A={h}$")
+        Patch(facecolor=color, edgecolor=color, label=f"$h_A={h}$")
         for h, color in PREFIX_COLORS.items()
     )
     ax.legend(handles=legend, loc="upper right", frameon=False, fontsize=FIGURE_FONT_PT,
