@@ -38,10 +38,9 @@
 \maketitle
 
 \begin{abstract}
-Frozen chunked robot policies retain deployment-time choices that can change
-both compute and closed-loop behavior: how much work generates each action
-chunk (refinement), how many actions it predicts, and how soon the policy
-replans from a new observation (replanning). We formulate this allocation problem
+A frozen chunked robot policy can spend deployment compute in two coupled ways:
+more work within each policy call to refine a predicted action chunk, or more
+frequent policy calls to replan from fresh observations. We study this allocation
 without updating model weights. Our evaluation procedure reports success with
 both nominal compute rate and complete attempt cost, selects comparisons on
 discovery tasks, and tests prespecified comparisons on held-out tasks. Comparisons
@@ -63,37 +62,34 @@ define a universal setting.
 
 \section{Introduction}
 
-We can adapt a robot policy after training without changing its weights. For a
-frozen chunked policy, we can instead adjust its deployment configuration: how
-much computation generates one action chunk, how many actions the chunk
-contains, and how many the policy executes before replanning from a new
-observation. These controls change both deployment cost and closed-loop
-behavior. We use \emph{refinement} for adjustable computation spent generating
-one action chunk. \emph{Replanning} means generating a new action chunk from a
-fresh observation. The execution prefix controls how many predicted actions are
-executed before replanning, while the predicted chunk length controls how many
-actions each policy call produces.
+We can adapt a robot policy after training without changing its weights. At
+deployment, a frozen chunked policy has two coupled compute decisions: how much
+work each policy call spends generating an action chunk, and how often to call
+the policy again from a fresh observation. We call the first decision
+\emph{refinement} and the second \emph{replanning frequency}. Each policy call
+predicts $K$ actions. The environment executes the first $h$, then the policy
+receives a new observation and runs again. Thus, $h$ sets the policy-call
+frequency: one call every $h$ executed actions. For SmolVLA, $d$ sets the number
+of denoising steps within each call.
 
 These choices couple computation and feedback. Additional refinement can alter
 the predicted actions. A longer execution prefix amortizes a policy call, but it
 delays feedback and exposes later actions from an older prediction to the
 environment. Holding predicted chunk length fixed, we ask one allocation
-question: \emph{under an explicit compute ceiling, how should SmolVLA divide
-compute between denoising refinement and replanning frequency to maximize
-closed-loop task success?} Here, ``best'' means the highest
+question: \emph{under an explicit compute ceiling, how much computation should
+each SmolVLA policy call spend on denoising refinement, and how often should the
+policy run again from a fresh observation?} We select the combination that
+maximizes closed-loop task success. Here, ``best'' means the highest
 empirical success rate among configurations that satisfy the stated compute
 ceiling. Counted arithmetic determines feasibility; we report nominal compute
 rates and realized attempt costs separately. We also report measured host
 latency, but it does not determine feasibility. We do not combine success and
 cost into one score or measure memory use.
 
-We study one frozen SmolVLA checkpoint \cite{smolvla}, rather than multiple
-policy architectures. For this model, the denoising count $d$ controls compute
-spent refining each predicted action chunk, and the execution prefix $h$
-controls how many actions run before the policy replans from a fresh
-observation. We fix predicted chunk length at $K=50$. Our contribution is a
-controlled study of this allocation and its effect on task success and complete
-attempt cost. We do not propose a new policy architecture or claim that the
+We study one frozen SmolVLA checkpoint \cite{smolvla} and fix predicted chunk
+length at $K=50$. Our contribution is a controlled study of the allocation
+between denoising work per policy call and policy-call frequency, together with
+its effect on task success and complete attempt cost. We do not claim that the
 selected allocation transfers to other checkpoints.
 
 SmolVLA also provides an asynchronous inference mode that overlaps action
@@ -115,8 +111,8 @@ future tests rather than support a confirmed claim.
 
 The contributions are:
 \begin{itemize}[leftmargin=*,nosep]
-    \item a compute-accounting formulation for SmolVLA's denoising count and
-    execution prefix at fixed predicted chunk length;
+    \item a compute-accounting formulation that connects SmolVLA's denoising
+    work per policy call and its policy-call frequency at fixed chunk length;
     \item a controlled discovery and held-out evaluation that measures task
     success together with nominal compute rate and complete attempt cost; and
     \item evidence that most counted per-call arithmetic is independent of
