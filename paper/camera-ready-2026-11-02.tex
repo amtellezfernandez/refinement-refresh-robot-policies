@@ -41,7 +41,7 @@
 Frozen chunked robot policies retain deployment-time choices that can change
 both compute and closed-loop behavior: how much work generates each action
 chunk (refinement), how many actions it predicts, and how soon the policy
-replans from a new observation (refresh). We formulate this allocation problem
+replans from a new observation (replanning). We formulate this allocation problem
 without updating model weights. Our evaluation procedure reports success with
 both nominal compute rate and complete attempt cost, selects comparisons on
 discovery tasks, and tests prespecified comparisons on held-out tasks while
@@ -67,19 +67,21 @@ chunked policy can also be adapted through its deployment configuration: how
 much computation is spent generating one action chunk, how many actions the
 chunk contains, and how many are executed before the policy replans from a new
 observation. These controls change both deployment cost and closed-loop
-behavior. We call adjustable computation within one policy call
-\emph{refinement}. We call obtaining a new observation-conditioned prediction
-\emph{refresh}; the execution prefix controls how often it occurs. Predicted
-chunk length determines how many actions each call constructs.
+behavior. We use \emph{refinement} for adjustable computation spent generating
+one action chunk. \emph{Replanning} means generating a new action chunk from a
+fresh observation. The execution prefix controls how many predicted actions are
+executed before replanning, while the predicted chunk length controls how many
+actions each policy call produces.
 
 These choices couple computation and feedback. Additional refinement can alter
 the predicted actions. A longer execution prefix amortizes a policy call, but it
 delays feedback and exposes later actions from an older prediction to the
 environment. We therefore ask one allocation question: \emph{under an explicit
-compute ceiling, which refinement, chunk-length, and refresh settings give the
-best closed-loop behavior?} We do not trade a fixed budget continuously between
-refinement and refresh; we compare configurations that are feasible under common
-compute ceilings and report their nominal rates and realized attempt costs.
+compute ceiling, which settings for refinement, chunk length, and execution
+prefix give the best closed-loop behavior?} We do not trade a fixed budget
+continuously between refinement and replanning; we compare configurations that
+are feasible under common compute ceilings and report their nominal rates and
+realized attempt costs.
 
 We study this form of post-training adaptation as a controlled allocation
 problem. Our evaluation procedure separates a model-specific refinement configuration,
@@ -116,7 +118,7 @@ The contributions are:
     \item a SmolVLA case study showing that a large per-call cost can be
     independent of the refinement control, that lower refinement improves
     held-out success in the primary comparison, and that quality preservation
-    under less frequent refresh remains unresolved.
+    under less frequent replanning remains unresolved.
 \end{itemize}
 
 \section{Related Work}
@@ -144,7 +146,7 @@ elapsed time depend on both the model and its execution system. Our case study
 holds the checkpoint, hardware, and synchronous execution path fixed so that the
 effects of refinement and execution prefix can be compared within one system.
 
-\paragraph{Choosing when to refresh.}
+\paragraph{Choosing when to replan.}
 ACT predicts action chunks to reduce the effective decision horizon
 \cite{act}; chunked action spaces have also been studied for reinforcement
 learning \cite{qchunking}.
@@ -158,7 +160,7 @@ evaluation, and report both nominal compute rate and realized attempt cost.
 This design evaluates axes available to an adaptive method; it does not compare
 a fixed deployment configuration with an online, within-episode schedule.
 
-\section{Allocating Deployment-Time Compute Between Refinement and Refresh}
+\section{Allocating Deployment-Time Compute Between Refinement and Replanning}
 \label{sec:allocation}
 
 We represent the post-training deployment configuration of a frozen chunked
@@ -429,14 +431,14 @@ meaningful differences in both directions, and task-level effects are mixed.
 The result therefore shows a large compute saving, but it does not establish
 equivalent quality.
 
-\paragraph{More frequent refresh shows no measured success advantage in these
+\paragraph{More frequent replanning shows no measured success advantage in these
 contrasts.}
-Refreshing after every action is still more expensive and shows no measured
-success advantage over refreshing after two actions. Taken together, the
+Replanning after every action is still more expensive and shows no measured
+success advantage over replanning after two actions. Taken together, the
 prefix comparisons show why cost and quality must be reported separately: the
 cost ranking is clear, whereas the quality ranking is not. Because these
 comparisons were defined after outcomes were visible, they motivate a future
-prespecified study rather than support a general recommendation about refresh
+prespecified study rather than support a general recommendation about replanning
 frequency. They also cannot reconcile the different discovery and held-out
 patterns, which were measured on different task sets.
 
@@ -469,7 +471,7 @@ success and total compute. In the primary SmolVLA comparison, reducing
 denoising from five to two steps improves held-out success while reducing
 counted arithmetic by 5.9\% per control step and 15.6\% per attempt. The other
 prespecified prefixes do not establish a uniform refinement effect. Executing
-five rather than two actions before refresh produces the much larger compute
+five rather than two actions before replanning produces the much larger compute
 saving---60.7\% per attempt---but the available descriptive comparison does not
 establish equivalent success. These results show why success, nominal rate, and
 complete attempt cost must be evaluated together.
@@ -648,7 +650,7 @@ For $(1,2)$, $(2,2)$, and $(5,2)$, the normalized arithmetic rates are
 0.857, 0.429, and 0.171, while the normalized host-time rates are 0.346, 0.173,
 and 0.069. Consequently, $(1,2)$ is ineligible at a half-native arithmetic
 ceiling but eligible at a separately normalized half-native host-time ceiling.
-These resource constraints admit different refresh schedules; the choices do
+These resource constraints admit different replanning schedules; the choices do
 not establish quality optima. The frozen experiment remains arithmetic-based.
 
 \subsection{Language-shape transport audit}
